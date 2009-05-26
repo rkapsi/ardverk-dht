@@ -19,8 +19,8 @@ public class AsyncFutureTask<V> implements Runnable, AsyncFuture<V> {
     private final List<AsyncFutureListener<V>> listeners 
         = new ArrayList<AsyncFutureListener<V>>();
     
-    private final OnewayExchanger<V, ExecutionException> exchanger 
-        = new OnewayExchanger<V, ExecutionException>(this, true);
+    private final OnewayExchanger<V> exchanger 
+        = new OnewayExchanger<V>(this, true);
     
     private final AsyncProcess<V> process;
     
@@ -252,9 +252,8 @@ public class AsyncFutureTask<V> implements Runnable, AsyncFuture<V> {
     }
     
     /**
-     * Make sure we're not calling get() from the EventThread
-     * which is fatal and a PITA to debug as it's in some cases
-     * not obvious why it's failing!
+     * Make sure can not call {@link #get()} and {@link #get(long, TimeUnit)}
+     * from the {@link EventUtils} Thread as it is very difficult to debug.
      */
     protected void checkIfEventThread() throws IllegalStateException {
         if (EventUtils.isEventThread() && !isDone()) {

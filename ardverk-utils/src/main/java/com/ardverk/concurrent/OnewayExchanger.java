@@ -2,6 +2,7 @@ package com.ardverk.concurrent;
 
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.Exchanger;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -29,7 +30,7 @@ import com.ardverk.utils.ExceptionUtils;
  * be changed anymore.
  * </ol>
  */
-public class OnewayExchanger<V, E extends Throwable> {
+public class OnewayExchanger<V> {
     
     private static final Object THIS = new Object();
     
@@ -48,7 +49,7 @@ public class OnewayExchanger<V, E extends Throwable> {
     private V value;
     
     /** The Exception we're going to throw */
-    private E exception;
+    private ExecutionException exception;
     
     private final boolean captureCallerStack;
     
@@ -107,7 +108,7 @@ public class OnewayExchanger<V, E extends Throwable> {
      * unless they're already set in which case this method
      * will return immediately.
      */
-    public V get() throws InterruptedException, E {
+    public V get() throws InterruptedException, ExecutionException {
         synchronized (lock) {
             try {
                 return get(0L, TimeUnit.MILLISECONDS);
@@ -123,7 +124,7 @@ public class OnewayExchanger<V, E extends Throwable> {
      * this method will return immediately.
      */
     public V get(long timeout, TimeUnit unit) 
-            throws InterruptedException, TimeoutException, E {
+            throws InterruptedException, TimeoutException, ExecutionException {
         
         synchronized (lock) {
             if (!done) {
@@ -155,7 +156,7 @@ public class OnewayExchanger<V, E extends Throwable> {
     /**
      * Tries to get the value without blocking.
      */
-    public V tryGet() throws InterruptedException, E {
+    public V tryGet() throws InterruptedException, ExecutionException {
         synchronized (lock) {
             if (done) {
                 return get();
@@ -249,7 +250,7 @@ public class OnewayExchanger<V, E extends Throwable> {
     /**
      * Sets the Exception that will be thrown by the get() method
      */
-    public void setException(E exception) {
+    public void setException(ExecutionException exception) {
         synchronized (lock) {
             if (exception == null) {
                 throw new NullPointerException();
@@ -305,7 +306,7 @@ public class OnewayExchanger<V, E extends Throwable> {
         boolean done = false;
         boolean cancelled = false;
         V value = null;
-        E exception = null;
+        ExecutionException exception = null;
         Throwable callerStack = null;
         synchronized (lock) {
             done = this.done;
