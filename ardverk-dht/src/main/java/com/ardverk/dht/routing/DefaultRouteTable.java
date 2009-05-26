@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.ardverk.collection.Cursor;
 import org.ardverk.collection.KeyAnalyzer;
 import org.ardverk.collection.SortedPatriciaTrie;
 import org.ardverk.collection.Trie;
+import org.slf4j.Logger;
 
 import com.ardverk.collection.FixedSizeHashMap;
 import com.ardverk.concurrent.AsyncFuture;
@@ -125,7 +124,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
     
     private synchronized boolean split(Bucket bucket) {
         if (canSplitBucket(bucket)) {
-            if (LOG.isLoggable(Level.INFO)) {
+            if (LOG.isInfoEnabled()) {
                 LOG.info("Splitting Bucket: " + bucket);
             }
             

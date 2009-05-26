@@ -1,12 +1,13 @@
 package com.ardverk.logging;
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LoggerUtils {
 
     private LoggerUtils() {}
     
     public static Logger getLogger(Class<?> clazz) {
-        return Logger.getLogger(clazz.getName());
+        return LoggerFactory.getLogger(clazz);
     }
 }

@@ -4,6 +4,8 @@
 	<classpathentry kind="src" path="ardverk-dht/src/main/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/patricia-trie"/>
-	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/mina-2.0.0/mina-core-2.0.0-M5.jar"/>
+	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/mina/mina-core-2.0.0-M5.jar"/>
+	<classpathentry kind="lib" path="ardverk-utils/lib/main/java/slf4j/slf4j-api-1.5.6.jar"/>
+	<classpathentry kind="lib" path="ardverk-utils/lib/main/java/slf4j/slf4j-simple-1.5.6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

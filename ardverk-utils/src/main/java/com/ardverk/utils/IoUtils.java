@@ -2,8 +2,8 @@ package com.ardverk.utils;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
 
 import com.ardverk.logging.LoggerUtils;
 
@@ -20,7 +20,7 @@ public class IoUtils {
                 closeable.close();
                 return true;
             } catch (IOException err) {
-                LOG.log(Level.SEVERE, "IOException", err);
+                LOG.error("IOException", err);
             }
         }
         return false;
