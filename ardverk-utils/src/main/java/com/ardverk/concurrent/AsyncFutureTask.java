@@ -70,7 +70,7 @@ public class AsyncFutureTask<V> extends FutureTask<V> implements AsyncFuture<V> 
         initWatchdog();
         return super.runAndReset();
     }
-
+    
     private synchronized void initWatchdog() {
         if (future != null) {
             future.cancel(true);
