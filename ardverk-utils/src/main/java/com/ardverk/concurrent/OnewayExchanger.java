@@ -31,6 +31,10 @@ import com.ardverk.utils.ExceptionUtils;
  */
 public class OnewayExchanger<V, E extends Throwable> {
     
+    private static final Object THIS = new Object();
+    
+    private final Object lock;
+    
     /** Flag for whether or not we're done */
     private boolean done = false;
     
@@ -58,7 +62,7 @@ public class OnewayExchanger<V, E extends Throwable> {
      * Creates an OnewayExchanger with the default configuration.
      */
     public OnewayExchanger() {
-        this(false, false);
+        this(THIS, false, false);
     }
     
     /**
@@ -69,12 +73,33 @@ public class OnewayExchanger<V, E extends Throwable> {
      * Default is false.
      */
     public OnewayExchanger(boolean oneShot) {
-        this(oneShot, false);
+        this(THIS, oneShot, false);
     }
     
     public OnewayExchanger(boolean oneShot, boolean callerStack) {
+        this(THIS, oneShot, callerStack);
+    }
+    
+    public OnewayExchanger(Object lock) {
+        this(lock, false, false);
+    }
+    
+    public OnewayExchanger(Object lock, boolean oneShot) {
+        this(lock, oneShot, false);
+    }
+    
+    public OnewayExchanger(Object lock, boolean oneShot, boolean callerStack) {
+        if (lock == null) {
+            throw new NullPointerException("lock");
+        }
+        
+        this.lock = (lock != THIS) ? lock : this;
         this.oneShot = oneShot;
-        this.captureCallerStack = callerStack;
+        this.captureCallerStack = callerStack;        
+    }
+    
+    public Object getLock() {
+        return lock;
     }
     
     /**
@@ -82,11 +107,13 @@ public class OnewayExchanger<V, E extends Throwable> {
      * unless they're already set in which case this method
      * will return immediately.
      */
-    public synchronized V get() throws InterruptedException, E {
-        try {
-            return get(0L, TimeUnit.MILLISECONDS);
-        } catch (TimeoutException cannotHappen) {
-            throw new Error(cannotHappen);
+    public V get() throws InterruptedException, E {
+        synchronized (lock) {
+            try {
+                return get(0L, TimeUnit.MILLISECONDS);
+            } catch (TimeoutException cannotHappen) {
+                throw new Error(cannotHappen);
+            }
         }
     }
     
@@ -95,42 +122,46 @@ public class OnewayExchanger<V, E extends Throwable> {
      * or an Exception unless they're already set in which case 
      * this method will return immediately.
      */
-    public synchronized V get(long timeout, TimeUnit unit) 
+    public V get(long timeout, TimeUnit unit) 
             throws InterruptedException, TimeoutException, E {
         
-        if (!done) {
-            if (timeout == 0L) {
-                wait();
-            } else {
-                unit.timedWait(this, timeout);
+        synchronized (lock) {
+            if (!done) {
+                if (timeout == 0L) {
+                    lock.wait();
+                } else {
+                    unit.timedWait(lock, timeout);
+                }
+                
+                // Not done? Must be a timeout!
+                if (!done) {
+                    throw new TimeoutException();
+                }
             }
             
-            // Not done? Must be a timeout!
-            if (!done) {
-                throw new TimeoutException();
+            if (cancelled) {
+                throw new CancellationException();
             }
+            
+            // Prioritize Exceptions!
+            if (exception != null) {
+                throw exception;
+            }
+            
+            return value;
         }
-        
-        if (cancelled) {
-            throw new CancellationException();
-        }
-        
-        // Prioritize Exceptions!
-        if (exception != null) {
-            throw exception;
-        }
-        
-        return value;
     }
     
     /**
      * Tries to get the value without blocking.
      */
-    public synchronized V tryGet() throws InterruptedException, E {
-        if (done) {
-            return get();
-        } else {
-            return null;
+    public V tryGet() throws InterruptedException, E {
+        synchronized (lock) {
+            if (done) {
+                return get();
+            } else {
+                return null;
+            }
         }
     }
     
@@ -138,43 +169,51 @@ public class OnewayExchanger<V, E extends Throwable> {
      * Tries to cancel the OnewayExchanger and returns true
      * on success.
      */
-    public synchronized boolean cancel() {
-        if (done) {
-            return cancelled;
+    public boolean cancel() {
+        synchronized (lock) {
+            if (done) {
+                return cancelled;
+            }
+            
+            done = true;
+            cancelled = true;
+            
+            if (captureCallerStack) {
+                callerStack = new Exception();
+            }
+            
+            lock.notifyAll();
+            return true;
         }
-        
-        done = true;
-        cancelled = true;
-        
-        if (captureCallerStack) {
-            callerStack = new Exception();
-        }
-        
-        notifyAll();
-        return true;
     }
     
     /**
      * Returns true if the OnewayExchanger is canceled
      */
-    public synchronized boolean isCancelled() {
-        return cancelled;
+    public boolean isCancelled() {
+        synchronized (lock) {
+            return cancelled;
+        }
     }
     
     /**
      * Returns true if the get() method will return immediately
      * by throwing an Exception or returning a value
      */
-    public synchronized boolean isDone() {
-        return done;
+    public boolean isDone() {
+        synchronized (lock) {
+            return done;
+        }
     }
     
     /**
      * Returns true if calling the get() method will
      * throw an Exception
      */
-    public synchronized boolean throwsException() {
-        return cancelled || exception != null;
+    public boolean throwsException() {
+        synchronized (lock) {
+            return cancelled || exception != null;
+        }
     }
     
     /**
@@ -187,70 +226,78 @@ public class OnewayExchanger<V, E extends Throwable> {
     /**
      * Sets the value that will be returned by the get() method
      */
-    public synchronized void setValue(V value) {
-        if (cancelled) {
-            return;
+    public void setValue(V value) {
+        synchronized (lock) {
+            if (cancelled) {
+                return;
+            }
+            
+            if (done && oneShot) {
+                throw new IllegalStateException("The OnewayExchanger is configured for a single shot");
+            }
+            
+            if (captureCallerStack) {
+                callerStack = new Exception();
+            }
+            
+            done = true;
+            this.value = value;
+            lock.notifyAll();
         }
-        
-        if (done && oneShot) {
-            throw new IllegalStateException("The OnewayExchanger is configured for a single shot");
-        }
-        
-        if (captureCallerStack) {
-            callerStack = new Exception();
-        }
-        
-        done = true;
-        this.value = value;
-        notifyAll();
     }
     
     /**
      * Sets the Exception that will be thrown by the get() method
      */
-    public synchronized void setException(E exception) {
-        if (exception == null) {
-            throw new NullPointerException();
+    public void setException(E exception) {
+        synchronized (lock) {
+            if (exception == null) {
+                throw new NullPointerException();
+            }
+            
+            if (cancelled) {
+                return;
+            }
+            
+            if (done && oneShot) {
+                throw new IllegalStateException("The OnewayExchanger is configured for a single shot");
+            }
+            
+            if (captureCallerStack) {
+                callerStack = new Exception();
+            }
+            
+            done = true;
+            this.exception = exception;
+            lock.notifyAll();
         }
-        
-        if (cancelled) {
-            return;
-        }
-        
-        if (done && oneShot) {
-            throw new IllegalStateException("The OnewayExchanger is configured for a single shot");
-        }
-        
-        if (captureCallerStack) {
-            callerStack = new Exception();
-        }
-        
-        done = true;
-        this.exception = exception;
-        notifyAll();
     }
     
     /**
      * Resets the OnewayExchanger so that it can be
      * reused unless it's configured for a single shot
      */
-    public synchronized void reset() {
-        if (oneShot) {
-            throw new IllegalStateException("The OnewayExchanger is configured for a single shot");
+    public void reset() {
+        synchronized (lock) {
+            if (oneShot) {
+                throw new IllegalStateException("The OnewayExchanger is configured for a single shot");
+            }
+            
+            done = false;
+            cancelled = false;
+            value = null;
+            exception = null;
+            callerStack = null;
         }
-        
-        done = false;
-        cancelled = false;
-        value = null;
-        exception = null;
-        callerStack = null;
     }
     
     /**
      * 
      */
-    public synchronized Throwable getCallerStack() {
-        return callerStack;
+    public Throwable getCallerStack() {
+        synchronized (lock) {
+            return callerStack;
+        }
     }
     
     @Override
@@ -260,7 +307,7 @@ public class OnewayExchanger<V, E extends Throwable> {
         V value = null;
         E exception = null;
         Throwable callerStack = null;
-        synchronized (this) {
+        synchronized (lock) {
             done = this.done;
             cancelled = this.cancelled;
             value = this.value;
