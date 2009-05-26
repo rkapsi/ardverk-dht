@@ -1,5 +1,6 @@
 package com.ardverk.dht.routing;
 
+import com.ardverk.dht.ContactPinger;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.KeyFactory;
 import com.ardverk.dht.routing.DefaultRouteTable.Bucket;
@@ -9,9 +10,11 @@ public abstract class AbstractRouteTable implements RouteTable {
     
     private static final long serialVersionUID = 1610290233049496587L;
 
-    private final ContactFactory contactFactory;
+    protected final ContactFactory contactFactory;
     
-    private final int k;
+    protected final int k;
+    
+    protected transient ContactPinger pinger;
     
     public AbstractRouteTable(ContactFactory contactFactory, int k) {
         if (contactFactory == null) {
@@ -46,6 +49,11 @@ public abstract class AbstractRouteTable implements RouteTable {
         return select(contactId, getK());
     }
     
+    @Override
+    public synchronized void setContactPinger(ContactPinger pinger) {
+        this.pinger = pinger;
+    }
+
     protected void fireSplitBucket(Bucket bucket, Bucket left, Bucket right) {
         
     }

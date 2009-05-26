@@ -13,6 +13,8 @@ import org.ardverk.collection.SortedPatriciaTrie;
 import org.ardverk.collection.Trie;
 
 import com.ardverk.collection.FixedSizeHashMap;
+import com.ardverk.concurrent.AsyncFuture;
+import com.ardverk.concurrent.AsyncFutureListener;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.KeyFactory;
 import com.ardverk.logging.LoggerUtils;
@@ -24,18 +26,44 @@ public class DefaultRouteTable extends AbstractRouteTable {
     private static final Logger LOG 
         = LoggerUtils.getLogger(DefaultRouteTable.class);
     
+    private final Contact local;
+    
     private final Trie<KUID, Bucket> buckets;
     
-    public DefaultRouteTable(ContactFactory contactFactory, int k) {
+    public DefaultRouteTable(ContactFactory contactFactory, 
+            Contact local, int k) {
         super(contactFactory, k);
         
-        KeyFactory keyFactory = contactFactory.getKeyFactory();
+        if (contactFactory == null) {
+            throw new NullPointerException("contactFactory");
+        }
+        
+        if (local == null) {
+            throw new NullPointerException("local");
+        }
+        
+        if (k <= 0) {
+            throw new IllegalArgumentException("k=" + k);
+        }
+        
+        KeyFactory keyFactory = getKeyFactory();
         int lengthInBits = keyFactory.lengthInBits();
         
         KeyAnalyzer<KUID> keyAnalyzer 
             = KUID.createKeyAnalyzer(lengthInBits);
         
+        this.local = local;
         this.buckets = new SortedPatriciaTrie<KUID, Bucket>(keyAnalyzer);
+        
+        init();
+    }
+    
+    private synchronized void init() {
+        KUID bucketId = getKeyFactory().min();
+        Bucket bucket = new Bucket(bucketId, 0, getK(), getMaxCacheSize());
+        buckets.put(bucketId, bucket);
+        
+        add(local);
     }
     
     @Override
@@ -83,12 +111,11 @@ public class DefaultRouteTable extends AbstractRouteTable {
                 Bucket bucket = entry.getValue();
                 
                 for (Contact node : bucket.getContacts()) {
-                    
-                    items.add(node);
-                    
                     if (items.size() >= count) {
                         return Decision.EXIT;
                     }
+                    
+                    items.add(node);
                 }
                 
                 return Decision.CONTINUE;
@@ -108,7 +135,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
             Bucket left = buckets[0];
             Bucket right = buckets[1];
             
-            // The left one replaces the current Bucket
+            // The left one replaces the existing Bucket
             Bucket oldLeft = this.buckets.put(left.getBucketId(), left);
             assert (oldLeft == bucket);
             
@@ -127,6 +154,10 @@ public class DefaultRouteTable extends AbstractRouteTable {
         return Integer.MAX_VALUE;
     }
     
+    public int getMaxCacheSize() {
+        return 16;
+    }
+    
     private synchronized boolean isTooDeep(Bucket bucket) {
         return bucket.getDepth() >= getMaxDepth();
     }
@@ -141,7 +172,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         // 1. Bucket contains the Local Contact
         // 2. Bucket is smallest subtree
         // 3. Bucket hasn't reached its max depth
-        KUID contactId = null;
+        KUID contactId = local.getId();
         
         if (bucket.contains(contactId)
                 || isSmallestSubtree(bucket)
@@ -149,6 +180,20 @@ public class DefaultRouteTable extends AbstractRouteTable {
             return true;
         }
         return false;
+    }
+    
+    private synchronized boolean ping(Contact contact) {
+        if (pinger == null) {
+            return false;
+        }
+        
+        AsyncFutureListener<?> listener = new AsyncFutureListener<?>() {
+            @Override
+            public void operationComplete(AsyncFuture<?> future) {
+            }
+        };
+        
+        return pinger.ping(contact, listener);
     }
     
     public static class Bucket {
