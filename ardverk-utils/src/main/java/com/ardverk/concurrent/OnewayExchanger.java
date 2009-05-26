@@ -322,8 +322,8 @@ public class OnewayExchanger<V> {
             .append(", done=").append(done)
             .append(", cancelled=").append(cancelled)
             .append(", value=").append(value)
-            .append(", exception=").append(exception != null ? ExceptionUtils.toString(exception) : null)
-            .append(", callerStack=").append(callerStack != null ? ExceptionUtils.toString(callerStack) : null);
+            .append(", exception=").append(ExceptionUtils.toString(exception))
+            .append(", callerStack=").append(ExceptionUtils.toString(callerStack));
         return buffer.toString();
     }
 }
