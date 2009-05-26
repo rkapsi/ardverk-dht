@@ -15,13 +15,13 @@ public class IoUtils {
     private IoUtils() {}
     
     public static boolean close(Closeable closeable) {
-        try {
-            if (closeable != null) {
+        if (closeable != null) {
+            try {
                 closeable.close();
                 return true;
+            } catch (IOException err) {
+                LOG.log(Level.SEVERE, "IOException", err);
             }
-        } catch (IOException err) {
-            LOG.log(Level.SEVERE, "IOException", err);
         }
         return false;
     }
