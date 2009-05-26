@@ -4,7 +4,7 @@ import com.ardverk.concurrent.AsyncFuture;
 import com.ardverk.dht.Pong;
 import com.ardverk.dht.message.PingResponse;
 
-public class PingResponseHandler extends MessageHandler<Pong, PingResponse> {
+public class PingResponseHandler extends ResponseHandler<Pong, PingResponse> {
 
     @Override
     protected void innerStart(AsyncFuture<Pong> future)
