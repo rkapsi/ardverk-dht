@@ -12,6 +12,6 @@ public class PingResponseHandler extends MessageHandler<Pong, PingResponse> {
     }
     
     @Override
-    protected void handleMessage(PingResponse message) throws Exception {
+    public void handleMessage(PingResponse message) throws Exception {
     }
 }

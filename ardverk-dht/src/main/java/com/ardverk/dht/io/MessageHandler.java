@@ -60,5 +60,5 @@ public abstract class MessageHandler<V, M extends ResponseMessage> implements Ch
     
     protected abstract void innerStart(AsyncFuture<V> future) throws Exception;
     
-    protected abstract void handleMessage(M message) throws Exception;
+    public abstract void handleMessage(M message) throws Exception;
 }
