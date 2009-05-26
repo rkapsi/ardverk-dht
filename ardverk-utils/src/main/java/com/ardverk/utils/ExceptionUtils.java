@@ -4,13 +4,17 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+/**
+ * An utility class to make working with {@link Exception}s easier.
+ */
 public class ExceptionUtils {
     
     private ExceptionUtils() {}
     
     /**
-     * Takes the given Exception, wraps it in an {@link IOException}
-     * and returns it.
+     * An utility method to wrap {@link Throwable}s in {@link IOException}s
+     * unless they are already an {@link IOException} in which case it will
+     * simply cast and return it.
      */
     public static IOException toIOException(Throwable cause) {
         if (cause == null) {
@@ -25,33 +29,16 @@ public class ExceptionUtils {
     }
     
     /**
-     * Returns true if the message of the given {@link Throwable}
-     * contains any of the other messages.
-     */
-    public static boolean isIgnorable(Throwable t, String... messages) {
-        String msg = t.getMessage();
-        if (msg != null) {
-            for (int i = messages.length-1; i >= 0; --i) {
-                if (msg.startsWith(messages[i])) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-    
-    /**
-     * Returns true if Throwable <tt>t</tt> was caused by an another
-     * Exception that is of type <tt>clazz</tt>
+     * Returns true if the given {@link Throwable} is or rather was caused
+     * by an instance of the given {@link Class}.
      */
     public static boolean isCausedBy(Throwable t, Class<? extends Throwable> clazz) {
         return getCause(t, clazz) != null;
     }
     
     /**
-     * Returns the first Exception from the exception cause 
-     * chain that is of type <tt>clazz</tt> or null if the
-     * given Throwable was not caused a such Exception.
+     * Returns the first {@link Exception} from the cause chain that is an
+     * instance of the given {@link Class}.
      */
     @SuppressWarnings("unchecked")
     public static <T extends Throwable> T getCause(Throwable t, Class<T> clazz) {
@@ -67,8 +54,7 @@ public class ExceptionUtils {
     
     
     /**
-     * Returns the stack trace of the given {@link Throwable}
-     * as a String.
+     * Turns the given {@link Throwable} in a nicely formatted {@link String}.
      */
     public static String toString(Throwable t) {
         if (t == null) {
