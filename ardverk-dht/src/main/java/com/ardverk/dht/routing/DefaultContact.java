@@ -48,6 +48,10 @@ public class DefaultContact implements Contact {
             throw new NullPointerException("contact");
         }
         
+        if (contact.getCreationTime() < existing.getCreationTime()) {
+            throw new IllegalArgumentException();
+        }
+        
         this.creationTime = existing.getCreationTime();
         this.timeStamp = contact.getTimeStamp();
         
