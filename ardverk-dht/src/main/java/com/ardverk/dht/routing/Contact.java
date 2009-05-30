@@ -1,10 +1,16 @@
 package com.ardverk.dht.routing;
 
-import java.io.Serializable;
+import java.net.SocketAddress;
 
 import com.ardverk.dht.KUID;
 
-public interface Contact extends Serializable {
+public interface Contact {
 
-    public KUID getId();
+    public long getCreationTime();
+
+    public long getTimeStamp();
+    
+    public KUID getContactId();
+    
+    public SocketAddress getRemoteAddress();
 }

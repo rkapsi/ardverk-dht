@@ -5,11 +5,8 @@ import com.ardverk.dht.KUID;
 import com.ardverk.dht.KeyFactory;
 import com.ardverk.dht.routing.DefaultRouteTable.Bucket;
 
-
 public abstract class AbstractRouteTable implements RouteTable {
     
-    private static final long serialVersionUID = 1610290233049496587L;
-
     protected final ContactFactory contactFactory;
     
     protected final int k;

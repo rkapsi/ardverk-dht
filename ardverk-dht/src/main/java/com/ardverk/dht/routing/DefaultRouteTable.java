@@ -71,7 +71,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
             throw new NullPointerException("contact");
         }
         
-        KUID contactId = contact.getId();
+        KUID contactId = contact.getContactId();
         Bucket bucket = buckets.selectValue(contactId);
         Contact existing = bucket.get(contactId);
         
@@ -171,7 +171,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         // 1. Bucket contains the Local Contact
         // 2. Bucket is smallest subtree
         // 3. Bucket hasn't reached its max depth
-        KUID contactId = local.getId();
+        KUID contactId = local.getContactId();
         
         if (bucket.contains(contactId)
                 || isSmallestSubtree(bucket)
@@ -299,7 +299,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
                     depth+1, k, maxCacheSize);
             
             for (Contact node : contacts.values()) {
-                KUID contactId = node.getId();
+                KUID contactId = node.getContactId();
                 if (!contactId.isSet(depth)) {
                     left.add(node);
                 } else {
@@ -308,7 +308,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
             }
             
             for (Contact node : cache.values()) {
-                KUID contactId = node.getId();
+                KUID contactId = node.getContactId();
                 if (!contactId.isSet(depth)) {
                     left.add(node);
                 } else {

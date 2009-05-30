@@ -1,12 +1,10 @@
 package com.ardverk.dht.routing;
 
-import java.io.Serializable;
-
 import com.ardverk.dht.ContactPinger;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.KeyFactory;
 
-public interface RouteTable extends Serializable {
+public interface RouteTable {
     
     public void setContactPinger(ContactPinger pinger);
     
