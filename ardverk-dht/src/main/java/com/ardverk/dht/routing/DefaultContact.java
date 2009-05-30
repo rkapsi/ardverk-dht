@@ -113,4 +113,21 @@ public class DefaultContact implements Contact {
     public Map<Object, Object> getAttributes() {
         return attributes;
     }
+
+    @Override
+    public int hashCode() {
+        return contactId.hashCode();
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        } else if (!(o instanceof Contact)) {
+            return false;
+        }
+        
+        Contact other = (Contact)o;
+        return contactId.equals(other.getContactId());
+    }
 }
