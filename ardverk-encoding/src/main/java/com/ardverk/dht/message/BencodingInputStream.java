@@ -40,7 +40,7 @@ public class BencodingInputStream extends FilterInputStream {
     private byte[] readBytes(int length) throws IOException {
         byte[] bytes = new byte[length];
         int total = 0;
-        while(total < bytes.length) {
+        while (total < bytes.length) {
             int r = read(bytes, total, bytes.length-total);
             if (r == -1) {
                 throw new EOFException();
@@ -54,7 +54,7 @@ public class BencodingInputStream extends FilterInputStream {
         StringBuilder buffer = new StringBuilder();
         buffer.append((char)token);
         
-        while((token = read()) != ':') {
+        while ((token = read()) != ':') {
             if (token == -1) {
                 throw new EOFException();
             }
