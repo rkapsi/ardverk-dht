@@ -18,13 +18,11 @@ public class DefaultContact implements Contact {
     
     private final SocketAddress address;
     
-    private final State state;
-    
     private final Map<Object, Object> attributes 
         = new ConcurrentHashMap<Object, Object>();
     
     public DefaultContact(KUID contactId, int instanceId, 
-            SocketAddress address, State state) {
+            SocketAddress address) {
         if (contactId == null) {
             throw new NullPointerException("contactId");
         }
@@ -33,21 +31,12 @@ public class DefaultContact implements Contact {
             throw new NullPointerException("address");
         }
         
-        if (state == null) {
-            throw new NullPointerException("state");
-        }
-        
-        if (state == State.DEAD) {
-            throw new IllegalArgumentException("state=" + state);
-        }
-        
         this.creationTime = System.currentTimeMillis();
         this.timeStamp = creationTime;
         
         this.contactId = contactId;
         this.instanceId = instanceId;
         this.address = address;
-        this.state = state;
     }
     
     public DefaultContact(Contact existing, Contact contact) {
@@ -71,7 +60,6 @@ public class DefaultContact implements Contact {
         this.contactId = existing.getContactId();
         this.instanceId = contact.getInstanceId();
         this.address = contact.getRemoteAddress();
-        this.state = contact.getState();
         
         this.attributes.putAll(existing.getAttributes());
         this.attributes.putAll(contact.getAttributes());
@@ -100,11 +88,6 @@ public class DefaultContact implements Contact {
     @Override
     public SocketAddress getRemoteAddress() {
         return address;
-    }
-
-    @Override
-    public State getState() {
-        return state;
     }
 
     @Override
