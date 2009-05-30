@@ -12,13 +12,13 @@ public class BencodeMessageCodec extends MessageCodec {
     }
 
     @Override
-    public Message deserialize(SocketAddress src, byte[] data)
+    public Message decode(SocketAddress src, byte[] data)
             throws IOException {
         return null;
     }
 
     @Override
-    public byte[] serialize(Message message, SocketAddress dst)
+    public byte[] encode(Message message, SocketAddress dst)
             throws IOException {
         return null;
     }
