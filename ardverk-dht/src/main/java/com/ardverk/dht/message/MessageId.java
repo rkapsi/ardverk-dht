@@ -5,7 +5,7 @@ import java.net.SocketAddress;
 
 import com.ardverk.io.Writable;
 
-public interface MessageId extends Writable, Serializable {
+public interface MessageId extends Writable, Serializable, Comparable<MessageId> {
 
     public boolean isTaggable();
     
