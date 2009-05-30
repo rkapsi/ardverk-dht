@@ -1,0 +1,111 @@
+package com.ardverk.dht.routing;
+
+import java.net.SocketAddress;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import com.ardverk.dht.KUID;
+
+public class DefaultContact implements Contact {
+
+    private final long creationTime;
+    
+    private final long timeStamp;
+    
+    private final KUID contactId;
+    
+    private final int instanceId;
+    
+    private final SocketAddress address;
+    
+    private final Map<Object, Object> attributes 
+        = new ConcurrentHashMap<Object, Object>();
+    
+    public DefaultContact(KUID contactId, int instanceId, SocketAddress address) {
+        if (contactId == null) {
+            throw new NullPointerException("contactId");
+        }
+        
+        if (address == null) {
+            throw new NullPointerException("address");
+        }
+        
+        this.creationTime = System.currentTimeMillis();
+        this.timeStamp = creationTime;
+        
+        this.contactId = contactId;
+        this.instanceId = instanceId;
+        this.address = address;
+    }
+    
+    public DefaultContact(Contact existing, Contact contact) {
+        
+        if (existing == null) {
+            throw new NullPointerException("existing");
+        }
+        
+        if (contact == null) {
+            throw new NullPointerException("contact");
+        }
+        
+        this.creationTime = existing.getCreationTime();
+        this.timeStamp = contact.getTimeStamp();
+        
+        this.contactId = existing.getContactId();
+        this.instanceId = contact.getInstanceId();
+        this.address = contact.getRemoteAddress();
+        
+        attributes.putAll(existing.getAttributes());
+        attributes.putAll(contact.getAttributes());
+    }
+    
+    @Override
+    public long getCreationTime() {
+        return creationTime;
+    }
+    
+    @Override
+    public long getTimeStamp() {
+        return timeStamp;
+    }
+
+    @Override
+    public KUID getContactId() {
+        return contactId;
+    }
+
+    @Override
+    public int getInstanceId() {
+        return instanceId;
+    }
+
+    @Override
+    public SocketAddress getRemoteAddress() {
+        return address;
+    }
+
+    @Override
+    public Object getAttribute(Object key) {
+        return attributes.get(key);
+    }
+
+    @Override
+    public boolean hasAttribute(Object key) {
+        return attributes.containsKey(key);
+    }
+
+    @Override
+    public Object removeAttribute(Object key) {
+        return attributes.remove(key);
+    }
+
+    @Override
+    public Object setAttribute(Object key, Object value) {
+        return attributes.put(key, value);
+    }
+
+    @Override
+    public Map<Object, Object> getAttributes() {
+        return attributes;
+    }
+}
