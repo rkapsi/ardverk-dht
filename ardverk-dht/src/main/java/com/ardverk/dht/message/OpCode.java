@@ -1,0 +1,59 @@
+package com.ardverk.dht.message;
+
+import com.ardverk.enumeration.IntegerValue;
+
+public enum OpCode implements IntegerValue {
+    
+    PING_REQUEST(0x00),
+    PING_RESPONSE(0x01),
+    
+    FIND_NODE_REQUEST(0x02),
+    FIND_NODE_RESPONSE(0x03),
+    
+    FIND_VALUE_REQUEST(0x04),
+    FIND_VALUE_RESPONSE(0x05),
+    
+    STORE_REQUEST(0x06),
+    STORE_RESPONSE(0x07);
+    
+    private final int value;
+    
+    private OpCode(int value) {
+        this.value = value;
+    }
+    
+    @Override
+    public int intValue() {
+        return value;
+    }
+    
+    @Override
+    public String toString() {
+        return name() + " (" + intValue() + ")";
+    }
+    
+    private static final OpCode[] VALUES;
+    
+    static {
+        OpCode[] values = values();
+        VALUES = new OpCode[values.length];
+        
+        for (OpCode o : values) {
+            int index = o.value % VALUES.length;
+            if (VALUES[index] != null) {
+                throw new IllegalStateException();
+            }
+            VALUES[index] = o;
+        }
+    }
+    
+    public static OpCode valueOf(int value) {
+        int index = (value & Integer.MAX_VALUE) % VALUES.length;
+        OpCode opcode = VALUES[index];
+        if (opcode != null && opcode.value == value) {
+            return opcode;
+        }
+        
+        throw new IllegalArgumentException("value=" + value);
+    }
+}

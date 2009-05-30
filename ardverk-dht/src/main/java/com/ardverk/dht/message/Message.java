@@ -6,5 +6,9 @@ public interface Message {
 
     public long getCreationTime();
     
+    public OpCode getOpCode();
+    
+    public MessageId getMessageId();
+    
     public Contact getContact();
 }
