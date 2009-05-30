@@ -16,6 +16,7 @@ import com.ardverk.concurrent.AsyncFuture;
 import com.ardverk.concurrent.AsyncFutureListener;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.KeyFactory;
+import com.ardverk.dht.routing.Contact.State;
 import com.ardverk.logging.LoggerUtils;
 
 public class DefaultRouteTable extends AbstractRouteTable {
@@ -69,6 +70,10 @@ public class DefaultRouteTable extends AbstractRouteTable {
     public synchronized void add(Contact contact) {
         if (contact == null) {
             throw new NullPointerException("contact");
+        }
+        
+        if (contact.getState() == State.DEAD) {
+            throw new IllegalArgumentException("Dead Contact: " + contact);
         }
         
         KUID contactId = contact.getContactId();
