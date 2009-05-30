@@ -9,7 +9,9 @@ import java.util.Arrays;
 import org.ardverk.collection.ByteArrayKeyAnalyzer;
 import org.ardverk.collection.KeyAnalyzer;
 
-public class KUID implements Serializable, Comparable<KUID> {
+import com.ardverk.io.Writable;
+
+public class KUID implements Writable, Serializable, Comparable<KUID> {
 
     private static final long serialVersionUID = -4611363711131603626L;
 
@@ -210,6 +212,7 @@ public class KUID implements Serializable, Comparable<KUID> {
         return Arrays.equals(key, other.key);
     }
 
+    @Override
     public int write(OutputStream out) throws IOException {
         if (out == null) {
             throw new NullPointerException("out");
