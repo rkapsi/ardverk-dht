@@ -23,4 +23,6 @@ public interface RouteTable {
     public Contact[] select(KUID contactId, int count);
     
     public void failure(KUID contactId, SocketAddress address);
+    
+    public void rebuild();
 }

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ardverk.collection.Cursor;
 import org.ardverk.collection.KeyAnalyzer;
@@ -210,6 +211,8 @@ public class DefaultRouteTable extends AbstractRouteTable {
         return pinger.ping(contact, listener);
     }
     
+    private static final int MAX_ERRORS = 5;
+    
     @Override
     public synchronized void failure(KUID contactId, SocketAddress address) {
         if (contactId == null) {
@@ -223,7 +226,67 @@ public class DefaultRouteTable extends AbstractRouteTable {
             return;
         }
         
+        int count = errorCount(contact, Operation.INCREMENT_AND_GET);
+        if (count >= MAX_ERRORS) {
+            contact = contact.changeState(State.DEAD);
+            updateDeadContactInBucket(bucket, contact);
+        }
+    }
+    
+    private synchronized void updateDeadContactInBucket(
+            Bucket bucket, Contact contact) {
         
+    }
+    
+    private static final String ERROR_COUNT_KEY 
+        = DefaultRouteTable.class.getName() + ".ERROR_COUNT_KEY";
+    
+    private static enum Operation {
+        GET,
+        INCREMENT_AND_GET,
+        RESET
+    }
+    
+    private synchronized int errorCount(Contact contact, Operation operation) {
+        AtomicInteger counter = (AtomicInteger)contact.getAttribute(ERROR_COUNT_KEY);
+        if (counter == null) {
+            counter = new AtomicInteger();
+            contact.setAttribute(ERROR_COUNT_KEY, counter);
+        }
+        
+        switch (operation) {
+            case GET:
+                return counter.get();
+            case INCREMENT_AND_GET:
+                return counter.incrementAndGet();
+            case RESET:
+                return counter.getAndSet(0);
+            default:
+                throw new IllegalArgumentException(
+                        "operation=" + operation);
+        }
+    }
+    
+    @Override
+    public synchronized void rebuild() {
+        
+    }
+    
+    private static class ContactHandle {
+        
+        private Contact contact;
+        
+        public ContactHandle(Contact contact) {
+            this.contact = contact;
+        }
+        
+        public Contact getContact() {
+            return contact;
+        }
+        
+        public void setContact(Contact contact) {
+            this.contact = contact;
+        }
     }
     
     public static class Bucket {
