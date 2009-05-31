@@ -274,10 +274,16 @@ public class DefaultRouteTable extends AbstractRouteTable {
     
     private static class ContactHandle {
         
+        private final KUID contactId;
+        
         private Contact contact;
         
-        public ContactHandle(Contact contact) {
-            this.contact = contact;
+        public ContactHandle(KUID contactId) {
+            if (contactId == null) {
+                throw new NullPointerException("contactId");
+            }
+            
+            this.contactId = contactId;
         }
         
         public Contact getContact() {
@@ -285,6 +291,14 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
         
         public Contact setContact(Contact contact) {
+            if (contact == null) {
+                throw new NullPointerException("contact");
+            }
+            
+            if (!contactId.equals(contact.getContactId())) {
+                throw new IllegalArgumentException();
+            }
+            
             Contact previous = this.contact;
             this.contact = contact;
             return previous;
