@@ -1,10 +1,11 @@
 package com.ardverk.dht.routing;
 
+import java.net.SocketAddress;
+
+import com.ardverk.dht.KUID;
 import com.ardverk.dht.KeyFactory;
 
 public abstract class AbstractContactFactory implements ContactFactory {
-    
-    private static final long serialVersionUID = 5916104248888312047L;
     
     protected final KeyFactory keyFactory;
     
@@ -19,5 +20,17 @@ public abstract class AbstractContactFactory implements ContactFactory {
     @Override
     public KeyFactory getKeyFactory() {
         return keyFactory;
+    }
+    
+    @Override
+    public Contact createUnknown(KUID contactId, 
+            int instanceId, SocketAddress address)  {
+        return createUnknown(contactId, instanceId, address, null);
+    }
+    
+    @Override
+    public Contact createAlive(KUID contactId, 
+            int instanceId, SocketAddress address)  {
+        return createAlive(contactId, instanceId, address, null);
     }
 }

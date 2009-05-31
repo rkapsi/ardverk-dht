@@ -24,7 +24,9 @@ public class DefaultContact implements Contact {
         = new ConcurrentHashMap<Object, Object>();
     
     public DefaultContact(KUID contactId, int instanceId, 
-            SocketAddress address, State state) {
+            SocketAddress address, State state, 
+            Map<?, ?> attributes) {
+        
         if (contactId == null) {
             throw new NullPointerException("contactId");
         }
@@ -44,6 +46,10 @@ public class DefaultContact implements Contact {
         this.instanceId = instanceId;
         this.address = address;
         this.state = state;
+        
+        if (attributes != null) {
+            this.attributes.putAll(attributes);
+        }
     }
     
     public DefaultContact(Contact existing, Contact contact) {
