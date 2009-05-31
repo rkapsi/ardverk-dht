@@ -210,8 +210,6 @@ public class DefaultRouteTable extends AbstractRouteTable {
         return pinger.ping(contact, listener);
     }
     
-    private static final int MAX_ERRORS = 5;
-    
     @Override
     public synchronized void failure(KUID contactId, SocketAddress address) {
         if (contactId == null) {
@@ -225,9 +223,9 @@ public class DefaultRouteTable extends AbstractRouteTable {
             return;
         }
         
-        int count = handle.errorCount(true);
-        if (count >= MAX_ERRORS) {
-            handle.dead();
+        boolean dead = handle.errorCount(true);
+        if (dead) {
+            
         }
     }
     
@@ -237,6 +235,8 @@ public class DefaultRouteTable extends AbstractRouteTable {
     }
     
     private static class ContactHandle {
+        
+        private static final int MAX_ERRORS = 5;
         
         private final KUID contactId;
         
@@ -274,15 +274,15 @@ public class DefaultRouteTable extends AbstractRouteTable {
             return previous;
         }
         
-        public int errorCount(boolean increment) {
+        public boolean errorCount(boolean increment) {
             if (increment) {
                 ++errorCount;
             }
-            return errorCount;
+            return isDead();
         }
         
-        public void dead() {
-            contact = contact.changeState(State.DEAD);
+        public boolean isDead() {
+            return errorCount >= MAX_ERRORS;
         }
     }
     
