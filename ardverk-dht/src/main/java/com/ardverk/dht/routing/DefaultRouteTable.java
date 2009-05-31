@@ -284,8 +284,10 @@ public class DefaultRouteTable extends AbstractRouteTable {
             return contact;
         }
         
-        public void setContact(Contact contact) {
+        public Contact setContact(Contact contact) {
+            Contact previous = this.contact;
             this.contact = contact;
+            return previous;
         }
     }
     
