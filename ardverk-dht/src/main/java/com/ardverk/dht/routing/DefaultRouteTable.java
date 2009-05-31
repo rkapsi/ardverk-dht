@@ -1,5 +1,6 @@
 package com.ardverk.dht.routing;
 
+import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -16,6 +17,7 @@ import com.ardverk.concurrent.AsyncFuture;
 import com.ardverk.concurrent.AsyncFutureListener;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.KeyFactory;
+import com.ardverk.dht.routing.Contact.State;
 import com.ardverk.logging.LoggerUtils;
 
 public class DefaultRouteTable extends AbstractRouteTable {
@@ -71,6 +73,14 @@ public class DefaultRouteTable extends AbstractRouteTable {
             throw new NullPointerException("contact");
         }
         
+        if (contact.getState() == State.DEAD) {
+            throw new IllegalArgumentException("Dead Contact: " + contact);
+        }
+        
+        innerAdd(contact);
+    }
+    
+    private synchronized void innerAdd(Contact contact) {
         KUID contactId = contact.getContactId();
         Bucket bucket = buckets.selectValue(contactId);
         Contact existing = bucket.get(contactId);
@@ -193,6 +203,22 @@ public class DefaultRouteTable extends AbstractRouteTable {
         };
         
         return pinger.ping(contact, listener);
+    }
+    
+    @Override
+    public synchronized void failure(KUID contactId, SocketAddress address) {
+        if (contactId == null) {
+            return;
+        }
+        
+        Bucket bucket = buckets.selectValue(contactId);
+        Contact contact = bucket.get(contactId);
+        
+        if (contact == null) {
+            return;
+        }
+        
+        
     }
     
     public static class Bucket {
