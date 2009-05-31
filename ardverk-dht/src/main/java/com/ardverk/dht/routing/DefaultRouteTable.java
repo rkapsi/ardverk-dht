@@ -110,6 +110,11 @@ public class DefaultRouteTable extends AbstractRouteTable {
     
     private synchronized void selectR(final KUID contactId, 
             final Collection<Contact> items, final int count) {
+        
+        if (contactId == null) {
+            throw new NullPointerException("contactId");
+        }
+        
         if (items.size() >= count) {
             return;
         }
