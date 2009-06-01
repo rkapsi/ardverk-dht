@@ -19,6 +19,7 @@ import com.ardverk.dht.KUID;
 import com.ardverk.dht.KeyFactory;
 import com.ardverk.dht.routing.Contact.State;
 import com.ardverk.logging.LoggerUtils;
+import com.ardverk.utils.ArrayUtils;
 
 public class DefaultRouteTable extends AbstractRouteTable {
     
@@ -294,7 +295,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         private final FixedSizeHashMap<KUID, ContactHandle> active;
         
-        private final FixedSizeHashMap<KUID, ContactHandle> cache;
+        private final FixedSizeHashMap<KUID, ContactHandle> cached;
         
         private Bucket(KUID bucketId, int depth, int k, int maxCacheSize) {
             if (bucketId == null) {
@@ -318,7 +319,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
             this.depth = depth;
             
             active = new FixedSizeHashMap<KUID, ContactHandle>(k, k);
-            cache = new FixedSizeHashMap<KUID, ContactHandle>(maxCacheSize);
+            cached = new FixedSizeHashMap<KUID, ContactHandle>(maxCacheSize);
         }
         
         public KUID getBucketId() {
@@ -334,19 +335,19 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
         
         public int getMaxCacheSize() {
-            return cache.getMaxSize();
+            return cached.getMaxSize();
         }
         
         public int getCacheSize() {
-            return cache.size();
+            return cached.size();
         }
         
         public boolean isCacheEmpty() {
-            return cache.isEmpty();
+            return cached.isEmpty();
         }
         
         public boolean isCacheFull() {
-            return cache.isFull();
+            return cached.isFull();
         }
         
         public boolean isActiveFull() {
@@ -360,17 +361,17 @@ public class DefaultRouteTable extends AbstractRouteTable {
         public ContactHandle get(KUID contactId) {
             ContactHandle handle = active.get(contactId);
             if (handle == null) {
-                handle = cache.get(contactId);
+                handle = cached.get(contactId);
             }
             return handle;
         }
         
         public ContactHandle[] getActive() {
-            return active.values().toArray(new ContactHandle[0]);
+            return ArrayUtils.shuffle(active.values().toArray(new ContactHandle[0]));
         }
         
         public ContactHandle[] getCached() {
-            return cache.values().toArray(new ContactHandle[0]);
+            return cached.values().toArray(new ContactHandle[0]);
         }
         
         public void add(ContactHandle handle) {
@@ -398,7 +399,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
                 }
             }
             
-            for (ContactHandle handle : cache.values()) {
+            for (ContactHandle handle : cached.values()) {
                 KUID contactId = handle.getContactId();
                 if (!contactId.isSet(depth)) {
                     left.add(handle);
@@ -412,7 +413,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         public boolean contains(KUID contactId) {
             return active.containsKey(contactId)
-                || cache.containsKey(contactId);
+                || cached.containsKey(contactId);
         }
     }
 }
