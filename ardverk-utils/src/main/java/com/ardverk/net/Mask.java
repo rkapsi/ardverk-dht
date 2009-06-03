@@ -42,7 +42,7 @@ public class Mask implements Comparable<Mask>, Serializable {
         
         int length = Math.min(address.length, mask.length);
         for (int i = 0; i < length; i++) {
-            address[i] &= mask[i]; 
+            address[address.length - i - 1] &= mask[mask.length - i - 1]; 
         }
         
         return address;
