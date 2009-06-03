@@ -18,6 +18,8 @@ import com.ardverk.concurrent.AsyncFutureListener;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.KeyFactory;
 import com.ardverk.dht.routing.Contact.State;
+import com.ardverk.dht.utils.AddressCounter;
+import com.ardverk.dht.utils.AddressCounter.Mask;
 import com.ardverk.logging.LoggerUtils;
 import com.ardverk.utils.ArrayUtils;
 
@@ -289,6 +291,11 @@ public class DefaultRouteTable extends AbstractRouteTable {
     
     public static class Bucket {
         
+        private static final byte[] CLASS_C_NETWORK 
+            = { (byte)0xFF, (byte)0xFF, (byte)0xFF, 0x00 };
+        
+        private static final Mask MASK = new Mask(CLASS_C_NETWORK);
+        
         private final KUID bucketId;
         
         private final int depth;
@@ -296,6 +303,9 @@ public class DefaultRouteTable extends AbstractRouteTable {
         private final FixedSizeHashMap<KUID, ContactHandle> active;
         
         private final FixedSizeHashMap<KUID, ContactHandle> cached;
+        
+        private final AddressCounter addressCounter 
+            = new AddressCounter(MASK);
         
         private Bucket(KUID bucketId, int depth, int k, int maxCacheSize) {
             if (bucketId == null) {
