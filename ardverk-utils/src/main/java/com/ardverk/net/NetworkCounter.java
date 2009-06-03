@@ -17,13 +17,13 @@ public class NetworkCounter implements Serializable {
     
     private static final long serialVersionUID = -7103271018736085248L;
 
-    private final Mask mask;
+    private final NetworkMask mask;
     
     private final Map<byte[], AtomicInteger> map 
         = new TreeMap<byte[], AtomicInteger>(
             ByteArrayComparator.COMPARATOR);
     
-    public NetworkCounter(Mask mask) {
+    public NetworkCounter(NetworkMask mask) {
         if (mask == null) {
             throw new NullPointerException("mask");
         }
@@ -32,9 +32,9 @@ public class NetworkCounter implements Serializable {
     }
     
     /**
-     * Returns the {@link Mask} this {@link NetworkCounter} is using
+     * Returns the {@link NetworkMask} this {@link NetworkCounter} is using
      */
-    public Mask getMask() {
+    public NetworkMask getMask() {
         return mask;
     }
     

@@ -20,7 +20,7 @@ import com.ardverk.dht.KeyFactory;
 import com.ardverk.dht.routing.Contact.State;
 import com.ardverk.logging.LoggerUtils;
 import com.ardverk.net.NetworkCounter;
-import com.ardverk.net.Mask;
+import com.ardverk.net.NetworkMask;
 import com.ardverk.utils.ArrayUtils;
 
 public class DefaultRouteTable extends AbstractRouteTable {
@@ -294,7 +294,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         private static final byte[] CLASS_C_NETWORK 
             = { (byte)0xFF, (byte)0xFF, (byte)0xFF, 0x00 };
         
-        private static final Mask MASK = new Mask(CLASS_C_NETWORK);
+        private static final NetworkMask MASK = new NetworkMask(CLASS_C_NETWORK);
         
         private final KUID bucketId;
         

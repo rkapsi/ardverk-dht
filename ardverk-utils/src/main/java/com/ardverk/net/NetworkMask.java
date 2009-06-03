@@ -9,20 +9,20 @@ import com.ardverk.utils.ByteArrayComparator;
 /**
  * A Network Mask
  */
-public class Mask implements Comparable<Mask>, Serializable {
+public class NetworkMask implements Comparable<NetworkMask>, Serializable {
     
     private static final long serialVersionUID = 7628001660790804026L;
     
     /**
      * A Network mask that does nothing
      */
-    public static final Mask NOP = new Mask(new byte[0]);
+    public static final NetworkMask NOP = new NetworkMask(new byte[0]);
     
     private final byte[] mask;
     
     private final int hashCode;
     
-    public Mask(byte[] mask) {
+    public NetworkMask(byte[] mask) {
         if (mask == null) {
             throw new NullPointerException("mask");
         }
@@ -68,15 +68,15 @@ public class Mask implements Comparable<Mask>, Serializable {
     public boolean equals(Object o) {
         if (o == this) {
             return true;
-        } else if (!(o instanceof Mask)) {
+        } else if (!(o instanceof NetworkMask)) {
             return false;
         }
         
-        return compareTo((Mask)o) == 0;
+        return compareTo((NetworkMask)o) == 0;
     }
     
     @Override
-    public int compareTo(Mask o) {
+    public int compareTo(NetworkMask o) {
         return ByteArrayComparator.COMPARATOR.compare(mask, o.mask);
     }
 
