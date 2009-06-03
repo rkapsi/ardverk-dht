@@ -16,7 +16,7 @@ public class ExceptionUtils {
      * unless they are already an {@link IOException} in which case it will
      * simply cast and return it.
      */
-    public static IOException toIOException(Throwable cause) {
+    public static IOException toIoException(Throwable cause) {
         if (cause == null) {
             throw new NullPointerException("cause");
         }
