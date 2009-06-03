@@ -31,10 +31,17 @@ public class Mask implements Comparable<Mask>, Serializable {
         this.hashCode = Arrays.hashCode(mask);
     }
     
+    /**
+     * Returns the byte mask
+     */
     public byte[] getBytes() {
         return mask.clone();
     }
     
+    /**
+     * Makes a copy of the given address (optional) and returns
+     * a masked version of it.
+     */
     byte[] mask(byte[] address, boolean copy) {
         if (address == null) {
             throw new NullPointerException("address");
