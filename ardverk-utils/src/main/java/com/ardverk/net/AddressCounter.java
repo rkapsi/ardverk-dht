@@ -1,11 +1,9 @@
-package com.ardverk.dht.utils;
+package com.ardverk.net;
 
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -100,75 +98,5 @@ public class AddressCounter implements Serializable {
     
     public synchronized void clear() {
         map.clear();
-    }
-    
-    /**
-     * A Network Mask
-     */
-    public static class Mask implements Comparable<Mask>, Serializable {
-        
-        private static final long serialVersionUID = 7628001660790804026L;
-        
-        public static final Mask NOP = new Mask(new byte[0]);
-        
-        private final byte[] mask;
-        
-        private final int hashCode;
-        
-        public Mask(byte[] mask) {
-            if (mask == null) {
-                throw new NullPointerException("mask");
-            }
-            
-            this.mask = mask.clone();
-            this.hashCode = Arrays.hashCode(mask);
-        }
-        
-        public byte[] getBytes() {
-            return mask.clone();
-        }
-        
-        private byte[] mask(byte[] address) {
-            if (address == null) {
-                throw new NullPointerException("address");
-            }
-            
-            if (address.length != mask.length) {
-                throw new IllegalArgumentException();
-            }
-            
-            int length = Math.min(address.length, mask.length);
-            for (int i = 0; i < length; i++) {
-                address[i] &= mask[i]; 
-            }
-            
-            return address;
-        }
-
-        @Override
-        public int hashCode() {
-            return hashCode;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (o == this) {
-                return true;
-            } else if (!(o instanceof Mask)) {
-                return false;
-            }
-            
-            return compareTo((Mask)o) == 0;
-        }
-        
-        @Override
-        public int compareTo(Mask o) {
-            return ByteArrayComparator.COMPARATOR.compare(mask, o.mask);
-        }
-
-        @Override
-        public String toString() {
-            return new BigInteger(1, mask).toString(16);
-        }
     }
 }

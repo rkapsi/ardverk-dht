@@ -18,9 +18,9 @@ import com.ardverk.concurrent.AsyncFutureListener;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.KeyFactory;
 import com.ardverk.dht.routing.Contact.State;
-import com.ardverk.dht.utils.AddressCounter;
-import com.ardverk.dht.utils.AddressCounter.Mask;
 import com.ardverk.logging.LoggerUtils;
+import com.ardverk.net.AddressCounter;
+import com.ardverk.net.Mask;
 import com.ardverk.utils.ArrayUtils;
 
 public class DefaultRouteTable extends AbstractRouteTable {
