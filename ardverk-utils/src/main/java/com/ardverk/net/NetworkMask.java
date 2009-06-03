@@ -13,11 +13,6 @@ public class NetworkMask implements Comparable<NetworkMask>, Serializable {
     
     private static final long serialVersionUID = 7628001660790804026L;
     
-    /**
-     * A Network mask that does nothing
-     */
-    public static final NetworkMask NOP = new NetworkMask(new byte[0]);
-    
     private final byte[] mask;
     
     private final int hashCode;
