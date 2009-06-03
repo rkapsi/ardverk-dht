@@ -19,7 +19,7 @@ import com.ardverk.dht.KUID;
 import com.ardverk.dht.KeyFactory;
 import com.ardverk.dht.routing.Contact.State;
 import com.ardverk.logging.LoggerUtils;
-import com.ardverk.net.AddressCounter;
+import com.ardverk.net.NetworkCounter;
 import com.ardverk.net.Mask;
 import com.ardverk.utils.ArrayUtils;
 
@@ -304,8 +304,8 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         private final FixedSizeHashMap<KUID, ContactHandle> cached;
         
-        private final AddressCounter addressCounter 
-            = new AddressCounter(MASK);
+        private final NetworkCounter counter 
+            = new NetworkCounter(MASK);
         
         private Bucket(KUID bucketId, int depth, int k, int maxCacheSize) {
             if (bucketId == null) {

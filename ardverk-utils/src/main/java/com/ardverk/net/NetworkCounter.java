@@ -13,7 +13,7 @@ import com.ardverk.utils.ByteArrayComparator;
 /**
  * A counter that counts Addresses or rather Networks.
  */
-public class AddressCounter implements Serializable {
+public class NetworkCounter implements Serializable {
     
     private static final long serialVersionUID = -7103271018736085248L;
 
@@ -23,7 +23,7 @@ public class AddressCounter implements Serializable {
         = new TreeMap<byte[], AtomicInteger>(
             ByteArrayComparator.COMPARATOR);
     
-    public AddressCounter(Mask mask) {
+    public NetworkCounter(Mask mask) {
         if (mask == null) {
             throw new NullPointerException("mask");
         }
