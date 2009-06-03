@@ -35,9 +35,13 @@ public class Mask implements Comparable<Mask>, Serializable {
         return mask.clone();
     }
     
-    byte[] mask(byte[] address) {
+    byte[] mask(byte[] address, boolean copy) {
         if (address == null) {
             throw new NullPointerException("address");
+        }
+        
+        if (copy) {
+            address = address.clone();
         }
         
         int length = Math.min(address.length, mask.length);

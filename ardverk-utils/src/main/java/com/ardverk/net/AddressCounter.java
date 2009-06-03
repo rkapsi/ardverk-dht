@@ -40,11 +40,15 @@ public class AddressCounter implements Serializable {
     }
     
     public int add(InetAddress address) {
-        return add(address.getAddress());
+        return add(address.getAddress(), false);
     }
     
-    public synchronized int add(byte[] address) {
-        byte[] key = mask.mask(address);
+    public int add(byte[] address) {
+        return add(address, true);
+    }
+    
+    private synchronized int add(byte[] address, boolean copy) {
+        byte[] key = mask.mask(address, copy);
         AtomicInteger value = map.get(key);
         if (value == null) {
             value = new AtomicInteger();
@@ -59,11 +63,15 @@ public class AddressCounter implements Serializable {
     }
     
     public int remove(InetAddress address) {
-        return remove(address.getAddress());
+        return remove(address.getAddress(), false);
     }
     
-    public synchronized int remove(byte[] address) {
-        byte[] key = mask.mask(address);
+    public int remove(byte[] address) {
+        return remove(address, true);
+    }
+    
+    private synchronized int remove(byte[] address, boolean copy) {
+        byte[] key = mask.mask(address, copy);
         AtomicInteger value = map.get(key);
         if (value != null && value.decrementAndGet() <= 0) {
             map.remove(key);
@@ -76,11 +84,15 @@ public class AddressCounter implements Serializable {
     }
     
     public int get(InetAddress address) {
-        return get(address.getAddress());
+        return get(address.getAddress(), false);
     }
     
-    public synchronized int get(byte[] address) {
-        byte[] key = mask.mask(address);
+    public int get(byte[] address) {
+        return get(address, true);
+    }
+            
+    private synchronized int get(byte[] address, boolean copy) {
+        byte[] key = mask.mask(address, copy);
         AtomicInteger value = map.get(key);
         if (value != null) {
             return value.get();
