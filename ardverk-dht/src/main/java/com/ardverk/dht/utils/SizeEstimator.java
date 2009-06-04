@@ -27,13 +27,19 @@ public class SizeEstimator {
     
     private static final int MIN_NODE_COUNT = 3;
     
-    /** History of local estimations */
+    /**
+     * History of sizes we estimated locally
+     */
     private List<BigInteger> localSizeHistory = new LinkedList<BigInteger>();
 
-    /** History of remote estimations (sizes we received with pongs) */
+    /**
+     * History of sizes we received from remote Nodes
+     */
     private List<BigInteger> remoteSizeHistory = new LinkedList<BigInteger>();
-
-    /** Current estimated size */
+    
+    /**
+     * Current estimated size
+     */
     private BigInteger estimatedSize = BigInteger.ZERO;
 
     /** The time when we made the last estimation */
@@ -44,11 +50,18 @@ public class SizeEstimator {
 
     private final BigInteger maximum;
     
-    public SizeEstimator(KUID maximum) {
+    private final RouteTable routeTable;
+    
+    public SizeEstimator(RouteTable routeTable, KUID maximum) {
+        if (routeTable == null) {
+            throw new NullPointerException("routeTable");
+        }
+        
         if (maximum == null) {
             throw new NullPointerException("maximum");
         }
         
+        this.routeTable = routeTable;
         this.maximum = maximum.toBigInteger();
     }
     
@@ -68,7 +81,7 @@ public class SizeEstimator {
     /**
      * Returns the approximate DHT size
      */
-    public synchronized BigInteger getEstimatedSize(RouteTable routeTable) {
+    public synchronized BigInteger getEstimatedSize() {
         if (routeTable != null && 
                 (System.currentTimeMillis() - localEstimateTime) 
                     >= ContextSettings.ESTIMATE_NETWORK_SIZE_EVERY.getValue()) {
