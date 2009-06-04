@@ -51,8 +51,6 @@ public class ExceptionUtils {
         return null;
     }
     
-    
-    
     /**
      * Turns the given {@link Throwable} in a nicely formatted {@link String}.
      */

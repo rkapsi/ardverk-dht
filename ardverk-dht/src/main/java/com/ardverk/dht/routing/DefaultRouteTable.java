@@ -17,7 +17,6 @@ import com.ardverk.concurrent.AsyncFuture;
 import com.ardverk.concurrent.AsyncFutureListener;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.KeyFactory;
-import com.ardverk.dht.routing.Contact.State;
 import com.ardverk.logging.LoggerUtils;
 import com.ardverk.net.NetworkConstants;
 import com.ardverk.net.NetworkCounter;
@@ -67,23 +66,27 @@ public class DefaultRouteTable extends AbstractRouteTable {
         Bucket bucket = new Bucket(bucketId, 0, getK(), getMaxCacheSize());
         buckets.put(bucketId, bucket);
         
-        add(local);
+        add(local, State.ALIVE);
     }
     
     @Override
-    public synchronized void add(Contact contact) {
+    public synchronized void add(Contact contact, State state) {
         if (contact == null) {
             throw new NullPointerException("contact");
         }
         
-        if (contact.getState() == State.DEAD) {
-            throw new IllegalArgumentException("Dead Contact: " + contact);
+        if (state == null) {
+            throw new NullPointerException("state");
         }
         
-        innerAdd(contact);
+        if (state == State.DEAD) {
+            throw new IllegalArgumentException("state=" + state);
+        }
+        
+        innerAdd(contact, state);
     }
     
-    private synchronized void innerAdd(Contact contact) {
+    private synchronized void innerAdd(Contact contact, State state) {
         KUID contactId = contact.getContactId();
         Bucket bucket = buckets.selectValue(contactId);
         ContactHandle handle = bucket.get(contactId);
@@ -93,7 +96,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         } else if (!bucket.isActiveFull()) {
             
         } else if (split(bucket)) {
-            add(contact);
+            add(contact, state);
         } else {
             
         }

@@ -8,9 +8,15 @@ import com.ardverk.dht.KeyFactory;
 
 public interface RouteTable {
     
+    public static enum State {
+        UNKNOWN,
+        ALIVE,
+        DEAD
+    };
+    
     public void setContactPinger(ContactPinger pinger);
     
-    public void add(Contact contact);
+    public void add(Contact contact, State state);
     
     public ContactFactory getContactFactory();
     
