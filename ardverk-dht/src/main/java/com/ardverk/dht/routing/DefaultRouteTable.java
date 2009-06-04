@@ -83,6 +83,12 @@ public class DefaultRouteTable extends AbstractRouteTable {
             throw new IllegalArgumentException("state=" + state);
         }
         
+        KeyFactory keyFactory = getKeyFactory();
+        KUID contactId = contact.getContactId();
+        if (keyFactory.lengthInBits() != contactId.lengthInBits()) {
+            throw new IllegalArgumentException();
+        }
+        
         innerAdd(contact, state);
     }
     
