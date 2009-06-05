@@ -24,8 +24,16 @@ public interface RouteTable {
     
     public int getK();
     
+    /**
+     * See {@link #select(KUID, int)}
+     */
     public Contact[] select(KUID contactId);
     
+    /**
+     * Returns up to <i>count</i> number of {@link Contact}s that are
+     * XOR bit-wise closest to the given {@link KUID}. The {@link Contact}s
+     * array is ordered by closeness.
+     */
     public Contact[] select(KUID contactId, int count);
     
     public void failure(KUID contactId, SocketAddress address);

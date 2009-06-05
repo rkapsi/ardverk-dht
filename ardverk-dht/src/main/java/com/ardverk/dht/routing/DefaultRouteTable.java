@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 
 import org.ardverk.collection.Cursor;
 import org.ardverk.collection.KeyAnalyzer;
-import org.ardverk.collection.SortedPatriciaTrie;
+import org.ardverk.collection.PatriciaTrie;
 import org.ardverk.collection.Trie;
 import org.slf4j.Logger;
 
@@ -20,7 +20,6 @@ import com.ardverk.dht.KeyFactory;
 import com.ardverk.logging.LoggerUtils;
 import com.ardverk.net.NetworkConstants;
 import com.ardverk.net.NetworkCounter;
-import com.ardverk.utils.ArrayUtils;
 
 public class DefaultRouteTable extends AbstractRouteTable {
     
@@ -30,6 +29,8 @@ public class DefaultRouteTable extends AbstractRouteTable {
         = LoggerUtils.getLogger(DefaultRouteTable.class);
     
     private final Contact local;
+    
+    private final KeyAnalyzer<KUID> keyAnalyzer;
     
     private final Trie<KUID, Bucket> buckets;
     
@@ -52,11 +53,10 @@ public class DefaultRouteTable extends AbstractRouteTable {
         KeyFactory keyFactory = getKeyFactory();
         int lengthInBits = keyFactory.lengthInBits();
         
-        KeyAnalyzer<KUID> keyAnalyzer 
-            = KUID.createKeyAnalyzer(lengthInBits);
+        this.keyAnalyzer = KUID.createKeyAnalyzer(lengthInBits);
         
         this.local = local;
-        this.buckets = new SortedPatriciaTrie<KUID, Bucket>(keyAnalyzer);
+        this.buckets = new PatriciaTrie<KUID, Bucket>(keyAnalyzer);
         
         init();
     }
@@ -298,13 +298,13 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
     }
     
-    public static class Bucket {
+    public class Bucket {
         
         private final KUID bucketId;
         
         private final int depth;
         
-        private final FixedSizeHashMap<KUID, ContactHandle> active;
+        private final Trie<KUID, ContactHandle> active;
         
         private final FixedSizeHashMap<KUID, ContactHandle> cached;
         
@@ -332,7 +332,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
             this.bucketId = bucketId;
             this.depth = depth;
             
-            active = new FixedSizeHashMap<KUID, ContactHandle>(k, k);
+            active = new PatriciaTrie<KUID, ContactHandle>(keyAnalyzer);
             cached = new FixedSizeHashMap<KUID, ContactHandle>(maxCacheSize);
         }
         
@@ -342,10 +342,6 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         public int getDepth() {
             return depth;
-        }
-        
-        public int getK() {
-            return active.getMaxSize();
         }
         
         public int getMaxCacheSize() {
@@ -365,7 +361,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
         
         public boolean isActiveFull() {
-            return active.isFull();
+            return active.size() >= getK();
         }
         
         public boolean isActiveEmpty() {
@@ -381,7 +377,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
         
         public ContactHandle[] getActive() {
-            return ArrayUtils.shuffle(active.values().toArray(new ContactHandle[0]));
+            return active.values().toArray(new ContactHandle[0]);
         }
         
         public ContactHandle[] getCached() {
