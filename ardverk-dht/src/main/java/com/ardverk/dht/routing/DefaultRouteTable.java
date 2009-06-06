@@ -2,14 +2,19 @@ package com.ardverk.dht.routing;
 
 import java.net.SocketAddress;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
+import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.ardverk.collection.Cursor;
 import org.ardverk.collection.KeyAnalyzer;
 import org.ardverk.collection.PatriciaTrie;
 import org.ardverk.collection.Trie;
+import org.ardverk.collection.Cursor.Decision;
 import org.slf4j.Logger;
 
 import com.ardverk.collection.FixedSizeHashMap;
@@ -135,16 +140,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
             @Override
             public Decision select(Entry<? extends KUID, ? extends Bucket> entry) {
                 Bucket bucket = entry.getValue();
-                
-                for (ContactHandle handle : bucket.getActive()) {
-                    if (items.size() >= count) {
-                        return Decision.EXIT;
-                    }
-                    
-                    items.add(handle.getContact());
-                }
-                
-                return Decision.CONTINUE;
+                return bucket.select(contactId, items, count);
             }
         });
     }
@@ -368,6 +364,23 @@ public class DefaultRouteTable extends AbstractRouteTable {
             return active.isEmpty();
         }
         
+        public Decision select(KUID contactId, 
+                final Collection<Contact> items, final int count) {
+            
+            active.select(contactId, new Cursor<KUID, ContactHandle>() {
+                @Override
+                public Decision select(Entry<? extends KUID, ? extends ContactHandle> entry) {
+                    if (items.size() < count) {
+                        items.add(entry.getValue().getContact());             
+                    }
+                    
+                    return (items.size() < count ? Decision.CONTINUE : Decision.EXIT);
+                }
+            });
+            
+            return (items.size() < count ? Decision.CONTINUE : Decision.EXIT);
+        }
+        
         public ContactHandle get(KUID contactId) {
             ContactHandle handle = active.get(contactId);
             if (handle == null) {
@@ -425,5 +438,55 @@ public class DefaultRouteTable extends AbstractRouteTable {
             return active.containsKey(contactId)
                 || cached.containsKey(contactId);
         }
+    }
+    
+    public static void main(String[] args) {
+        TreeMap<KUID, KUID> tree = new TreeMap<KUID, KUID>();
+        Trie<KUID, KUID> trie = new PatriciaTrie<KUID, KUID>(KUID.createKeyAnalyzer(160));
+        
+        Random generator = new Random();
+        
+        for (int i = 0; i < 5; i++) {
+            byte[] data = new byte[20];
+            generator.nextBytes(data);
+            
+            KUID key = new KUID(data, KUID.NO_BIT_MASK, 160);
+            
+            tree.put(key, key);
+            trie.put(key, key);
+        }
+        
+        byte[] data = new byte[20];
+        generator.nextBytes(data);
+        final KUID lookupKey = new KUID(data, KUID.NO_BIT_MASK, 160);
+        
+        System.out.println("KEY: " + lookupKey);
+        System.out.println();
+        
+        Comparator<KUID> comparator = new Comparator<KUID>() {
+            @Override
+            public int compare(KUID o1, KUID o2) {
+                return o1.xor(lookupKey).compareTo(o2.xor(lookupKey));
+            }
+        };
+        
+        KUID[] keys = tree.keySet().toArray(new KUID[0]);
+        Arrays.sort(keys, comparator);
+        
+        for (KUID id : keys) {
+            System.out.println("TREE: " + id + ", " + id.xor(lookupKey));
+        }
+        
+        System.out.println();
+        
+        Cursor<KUID, KUID> cursor = new Cursor<KUID, KUID>() {
+            @Override
+            public Decision select(Entry<? extends KUID, ? extends KUID> entry) {
+                System.out.println("TRIE: " + entry.getKey() + ", " + entry.getKey().xor(lookupKey));
+                return Decision.CONTINUE;
+            }
+        };
+        
+        trie.select(lookupKey, cursor);
     }
 }
