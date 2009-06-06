@@ -364,14 +364,25 @@ public class DefaultRouteTable extends AbstractRouteTable {
             return active.isEmpty();
         }
         
+        private static final double PROBABILITY = 0.75d;
+        
         public Decision select(KUID contactId, 
                 final Collection<Contact> items, final int count) {
             
             active.select(contactId, new Cursor<KUID, ContactHandle>() {
                 @Override
-                public Decision select(Entry<? extends KUID, ? extends ContactHandle> entry) {
-                    if (items.size() < count) {
-                        items.add(entry.getValue().getContact());             
+                public Decision select(Entry<? extends KUID, 
+                        ? extends ContactHandle> entry) {
+                    
+                    ContactHandle handle = entry.getValue();
+                    
+                    double probability = 1.0d;
+                    if (handle.isDead()) {
+                        probability = Math.random();
+                    }
+                    
+                    if (probability >= PROBABILITY) {
+                        items.add(handle.getContact());
                     }
                     
                     return (items.size() < count ? Decision.CONTINUE : Decision.EXIT);
