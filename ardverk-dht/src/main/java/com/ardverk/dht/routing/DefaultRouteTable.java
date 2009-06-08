@@ -412,6 +412,49 @@ public class DefaultRouteTable extends AbstractRouteTable {
             
         }
         
+        public int getActiveCount(ContactHandle handle) {
+            return counter.get(handle.getContact().getRemoteAddress());
+        }
+        
+        private boolean addActive(ContactHandle handle) {
+            KUID contactId = handle.getContactId();
+            Contact contact = handle.getContact();
+            
+            boolean contains = active.containsKey(contactId);
+            if (contains || makeSpace()) {
+                if (contains) {
+                    counter.remove(contact.getRemoteAddress());
+                }
+                
+                active.put(contactId, handle);
+                counter.add(contact.getRemoteAddress());
+                return true;
+            }
+            
+            return false;
+        }
+        
+        private boolean makeSpace() {
+            if (isActiveFull()) {
+                for (ContactHandle current : getActive()) {
+                    if (current.isDead()) {
+                        removeActive(current);
+                        break;
+                    }
+                }
+            }
+            
+            return !isActiveFull();
+        }
+        
+        private void removeActive(ContactHandle handle) {
+            ContactHandle other = active.remove(handle.getContactId());
+            assert (handle == other);
+            
+            SocketAddress address = other.getContact().getRemoteAddress();
+            counter.remove(address);
+        }
+        
         public Bucket[] split() {
             KUID bucketId = getBucketId();
             int depth = getDepth();
