@@ -329,7 +329,9 @@ public class DefaultRouteTable extends AbstractRouteTable {
             this.depth = depth;
             
             active = new PatriciaTrie<KUID, ContactHandle>(keyAnalyzer);
-            cached = new FixedSizeHashMap<KUID, ContactHandle>(maxCacheSize);
+            
+            cached = new FixedSizeHashMap<KUID, ContactHandle>(
+                    maxCacheSize, 1.0f, true, maxCacheSize);
         }
         
         public KUID getBucketId() {
@@ -408,12 +410,22 @@ public class DefaultRouteTable extends AbstractRouteTable {
             return cached.values().toArray(new ContactHandle[0]);
         }
         
-        public void add(ContactHandle handle) {
-            
-        }
-        
         public int getActiveCount(ContactHandle handle) {
             return counter.get(handle.getContact().getRemoteAddress());
+        }
+        
+        public void add(ContactHandle handle) {
+            // Remove it from the Cache if it's there
+            removeCache(handle);
+            
+            // Add it to the active RouteTable if possible
+            boolean success = addActive(handle);
+            
+            // Add the Contact back to the Cache if it was not 
+            // possible to add it to the active RouteTable
+            if (!success) {
+                addCache(handle);
+            }
         }
         
         private boolean addActive(ContactHandle handle) {
@@ -422,16 +434,28 @@ public class DefaultRouteTable extends AbstractRouteTable {
             
             boolean contains = active.containsKey(contactId);
             if (contains || makeSpace()) {
+                
+                SocketAddress address = contact.getRemoteAddress();
                 if (contains) {
-                    counter.remove(contact.getRemoteAddress());
+                    counter.remove(address);
                 }
                 
                 active.put(contactId, handle);
-                counter.add(contact.getRemoteAddress());
+                counter.add(address);
                 return true;
             }
             
             return false;
+        }
+        
+        private void addCache(ContactHandle handle) {
+            KUID contactId = handle.getContactId();
+            cached.put(contactId, handle);
+        }
+        
+        private ContactHandle removeCache(ContactHandle handle) {
+            KUID contactId = handle.getContactId();
+            return cached.remove(contactId);
         }
         
         private boolean makeSpace() {
