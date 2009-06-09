@@ -103,17 +103,38 @@ public class DefaultRouteTable extends AbstractRouteTable {
         ContactHandle handle = bucket.get(contactId);
         
         if (handle != null) {
-            updateContactInBucket(bucket, handle, contact);
+            updateContact(bucket, handle, contact);
         } else if (!bucket.isActiveFull()) {
-            
+            if (isOkayToAdd(bucket, contact)) {
+                addActive(bucket, contact);
+            } else if (!canSplitBucket(bucket)) {
+                addCache(bucket, contact);
+            }
         } else if (split(bucket)) {
             add(contact, state);
         } else {
-            
+            replaceCache(bucket, contact);
         }
     }
     
-    private synchronized void updateContactInBucket(Bucket bucket, 
+    private synchronized boolean isOkayToAdd(Bucket bucket, Contact contact) {
+        SocketAddress address = contact.getRemoteAddress();
+        return bucket.getActiveCount(address) < Integer.MAX_VALUE;
+    }
+    
+    private synchronized void addActive(Bucket bucket, Contact contact) {
+        bucket.addActive(new ContactHandle(contact));
+    }
+    
+    private synchronized void addCache(Bucket bucket, Contact contact) {
+        bucket.addCache(new ContactHandle(contact));
+    }
+    
+    private synchronized void replaceCache(Bucket bucket, Contact contact) {
+        
+    }
+    
+    private synchronized void updateContact(Bucket bucket, 
             ContactHandle existing, Contact contact) {
         
     }
@@ -258,6 +279,11 @@ public class DefaultRouteTable extends AbstractRouteTable {
             }
             
             this.contactId = contactId;
+        }
+        
+        public ContactHandle(Contact contact) {
+            this(contact.getContactId());
+            this.contact = contact;
         }
         
         public KUID getContactId() {
@@ -410,8 +436,8 @@ public class DefaultRouteTable extends AbstractRouteTable {
             return cached.values().toArray(new ContactHandle[0]);
         }
         
-        public int getActiveCount(ContactHandle handle) {
-            return counter.get(handle.getContact().getRemoteAddress());
+        public int getActiveCount(SocketAddress address) {
+            return counter.get(address);
         }
         
         public void add(ContactHandle handle) {
