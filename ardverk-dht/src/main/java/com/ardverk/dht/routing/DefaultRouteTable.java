@@ -1,5 +1,6 @@
 package com.ardverk.dht.routing;
 
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,6 +26,7 @@ import com.ardverk.dht.KeyFactory;
 import com.ardverk.logging.LoggerUtils;
 import com.ardverk.net.NetworkConstants;
 import com.ardverk.net.NetworkCounter;
+import com.ardverk.utils.NetworkUtils;
 
 public class DefaultRouteTable extends AbstractRouteTable {
     
@@ -107,24 +109,36 @@ public class DefaultRouteTable extends AbstractRouteTable {
         } else if (!bucket.isActiveFull()) {
             if (isOkayToAdd(bucket, contact)) {
                 addActive(bucket, contact);
-            } else if (!canSplitBucket(bucket)) {
+            } else if (!canSplit(bucket)) {
                 addCache(bucket, contact);
             }
         } else if (split(bucket)) {
-            add(contact, state);
+            innerAdd(contact, state);
         } else {
             replaceCache(bucket, contact);
         }
     }
     
     private synchronized void updateContact(Bucket bucket, 
-            ContactHandle existing, Contact contact) {
+            ContactHandle handle, Contact contact) {
+        
+        if (handle.isSameRemoteAddress(contact)) {
+            Contact[] merged = handle.setContact(contact);
+            fireUpdateContact(merged[0], merged[1]);
+        } else {
+            // Spoof Check
+        }
+    }
+    
+    protected void fireUpdateContact(Contact existing, Contact contact) {
         
     }
     
+    private static final int MAX_PER_BUCKET = Integer.MAX_VALUE;
+    
     private synchronized boolean isOkayToAdd(Bucket bucket, Contact contact) {
         SocketAddress address = contact.getRemoteAddress();
-        return bucket.getActiveCount(address) < Integer.MAX_VALUE;
+        return bucket.getActiveCount(address) < MAX_PER_BUCKET;
     }
     
     private synchronized void addActive(Bucket bucket, Contact contact) {
@@ -140,7 +154,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
     }
     
     private synchronized boolean split(Bucket bucket) {
-        if (canSplitBucket(bucket)) {
+        if (canSplit(bucket)) {
             if (LOG.isInfoEnabled()) {
                 LOG.info("Splitting Bucket: " + bucket);
             }
@@ -166,7 +180,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         return false;
     }
     
-    private synchronized boolean canSplitBucket(Bucket bucket) {
+    private synchronized boolean canSplit(Bucket bucket) {
         
         // We *split* the Bucket if:
         // 1. Bucket contains the Local Contact
@@ -267,22 +281,20 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         private static final int MAX_ERRORS = 5;
         
+        private final long creationTime = System.currentTimeMillis();
+        
         private final KUID contactId;
         
         private Contact contact;
         
         private int errorCount = 0;
         
-        public ContactHandle(KUID contactId) {
-            if (contactId == null) {
-                throw new NullPointerException("contactId");
+        public ContactHandle(Contact contact) {
+            if (contact == null) {
+                throw new NullPointerException("contact");
             }
             
-            this.contactId = contactId;
-        }
-        
-        public ContactHandle(Contact contact) {
-            this(contact.getContactId());
+            this.contactId = contact.getContactId();
             this.contact = contact;
         }
         
@@ -294,7 +306,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
             return contact;
         }
         
-        public Contact setContact(Contact contact) {
+        public Contact[] setContact(Contact contact) {
             if (contact == null) {
                 throw new NullPointerException("contact");
             }
@@ -304,8 +316,13 @@ public class DefaultRouteTable extends AbstractRouteTable {
             }
             
             Contact previous = this.contact;
+            
+            if (previous != null) {
+                contact = new DefaultContact(previous, contact);
+            }
+            
             this.contact = contact;
-            return previous;
+            return new Contact[] { previous, contact };
         }
         
         public boolean errorCount(boolean increment) {
@@ -317,6 +334,12 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         public boolean isDead() {
             return errorCount >= MAX_ERRORS;
+        }
+        
+        public boolean isSameRemoteAddress(Contact contact) {
+            return NetworkUtils.isSameAddress(
+                    this.contact.getRemoteAddress(), 
+                    contact.getRemoteAddress());
         }
     }
     
