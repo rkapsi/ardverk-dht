@@ -117,6 +117,11 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
     }
     
+    private synchronized void updateContact(Bucket bucket, 
+            ContactHandle existing, Contact contact) {
+        
+    }
+    
     private synchronized boolean isOkayToAdd(Bucket bucket, Contact contact) {
         SocketAddress address = contact.getRemoteAddress();
         return bucket.getActiveCount(address) < Integer.MAX_VALUE;
@@ -132,38 +137,6 @@ public class DefaultRouteTable extends AbstractRouteTable {
     
     private synchronized void replaceCache(Bucket bucket, Contact contact) {
         
-    }
-    
-    private synchronized void updateContact(Bucket bucket, 
-            ContactHandle existing, Contact contact) {
-        
-    }
-    
-    @Override
-    public Contact[] select(KUID contactId, int count) {
-        List<Contact> items = new ArrayList<Contact>(count);
-        selectR(contactId, items, count);
-        return items.toArray(new Contact[0]);
-    }
-    
-    private synchronized void selectR(final KUID contactId, 
-            final Collection<Contact> items, final int count) {
-        
-        if (contactId == null) {
-            throw new NullPointerException("contactId");
-        }
-        
-        if (items.size() >= count) {
-            return;
-        }
-       
-        buckets.select(contactId, new Cursor<KUID, Bucket>() {
-            @Override
-            public Decision select(Entry<? extends KUID, ? extends Bucket> entry) {
-                Bucket bucket = entry.getValue();
-                return bucket.select(contactId, items, count);
-            }
-        });
     }
     
     private synchronized boolean split(Bucket bucket) {
@@ -193,22 +166,6 @@ public class DefaultRouteTable extends AbstractRouteTable {
         return false;
     }
     
-    public int getMaxDepth() {
-        return Integer.MAX_VALUE;
-    }
-    
-    public int getMaxCacheSize() {
-        return 16;
-    }
-    
-    private synchronized boolean isTooDeep(Bucket bucket) {
-        return bucket.getDepth() >= getMaxDepth();
-    }
-    
-    private synchronized boolean isSmallestSubtree(Bucket bucket) {
-        return false;
-    }
-    
     private synchronized boolean canSplitBucket(Bucket bucket) {
         
         // We *split* the Bucket if:
@@ -222,6 +179,49 @@ public class DefaultRouteTable extends AbstractRouteTable {
                 || !isTooDeep(bucket)) {
             return true;
         }
+        return false;
+    }
+    
+    @Override
+    public Contact[] select(KUID contactId, int count) {
+        List<Contact> items = new ArrayList<Contact>(count);
+        selectR(contactId, items, count);
+        return items.toArray(new Contact[0]);
+    }
+    
+    private synchronized void selectR(final KUID contactId, 
+            final Collection<Contact> items, final int count) {
+        
+        if (contactId == null) {
+            throw new NullPointerException("contactId");
+        }
+        
+        if (items.size() >= count) {
+            return;
+        }
+       
+        buckets.select(contactId, new Cursor<KUID, Bucket>() {
+            @Override
+            public Decision select(Entry<? extends KUID, ? extends Bucket> entry) {
+                Bucket bucket = entry.getValue();
+                return bucket.select(contactId, items, count);
+            }
+        });
+    }
+    
+    public int getMaxDepth() {
+        return Integer.MAX_VALUE;
+    }
+    
+    public int getMaxCacheSize() {
+        return 16;
+    }
+    
+    private synchronized boolean isTooDeep(Bucket bucket) {
+        return bucket.getDepth() >= getMaxDepth();
+    }
+    
+    private synchronized boolean isSmallestSubtree(Bucket bucket) {
         return false;
     }
     
