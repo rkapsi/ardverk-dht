@@ -1,6 +1,5 @@
 package com.ardverk.dht.routing;
 
-import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,11 +34,13 @@ public class DefaultRouteTable extends AbstractRouteTable {
     private static final Logger LOG 
         = LoggerUtils.getLogger(DefaultRouteTable.class);
     
-    private final Contact local;
+    private final Contact localhost;
     
     private final KeyAnalyzer<KUID> keyAnalyzer;
     
     private final Trie<KUID, Bucket> buckets;
+    
+    private int consecutiveErrors = 0;
     
     public DefaultRouteTable(ContactFactory contactFactory, 
             Contact local, int k) {
@@ -62,10 +63,15 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         this.keyAnalyzer = KUID.createKeyAnalyzer(lengthInBits);
         
-        this.local = local;
+        this.localhost = local;
         this.buckets = new PatriciaTrie<KUID, Bucket>(keyAnalyzer);
         
         init();
+    }
+    
+    @Override
+    public Contact getLocalhost() {
+        return localhost;
     }
     
     private synchronized void init() {
@@ -73,7 +79,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         Bucket bucket = new Bucket(bucketId, 0, getK(), getMaxCacheSize());
         buckets.put(bucketId, bucket);
         
-        add(local, State.ALIVE);
+        add(localhost, State.ALIVE);
     }
     
     @Override
@@ -94,6 +100,10 @@ public class DefaultRouteTable extends AbstractRouteTable {
         KUID contactId = contact.getContactId();
         if (keyFactory.lengthInBits() != contactId.lengthInBits()) {
             throw new IllegalArgumentException();
+        }
+        
+        if (state == State.ALIVE) {
+            consecutiveErrors = 0;
         }
         
         innerAdd(contact, state);
@@ -183,10 +193,10 @@ public class DefaultRouteTable extends AbstractRouteTable {
     private synchronized boolean canSplit(Bucket bucket) {
         
         // We *split* the Bucket if:
-        // 1. Bucket contains the Local Contact
+        // 1. Bucket contains the localhost Contact
         // 2. Bucket is smallest subtree
         // 3. Bucket hasn't reached its max depth
-        KUID contactId = local.getContactId();
+        KUID contactId = localhost.getContactId();
         
         if (bucket.contains(contactId)
                 || isSmallestSubtree(bucket)
@@ -231,12 +241,29 @@ public class DefaultRouteTable extends AbstractRouteTable {
         return 16;
     }
     
+    /**
+     * Returns true if the given {@link Bucket} has reached its maximum
+     * depth in the RoutingTable Tree.
+     */
     private synchronized boolean isTooDeep(Bucket bucket) {
         return bucket.getDepth() >= getMaxDepth();
     }
     
+    /**
+     * Returns true if the given {@link Bucket} is the closest left
+     * or right hand sibling of the {@link Bucket} which contains 
+     * the localhost {@link Contact}.
+     */
     private synchronized boolean isSmallestSubtree(Bucket bucket) {
-        return false;
+        KUID contactId = localhost.getContactId();
+        KUID bucketId = bucket.getBucketId();
+        int prefixLength = contactId.getPrefixLength(bucketId);
+        
+        // The sibling Bucket contains the localhost Contact. 
+        // We're looking if the other Bucket is its sibling 
+        // (what we call the smallest subtree).
+        Bucket sibling = buckets.selectValue(contactId);
+        return (sibling.getDepth() - 1) == prefixLength;
     }
     
     private synchronized boolean ping(Contact contact) {
@@ -253,6 +280,8 @@ public class DefaultRouteTable extends AbstractRouteTable {
         return pinger.ping(contact, listener);
     }
     
+    private static final int MAX_CONSECUTIVE_ERRORS = 100;
+    
     @Override
     public synchronized void failure(KUID contactId, SocketAddress address) {
         if (contactId == null) {
@@ -263,6 +292,12 @@ public class DefaultRouteTable extends AbstractRouteTable {
         ContactHandle handle = bucket.get(contactId);
         
         if (handle == null) {
+            return;
+        }
+        
+        // Make sure we're not going kill the entire RouteTable 
+        // if the Network goes down!
+        if (++consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {
             return;
         }
         
@@ -296,6 +331,10 @@ public class DefaultRouteTable extends AbstractRouteTable {
             
             this.contactId = contact.getContactId();
             this.contact = contact;
+        }
+        
+        public long getCreationTime() {
+            return creationTime;
         }
         
         public KUID getContactId() {

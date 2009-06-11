@@ -14,6 +14,8 @@ public interface RouteTable {
         DEAD
     };
     
+    public Contact getLocalhost();
+    
     public void setContactPinger(ContactPinger pinger);
     
     public void add(Contact contact, State state);

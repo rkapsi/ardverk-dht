@@ -150,6 +150,30 @@ public class KUID implements Writable, Serializable, Comparable<KUID> {
         return this;
     }
     
+    /**
+     * Returns the common prefix length of the two {@link KUID}s.
+     */   
+    public int getPrefixLength(KUID otherId) {
+        if (otherId == null) {
+            throw new NullPointerException("otherId");
+        }
+        
+        int lengthInBits = lengthInBits();
+        if (lengthInBits != otherId.lengthInBits()) {
+            throw new IllegalArgumentException(
+                    "lengthInBits=" + lengthInBits 
+                    + ", otherId.lengthInBits=" + otherId.lengthInBits());
+        }
+        
+        for (int i = 0; i < lengthInBits; i++) {
+            if (isSet(i) != otherId.isSet(i)) {
+                return i;
+            }
+        }
+        
+        return lengthInBits;
+    }
+    
     @Override
     public int compareTo(KUID otherId) {
         return compareTo(otherId, lengthInBits());
