@@ -43,7 +43,7 @@ public class NetworkCounter implements Serializable {
      * in the same Network
      */
     public int add(SocketAddress address) {
-        return add(((InetSocketAddress)address).getAddress());
+        return addKey(mask.mask(address));
     }
     
     /**
@@ -51,7 +51,7 @@ public class NetworkCounter implements Serializable {
      * in the same Network
      */
     public int add(InetAddress address) {
-        return add(address.getAddress(), false);
+        return addKey(mask.mask(address));
     }
     
     /**
@@ -59,15 +59,14 @@ public class NetworkCounter implements Serializable {
      * in the same Network
      */
     public int add(byte[] address) {
-        return add(address, true);
+        return addKey(mask.mask(address));
     }
     
     /**
      * Adds the given address and returns the number of addresses
      * in the same Network
      */
-    private synchronized int add(byte[] address, boolean copy) {
-        byte[] key = mask.mask(address, copy);
+    private synchronized int addKey(byte[] key) {
         AtomicInteger value = map.get(key);
         if (value == null) {
             value = new AtomicInteger();
@@ -82,7 +81,7 @@ public class NetworkCounter implements Serializable {
      * of addresses in the same Network
      */
     public int remove(SocketAddress address) {
-        return remove(((InetSocketAddress)address).getAddress());
+        return removeKey(mask.mask(address));
     }
     
     /**
@@ -90,7 +89,7 @@ public class NetworkCounter implements Serializable {
      * of addresses in the same Network
      */
     public int remove(InetAddress address) {
-        return remove(address.getAddress(), false);
+        return removeKey(mask.mask(address));
     }
     
     /**
@@ -98,15 +97,14 @@ public class NetworkCounter implements Serializable {
      * of addresses in the same Network
      */
     public int remove(byte[] address) {
-        return remove(address, true);
+        return removeKey(mask.mask(address));
     }
     
     /**
      * Removes the given address and returns the remaining number
      * of addresses in the same Network
      */
-    private synchronized int remove(byte[] address, boolean copy) {
-        byte[] key = mask.mask(address, copy);
+    private synchronized int removeKey(byte[] key) {
         AtomicInteger value = map.get(key);
         if (value != null && value.decrementAndGet() <= 0) {
             map.remove(key);
@@ -119,28 +117,27 @@ public class NetworkCounter implements Serializable {
      * Returns the number addresses that are in the same Network
      */
     public int get(SocketAddress address) {
-        return get(((InetSocketAddress)address).getAddress());
+        return getKey(mask.mask(address));
     }
     
     /**
      * Returns the number addresses that are in the same Network
      */
     public int get(InetAddress address) {
-        return get(address.getAddress(), false);
+        return getKey(mask.mask(address));
     }
     
     /**
      * Returns the number addresses that are in the same Network
      */
     public int get(byte[] address) {
-        return get(address, true);
+        return getKey(mask.mask(address));
     }
      
     /**
      * Returns the number addresses that are in the same Network
      */
-    private synchronized int get(byte[] address, boolean copy) {
-        byte[] key = mask.mask(address, copy);
+    private synchronized int getKey(byte[] key) {
         AtomicInteger value = map.get(key);
         if (value != null) {
             return value.get();
