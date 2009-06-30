@@ -62,6 +62,10 @@ public class DefaultContact implements Contact {
             throw new NullPointerException("contact");
         }
         
+        if (!existing.getContactId().equals(contact.getContactId())) {
+            throw new IllegalArgumentException();
+        }
+        
         // 2nd argument must be older
         if (contact.getCreationTime() < existing.getCreationTime()) {
             throw new IllegalArgumentException();

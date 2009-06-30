@@ -43,15 +43,15 @@ public class DefaultRouteTable extends AbstractRouteTable {
     private int consecutiveErrors = 0;
     
     public DefaultRouteTable(ContactFactory contactFactory, 
-            Contact local, int k) {
+            Contact localhost, int k) {
         super(contactFactory, k);
         
         if (contactFactory == null) {
             throw new NullPointerException("contactFactory");
         }
         
-        if (local == null) {
-            throw new NullPointerException("local");
+        if (localhost == null) {
+            throw new NullPointerException("localhost");
         }
         
         if (k <= 0) {
@@ -63,7 +63,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         this.keyAnalyzer = KUID.createKeyAnalyzer(lengthInBits);
         
-        this.localhost = local;
+        this.localhost = localhost;
         this.buckets = new PatriciaTrie<KUID, Bucket>(keyAnalyzer);
         
         init();
@@ -156,7 +156,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
     }
     
     private synchronized void addCache(Bucket bucket, Contact contact) {
-        bucket.addCache(new ContactHandle(contact));
+        bucket.addCache(contact);
     }
     
     private synchronized void replaceCache(Bucket bucket, Contact contact) {
@@ -318,6 +318,8 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         private final long creationTime = System.currentTimeMillis();
         
+        private long timeStamp = creationTime;
+        
         private final KUID contactId;
         
         private Contact contact;
@@ -335,6 +337,10 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         public long getCreationTime() {
             return creationTime;
+        }
+        
+        public long getTimeStamp() {
+            return timeStamp;
         }
         
         public KUID getContactId() {
@@ -361,7 +367,13 @@ public class DefaultRouteTable extends AbstractRouteTable {
             }
             
             this.contact = contact;
+            this.timeStamp = System.currentTimeMillis();
+            
             return new Contact[] { previous, contact };
+        }
+        
+        public Contact replaceContact(Contact contact) {
+            return setContact(contact)[0];
         }
         
         public boolean errorCount(boolean increment) {
@@ -379,6 +391,12 @@ public class DefaultRouteTable extends AbstractRouteTable {
             return NetworkUtils.isSameAddress(
                     this.contact.getRemoteAddress(), 
                     contact.getRemoteAddress());
+        }
+        
+        private static final long X = 5L*60L*1000L;
+        
+        public boolean hasBeenActiveRecently() {
+            return (System.currentTimeMillis() - getTimeStamp()) < X;
         }
     }
     
@@ -516,29 +534,59 @@ public class DefaultRouteTable extends AbstractRouteTable {
             }
         }
         
-        private boolean addActive(ContactHandle handle) {
-            KUID contactId = handle.getContactId();
-            Contact contact = handle.getContact();
+        private boolean addActive(Contact contact) {
+            KUID contactId = contact.getContactId();
             
-            boolean contains = active.containsKey(contactId);
-            if (contains || makeSpace()) {
+            ContactHandle existing = active.remove(contactId);
+            if (existing != null || makeSpace()) {
                 
-                SocketAddress address = contact.getRemoteAddress();
-                if (contains) {
+                if (existing != null) {
+                    Contact foo = existing.getContact();
+                    SocketAddress address = foo.getRemoteAddress();                    
                     counter.remove(address);
+                    
+                    existing.setContact(contact);
+                } else {
+                    active.put(contactId, new ContactHandle(contact));                    
                 }
                 
-                active.put(contactId, handle);
-                counter.add(address);
+                counter.add(contact.getRemoteAddress());
                 return true;
             }
             
             return false;
         }
         
-        private void addCache(ContactHandle handle) {
-            KUID contactId = handle.getContactId();
-            cached.put(contactId, handle);
+        private Contact addCache(Contact contact) {
+            KUID contactId = contact.getContactId();
+            
+            ContactHandle handle = cached.get(contactId);
+            if (handle != null) {
+                return handle.replaceContact(contact);
+            }
+            
+            if (!isCacheFull()) {
+                cached.put(contactId, new ContactHandle(contact));
+                return null;
+            }
+            
+            ContactHandle lrs = getLeastRecentlySeen();
+            if (lrs.isDead() || (!lrs.hasBeenActiveRecently() && contact.isAlive())) {
+                ContactHandle removed = cached.remove(lrs.getContactId());
+                assert (lrs == removed);
+                
+                cached.put(contactId, new ContactHandle(contact));
+            }
+        }
+        
+        private ContactHandle getLeastRecentlySeen() {
+            ContactHandle lrs = null;
+            for (ContactHandle handle : cached.values()) {
+                if (lrs == null || handle.getTimeStamp() < lrs.getTimeStamp()) {
+                    lrs = handle;
+                }
+            }
+            return lrs;
         }
         
         private ContactHandle removeCache(ContactHandle handle) {
