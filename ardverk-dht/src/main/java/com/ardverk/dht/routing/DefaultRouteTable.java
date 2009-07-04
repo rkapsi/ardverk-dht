@@ -22,6 +22,7 @@ import com.ardverk.concurrent.AsyncFuture;
 import com.ardverk.concurrent.AsyncFutureListener;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.KeyFactory;
+import com.ardverk.dht.routing.Contact.State;
 import com.ardverk.logging.LoggerUtils;
 import com.ardverk.net.NetworkConstants;
 import com.ardverk.net.NetworkCounter;
@@ -79,18 +80,16 @@ public class DefaultRouteTable extends AbstractRouteTable {
         Bucket bucket = new Bucket(bucketId, 0, getK(), getMaxCacheSize());
         buckets.put(bucketId, bucket);
         
-        add(localhost, State.ALIVE);
+        add(localhost);
     }
     
     @Override
-    public synchronized void add(Contact contact, State state) {
+    public synchronized void add(Contact contact) {
         if (contact == null) {
             throw new NullPointerException("contact");
         }
         
-        if (state == null) {
-            throw new NullPointerException("state");
-        }
+        State state = contact.getState();
         
         if (state == State.DEAD) {
             throw new IllegalArgumentException("state=" + state);
@@ -99,7 +98,9 @@ public class DefaultRouteTable extends AbstractRouteTable {
         KeyFactory keyFactory = getKeyFactory();
         KUID contactId = contact.getContactId();
         if (keyFactory.lengthInBits() != contactId.lengthInBits()) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(
+                    "Bits: " + keyFactory.lengthInBits() 
+                    + " vs. " + contactId.lengthInBits());
         }
         
         if (state == State.ALIVE) {
@@ -112,10 +113,10 @@ public class DefaultRouteTable extends AbstractRouteTable {
     private synchronized void innerAdd(Contact contact, State state) {
         KUID contactId = contact.getContactId();
         Bucket bucket = buckets.selectValue(contactId);
-        ContactHandle handle = bucket.get(contactId);
+        ContactEntity entity = bucket.get(contactId);
         
-        if (handle != null) {
-            updateContact(bucket, handle, contact);
+        if (entity != null) {
+            updateContact(bucket, entity, contact);
         } else if (!bucket.isActiveFull()) {
             if (isOkayToAdd(bucket, contact)) {
                 addActive(bucket, contact);
@@ -130,10 +131,10 @@ public class DefaultRouteTable extends AbstractRouteTable {
     }
     
     private synchronized void updateContact(Bucket bucket, 
-            ContactHandle handle, Contact contact) {
+            ContactEntity entity, Contact contact) {
         
-        if (handle.isSameRemoteAddress(contact)) {
-            Contact[] merged = handle.setContact(contact);
+        if (entity.isSameRemoteAddress(contact)) {
+            Contact[] merged = entity.update(contact);
             fireUpdateContact(merged[0], merged[1]);
         } else {
             // Spoof Check
@@ -152,11 +153,11 @@ public class DefaultRouteTable extends AbstractRouteTable {
     }
     
     private synchronized void addActive(Bucket bucket, Contact contact) {
-        bucket.addActive(new ContactHandle(contact));
+        bucket.addActive(new ContactEntity(contact));
     }
     
     private synchronized void addCache(Bucket bucket, Contact contact) {
-        bucket.addCache(contact);
+        bucket.addCache(new ContactEntity(contact));
     }
     
     private synchronized void replaceCache(Bucket bucket, Contact contact) {
@@ -289,7 +290,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
         
         Bucket bucket = buckets.selectValue(contactId);
-        ContactHandle handle = bucket.get(contactId);
+        ContactEntity handle = bucket.get(contactId);
         
         if (handle == null) {
             return;
@@ -312,7 +313,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
     }
     
-    private static class ContactHandle {
+    private static class ContactEntity {
         
         private static final int MAX_ERRORS = 5;
         
@@ -326,7 +327,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         private int errorCount = 0;
         
-        public ContactHandle(Contact contact) {
+        public ContactEntity(Contact contact) {
             if (contact == null) {
                 throw new NullPointerException("contact");
             }
@@ -351,7 +352,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
             return contact;
         }
         
-        public Contact[] setContact(Contact contact) {
+        public Contact[] update(Contact contact) {
             if (contact == null) {
                 throw new NullPointerException("contact");
             }
@@ -373,7 +374,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
         
         public Contact replaceContact(Contact contact) {
-            return setContact(contact)[0];
+            return update(contact)[0];
         }
         
         public boolean errorCount(boolean increment) {
@@ -406,9 +407,9 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         private final int depth;
         
-        private final Trie<KUID, ContactHandle> active;
+        private final Trie<KUID, ContactEntity> active;
         
-        private final FixedSizeHashMap<KUID, ContactHandle> cached;
+        private final FixedSizeHashMap<KUID, ContactEntity> cached;
         
         private final NetworkCounter counter 
             = new NetworkCounter(NetworkConstants.CLASS_C);
@@ -434,9 +435,9 @@ public class DefaultRouteTable extends AbstractRouteTable {
             this.bucketId = bucketId;
             this.depth = depth;
             
-            active = new PatriciaTrie<KUID, ContactHandle>(keyAnalyzer);
+            active = new PatriciaTrie<KUID, ContactEntity>(keyAnalyzer);
             
-            cached = new FixedSizeHashMap<KUID, ContactHandle>(
+            cached = new FixedSizeHashMap<KUID, ContactEntity>(
                     maxCacheSize, 1.0f, true, maxCacheSize);
         }
         
@@ -477,12 +478,12 @@ public class DefaultRouteTable extends AbstractRouteTable {
         public Decision select(KUID contactId, 
                 final Collection<Contact> items, final int count) {
             
-            active.select(contactId, new Cursor<KUID, ContactHandle>() {
+            active.select(contactId, new Cursor<KUID, ContactEntity>() {
                 @Override
                 public Decision select(Entry<? extends KUID, 
-                        ? extends ContactHandle> entry) {
+                        ? extends ContactEntity> entry) {
                     
-                    ContactHandle handle = entry.getValue();
+                    ContactEntity handle = entry.getValue();
                     
                     double probability = 1.0d;
                     if (handle.isDead()) {
@@ -500,54 +501,58 @@ public class DefaultRouteTable extends AbstractRouteTable {
             return (items.size() < count ? Decision.CONTINUE : Decision.EXIT);
         }
         
-        public ContactHandle get(KUID contactId) {
-            ContactHandle handle = active.get(contactId);
+        public ContactEntity get(KUID contactId) {
+            ContactEntity handle = active.get(contactId);
             if (handle == null) {
                 handle = cached.get(contactId);
             }
             return handle;
         }
         
-        public ContactHandle[] getActive() {
-            return active.values().toArray(new ContactHandle[0]);
+        public ContactEntity[] getActive() {
+            return active.values().toArray(new ContactEntity[0]);
         }
         
-        public ContactHandle[] getCached() {
-            return cached.values().toArray(new ContactHandle[0]);
+        public ContactEntity[] getCached() {
+            return cached.values().toArray(new ContactEntity[0]);
         }
         
         public int getActiveCount(SocketAddress address) {
             return counter.get(address);
         }
         
-        public void add(ContactHandle handle) {
+        public void add(ContactEntity entity) {
             // Remove it from the Cache if it's there
-            removeCache(handle);
+            removeCache(entity);
             
             // Add it to the active RouteTable if possible
-            boolean success = addActive(handle);
+            boolean success = addActive(entity);
             
             // Add the Contact back to the Cache if it was not 
             // possible to add it to the active RouteTable
             if (!success) {
-                addCache(handle);
+                addCache(entity);
             }
         }
         
-        private boolean addActive(Contact contact) {
+        private boolean addActive(ContactEntity entity) {
+            Contact contact = entity.getContact();
             KUID contactId = contact.getContactId();
             
-            ContactHandle existing = active.remove(contactId);
-            if (existing != null || makeSpace()) {
+            ContactEntity existingEntity = active.remove(contactId);
+            if (existingEntity != null || makeSpace()) {
                 
-                if (existing != null) {
-                    Contact foo = existing.getContact();
-                    SocketAddress address = foo.getRemoteAddress();                    
+                if (existingEntity != null) {
+                    Contact existing = existingEntity.getContact();
+                    SocketAddress address = existing.getRemoteAddress();                    
                     counter.remove(address);
                     
-                    existing.setContact(contact);
+                    Contact[] merged = existingEntity.update(contact);
+                    fireUpdateContact(merged[0], merged[1]);
+                    
                 } else {
-                    active.put(contactId, new ContactHandle(contact));                    
+                    active.put(contactId, new ContactEntity(contact));
+                    fireContactAdded(contact);
                 }
                 
                 counter.add(contact.getRemoteAddress());
@@ -557,31 +562,41 @@ public class DefaultRouteTable extends AbstractRouteTable {
             return false;
         }
         
-        private Contact addCache(Contact contact) {
+        private boolean addCache(ContactEntity entity) {
+            Contact contact = entity.getContact();
             KUID contactId = contact.getContactId();
             
-            ContactHandle handle = cached.get(contactId);
-            if (handle != null) {
-                return handle.replaceContact(contact);
+            ContactEntity existing = cached.get(contactId);
+            if (existing != null) {
+                Contact foo = existing.replaceContact(contact);
+                fireUpdateContact(foo, contact);
+                return true;
             }
             
             if (!isCacheFull()) {
-                cached.put(contactId, new ContactHandle(contact));
-                return null;
+                cached.put(contactId, new ContactEntity(contact));
+                fireContactAdded(contact);
+                return true;
             }
             
-            ContactHandle lrs = getLeastRecentlySeen();
-            if (lrs.isDead() || (!lrs.hasBeenActiveRecently() && contact.isAlive())) {
-                ContactHandle removed = cached.remove(lrs.getContactId());
+            State state = contact.getState();
+            
+            ContactEntity lrs = getLeastRecentlySeen();
+            if (lrs.isDead() || (!lrs.hasBeenActiveRecently() && state == State.ALIVE)) {
+                ContactEntity removed = cached.remove(lrs.getContactId());
                 assert (lrs == removed);
                 
-                cached.put(contactId, new ContactHandle(contact));
+                cached.put(contactId, new ContactEntity(contact));
+                fireContactReplaced(lrs.getContact(), contact);
+                return true;
             }
+            
+            return false;
         }
         
-        private ContactHandle getLeastRecentlySeen() {
-            ContactHandle lrs = null;
-            for (ContactHandle handle : cached.values()) {
+        private ContactEntity getLeastRecentlySeen() {
+            ContactEntity lrs = null;
+            for (ContactEntity handle : cached.values()) {
                 if (lrs == null || handle.getTimeStamp() < lrs.getTimeStamp()) {
                     lrs = handle;
                 }
@@ -589,14 +604,14 @@ public class DefaultRouteTable extends AbstractRouteTable {
             return lrs;
         }
         
-        private ContactHandle removeCache(ContactHandle handle) {
+        private ContactEntity removeCache(ContactEntity handle) {
             KUID contactId = handle.getContactId();
             return cached.remove(contactId);
         }
         
         private boolean makeSpace() {
             if (isActiveFull()) {
-                for (ContactHandle current : getActive()) {
+                for (ContactEntity current : getActive()) {
                     if (current.isDead()) {
                         removeActive(current);
                         break;
@@ -607,8 +622,8 @@ public class DefaultRouteTable extends AbstractRouteTable {
             return !isActiveFull();
         }
         
-        private void removeActive(ContactHandle handle) {
-            ContactHandle other = active.remove(handle.getContactId());
+        private void removeActive(ContactEntity handle) {
+            ContactEntity other = active.remove(handle.getContactId());
             assert (handle == other);
             
             SocketAddress address = other.getContact().getRemoteAddress();
@@ -627,7 +642,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
             Bucket right = new Bucket(bucketId.set(depth), 
                     depth+1, k, maxCacheSize);
             
-            for (ContactHandle handle : active.values()) {
+            for (ContactEntity handle : active.values()) {
                 KUID contactId = handle.getContactId();
                 if (!contactId.isSet(depth)) {
                     left.add(handle);
@@ -636,7 +651,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
                 }
             }
             
-            for (ContactHandle handle : cached.values()) {
+            for (ContactEntity handle : cached.values()) {
                 KUID contactId = handle.getContactId();
                 if (!contactId.isSet(depth)) {
                     left.add(handle);
