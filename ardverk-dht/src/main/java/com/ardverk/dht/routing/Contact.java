@@ -7,10 +7,9 @@ import com.ardverk.dht.KUID;
 
 public interface Contact {
     
-    public static enum State {
-        UNKNOWN,
-        ALIVE,
-        DEAD
+    public static enum Type {
+        CHARTED,
+        UNCHARTED
     }
     
     public long getCreationTime();
@@ -23,9 +22,7 @@ public interface Contact {
     
     public SocketAddress getRemoteAddress();
     
-    public State getState();
-    
-    public Contact changeState(State state);
+    public Type getType2();
     
     public Object getAttribute(Object key);
     

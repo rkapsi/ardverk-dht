@@ -13,13 +13,13 @@ public interface ContactFactory {
     public Contact createUnknown(KUID contactId, 
             int instanceId, SocketAddress address);
     
-    public Contact createUnknown(KUID contactId, 
+    public Contact createUncharted(KUID contactId, 
             int instanceId, SocketAddress address, Map<?, ?> attributes);
     
     public Contact createAlive(KUID contactId, 
             int instanceId, SocketAddress address);
     
-    public Contact createAlive(KUID contactId, 
+    public Contact createCharted(KUID contactId, 
             int instanceId, SocketAddress address, Map<?, ?> attributes);
     
     public Contact merge(Contact existing, Contact contact);

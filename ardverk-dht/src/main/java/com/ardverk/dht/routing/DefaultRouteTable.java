@@ -22,7 +22,7 @@ import com.ardverk.concurrent.AsyncFuture;
 import com.ardverk.concurrent.AsyncFutureListener;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.KeyFactory;
-import com.ardverk.dht.routing.Contact.State;
+import com.ardverk.dht.routing.Contact.Type;
 import com.ardverk.logging.LoggerUtils;
 import com.ardverk.net.NetworkConstants;
 import com.ardverk.net.NetworkCounter;
@@ -89,12 +89,6 @@ public class DefaultRouteTable extends AbstractRouteTable {
             throw new NullPointerException("contact");
         }
         
-        State state = contact.getState();
-        
-        if (state == State.DEAD) {
-            throw new IllegalArgumentException("state=" + state);
-        }
-        
         KeyFactory keyFactory = getKeyFactory();
         KUID contactId = contact.getContactId();
         if (keyFactory.lengthInBits() != contactId.lengthInBits()) {
@@ -103,14 +97,15 @@ public class DefaultRouteTable extends AbstractRouteTable {
                     + " vs. " + contactId.lengthInBits());
         }
         
-        if (state == State.ALIVE) {
+        Type type = contact.getType2();
+        if (type == Type.CHARTED) {
             consecutiveErrors = 0;
         }
         
-        innerAdd(contact, state);
+        innerAdd(contact);
     }
     
-    private synchronized void innerAdd(Contact contact, State state) {
+    private synchronized void innerAdd(Contact contact) {
         KUID contactId = contact.getContactId();
         Bucket bucket = buckets.selectValue(contactId);
         ContactEntity entity = bucket.get(contactId);
@@ -124,7 +119,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
                 addCache(bucket, contact);
             }
         } else if (split(bucket)) {
-            innerAdd(contact, state);
+            innerAdd(contact);
         } else {
             replaceCache(bucket, contact);
         }
@@ -135,14 +130,10 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         if (entity.isSameRemoteAddress(contact)) {
             Contact[] merged = entity.update(contact);
-            fireUpdateContact(merged[0], merged[1]);
+            fireContactChanged(bucket, merged[0], merged[1]);
         } else {
             // Spoof Check
         }
-    }
-    
-    protected void fireUpdateContact(Contact existing, Contact contact) {
-        
     }
     
     private static final int MAX_PER_BUCKET = Integer.MAX_VALUE;
@@ -153,11 +144,25 @@ public class DefaultRouteTable extends AbstractRouteTable {
     }
     
     private synchronized void addActive(Bucket bucket, Contact contact) {
-        bucket.addActive(new ContactEntity(contact));
+        ContactEntity entity = new ContactEntity(contact);
+        boolean success = bucket.addActive(entity);
+        
+        if (success) {
+            fireContactAdded(bucket, contact);
+        }
     }
     
     private synchronized void addCache(Bucket bucket, Contact contact) {
-        bucket.addCache(new ContactEntity(contact));
+        ContactEntity entity = new ContactEntity(contact);
+        ContactEntity other = bucket.addCache(entity);
+        
+        if (other != null) {
+            if (entity == other) {
+                fireContactAdded(bucket, contact);
+            } else {
+                fireContactReplaced(bucket, other.getContact(), contact);
+            }
+        }
     }
     
     private synchronized void replaceCache(Bucket bucket, Contact contact) {
@@ -302,7 +307,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
             return;
         }
         
-        boolean dead = handle.errorCount(true);
+        boolean dead = handle.error();
         if (dead) {
             
         }
@@ -364,6 +369,11 @@ public class DefaultRouteTable extends AbstractRouteTable {
             Contact previous = this.contact;
             
             if (previous != null) {
+                if (previous.getType2() == Type.CHARTED
+                        && contact.getType2() == Type.UNCHARTED) {
+                    throw new IllegalArgumentException();
+                }
+                
                 contact = new DefaultContact(previous, contact);
             }
             
@@ -377,15 +387,29 @@ public class DefaultRouteTable extends AbstractRouteTable {
             return update(contact)[0];
         }
         
-        public boolean errorCount(boolean increment) {
-            if (increment) {
-                ++errorCount;
-            }
+        public boolean error() {
+            ++errorCount;
             return isDead();
+        }
+        
+        public boolean isCharted() {
+            return contact.getType2() == Type.CHARTED;
+        }
+        
+        public boolean isUncharted() {
+            return contact.getType2() == Type.UNCHARTED;
         }
         
         public boolean isDead() {
             return errorCount >= MAX_ERRORS;
+        }
+        
+        public boolean isAlive() {
+            return !isDead() && isCharted();
+        }
+        
+        public boolean isUnknown() {
+            return !isDead() && isUncharted();
         }
         
         public boolean isSameRemoteAddress(Contact contact) {
@@ -398,7 +422,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         public boolean hasBeenActiveRecently() {
             return (System.currentTimeMillis() - getTimeStamp()) < X;
-        }
+        }   
     }
     
     public class Bucket {
@@ -502,11 +526,11 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
         
         public ContactEntity get(KUID contactId) {
-            ContactEntity handle = active.get(contactId);
-            if (handle == null) {
-                handle = cached.get(contactId);
+            ContactEntity entity = active.get(contactId);
+            if (entity == null) {
+                entity = cached.get(contactId);
             }
-            return handle;
+            return entity;
         }
         
         public ContactEntity[] getActive() {
@@ -539,22 +563,12 @@ public class DefaultRouteTable extends AbstractRouteTable {
             Contact contact = entity.getContact();
             KUID contactId = contact.getContactId();
             
-            ContactEntity existingEntity = active.remove(contactId);
-            if (existingEntity != null || makeSpace()) {
+            // Make sure Bucket does not contain the Contact!
+            assert (!active.containsKey(contactId)
+                    && !cached.containsKey(contactId));
                 
-                if (existingEntity != null) {
-                    Contact existing = existingEntity.getContact();
-                    SocketAddress address = existing.getRemoteAddress();                    
-                    counter.remove(address);
-                    
-                    Contact[] merged = existingEntity.update(contact);
-                    fireUpdateContact(merged[0], merged[1]);
-                    
-                } else {
-                    active.put(contactId, new ContactEntity(contact));
-                    fireContactAdded(contact);
-                }
-                
+            if (hasOrMakeSpace()) {
+                active.put(contactId, entity);
                 counter.add(contact.getRemoteAddress());
                 return true;
             }
@@ -562,54 +576,57 @@ public class DefaultRouteTable extends AbstractRouteTable {
             return false;
         }
         
-        private boolean addCache(ContactEntity entity) {
+        private ContactEntity addCache(ContactEntity entity) {
             Contact contact = entity.getContact();
             KUID contactId = contact.getContactId();
             
-            ContactEntity existing = cached.get(contactId);
-            if (existing != null) {
-                Contact foo = existing.replaceContact(contact);
-                fireUpdateContact(foo, contact);
-                return true;
-            }
+            // Make sure Bucket does not contain the Contact!
+            assert (!active.containsKey(contactId)
+                    && !cached.containsKey(contactId));
             
             if (!isCacheFull()) {
-                cached.put(contactId, new ContactEntity(contact));
-                fireContactAdded(contact);
-                return true;
+                cached.put(contactId, entity);
+                return entity;
             }
             
-            State state = contact.getState();
-            
-            ContactEntity lrs = getLeastRecentlySeen();
-            if (lrs.isDead() || (!lrs.hasBeenActiveRecently() && state == State.ALIVE)) {
+            ContactEntity lrs = getLeastRecentlySeenCachedContact();
+            if (lrs.isDead() || (!lrs.hasBeenActiveRecently() && entity.isCharted())) {
                 ContactEntity removed = cached.remove(lrs.getContactId());
                 assert (lrs == removed);
                 
-                cached.put(contactId, new ContactEntity(contact));
-                fireContactReplaced(lrs.getContact(), contact);
-                return true;
+                cached.put(contactId, entity);
+                return removed;
             }
             
-            return false;
+            return null;
         }
         
-        private ContactEntity getLeastRecentlySeen() {
+        private ContactEntity getLeastRecentlySeenCachedContact() {
             ContactEntity lrs = null;
-            for (ContactEntity handle : cached.values()) {
-                if (lrs == null || handle.getTimeStamp() < lrs.getTimeStamp()) {
-                    lrs = handle;
+            for (ContactEntity entity : cached.values()) {
+                if (lrs == null || entity.getTimeStamp() < lrs.getTimeStamp()) {
+                    lrs = entity;
                 }
             }
             return lrs;
         }
         
-        private ContactEntity removeCache(ContactEntity handle) {
-            KUID contactId = handle.getContactId();
+        private ContactEntity getLeastRecentlySeenActiveContact() {
+            ContactEntity lrs = null;
+            for (ContactEntity entity : active.values()) {
+                if (lrs == null || entity.getTimeStamp() < lrs.getTimeStamp()) {
+                    lrs = entity;
+                }
+            }
+            return lrs;
+        }
+        
+        private ContactEntity removeCache(ContactEntity entity) {
+            KUID contactId = entity.getContactId();
             return cached.remove(contactId);
         }
         
-        private boolean makeSpace() {
+        private boolean hasOrMakeSpace() {
             if (isActiveFull()) {
                 for (ContactEntity current : getActive()) {
                     if (current.isDead()) {
@@ -622,9 +639,9 @@ public class DefaultRouteTable extends AbstractRouteTable {
             return !isActiveFull();
         }
         
-        private void removeActive(ContactEntity handle) {
-            ContactEntity other = active.remove(handle.getContactId());
-            assert (handle == other);
+        private void removeActive(ContactEntity entity) {
+            ContactEntity other = active.remove(entity.getContactId());
+            assert (entity == other);
             
             SocketAddress address = other.getContact().getRemoteAddress();
             counter.remove(address);
@@ -642,21 +659,21 @@ public class DefaultRouteTable extends AbstractRouteTable {
             Bucket right = new Bucket(bucketId.set(depth), 
                     depth+1, k, maxCacheSize);
             
-            for (ContactEntity handle : active.values()) {
-                KUID contactId = handle.getContactId();
+            for (ContactEntity entity : active.values()) {
+                KUID contactId = entity.getContactId();
                 if (!contactId.isSet(depth)) {
-                    left.add(handle);
+                    left.add(entity);
                 } else {
-                    right.add(handle);
+                    right.add(entity);
                 }
             }
             
-            for (ContactEntity handle : cached.values()) {
-                KUID contactId = handle.getContactId();
+            for (ContactEntity entity : cached.values()) {
+                KUID contactId = entity.getContactId();
                 if (!contactId.isSet(depth)) {
-                    left.add(handle);
+                    left.add(entity);
                 } else {
-                    right.add(handle);
+                    right.add(entity);
                 }
             }
             

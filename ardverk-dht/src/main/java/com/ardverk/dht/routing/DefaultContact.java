@@ -12,20 +12,24 @@ public class DefaultContact implements Contact {
     
     private final long timeStamp;
     
+    private final Type type;
+    
     private final KUID contactId;
     
     private final int instanceId;
     
     private final SocketAddress address;
     
-    private final State state;
-    
     private final Map<Object, Object> attributes 
         = new ConcurrentHashMap<Object, Object>();
     
-    public DefaultContact(KUID contactId, int instanceId, 
-            SocketAddress address, State state, 
+    public DefaultContact(Type type, KUID contactId, 
+            int instanceId, SocketAddress address, 
             Map<?, ?> attributes) {
+        
+        if (type == null) {
+            throw new NullPointerException("type");
+        }
         
         if (contactId == null) {
             throw new NullPointerException("contactId");
@@ -35,17 +39,13 @@ public class DefaultContact implements Contact {
             throw new NullPointerException("address");
         }
         
-        if (state == null) {
-            throw new NullPointerException("state");
-        }
-        
+        this.type = type;
         this.creationTime = System.currentTimeMillis();
         this.timeStamp = creationTime;
         
         this.contactId = contactId;
         this.instanceId = instanceId;
         this.address = address;
-        this.state = state;
         
         if (attributes != null) {
             this.attributes.putAll(attributes);
@@ -77,19 +77,19 @@ public class DefaultContact implements Contact {
         this.contactId = existing.getContactId();
         this.instanceId = contact.getInstanceId();
         this.address = contact.getRemoteAddress();
-        this.state = contact.getState();
+        this.type = contact.getType2();
         
         this.attributes.putAll(existing.getAttributes());
         this.attributes.putAll(contact.getAttributes());
     }
     
-    private DefaultContact(Contact contact, State state) {
+    private DefaultContact(Contact contact, Type type) {
         if (contact == null) {
             throw new NullPointerException("contact");
         }
         
-        if (state == null) {
-            throw new NullPointerException("state");
+        if (type == null) {
+            throw new NullPointerException("type");
         }
         
         this.creationTime = contact.getCreationTime();
@@ -98,7 +98,7 @@ public class DefaultContact implements Contact {
         this.contactId = contact.getContactId();
         this.instanceId = contact.getInstanceId();
         this.address = contact.getRemoteAddress();
-        this.state = state;
+        this.type = type;
         
         this.attributes.putAll(contact.getAttributes());   
     }
@@ -129,13 +129,8 @@ public class DefaultContact implements Contact {
     }
     
     @Override
-    public State getState() {
-        return state;
-    }
-
-    @Override
-    public Contact changeState(State state) {
-        return new DefaultContact(this, state);
+    public Type getType2() {
+        return type;
     }
 
     @Override

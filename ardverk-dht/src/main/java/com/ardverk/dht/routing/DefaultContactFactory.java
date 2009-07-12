@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.KeyFactory;
-import com.ardverk.dht.routing.Contact.State;
+import com.ardverk.dht.routing.Contact.Type;
 
 public class DefaultContactFactory extends AbstractContactFactory {
 
@@ -14,19 +14,19 @@ public class DefaultContactFactory extends AbstractContactFactory {
     }
 
     @Override
-    public Contact createUnknown(KUID contactId, int instanceId,
+    public Contact createUncharted(KUID contactId, int instanceId,
             SocketAddress address, Map<?, ?> attributes)  {
         
-        return new DefaultContact(contactId, instanceId, 
-                address, State.UNKNOWN, attributes);
+        return new DefaultContact(Type.UNCHARTED, contactId, 
+                instanceId, address, attributes);
     }
     
     @Override
-    public Contact createAlive(KUID contactId, int instanceId,
+    public Contact createCharted(KUID contactId, int instanceId,
             SocketAddress address, Map<?, ?> attributes)  {
         
-        return new DefaultContact(contactId, instanceId, 
-                address, State.ALIVE, attributes);
+        return new DefaultContact(Type.CHARTED, contactId, 
+                instanceId, address, attributes);
     }
 
     @Override

@@ -54,4 +54,16 @@ public abstract class AbstractRouteTable implements RouteTable {
     protected void fireSplitBucket(Bucket bucket, Bucket left, Bucket right) {
         
     }
+    
+    protected void fireContactAdded(Bucket bucket, Contact contact) {
+        
+    }
+    
+    protected void fireContactReplaced(Bucket bucket, Contact existing, Contact contact) {
+        
+    }
+    
+    protected void fireContactChanged(Bucket bucket, Contact existing, Contact contact) {
+        
+    }
 }
