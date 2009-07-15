@@ -44,15 +44,19 @@ public class DefaultRouteTable extends AbstractRouteTable {
     private int consecutiveErrors = 0;
     
     public DefaultRouteTable(ContactFactory contactFactory, 
-            Contact localhost, int k) {
+            KUID contactId, SocketAddress address, int k) {
         super(contactFactory, k);
         
         if (contactFactory == null) {
             throw new NullPointerException("contactFactory");
         }
         
-        if (localhost == null) {
-            throw new NullPointerException("localhost");
+        if (contactId == null) {
+            throw new NullPointerException("contactId");
+        }
+        
+        if (address == null) {
+            throw new NullPointerException("address");
         }
         
         if (k <= 0) {
@@ -61,10 +65,15 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         KeyFactory keyFactory = getKeyFactory();
         int lengthInBits = keyFactory.lengthInBits();
+        if (contactId.lengthInBits() != lengthInBits) {
+            throw new IllegalArgumentException(
+                    "Bits: " + lengthInBits + " vs. " 
+                        + contactId.lengthInBits());
+        }
         
         this.keyAnalyzer = KUID.createKeyAnalyzer(lengthInBits);
         
-        this.localhost = localhost;
+        this.localhost = contactFactory.createCharted(contactId, 0, address);
         this.buckets = new PatriciaTrie<KUID, Bucket>(keyAnalyzer);
         
         init();
@@ -76,11 +85,17 @@ public class DefaultRouteTable extends AbstractRouteTable {
     }
     
     private synchronized void init() {
+        consecutiveErrors = 0;
+        
         KUID bucketId = getKeyFactory().min();
         Bucket bucket = new Bucket(bucketId, 0, getK(), getMaxCacheSize());
         buckets.put(bucketId, bucket);
         
-        add(localhost);
+        innerAdd(localhost);
+    }
+    
+    private boolean isLocalhost(Contact contact) {
+        return localhost.getContactId().equals(contact.getContactId());
     }
     
     @Override
@@ -97,7 +112,15 @@ public class DefaultRouteTable extends AbstractRouteTable {
                     + " vs. " + contactId.lengthInBits());
         }
         
-        Type type = contact.getType2();
+        // Nobody and nothing can add a Contact that has 
+        // the exact same KUID as the localhost Contact!
+        if (isLocalhost(contact)) {
+            return;
+        }
+        
+        // Reset the consecutive errors counter every time
+        // we receive a "message" from an actual Contact.
+        Type type = contact.getType();
         if (type == Type.CHARTED) {
             consecutiveErrors = 0;
         }
@@ -127,6 +150,14 @@ public class DefaultRouteTable extends AbstractRouteTable {
     
     private synchronized void updateContact(Bucket bucket, 
             ContactEntity entity, Contact contact) {
+        
+        assert (!entity.same(localhost) 
+                && !contact.equals(localhost));
+        
+        // 
+        if (entity.isAlive() && !contact.isCharted()) {
+            return;
+        }
         
         if (entity.isSameRemoteAddress(contact)) {
             Contact[] merged = entity.update(contact);
@@ -369,8 +400,8 @@ public class DefaultRouteTable extends AbstractRouteTable {
             Contact previous = this.contact;
             
             if (previous != null) {
-                if (previous.getType2() == Type.CHARTED
-                        && contact.getType2() == Type.UNCHARTED) {
+                if (previous.getType() == Type.CHARTED
+                        && contact.getType() == Type.UNCHARTED) {
                     throw new IllegalArgumentException();
                 }
                 
@@ -393,11 +424,11 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
         
         public boolean isCharted() {
-            return contact.getType2() == Type.CHARTED;
+            return contact.getType() == Type.CHARTED;
         }
         
         public boolean isUncharted() {
-            return contact.getType2() == Type.UNCHARTED;
+            return contact.getType() == Type.UNCHARTED;
         }
         
         public boolean isDead() {
@@ -422,7 +453,15 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         public boolean hasBeenActiveRecently() {
             return (System.currentTimeMillis() - getTimeStamp()) < X;
-        }   
+        }
+        
+        public boolean same(Contact other) {
+            if (other == null) {
+                throw new NullPointerException("other");
+            }
+            
+            return contact != null && contact.equals(other);
+        }
     }
     
     public class Bucket {
@@ -590,7 +629,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
             }
             
             ContactEntity lrs = getLeastRecentlySeenCachedContact();
-            if (lrs.isDead() || (!lrs.hasBeenActiveRecently() && entity.isCharted())) {
+            if (lrs.isDead() || (!lrs.hasBeenActiveRecently() && !entity.isDead())) {
                 ContactEntity removed = cached.remove(lrs.getContactId());
                 assert (lrs == removed);
                 

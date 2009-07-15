@@ -77,7 +77,7 @@ public class DefaultContact implements Contact {
         this.contactId = existing.getContactId();
         this.instanceId = contact.getInstanceId();
         this.address = contact.getRemoteAddress();
-        this.type = contact.getType2();
+        this.type = contact.getType();
         
         this.attributes.putAll(existing.getAttributes());
         this.attributes.putAll(contact.getAttributes());
@@ -129,8 +129,13 @@ public class DefaultContact implements Contact {
     }
     
     @Override
-    public Type getType2() {
+    public Type getType() {
         return type;
+    }
+
+    @Override
+    public boolean isCharted() {
+        return type == Type.CHARTED;
     }
 
     @Override

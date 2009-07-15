@@ -22,7 +22,7 @@ public interface Contact {
     
     public SocketAddress getRemoteAddress();
     
-    public Type getType2();
+    public Type getType();
     
     public Object getAttribute(Object key);
     
@@ -33,4 +33,6 @@ public interface Contact {
     public boolean hasAttribute(Object key);
     
     public Map<Object, Object> getAttributes();
+    
+    public boolean isCharted();
 }

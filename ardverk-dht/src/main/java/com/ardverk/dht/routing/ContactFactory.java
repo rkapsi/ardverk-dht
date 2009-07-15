@@ -10,13 +10,13 @@ public interface ContactFactory {
 
     public KeyFactory getKeyFactory();
     
-    public Contact createUnknown(KUID contactId, 
+    public Contact createUncharted(KUID contactId, 
             int instanceId, SocketAddress address);
     
     public Contact createUncharted(KUID contactId, 
             int instanceId, SocketAddress address, Map<?, ?> attributes);
     
-    public Contact createAlive(KUID contactId, 
+    public Contact createCharted(KUID contactId, 
             int instanceId, SocketAddress address);
     
     public Contact createCharted(KUID contactId, 

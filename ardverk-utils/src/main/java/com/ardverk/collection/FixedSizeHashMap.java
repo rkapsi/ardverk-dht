@@ -8,7 +8,7 @@ import java.util.Map;
  * A {@link Map} with a fixed-size capacity.
  */
 public class FixedSizeHashMap<K, V> extends LinkedHashMap<K, V> 
-        implements Serializable {
+        implements FixedSize, Serializable {
     
     private static final long serialVersionUID = -8289709441678695668L;
     
@@ -65,10 +65,12 @@ public class FixedSizeHashMap<K, V> extends LinkedHashMap<K, V>
         this.maxSize = maxSize;
     }
 
+    @Override
     public int getMaxSize() {
         return maxSize;
     }
     
+    @Override
     public boolean isFull() {
         return size() >= getMaxSize();
     }
