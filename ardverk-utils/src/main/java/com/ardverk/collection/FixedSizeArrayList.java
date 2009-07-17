@@ -51,21 +51,29 @@ public class FixedSizeArrayList<E> extends ArrayList<E> implements FixedSize {
 
     @Override
     public boolean add(E e) {
-        adjustSize();
+        adjustSize(size(), e);
         return super.add(e);
     }
 
     @Override
     public void add(int index, E element) {
-        adjustSize();
+        if (index < 0 || size() < index) {
+            throw new IllegalArgumentException("index=" + index);
+        }
+        
+        adjustSize(index, element);
         super.add(index, element);
     }
     
-    private void adjustSize() {
+    private void adjustSize(int index, E e) {
         if (isFull()) {
-            E old = remove(0);
+            E old = remove(eject(index, e));
             removed(old);
         }
+    }
+    
+    protected int eject(int index, E e) {
+        return 0;
     }
     
     protected void removed(E element) {
