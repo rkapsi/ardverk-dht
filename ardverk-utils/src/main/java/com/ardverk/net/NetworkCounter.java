@@ -3,10 +3,15 @@ package com.ardverk.net;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.SocketAddress;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.ardverk.coding.CodingUtils;
 import com.ardverk.utils.ByteArrayComparator;
 
 /**
@@ -145,6 +150,41 @@ public class NetworkCounter implements Serializable {
     }
     
     /**
+     * 
+     */
+    public synchronized Set<byte[]> keySet() {
+        return Collections.unmodifiableSet(map.keySet());
+    }
+    
+    /**
+     * 
+     */
+    public synchronized Collection<Integer> values() {
+        Integer[] values = new Integer[map.size()];
+        
+        int index = 0;
+        for (AtomicInteger value : map.values()) {
+            values[index++] = value.intValue();
+        }
+        
+        return Arrays.asList(values);
+    }
+    
+    /**
+     * 
+     */
+    public synchronized Set<Map.Entry<byte[], Integer>> entrySet() {
+        Map<byte[], Integer> copy = new TreeMap<byte[], Integer>(
+                ByteArrayComparator.COMPARATOR);
+        
+        for (Map.Entry<byte[], AtomicInteger> entry : map.entrySet()) {
+            copy.put(entry.getKey(), entry.getValue().intValue());
+        }
+        
+        return copy.entrySet();
+    }
+    
+    /**
      * Returns the number of networks
      */
     public synchronized int size() {
@@ -163,5 +203,21 @@ public class NetworkCounter implements Serializable {
      */
     public synchronized void clear() {
         map.clear();
+    }
+    
+    @Override
+    public synchronized String toString() {
+        StringBuilder buffer = new StringBuilder("[");
+        
+        if (!map.isEmpty()) {
+            for (Map.Entry<byte[], AtomicInteger> entry : map.entrySet()) {
+                buffer.append(CodingUtils.encodeBase16(entry.getKey()))
+                    .append("=").append(entry.getValue()).append(", ");
+            }
+            
+            buffer.setLength(buffer.length()-2);
+        }
+        
+        return buffer.append("]").toString();
     }
 }
