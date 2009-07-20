@@ -90,6 +90,12 @@ public class AsyncFutureTask<V> implements Runnable, AsyncFuture<V> {
         watchdog = EXECUTOR.schedule(task, timeout, unit);
     }
     
+    /**
+     * This method is being called right before the watchdog is killing 
+     * this {@link AsyncFuture}.
+     * 
+     * NOTE: This method is being called while a lock on this this being held.
+     */
     protected void watchdogWillKillFuture() {
         // OVERRIDE
     }
@@ -200,6 +206,9 @@ public class AsyncFutureTask<V> implements Runnable, AsyncFuture<V> {
         fireOperationComplete();
     }
     
+    /**
+     * Called when the {@link AsyncFutureTask} is done.
+     */
     protected void done() {
         // OVERRIDE
     }
@@ -238,6 +247,9 @@ public class AsyncFutureTask<V> implements Runnable, AsyncFuture<V> {
         return listeners.toArray(new AsyncFutureListener[0]);
     }
     
+    /**
+     * Notifies all {@link AsyncFutureListener}s
+     */
     protected void fireOperationComplete() {
         Runnable event = new Runnable() {
             @Override
@@ -252,8 +264,8 @@ public class AsyncFutureTask<V> implements Runnable, AsyncFuture<V> {
     }
     
     /**
-     * Make sure can not call {@link #get()} and {@link #get(long, TimeUnit)}
-     * from the {@link EventUtils} Thread as it is very difficult to debug.
+     * Make sure one can not call any of the {@link #get()} methods from
+     * the {@link EventUtils} Thread as it is very difficult to debug.
      */
     protected void checkIfEventThread() throws IllegalStateException {
         if (EventUtils.isEventThread() && !isDone()) {
