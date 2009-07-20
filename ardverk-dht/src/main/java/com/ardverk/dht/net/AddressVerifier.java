@@ -25,7 +25,7 @@ public class AddressVerifier {
         }
         
         if (count < 0) {
-            throw new IllegalArgumentException("maxSize=" + count);
+            throw new IllegalArgumentException("count=" + count);
         }
         
         this.mask = mask;
