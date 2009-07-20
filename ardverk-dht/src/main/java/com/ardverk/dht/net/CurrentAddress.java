@@ -9,7 +9,7 @@ import com.ardverk.net.NetworkMask;
 /**
  * 
  */
-public class AddressVerifier {
+public class CurrentAddress {
 
     private final NetworkMask mask;
     
@@ -19,7 +19,7 @@ public class AddressVerifier {
     
     private InetAddress temporary = null;
     
-    public AddressVerifier(NetworkMask mask, int count) {        
+    public CurrentAddress(NetworkMask mask, int count) {        
         if (mask == null) {
             throw new NullPointerException("mask");
         }
@@ -49,24 +49,23 @@ public class AddressVerifier {
             return true;
         }
         
-        // Initialize the temporary address with the given value if 
-        // it's null
+        // Initialize the temporary address with the given value if it's null
         if (temporary == null) {
             temporary = address;
             
-        // Reset the temporary address if it doesn't match with the 
-        // given address. In other words, we continue working with 
-        // the current address.
+        // Reset the temporary address if it doesn't match with the given 
+        // address and continue working with the one we already have
         } else if (!temporary.equals(address)) {
             temporary = null;
             history.clear();
             return false;
         }
         
+        // We use a ByteBuffer because it implements equals() and hashCode()
         ByteBuffer network = ByteBuffer.wrap(mask.mask(src));
         
-        // Make sure we're not accepting proposals more than once
-        // from the same Network during the discovery process.
+        // Make sure we're not accepting proposals more than once from the 
+        // same Network during the discovery process
         if (!history.contains(network)) {
             history.add(network);
             if (history.isFull()) {

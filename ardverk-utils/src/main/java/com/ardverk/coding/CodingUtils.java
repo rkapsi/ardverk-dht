@@ -11,7 +11,11 @@ public class CodingUtils {
     }
     
     public static String encodeBase16(byte[] data) {
-        return StringUtils.toString(Base16.encodeBase16(data));
+        return encodeBase16(data, 0, data.length);
+    }
+    
+    public static String encodeBase16(byte[] data, int offset, int length) {
+        return StringUtils.toString(Base16.encodeBase16(data, offset, length));
     }
     
     public static byte[] decodeBase16(String data) {
