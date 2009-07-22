@@ -1,8 +1,9 @@
 package com.ardverk.dht.routing;
 
 import java.net.SocketAddress;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import com.ardverk.dht.KUID;
 
@@ -20,8 +21,7 @@ public class DefaultContact implements Contact {
     
     private final SocketAddress address;
     
-    private final Map<Object, Object> attributes 
-        = new ConcurrentHashMap<Object, Object>();
+    private Map<Object, Object> attributes;
     
     public DefaultContact(Type type, KUID contactId, 
             int instanceId, SocketAddress address, 
@@ -47,8 +47,8 @@ public class DefaultContact implements Contact {
         this.instanceId = instanceId;
         this.address = address;
         
-        if (attributes != null) {
-            this.attributes.putAll(attributes);
+        if (attributes != null && !attributes.isEmpty()) {
+            this.attributes = new HashMap<Object, Object>(attributes);
         }
     }
     
@@ -79,8 +79,7 @@ public class DefaultContact implements Contact {
         this.address = contact.getRemoteAddress();
         this.type = contact.getType();
         
-        this.attributes.putAll(existing.getAttributes());
-        this.attributes.putAll(contact.getAttributes());
+        copyAttributes(existing, contact);
     }
     
     private DefaultContact(Contact contact, Type type) {
@@ -100,7 +99,7 @@ public class DefaultContact implements Contact {
         this.address = contact.getRemoteAddress();
         this.type = type;
         
-        this.attributes.putAll(contact.getAttributes());   
+        copyAttributes(contact);
     }
     
     @Override
@@ -139,30 +138,48 @@ public class DefaultContact implements Contact {
     }
 
     @Override
-    public Object getAttribute(Object key) {
-        return attributes.get(key);
+    public synchronized Object getAttribute(Object key) {
+        return attributes != null ? attributes.get(key) : null;
     }
 
     @Override
-    public boolean hasAttribute(Object key) {
-        return attributes.containsKey(key);
+    public synchronized boolean hasAttribute(Object key) {
+        return attributes != null ? attributes.containsKey(key) : false;
     }
 
     @Override
-    public Object removeAttribute(Object key) {
-        return attributes.remove(key);
+    public synchronized Object removeAttribute(Object key) {
+        return attributes != null ? attributes.remove(key) : null;
     }
 
     @Override
-    public Object setAttribute(Object key, Object value) {
+    public synchronized Object setAttribute(Object key, Object value) {
+        if (attributes == null) {
+            attributes = new HashMap<Object, Object>();
+        }
         return attributes.put(key, value);
     }
 
     @Override
-    public Map<Object, Object> getAttributes() {
-        return attributes;
+    public synchronized Map<Object, Object> getAttributes() {
+        return attributes != null ? attributes : Collections.emptyMap();
     }
-
+    
+    private synchronized void copyAttributes(Contact... src) {
+        for (Contact contact : src) {
+            synchronized (contact) {
+                Map<Object, Object> attr = contact.getAttributes();
+                if (attr != null && !attr.isEmpty()) {
+                    if (attributes == null) {
+                        attributes = new HashMap<Object, Object>(attr);
+                    } else {
+                        attributes.putAll(attr);
+                    }
+                }
+            }
+        }
+    }
+    
     @Override
     public int hashCode() {
         return contactId.hashCode();

@@ -12,6 +12,12 @@ public interface Contact {
         UNCHARTED
     }
     
+    public static enum Type2 {
+        FOO,
+        UNSOLICITED,
+        SOLICITED;
+    }
+    
     public long getCreationTime();
 
     public long getTimeStamp();
