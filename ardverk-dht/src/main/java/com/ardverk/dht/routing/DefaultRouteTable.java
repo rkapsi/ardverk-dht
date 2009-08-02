@@ -44,12 +44,8 @@ public class DefaultRouteTable extends AbstractRouteTable {
     private int consecutiveErrors = 0;
     
     public DefaultRouteTable(ContactFactory contactFactory, 
-            KUID contactId, SocketAddress address, int k) {
+            int k, KUID contactId, int instanceId, SocketAddress address) {
         super(contactFactory, k);
-        
-        if (contactFactory == null) {
-            throw new NullPointerException("contactFactory");
-        }
         
         if (contactId == null) {
             throw new NullPointerException("contactId");
@@ -57,10 +53,6 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         if (address == null) {
             throw new NullPointerException("address");
-        }
-        
-        if (k <= 0) {
-            throw new IllegalArgumentException("k=" + k);
         }
         
         KeyFactory keyFactory = getKeyFactory();
@@ -73,7 +65,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         this.keyAnalyzer = KUID.createKeyAnalyzer(lengthInBits);
         
-        this.localhost = contactFactory.createCharted(contactId, 0, address);
+        this.localhost = contactFactory.createCharted(contactId, instanceId, address);
         this.buckets = new PatriciaTrie<KUID, Bucket>(keyAnalyzer);
         
         init();
