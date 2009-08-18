@@ -17,7 +17,7 @@ public class DefaultContactFactory extends AbstractContactFactory {
     public Contact createUncharted(KUID contactId, int instanceId,
             SocketAddress address, Map<?, ?> attributes)  {
         
-        return new DefaultContact(Type.UNCHARTED, contactId, 
+        return new DefaultContact(Type.UNSOLICITED, contactId, 
                 instanceId, address, attributes);
     }
     
@@ -25,7 +25,7 @@ public class DefaultContactFactory extends AbstractContactFactory {
     public Contact createCharted(KUID contactId, int instanceId,
             SocketAddress address, Map<?, ?> attributes)  {
         
-        return new DefaultContact(Type.CHARTED, contactId, 
+        return new DefaultContact(Type.SOLICITED, contactId, 
                 instanceId, address, attributes);
     }
 

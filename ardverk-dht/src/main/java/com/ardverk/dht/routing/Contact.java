@@ -8,14 +8,30 @@ import com.ardverk.dht.KUID;
 public interface Contact {
     
     public static enum Type {
-        CHARTED,
-        UNCHARTED
-    }
-    
-    public static enum Type2 {
-        FOO,
-        UNSOLICITED,
-        SOLICITED;
+        /**
+         * {@link Contact}s that were returned in FIND_NODE responses
+         */
+        UNKNOWN(false),
+        
+        /**
+         * {@link Contact}s that sent us a request
+         */
+        UNSOLICITED(true),
+        
+        /**
+         * {@link Contact}s that sent us a response
+         */
+        SOLICITED(true);
+        
+        private final boolean active;
+        
+        private Type(boolean active) {
+            this.active = active;
+        }
+        
+        public boolean isActive() {
+            return active;
+        }
     }
     
     public long getCreationTime();
@@ -40,5 +56,11 @@ public interface Contact {
     
     public Map<Object, Object> getAttributes();
     
-    public boolean isCharted();
+    public boolean isSolicited();
+    
+    public boolean isUnsolicited();
+    
+    public boolean isUnknown();
+    
+    public boolean isActive();
 }

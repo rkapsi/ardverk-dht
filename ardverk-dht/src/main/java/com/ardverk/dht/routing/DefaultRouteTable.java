@@ -114,8 +114,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         // Reset the consecutive errors counter every time
         // we receive a "message" from an actual Contact.
-        Type type = contact.getType();
-        if (type == Type.CHARTED) {
+        if (contact.isActive()) {
             consecutiveErrors = 0;
         }
         
@@ -149,7 +148,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
                 && !contact.equals(localhost));
         
         // 
-        if (entity.isAlive() && !contact.isCharted()) {
+        if (entity.isAlive() && !contact.isSolicited()) {
             return;
         }
         
@@ -318,9 +317,9 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
         
         Bucket bucket = buckets.selectValue(contactId);
-        ContactEntity handle = bucket.get(contactId);
+        ContactEntity entity = bucket.get(contactId);
         
-        if (handle == null) {
+        if (entity == null) {
             return;
         }
         
@@ -330,7 +329,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
             return;
         }
         
-        boolean dead = handle.error();
+        boolean dead = entity.error();
         if (dead) {
             
         }
@@ -392,8 +391,8 @@ public class DefaultRouteTable extends AbstractRouteTable {
             Contact previous = this.contact;
             
             if (previous != null) {
-                if (previous.getType() == Type.CHARTED
-                        && contact.getType() == Type.UNCHARTED) {
+                if (previous.getType() == Type.SOLICITED
+                        && contact.getType() == Type.UNSOLICITED) {
                     throw new IllegalArgumentException();
                 }
                 
@@ -415,12 +414,12 @@ public class DefaultRouteTable extends AbstractRouteTable {
             return isDead();
         }
         
-        public boolean isCharted() {
-            return contact.getType() == Type.CHARTED;
+        public boolean isSolicited() {
+            return contact.isSolicited();
         }
         
-        public boolean isUncharted() {
-            return contact.getType() == Type.UNCHARTED;
+        public boolean isUnsolicited() {
+            return contact.isUnsolicited();
         }
         
         public boolean isDead() {
@@ -428,11 +427,11 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
         
         public boolean isAlive() {
-            return !isDead() && isCharted();
+            return !isDead() && contact.isActive();
         }
         
         public boolean isUnknown() {
-            return !isDead() && isUncharted();
+            return !isDead() && isUnsolicited();
         }
         
         public boolean isSameRemoteAddress(Contact contact) {

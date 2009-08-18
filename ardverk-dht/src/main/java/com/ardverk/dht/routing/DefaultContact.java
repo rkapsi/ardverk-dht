@@ -133,8 +133,23 @@ public class DefaultContact implements Contact {
     }
 
     @Override
-    public boolean isCharted() {
-        return type == Type.CHARTED;
+    public boolean isSolicited() {
+        return type == Type.SOLICITED;
+    }
+    
+    @Override
+    public boolean isUnknown() {
+        return type == Type.UNKNOWN;
+    }
+
+    @Override
+    public boolean isUnsolicited() {
+        return type == Type.UNSOLICITED;
+    }
+
+    @Override
+    public boolean isActive() {
+        return type.isActive();
     }
 
     @Override
