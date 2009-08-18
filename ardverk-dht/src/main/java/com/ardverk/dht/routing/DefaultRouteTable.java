@@ -238,9 +238,9 @@ public class DefaultRouteTable extends AbstractRouteTable {
     
     @Override
     public Contact[] select(KUID contactId, int count) {
-        List<Contact> items = new ArrayList<Contact>(count);
-        selectR(contactId, items, count);
-        return items.toArray(new Contact[0]);
+        List<Contact> dst = new ArrayList<Contact>(count);
+        selectR(contactId, dst, count);
+        return dst.toArray(new Contact[0]);
     }
     
     private synchronized void selectR(final KUID contactId, 
