@@ -67,7 +67,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         this.keyAnalyzer = KUID.createKeyAnalyzer(lengthInBits);
         
-        this.localhost = contactFactory.createCharted(contactId, instanceId, address);
+        this.localhost = contactFactory.createSolicited(contactId, instanceId, address);
         this.buckets = new PatriciaTrie<KUID, Bucket>(keyAnalyzer);
         
         init();

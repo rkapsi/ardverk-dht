@@ -14,7 +14,7 @@ public class DefaultContactFactory extends AbstractContactFactory {
     }
 
     @Override
-    public Contact createUncharted(KUID contactId, int instanceId,
+    public Contact createUnsolicited(KUID contactId, int instanceId,
             SocketAddress address, Map<?, ?> attributes)  {
         
         return new DefaultContact(Type.UNSOLICITED, contactId, 
@@ -22,10 +22,18 @@ public class DefaultContactFactory extends AbstractContactFactory {
     }
     
     @Override
-    public Contact createCharted(KUID contactId, int instanceId,
+    public Contact createSolicited(KUID contactId, int instanceId,
             SocketAddress address, Map<?, ?> attributes)  {
         
         return new DefaultContact(Type.SOLICITED, contactId, 
+                instanceId, address, attributes);
+    }
+    
+    @Override
+    public Contact createUnknown(KUID contactId, int instanceId,
+            SocketAddress address, Map<?, ?> attributes)  {
+        
+        return new DefaultContact(Type.UNKNOWN, contactId, 
                 instanceId, address, attributes);
     }
 

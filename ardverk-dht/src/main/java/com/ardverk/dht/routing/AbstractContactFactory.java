@@ -23,14 +23,20 @@ public abstract class AbstractContactFactory implements ContactFactory {
     }
     
     @Override
-    public Contact createUncharted(KUID contactId, 
+    public Contact createUnsolicited(KUID contactId, 
             int instanceId, SocketAddress address)  {
-        return createUncharted(contactId, instanceId, address, null);
+        return createUnsolicited(contactId, instanceId, address, null);
     }
     
     @Override
-    public Contact createCharted(KUID contactId, 
+    public Contact createSolicited(KUID contactId, 
             int instanceId, SocketAddress address)  {
-        return createCharted(contactId, instanceId, address, null);
+        return createSolicited(contactId, instanceId, address, null);
+    }
+    
+    @Override
+    public Contact createUnknown(KUID contactId, 
+            int instanceId, SocketAddress address) {
+        return createUnknown(contactId, instanceId, address, null);
     }
 }

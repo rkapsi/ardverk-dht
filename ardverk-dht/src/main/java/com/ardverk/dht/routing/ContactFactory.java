@@ -10,16 +10,22 @@ public interface ContactFactory {
 
     public KeyFactory getKeyFactory();
     
-    public Contact createUncharted(KUID contactId, 
+    public Contact createUnsolicited(KUID contactId, 
             int instanceId, SocketAddress address);
     
-    public Contact createUncharted(KUID contactId, 
+    public Contact createUnsolicited(KUID contactId, 
             int instanceId, SocketAddress address, Map<?, ?> attributes);
     
-    public Contact createCharted(KUID contactId, 
+    public Contact createSolicited(KUID contactId, 
             int instanceId, SocketAddress address);
     
-    public Contact createCharted(KUID contactId, 
+    public Contact createSolicited(KUID contactId, 
+            int instanceId, SocketAddress address, Map<?, ?> attributes);
+    
+    public Contact createUnknown(KUID contactId, 
+            int instanceId, SocketAddress address);
+    
+    public Contact createUnknown(KUID contactId, 
             int instanceId, SocketAddress address, Map<?, ?> attributes);
     
     public Contact merge(Contact existing, Contact contact);
