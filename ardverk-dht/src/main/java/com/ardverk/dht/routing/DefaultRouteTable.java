@@ -200,14 +200,14 @@ public class DefaultRouteTable extends AbstractRouteTable {
                 LOG.info("Splitting Bucket: " + bucket);
             }
             
-            Bucket[] buckets = bucket.split();
-            assert (buckets.length == 2);
+            Bucket[] split = bucket.split();
+            assert (split.length == 2);
             
-            Bucket left = buckets[0];
-            Bucket right = buckets[1];
+            Bucket left = split[0];
+            Bucket right = split[1];
             
             // The left one replaces the existing Bucket
-            Bucket oldLeft = this.buckets.put(left.getBucketId(), left);
+            Bucket oldLeft = buckets.put(left.getBucketId(), left);
             assert (oldLeft == bucket);
             
             // The right one is new in the RouteTable
@@ -245,13 +245,13 @@ public class DefaultRouteTable extends AbstractRouteTable {
     }
     
     private synchronized void selectR(final KUID contactId, 
-            final Collection<Contact> items, final int count) {
+            final Collection<Contact> dst, final int count) {
         
         if (contactId == null) {
             throw new NullPointerException("contactId");
         }
         
-        if (items.size() >= count) {
+        if (dst.size() >= count) {
             return;
         }
        
@@ -259,7 +259,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
             @Override
             public Decision select(Entry<? extends KUID, ? extends Bucket> entry) {
                 Bucket bucket = entry.getValue();
-                return bucket.select(contactId, items, count);
+                return bucket.select(contactId, dst, count);
             }
         });
     }
@@ -531,7 +531,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         private static final double PROBABILITY = 0.75d;
         
         public Decision select(KUID contactId, 
-                final Collection<Contact> items, final int count) {
+                final Collection<Contact> dst, final int count) {
             
             active.select(contactId, new Cursor<KUID, ContactEntity>() {
                 @Override
@@ -546,14 +546,14 @@ public class DefaultRouteTable extends AbstractRouteTable {
                     }
                     
                     if (probability >= PROBABILITY) {
-                        items.add(handle.getContact());
+                        dst.add(handle.getContact());
                     }
                     
-                    return (items.size() < count ? Decision.CONTINUE : Decision.EXIT);
+                    return (dst.size() < count ? Decision.CONTINUE : Decision.EXIT);
                 }
             });
             
-            return (items.size() < count ? Decision.CONTINUE : Decision.EXIT);
+            return (dst.size() < count ? Decision.CONTINUE : Decision.EXIT);
         }
         
         public ContactEntity get(KUID contactId) {
