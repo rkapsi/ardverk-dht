@@ -10,7 +10,7 @@ public interface RouteTable {
     
     public Contact getLocalhost();
     
-    public void setContactPinger(ContactPinger pinger);
+    public ContactPinger getContactPinger();
     
     public void add(Contact contact);
     
@@ -35,4 +35,10 @@ public interface RouteTable {
     public void failure(KUID contactId, SocketAddress address);
     
     public void rebuild();
+    
+    public void addRouteTableListener(RouteTableListener l);
+    
+    public void removeRouteTableListener(RouteTableListener l);
+    
+    public RouteTableListener[] getRouteTableListeners();
 }

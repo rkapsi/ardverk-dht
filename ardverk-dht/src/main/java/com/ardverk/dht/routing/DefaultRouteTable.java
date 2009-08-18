@@ -20,8 +20,10 @@ import org.slf4j.Logger;
 import com.ardverk.collection.FixedSizeHashMap;
 import com.ardverk.concurrent.AsyncFuture;
 import com.ardverk.concurrent.AsyncFutureListener;
+import com.ardverk.dht.ContactPinger;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.KeyFactory;
+import com.ardverk.dht.message.PingResponse;
 import com.ardverk.dht.routing.Contact.Type;
 import com.ardverk.logging.LoggerUtils;
 import com.ardverk.net.NetworkConstants;
@@ -43,9 +45,9 @@ public class DefaultRouteTable extends AbstractRouteTable {
     
     private int consecutiveErrors = 0;
     
-    public DefaultRouteTable(ContactFactory contactFactory, 
+    public DefaultRouteTable(ContactPinger pinger, ContactFactory contactFactory, 
             int k, KUID contactId, int instanceId, SocketAddress address) {
-        super(contactFactory, k);
+        super(pinger, contactFactory, k);
         
         if (contactId == null) {
             throw new NullPointerException("contactId");
@@ -295,18 +297,16 @@ public class DefaultRouteTable extends AbstractRouteTable {
         return (sibling.getDepth() - 1) == prefixLength;
     }
     
-    private synchronized boolean ping(Contact contact) {
-        if (pinger == null) {
-            return false;
-        }
-        
-        AsyncFutureListener<?> listener = new AsyncFutureListener<?>() {
+    private synchronized void ping(Contact contact) {
+        AsyncFutureListener<PingResponse> listener 
+                = new AsyncFutureListener<PingResponse>() {
             @Override
-            public void operationComplete(AsyncFuture<?> future) {
+            public void operationComplete(AsyncFuture<PingResponse> future) {
             }
         };
         
-        return pinger.ping(contact, listener);
+        AsyncFuture<PingResponse> future = pinger.ping(contact);
+        future.addAsyncFutureListener(listener);
     }
     
     private static final int MAX_CONSECUTIVE_ERRORS = 100;
