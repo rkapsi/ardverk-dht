@@ -21,7 +21,7 @@ public abstract class MessageCodecSpi {
     
     public abstract byte[] encode(Message message, SocketAddress dst) throws IOException;
     
-    public abstract Message decode(SocketAddress src, byte[] data) throws IOException;
+    public abstract Message decode(SocketAddress src, byte[] in) throws IOException;
     
     @Override
     public String toString() {

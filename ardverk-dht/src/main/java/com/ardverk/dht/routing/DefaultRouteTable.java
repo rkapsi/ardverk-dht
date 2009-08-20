@@ -88,6 +88,10 @@ public class DefaultRouteTable extends AbstractRouteTable {
         innerAdd(localhost);
     }
     
+    private boolean isLocalhost(ContactEntity entity) {
+        return isLocalhost(entity.getContact());
+    }
+    
     private boolean isLocalhost(Contact contact) {
         return localhost.getContactId().equals(contact.getContactId());
     }
@@ -176,7 +180,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
     }
     
-    private synchronized void addCache(Bucket bucket, Contact contact) {
+    private synchronized ContactEntity addCache(Bucket bucket, Contact contact) {
         ContactEntity entity = new ContactEntity(contact);
         ContactEntity other = bucket.addCache(entity);
         
@@ -187,10 +191,35 @@ public class DefaultRouteTable extends AbstractRouteTable {
                 fireContactReplaced(bucket, other.getContact(), contact);
             }
         }
+        
+        return other;
     }
     
     private synchronized void replaceCache(Bucket bucket, Contact contact) {
+        ContactEntity lrs = bucket.getLeastRecentlySeenActiveContact();
         
+        if (contact.isActive() && isOkayToAdd(bucket, contact)) {
+            
+            if (!isLocalhost(lrs) /* OTHER CONDITION! */) {
+                
+                bucket.removeActive(lrs);
+                bucket.addActive(new ContactEntity(contact));
+                
+                fireReplaceContact(bucket, lrs.getContact(), contact);
+                
+                return;
+            }
+        }
+        
+        addCache(bucket, contact);
+        pingLeastRecentlySeenContact(bucket);
+    }
+    
+    private synchronized void pingLeastRecentlySeenContact(Bucket bucket) {
+        ContactEntity lrs = bucket.getLeastRecentlySeenActiveContact();
+        if (!isLocalhost(lrs)) {
+            ping(lrs, null);
+        }
     }
     
     private synchronized boolean split(Bucket bucket) {
@@ -210,7 +239,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
             assert (oldLeft == bucket);
             
             // The right one is new in the RouteTable
-            Bucket oldRight = this.buckets.put(right.getBucketId(), right);
+            Bucket oldRight = buckets.put(right.getBucketId(), right);
             assert (oldRight == null);
             
             fireSplitBucket(bucket, left, right);
@@ -296,16 +325,31 @@ public class DefaultRouteTable extends AbstractRouteTable {
         return (sibling.getDepth() - 1) == prefixLength;
     }
     
-    private synchronized void ping(Contact contact) {
-        AsyncFutureListener<PingResponse> listener 
+    private synchronized void ping(ContactEntity entity, 
+            AsyncFutureListener<PingResponse> listener) {
+        /*AsyncFutureListener<PingResponse> listener 
                 = new AsyncFutureListener<PingResponse>() {
             @Override
             public void operationComplete(AsyncFuture<PingResponse> future) {
+                if (!future.throwsException()) {
+                    try {
+                        PingResponse response = future.get();
+                        fireCollision(response.getContact());
+                    } catch (InterruptedException err) {
+                        LOG.error("InterruptedException", err);
+                    } catch (ExecutionException err) {
+                        LOG.error("ExecutionException", err);
+                    }
+                }
             }
-        };
+        };*/
         
-        AsyncFuture<PingResponse> future = pinger.ping(contact);
-        future.addAsyncFutureListener(listener);
+        AsyncFuture<PingResponse> future 
+            = pinger.ping(entity.getContact());
+        
+        if (listener != null) {
+            future.addAsyncFutureListener(listener);
+        }
     }
     
     private static final int MAX_CONSECUTIVE_ERRORS = 100;
@@ -537,15 +581,15 @@ public class DefaultRouteTable extends AbstractRouteTable {
                 public Decision select(Entry<? extends KUID, 
                         ? extends ContactEntity> entry) {
                     
-                    ContactEntity handle = entry.getValue();
+                    ContactEntity entity = entry.getValue();
                     
                     double probability = 1.0d;
-                    if (handle.isDead()) {
+                    if (entity.isDead()) {
                         probability = Math.random();
                     }
                     
                     if (probability >= PROBABILITY) {
-                        dst.add(handle.getContact());
+                        dst.add(entity.getContact());
                     }
                     
                     return (dst.size() < count ? Decision.CONTINUE : Decision.EXIT);
@@ -594,8 +638,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
             KUID contactId = contact.getContactId();
             
             // Make sure Bucket does not contain the Contact!
-            assert (!active.containsKey(contactId)
-                    && !cached.containsKey(contactId));
+            assert (!contains(contactId));
                 
             if (hasOrMakeSpace()) {
                 active.put(contactId, entity);
@@ -611,8 +654,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
             KUID contactId = contact.getContactId();
             
             // Make sure Bucket does not contain the Contact!
-            assert (!active.containsKey(contactId)
-                    && !cached.containsKey(contactId));
+            assert (!contains(contactId));
             
             if (!isCacheFull()) {
                 cached.put(contactId, entity);

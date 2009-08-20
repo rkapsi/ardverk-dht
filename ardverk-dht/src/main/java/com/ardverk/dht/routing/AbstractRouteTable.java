@@ -138,4 +138,30 @@ public abstract class AbstractRouteTable implements RouteTable {
         
         EventUtils.fireEvent(event);
     }
+    
+    protected void fireCollision(Contact contact) {
+        Runnable event = new Runnable() {
+            @Override
+            public void run() {
+                for (RouteTableListener l : listeners) {
+                    
+                }
+            }
+        };
+        
+        EventUtils.fireEvent(event);
+    }
+    
+    protected void fireReplaceContact(Bucket bucket, Contact existing, Contact contact) {
+        Runnable event = new Runnable() {
+            @Override
+            public void run() {
+                for (RouteTableListener l : listeners) {
+                    
+                }
+            }
+        };
+        
+        EventUtils.fireEvent(event);
+    }
 }
