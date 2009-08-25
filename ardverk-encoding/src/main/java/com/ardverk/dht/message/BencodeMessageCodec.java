@@ -1,7 +1,9 @@
 package com.ardverk.dht.message;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.SocketAddress;
+import java.net.InetSocketAddress;
 
 public class BencodeMessageCodec extends MessageCodec {
 
@@ -12,14 +14,24 @@ public class BencodeMessageCodec extends MessageCodec {
     }
 
     @Override
-    public Message decode(SocketAddress src, byte[] in)
+    public Message decode(InetSocketAddress src, byte[] data)
             throws IOException {
+        BencodingInputStream in = new BencodingInputStream(
+                new ByteArrayInputStream(data));
         return null;
     }
-
+    
     @Override
-    public byte[] encode(Message message, SocketAddress dst)
+    public byte[] encode(Message message, InetSocketAddress dst)
             throws IOException {
-        return null;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        BencodingOutputStream out = new BencodingOutputStream(baos);
+        
+        out.writeObject(message.getOpCode().name());
+        out.writeObject(message.getMessageId().getBytes());
+        out.writeObject(dst.getAddress().getAddress());
+        
+        out.close();
+        return baos.toByteArray();
     }
 }

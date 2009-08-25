@@ -1,7 +1,7 @@
 package com.ardverk.dht.message;
 
 import java.io.IOException;
-import java.net.SocketAddress;
+import java.net.InetSocketAddress;
 
 public abstract class MessageCodecSpi {
 
@@ -19,9 +19,9 @@ public abstract class MessageCodecSpi {
         return name;
     }
     
-    public abstract byte[] encode(Message message, SocketAddress dst) throws IOException;
+    public abstract byte[] encode(Message message, InetSocketAddress dst) throws IOException;
     
-    public abstract Message decode(SocketAddress src, byte[] in) throws IOException;
+    public abstract Message decode(InetSocketAddress src, byte[] in) throws IOException;
     
     @Override
     public String toString() {

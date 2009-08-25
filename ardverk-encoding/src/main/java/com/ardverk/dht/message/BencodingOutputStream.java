@@ -68,6 +68,8 @@ public class BencodingOutputStream extends FilterOutputStream {
                 writeObject(value);
             }
             write('e');
+        } else if (obj instanceof Enum) {
+            writeObject(((Enum)obj).name());
             
         } else {
             throw new IOException("Cannot bencode " + obj);
