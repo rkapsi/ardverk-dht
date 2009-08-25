@@ -3,7 +3,8 @@ package com.ardverk.dht.message;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.InetSocketAddress;
+
+import com.ardverk.dht.io.SessionContext;
 
 public class BencodeMessageCodec extends MessageCodec {
 
@@ -14,22 +15,26 @@ public class BencodeMessageCodec extends MessageCodec {
     }
 
     @Override
-    public Message decode(InetSocketAddress src, byte[] data)
+    public Message decode(SessionContext context, byte[] data)
             throws IOException {
         BencodingInputStream in = new BencodingInputStream(
                 new ByteArrayInputStream(data));
+        
+        OpCode opcode = OpCode.valueOf((String)in.readObject());
+        //MessageId messageId = MessageFactory.
         return null;
     }
     
     @Override
-    public byte[] encode(Message message, InetSocketAddress dst)
+    public byte[] encode(SessionContext context, Message message)
             throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         BencodingOutputStream out = new BencodingOutputStream(baos);
         
         out.writeObject(message.getOpCode().name());
         out.writeObject(message.getMessageId().getBytes());
-        out.writeObject(dst.getAddress().getAddress());
+        
+        out.writeObject(context.getRemoteAddress().getAddress().getAddress());
         
         out.close();
         return baos.toByteArray();
