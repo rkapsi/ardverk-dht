@@ -53,6 +53,11 @@ public class KUID implements Writable, Serializable, Comparable<KUID> {
         return key.clone();
     }
     
+    public byte[] getBytes(byte[] dst, int destPos) {
+        System.arraycopy(key, 0, dst, destPos, key.length);
+        return dst;
+    }
+    
     public int length() {
         return key.length;
     }
