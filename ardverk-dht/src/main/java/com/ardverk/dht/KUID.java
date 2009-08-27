@@ -9,23 +9,18 @@ import java.util.Arrays;
 import org.ardverk.collection.ByteArrayKeyAnalyzer;
 import org.ardverk.collection.KeyAnalyzer;
 
+import com.ardverk.coding.CodingUtils;
 import com.ardverk.io.Writable;
 
 public class KUID implements Writable, Serializable, Comparable<KUID> {
 
     private static final long serialVersionUID = -4611363711131603626L;
-
-    public static final int NO_BIT_MASK = -1;
     
     private final byte[] key;
-
-    private final int bitMask;
-    
-    private final int lengthInBits;
     
     private final int hashCode;
 
-    public KUID(byte[] key, int bitMask, int lengthInBits) {
+    public KUID(byte[] key) {
         if (key == null) {
             throw new NullPointerException("key");
         }
@@ -34,18 +29,7 @@ public class KUID implements Writable, Serializable, Comparable<KUID> {
             throw new IllegalArgumentException("key.length=" + key.length);
         }
         
-        if (lengthInBits <= 0 || (lengthInBits > (key.length * 8))) {
-            throw new IllegalArgumentException("lengthInBits=" + lengthInBits);
-        }
-        
         this.key = key;
-        this.bitMask = bitMask;
-        this.lengthInBits = lengthInBits;
-        
-        if (bitMask != NO_BIT_MASK) {
-            key[key.length-1] = (byte)(key[key.length-1] & bitMask);
-        }
-        
         this.hashCode = Arrays.hashCode(key);
     }
 
@@ -63,11 +47,7 @@ public class KUID implements Writable, Serializable, Comparable<KUID> {
     }
 
     public int lengthInBits() {
-        return lengthInBits;
-    }
-    
-    public int bitMask() {
-        return bitMask;
+        return length() * 8;
     }
     
     public KUID xor(KUID otherId) {
@@ -81,21 +61,21 @@ public class KUID implements Writable, Serializable, Comparable<KUID> {
                     "lengthInBits=" + otherId.lengthInBits());
         }
 
-        byte[] bytes = new byte[length()];
+        byte[] data = new byte[length()];
         for (int i = 0; i < key.length; i++) {
-            bytes[i] = (byte) (key[i] ^ otherId.key[i]);
+            data[i] = (byte) (key[i] ^ otherId.key[i]);
         }
 
-        return new KUID(bytes, bitMask(), lengthInBits);
+        return new KUID(data);
     }
 
     public KUID inverse() {
-        byte[] bytes = new byte[length()];
+        byte[] data = new byte[length()];
         for (int i = 0; i < key.length; i++) {
-            bytes[i] = (byte)(~key[i]);
+            data[i] = (byte)(~key[i]);
         }
         
-        return new KUID(bytes, bitMask(), lengthInBits());
+        return new KUID(data);
     }
     
     public boolean isSet(int bitIndex) {
@@ -141,7 +121,6 @@ public class KUID implements Writable, Serializable, Comparable<KUID> {
         int value = (int)(key[index] & 0xFF);
         
         if (on != ((value & mask) != 0x00)) {
-            int bitMask = bitMask();
             byte[] copy = getBytes();
             
             if (on) {
@@ -149,7 +128,7 @@ public class KUID implements Writable, Serializable, Comparable<KUID> {
             } else {
                 copy[index] = (byte)(value & ~mask);
             }
-            return new KUID(copy, bitMask, lengthInBits);
+            return new KUID(copy);
         }
         
         return this;
@@ -252,18 +231,11 @@ public class KUID implements Writable, Serializable, Comparable<KUID> {
     }
 
     public BigInteger toBigInteger() {
-        BigInteger value = new BigInteger(1 /* unsigned */, key);
-        
-        if (bitMask() != NO_BIT_MASK) {
-            int bits = (lengthInBits % 8);
-            value = value.shiftRight(bits);
-        }
-        
-        return value;
+        return new BigInteger(1 /* unsigned */, key);
     }
     
     public String toHexString() {
-        return toBigInteger().toString(16);
+        return CodingUtils.encodeBase16(key);
     }
     
     @Override

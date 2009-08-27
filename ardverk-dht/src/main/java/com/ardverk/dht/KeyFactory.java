@@ -27,6 +27,4 @@ public interface KeyFactory extends Serializable {
     public int length();
     
     public int lengthInBits();
-    
-    public int bitMask();
 }

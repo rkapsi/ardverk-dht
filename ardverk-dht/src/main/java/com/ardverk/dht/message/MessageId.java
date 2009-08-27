@@ -3,13 +3,13 @@ package com.ardverk.dht.message;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.util.Arrays;
 
+import com.ardverk.coding.CodingUtils;
 import com.ardverk.io.Writable;
 import com.ardverk.utils.ByteArrayComparator;
 
-public class MessageId implements Writable, Serializable, Comparable<MessageId> {
+public final class MessageId implements Writable, Serializable, Comparable<MessageId> {
 
     private static final long serialVersionUID = 6653397095695641792L;
     
@@ -28,7 +28,7 @@ public class MessageId implements Writable, Serializable, Comparable<MessageId> 
 
     @Override
     public int compareTo(MessageId o) {
-        return ByteArrayComparator.COMPARATOR.compare(messageId, o.getBytes());
+        return ByteArrayComparator.COMPARATOR.compare(messageId, o.messageId);
     }
 
     @Override
@@ -68,7 +68,7 @@ public class MessageId implements Writable, Serializable, Comparable<MessageId> 
     }
     
     public String toHexString() {
-        return new BigInteger(1, messageId).toString(16);
+        return CodingUtils.encodeBase16(messageId);
     }
     
     @Override

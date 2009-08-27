@@ -14,40 +14,23 @@ public class DefaultKeyFactory implements KeyFactory {
     private static final long serialVersionUID = -3573934494417059105L;
 
     private static final Random GENEREATOR = new SecureRandom();
-
-    private final int lengthInBits;
-
-    private final int bitMask;
-
+    
     private final int length;
     
     private final KUID min;
 
     private final KUID max;
     
-    public DefaultKeyFactory(int lengthInBits) {
-        if (lengthInBits <= 0) {
-            throw new IllegalArgumentException("lengthInBits=" + lengthInBits);
+    public DefaultKeyFactory(int length) {
+        if (length <= 0) {
+            throw new IllegalArgumentException("length=" + length);
         }
         
-        this.lengthInBits = lengthInBits;
-
-        this.length = Math.max(1, Math.round(lengthInBits / 8f));
+        this.length = length;
+        
         byte[] minKey = new byte[length];
         byte[] maxKey = new byte[length];
         Arrays.fill(maxKey, (byte) 0xFF);
-
-        int remaining = lengthInBits % 8;
-        int bitMask = 0x00;
-        for (int i = 0; i < remaining; i++) {
-            bitMask |= (0x80 >>> i);
-        }
-        
-        if (bitMask == 0x00) {
-            bitMask = KUID.NO_BIT_MASK;
-        }
-        
-        this.bitMask = bitMask;
         
         this.min = createKey(minKey, false);
         this.max = createKey(maxKey, false);
@@ -71,7 +54,7 @@ public class DefaultKeyFactory implements KeyFactory {
             key = key.clone();
         }
         
-        return new KUID(key, bitMask(), lengthInBits());
+        return new KUID(key);
     }
 
     @Override
@@ -131,11 +114,6 @@ public class DefaultKeyFactory implements KeyFactory {
             throw new IllegalArgumentException("value=" + value);
         }
         
-        if (bitMask() != KUID.NO_BIT_MASK) {
-            int bits = (lengthInBits / 8);
-            value = value.shiftLeft(bits);
-        }
-        
         byte[] bytes = value.toByteArray();
         
         byte[] key = new byte[length()];
@@ -152,13 +130,8 @@ public class DefaultKeyFactory implements KeyFactory {
     }
 
     @Override
-    public int bitMask() {
-        return bitMask;
-    }
-
-    @Override
     public int lengthInBits() {
-        return lengthInBits;
+        return length() * 8;
     }
     
     @Override

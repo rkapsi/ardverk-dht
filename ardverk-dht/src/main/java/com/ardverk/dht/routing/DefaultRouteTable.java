@@ -768,7 +768,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
             byte[] data = new byte[20];
             generator.nextBytes(data);
             
-            KUID key = new KUID(data, KUID.NO_BIT_MASK, 160);
+            KUID key = new KUID(data);
             
             tree.put(key, key);
             trie.put(key, key);
@@ -776,7 +776,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         byte[] data = new byte[20];
         generator.nextBytes(data);
-        final KUID lookupKey = new KUID(data, KUID.NO_BIT_MASK, 160);
+        final KUID lookupKey = new KUID(data);
         
         System.out.println("KEY: " + lookupKey);
         System.out.println();
