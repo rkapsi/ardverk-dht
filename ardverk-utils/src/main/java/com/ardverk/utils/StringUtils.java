@@ -6,6 +6,8 @@ public class StringUtils {
 
     public static final String UTF_8 = "UTF-8";
     
+    public static final String ISO_8859_1 = "ISO-8859-1";
+    
     private StringUtils() {}
     
     public static String toString(byte[] data) {
@@ -31,6 +33,4 @@ public class StringUtils {
             throw new IllegalArgumentException("encoding=" + encoding, e);
         }
     }
-    
-    
 }
