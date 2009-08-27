@@ -1,12 +1,12 @@
 package com.ardverk.dht.message;
 
-import java.net.InetSocketAddress;
+import com.ardverk.dht.io.SessionContext;
 
 public interface MessageFactory {
 
     public MessageId createMessageId(byte[] messageId);
     
-    public MessageId createMessageId(InetSocketAddress dst);
+    public MessageId createMessageId(SessionContext context);
     
-    public boolean isFor(MessageId messageId, InetSocketAddress src);
+    public boolean isFor(MessageId messageId, SessionContext context);
 }
