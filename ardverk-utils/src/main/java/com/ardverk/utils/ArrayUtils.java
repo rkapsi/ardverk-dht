@@ -1,10 +1,11 @@
 package com.ardverk.utils;
 
+import java.security.SecureRandom;
 import java.util.Random;
 
 public class ArrayUtils {
 
-    private static final Random GENERATOR = new Random();
+    private static final Random GENERATOR = new SecureRandom();
     
     private ArrayUtils() {}
     
