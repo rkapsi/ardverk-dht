@@ -90,7 +90,7 @@ public class BencodingInputStream extends FilterInputStream {
         try {
             return Integer.parseInt(buffer.toString());
         } catch (NumberFormatException err) {
-            throw new IOException(err);
+            throw new IOException("NumberFormatException", err);
         }
     }
     
@@ -108,7 +108,7 @@ public class BencodingInputStream extends FilterInputStream {
         try {
             return Long.parseLong(buffer.toString());
         } catch (NumberFormatException err) {
-            throw new IOException(err);
+            throw new IOException("NumberFormatException", err);
         }
     }
     
@@ -134,7 +134,7 @@ public class BencodingInputStream extends FilterInputStream {
                 throw new EOFException();
             }
             
-            String str = new String((byte[])key, StringUtils.UTF_8);
+            String str = new String((byte[])key, encoding);
             map.put(str, value);
         }
         return map;

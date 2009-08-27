@@ -12,6 +12,10 @@ import com.ardverk.utils.StringUtils;
 
 public class BencodingOutputStream extends FilterOutputStream {
 
+    private static final Integer TRUE = Integer.valueOf(1);
+    
+    private static final Integer FALSE = Integer.valueOf(0);
+    
     private final String encoding;
     
     public BencodingOutputStream(OutputStream out) {
@@ -45,9 +49,9 @@ public class BencodingOutputStream extends FilterOutputStream {
             
         } else if (obj instanceof Boolean) {
             if (((Boolean)obj).booleanValue()) {
-                writeObject(Integer.valueOf(1));
+                writeObject(TRUE);
             } else {
-                writeObject(Integer.valueOf(0));
+                writeObject(FALSE);
             }
             
         } else if (obj instanceof Number) {
@@ -74,12 +78,14 @@ public class BencodingOutputStream extends FilterOutputStream {
             }
             
             write('d');
-            for (Object key : map.keySet()) {
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
+                Object key = entry.getKey();
+                Object value = entry.getValue();
+                
                 if (!(key instanceof String)) {
                     throw new IOException("Key must be a String: " + key);
                 }
                 
-                Object value = map.get(key);
                 writeObject(key);
                 writeObject(value);
             }
