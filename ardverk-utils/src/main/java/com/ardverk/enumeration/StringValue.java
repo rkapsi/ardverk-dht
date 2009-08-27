@@ -3,10 +3,10 @@ package com.ardverk.enumeration;
 /**
  * An interface meant to be implemented only by {@link Enum}s.
  */
-public interface IntegerValue {
+public interface StringValue {
 
     /**
-     * Returns the int value of an {@link Enum}.
+     * Returns the {@link String} value of an {@link Enum}.
      */
-    public int intValue();
+    public String stringValue();
 }
