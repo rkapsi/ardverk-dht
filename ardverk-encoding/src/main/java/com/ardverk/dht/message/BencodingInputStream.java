@@ -13,8 +13,24 @@ import com.ardverk.utils.StringUtils;
 
 public class BencodingInputStream extends FilterInputStream {
 
+    private final String encoding;
+    
     public BencodingInputStream(InputStream in) {
+        this(in, StringUtils.UTF_8);
+    }
+    
+    public BencodingInputStream(InputStream in, String encoding) {
         super(in);
+        
+        if (encoding == null) {
+            throw new NullPointerException("encoding");
+        }
+        
+        this.encoding = encoding;
+    }
+    
+    public String getEncoding() {
+        return encoding;
     }
     
     public Object readObject() throws IOException {
@@ -35,6 +51,15 @@ public class BencodingInputStream extends FilterInputStream {
         
         int length = readLength(token);
         return readBytes(length);
+    }
+    
+    public String readString() throws IOException {
+        byte[] str = (byte[])readObject();
+        return new String(str, encoding);
+    }
+    
+    public <T extends Enum<T>> T readEnum(Class<T> clazz) throws IOException {
+        return Enum.valueOf(clazz, readString());
     }
     
     private byte[] readBytes(int length) throws IOException {
