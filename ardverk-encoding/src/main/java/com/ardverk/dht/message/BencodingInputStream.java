@@ -4,6 +4,11 @@ import java.io.EOFException;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +17,7 @@ import java.util.TreeMap;
 import com.ardverk.utils.StringUtils;
 
 public class BencodingInputStream extends FilterInputStream {
-
+    
     private final String encoding;
     
     public BencodingInputStream(InputStream in) {
@@ -39,43 +44,31 @@ public class BencodingInputStream extends FilterInputStream {
             throw new EOFException();
         }
         
-        if (token == 'e') {
-            return null;
-        } else if (token == 'd') {
-            return readMap();
+        return readObject0(token);
+    }
+    
+    private Object readObject0(int token) throws IOException {
+        if (token == 'd') {
+            return readMap0();
         } else if (token == 'l') {
-            return readList();
+            return readList0();
         } else if (token == 'i') {
-            return readNumber();
+            return readNumber0();
         }
         
-        int length = readLength(token);
-        return readBytes(length);
+        return readBytes0(token);
     }
     
-    public String readString() throws IOException {
-        byte[] str = (byte[])readObject();
-        return new String(str, encoding);
-    }
-    
-    public <T extends Enum<T>> T readEnum(Class<T> clazz) throws IOException {
-        return Enum.valueOf(clazz, readString());
-    }
-    
-    private byte[] readBytes(int length) throws IOException {
-        byte[] bytes = new byte[length];
-        int total = 0;
-        while (total < bytes.length) {
-            int r = read(bytes, total, bytes.length-total);
-            if (r == -1) {
-                throw new EOFException();
-            }
-            total += r;
+    public byte[] readBytes() throws IOException {
+        int token = read();
+        if (token == -1) {
+            throw new EOFException();
         }
-        return bytes;
+        
+        return readBytes0(token);
     }
     
-    private int readLength(int token) throws IOException {
+    private byte[] readBytes0(int token) throws IOException {
         StringBuilder buffer = new StringBuilder();
         buffer.append((char)token);
         
@@ -87,56 +80,175 @@ public class BencodingInputStream extends FilterInputStream {
             buffer.append((char)token);
         }
         
-        try {
-            return Integer.parseInt(buffer.toString());
-        } catch (NumberFormatException err) {
-            throw new IOException("NumberFormatException", err);
+        int length = Integer.parseInt(buffer.toString());
+        byte[] data = new byte[length];
+        
+        int total = 0;
+        while (total < data.length) {
+            int r = read(data, total, data.length-total);
+            if (r == -1) {
+                throw new EOFException();
+            }
+            total += r;
         }
+        
+        return data;
     }
     
-    private Number readNumber() throws IOException {
+    public String readString() throws IOException {
+        return new String(readBytes(), encoding);
+    }
+    
+    public <T extends Enum<T>> T readEnum(Class<T> clazz) throws IOException {
+        return Enum.valueOf(clazz, readString());
+    }
+    
+    public char readCharacter() throws IOException {
+        return readString().charAt(0);
+    }
+    
+    public boolean readBoolean() throws IOException {
+        return readInteger() != 0;
+    }
+    
+    public byte readByte() throws IOException {
+        return readNumber().byteValue();
+    }
+    
+    public short readShort() throws IOException {
+        return readNumber().shortValue();
+    }
+    
+    public int readInteger() throws IOException {
+        return readNumber().intValue();
+    }
+    
+    public float readFloat() throws IOException {
+        return readNumber().floatValue();
+    }
+    
+    public long readLong() throws IOException {
+        return readNumber().longValue();
+    }
+    
+    public double readDouble() throws IOException {
+        return readNumber().doubleValue();
+    }
+    
+    public Number readNumber() throws IOException {
+        int token = read();
+        if (token == -1) {
+            throw new EOFException();
+        }
+        
+        if (token != 'i') {
+            throw new IOException();
+        }
+        
+        return readNumber0();
+    }
+    
+    private Number readNumber0() throws IOException {
         StringBuilder buffer = new StringBuilder();
+        
+        boolean decimal = false;
         int token = -1;
+        
         while ((token = read()) != 'e') {
             if (token == -1) {
                 throw new EOFException();
+            }
+            
+            if (token == '.') {
+                decimal = true;
             }
             
             buffer.append((char)token);
         }
         
         try {
-            return Long.parseLong(buffer.toString());
+            if (decimal) {
+                return new BigDecimal(buffer.toString());
+            } else {
+                return new BigInteger(buffer.toString());
+            }
         } catch (NumberFormatException err) {
             throw new IOException("NumberFormatException", err);
         }
     }
     
-    private List<?> readList() throws IOException {
+    public List<?> readList() throws IOException {
+        int token = read();
+        if (token == -1) {
+            throw new EOFException();
+        }
+        
+        if (token != 'l') {
+            throw new IOException();
+        }
+        
+        return readList0();
+    }
+    
+    private List<?> readList0() throws IOException {
         List<Object> list = new ArrayList<Object>();
-        Object value = null;
-        while ((value = readObject()) != null) {
-            list.add(value);
+        int token = -1;
+        while ((token = read()) != 'e') {
+            if (token == -1) {
+                throw new EOFException();
+            }
+            
+            list.add(readObject0(token));
         }
         return list;
     }
     
-    private Map<String, ?> readMap() throws IOException {
+    public Map<String, ?> readMap() throws IOException {
+        int token = read();
+        if (token == -1) {
+            throw new EOFException();
+        }
+        
+        if (token != 'd') {
+            throw new IOException();
+        }
+        
+        return readMap0();
+    }
+    
+    private Map<String, ?> readMap0() throws IOException {
         Map<String, Object> map = new TreeMap<String, Object>();
-        Object key = null;
-        while ((key = readObject()) != null) {
-            if (!(key instanceof byte[])) {
-                throw new IOException("Key must be a byte String");
-            }
-            
-            Object value = readObject();
-            if (value == null) {
+        int token = -1;
+        while ((token = read()) != 'e') {
+            if (token == -1) {
                 throw new EOFException();
             }
             
-            String str = new String((byte[])key, encoding);
-            map.put(str, value);
+            String key = new String(readBytes0(token), encoding);
+            Object value = readObject();
+            
+            map.put(key, value);
         }
+        
         return map;
+    }
+    
+    public Object[] readArray() throws IOException {
+        return readList().toArray(new Object[0]);
+    }
+    
+    public InetAddress readInetAddress() throws IOException {
+        return InetAddress.getByName(readString());
+    }
+    
+    public SocketAddress readSocketAddress() throws IOException {
+        String value = readString();
+        int p = value.indexOf(":");
+        if (p == -1) {
+            throw new IOException("value=" + value);
+        }
+        
+        return new InetSocketAddress(value.substring(0, p), 
+                Integer.parseInt(value.substring(++p)));
     }
 }
