@@ -4,6 +4,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import org.ardverk.coding.BencodingInputStream;
+import org.ardverk.coding.BencodingOutputStream;
+
 import com.ardverk.dht.io.SessionContext;
 
 public class BencodeMessageCodec extends MessageCodec {
