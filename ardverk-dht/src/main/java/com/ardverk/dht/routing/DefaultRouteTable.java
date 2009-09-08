@@ -85,7 +85,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         Bucket bucket = new Bucket(bucketId, 0, getK(), getMaxCacheSize());
         buckets.put(bucketId, bucket);
         
-        innerAdd(localhost);
+        add0(localhost);
     }
     
     private boolean isLocalhost(ContactEntity entity) {
@@ -122,10 +122,10 @@ public class DefaultRouteTable extends AbstractRouteTable {
             consecutiveErrors = 0;
         }
         
-        innerAdd(contact);
+        add0(contact);
     }
     
-    private synchronized void innerAdd(Contact contact) {
+    private synchronized void add0(Contact contact) {
         KUID contactId = contact.getContactId();
         Bucket bucket = buckets.selectValue(contactId);
         ContactEntity entity = bucket.get(contactId);
@@ -139,7 +139,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
                 addCache(bucket, contact);
             }
         } else if (split(bucket)) {
-            innerAdd(contact);
+            add0(contact);
         } else {
             replaceCache(bucket, contact);
         }
