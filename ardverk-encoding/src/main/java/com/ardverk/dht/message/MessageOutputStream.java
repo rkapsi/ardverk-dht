@@ -14,12 +14,16 @@ import com.ardverk.dht.routing.Contact;
 
 class MessageOutputStream extends BencodingOutputStream {
 
-    public MessageOutputStream(OutputStream out, String charset) {
-        super(out, charset);
-    }
-
-    public MessageOutputStream(OutputStream out) {
+    private final SessionContext context;
+    
+    public MessageOutputStream(OutputStream out, SessionContext context) {
         super(out);
+        
+        if (context == null) {
+            throw new NullPointerException("context");
+        }
+        
+        this.context = context;
     }
 
     @Override
@@ -34,8 +38,8 @@ class MessageOutputStream extends BencodingOutputStream {
             writeMessageId((MessageId)obj);
         } else if (obj instanceof Contact) {
             writeContact((Contact)obj);
-        //} else if (obj instanceof Message) {
-        //    writeMessage((Message)obj);
+        } else if (obj instanceof Message) {
+            writeMessage((Message)obj);
         } else {
             super.writeCustom(obj);
         }
@@ -64,8 +68,7 @@ class MessageOutputStream extends BencodingOutputStream {
         writeSocketAddress(contact.getRemoteAddress());
     }
     
-    public void writeMessage(SessionContext context, 
-            Message message) throws IOException {
+    public void writeMessage(Message message) throws IOException {
         
         writeEnum(message.getOpCode());
         writeMessageId(message.getMessageId());
