@@ -47,12 +47,12 @@ class MessageInputStream extends BencodingInputStream {
     }
     
     public Message readMessage(Contact.Type type) throws IOException {
-        OpCode opcode = readEnum(OpCode.class);
         int version = readUnsignedByte();
         if (version != MessageUtils.VERSION) {
             throw new IOException("version=" + version);
         }
         
+        OpCode opcode = readEnum(OpCode.class);
         MessageId messageId = readMessageId();
         Contact contact = readContact(type);
         long time = readLong();
