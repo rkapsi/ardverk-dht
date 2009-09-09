@@ -10,6 +10,7 @@ import org.ardverk.coding.BencodingInputStream;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.DefaultContact;
 
 class MessageInputStream extends BencodingInputStream {
 
@@ -37,14 +38,15 @@ class MessageInputStream extends BencodingInputStream {
                 Integer.parseInt(value.substring(++p)));
     }
     
-    public Contact readContact() throws IOException {
+    public Contact readContact(Contact.Type type) throws IOException {
         KUID contactId = readKUID();
         int instanceId = readInt();
         SocketAddress address = readSocketAddress();
-        return null;
+        return new DefaultContact(type, contactId, 
+                instanceId, address, null);
     }
     
-    public Message readMessage() throws IOException {
+    public Message readMessage(Contact.Type type) throws IOException {
         OpCode opcode = readEnum(OpCode.class);
         int version = readUnsignedByte();
         if (version != MessageUtils.VERSION) {
@@ -52,7 +54,7 @@ class MessageInputStream extends BencodingInputStream {
         }
         
         MessageId messageId = readMessageId();
-        Contact contact = readContact();
+        Contact contact = readContact(type);
         long time = readLong();
         
         InetAddress address = readInetAddress();
