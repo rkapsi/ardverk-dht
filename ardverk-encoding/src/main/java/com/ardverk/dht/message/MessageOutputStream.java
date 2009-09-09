@@ -71,10 +71,15 @@ class MessageOutputStream extends BencodingOutputStream {
     public void writeMessage(Message message) throws IOException {
         
         writeEnum(message.getOpCode());
+        writeByte(MessageUtils.VERSION);
+        
         writeMessageId(message.getMessageId());
         
-        writeSocketAddress(context.getRemoteAddress());
-        
+        // The Localhost and its Time
         writeContact(message.getContact());
+        writeLong(System.currentTimeMillis());
+        
+        // The Remote Host's Address
+        writeInetAddress(context.getRemoteAddress().getAddress());
     }
 }
