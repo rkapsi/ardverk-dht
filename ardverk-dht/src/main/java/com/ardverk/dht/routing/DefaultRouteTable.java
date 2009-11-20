@@ -15,11 +15,11 @@ import org.ardverk.collection.KeyAnalyzer;
 import org.ardverk.collection.PatriciaTrie;
 import org.ardverk.collection.Trie;
 import org.ardverk.collection.Cursor.Decision;
+import org.ardverk.concurrent.AsyncFuture;
+import org.ardverk.concurrent.AsyncFutureListener;
 import org.slf4j.Logger;
 
 import com.ardverk.collection.FixedSizeHashMap;
-import com.ardverk.concurrent.AsyncFuture;
-import com.ardverk.concurrent.AsyncFutureListener;
 import com.ardverk.dht.ContactPinger;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.KeyFactory;

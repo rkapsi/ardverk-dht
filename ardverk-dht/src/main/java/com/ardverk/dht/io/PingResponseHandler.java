@@ -1,6 +1,7 @@
 package com.ardverk.dht.io;
 
-import com.ardverk.concurrent.AsyncFuture;
+import org.ardverk.concurrent.AsyncFuture;
+
 import com.ardverk.dht.Pong;
 import com.ardverk.dht.message.PingResponse;
 

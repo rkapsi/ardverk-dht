@@ -1,6 +1,7 @@
 package com.ardverk.dht;
 
-import com.ardverk.concurrent.AsyncFuture;
+import org.ardverk.concurrent.AsyncFuture;
+
 import com.ardverk.dht.message.PingResponse;
 import com.ardverk.dht.routing.Contact;
 
