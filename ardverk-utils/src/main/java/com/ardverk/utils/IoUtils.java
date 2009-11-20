@@ -2,6 +2,7 @@ package com.ardverk.utils;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Collection;
 
 import org.slf4j.Logger;
 
@@ -24,5 +25,25 @@ public class IoUtils {
             }
         }
         return false;
+    }
+    
+    public static boolean closeAll(Closeable... closeables) {
+        boolean success = false;
+        if (closeables != null) {
+            for (Closeable c : closeables) {
+                success |= close(c);
+            }
+        }
+        return success;
+    }
+    
+    public static boolean closeAll(Collection<? extends Closeable> closeables) {
+        boolean success = false;
+        if (closeables != null) {
+            for (Closeable c : closeables) {
+                success |= close(c);
+            }
+        }
+        return success;
     }
 }
