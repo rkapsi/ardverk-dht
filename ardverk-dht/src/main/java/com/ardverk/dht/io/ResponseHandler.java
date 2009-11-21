@@ -7,7 +7,8 @@ import org.ardverk.concurrent.AsyncProcess;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.utils.Checkable;
 
-public abstract class ResponseHandler<V, T extends ResponseMessage> implements MessageHandler<T>, Checkable, AsyncProcess<V> {
+public abstract class ResponseHandler<V, T extends ResponseMessage> 
+        implements MessageHandler<T>, Checkable, AsyncProcess<V> {
     
     private volatile AsyncFuture<V> future = null;
     
