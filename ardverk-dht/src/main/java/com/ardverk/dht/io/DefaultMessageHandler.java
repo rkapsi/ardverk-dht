@@ -3,6 +3,7 @@ package com.ardverk.dht.io;
 import com.ardverk.dht.message.Message;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
+import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
 
@@ -27,6 +28,11 @@ public class DefaultMessageHandler implements MessageHandler<Message> {
     
     @Override
     public void handleMessage(Message message) {
+        Contact contact = message.getContact();
+        if (contact.isFirewalled()) {
+            return;
+        }
+        
         if (message instanceof RequestMessage) {
             handleRequest((RequestMessage)message);
         } else {
