@@ -29,6 +29,7 @@ public abstract class ResponseHandler<V, T extends ResponseMessage> implements M
         AsyncFuture<V> future = this.future;
         if (future != null) {
             future.setValue(value);
+            return;
         }
         throw new IllegalStateException();
     }
@@ -37,6 +38,7 @@ public abstract class ResponseHandler<V, T extends ResponseMessage> implements M
         AsyncFuture<V> future = this.future;
         if (future != null) {
             future.setException(t);
+            return;
         }
         throw new IllegalStateException();
     }
@@ -59,5 +61,6 @@ public abstract class ResponseHandler<V, T extends ResponseMessage> implements M
         innerStart(future);
     }
     
-    protected abstract void innerStart(AsyncFuture<V> future) throws Exception;
+    protected abstract void innerStart(
+            AsyncFuture<V> future) throws Exception;
 }
