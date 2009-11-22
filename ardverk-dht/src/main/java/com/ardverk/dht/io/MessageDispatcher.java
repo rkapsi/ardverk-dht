@@ -5,7 +5,10 @@ import java.net.SocketAddress;
 
 import com.ardverk.dht.message.Message;
 
-public interface MessageDispatcher {
+public abstract class MessageDispatcher {
 
-    public void send(SocketAddress dst, Message message) throws IOException;
+    public abstract void send(SocketAddress dst, 
+            Message message) throws IOException;
+    
+    protected void received() {}
 }

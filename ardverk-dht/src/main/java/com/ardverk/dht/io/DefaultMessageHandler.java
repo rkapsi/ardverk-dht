@@ -29,9 +29,9 @@ public class DefaultMessageHandler implements MessageHandler<Message> {
     @Override
     public void handleMessage(Message message) {
         Contact contact = message.getContact();
-        if (contact.isFirewalled()) {
+        /*if (contact.isFirewalled()) {
             return;
-        }
+        }*/
         
         if (message instanceof RequestMessage) {
             handleRequest((RequestMessage)message);

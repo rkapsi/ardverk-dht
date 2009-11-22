@@ -20,7 +20,6 @@
 	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/mina/commons-lang-2.4.jar"/>
 	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/mina/commons-logging-1.0.3.jar"/>
 	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/mina/javassist-3.7.ga.jar"/>
-	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/mina/mina-core-2.0.0-M5.jar"/>
 	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/mina/mina-core-2.0.0-RC1.jar"/>
 	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/mina/ognl-2.7.2.jar"/>
 	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/mina/slf4j-api-1.5.2.jar"/>
