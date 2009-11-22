@@ -4,7 +4,7 @@ import com.ardverk.dht.io.transport.Transport;
 
 public class ArdverkDHT {
 
-    private final NodeManager foo 
+    private final NodeManager nodeManager 
         = new NodeManager();
     
     private final Transport transport;
@@ -20,7 +20,7 @@ public class ArdverkDHT {
         
         this.transport = transport;
         
-        foo.add(nodeId);
+        nodeManager.add(nodeId);
     }
     
     public Transport getTransport() {
