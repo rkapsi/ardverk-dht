@@ -5,7 +5,7 @@ import java.net.SocketAddress;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.ardverk.dht.io.Session;
+import com.ardverk.dht.io.session.Session;
 
 public abstract class AbstractTransport implements Transport {
 

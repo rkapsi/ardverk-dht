@@ -1,4 +1,4 @@
-package com.ardverk.dht.io;
+package com.ardverk.dht.io.session;
 
 import java.net.SocketAddress;
 

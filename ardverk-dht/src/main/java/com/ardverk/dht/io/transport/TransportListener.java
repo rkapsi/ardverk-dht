@@ -2,7 +2,7 @@ package com.ardverk.dht.io.transport;
 
 import java.io.IOException;
 
-import com.ardverk.dht.io.Session;
+import com.ardverk.dht.io.session.Session;
 
 public interface TransportListener {
     

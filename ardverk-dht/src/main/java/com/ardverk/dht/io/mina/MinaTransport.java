@@ -14,7 +14,8 @@ import org.apache.mina.core.session.IoSession;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.NioDatagramAcceptor;
 
-import com.ardverk.dht.io.Session;
+import com.ardverk.dht.io.session.AbstractSession;
+import com.ardverk.dht.io.session.Session;
 import com.ardverk.dht.io.transport.AbstractTransport;
 import com.ardverk.dht.io.transport.TransportListener;
 
@@ -57,7 +58,7 @@ public class MinaTransport extends AbstractTransport implements Closeable {
         session.write(IoBuffer.wrap(message, offset, length));
     }
     
-    private static class SessionImpl implements Session {
+    private static class SessionImpl extends AbstractSession {
         
         private final IoSession session;
         
