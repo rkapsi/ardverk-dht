@@ -30,9 +30,7 @@ public class MinaTransport extends AbstractTransport implements Closeable {
             public void messageReceived(IoSession session, Object message)
                     throws IOException {
                 SocketAddress src = session.getRemoteAddress();
-                IoBuffer data = (IoBuffer)message;
-                MinaTransport.this.received(src, data.array(), 
-                        data.arrayOffset(), data.remaining());
+                received(src, message);
             }
         };
         
@@ -62,9 +60,8 @@ public class MinaTransport extends AbstractTransport implements Closeable {
         transport.addTransportListener(new TransportListener() {
             
             @Override
-            public void received(SocketAddress src, byte[] message, int offet,
-                    int length) throws IOException {
-                System.out.println(src + ", " + new String(message));
+            public void received(SocketAddress src, Object message) throws IOException {
+                System.out.println(src + ", " + message            );
             }
         });
         
