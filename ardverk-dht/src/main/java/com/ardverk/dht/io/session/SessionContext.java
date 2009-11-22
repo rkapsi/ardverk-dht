@@ -1,10 +1,10 @@
 package com.ardverk.dht.io.session;
 
-import java.net.SocketAddress;
+import java.net.InetSocketAddress;
 
 public interface SessionContext {
 
-    public SocketAddress getLocalAddress();
+    public InetSocketAddress getLocalAddress();
     
-    public SocketAddress getRemoteAddress();
+    public InetSocketAddress getRemoteAddress();
 }

@@ -67,13 +67,13 @@ public class MinaTransport extends AbstractTransport implements Closeable {
         }
 
         @Override
-        public SocketAddress getLocalAddress() {
-            return session.getLocalAddress();
+        public InetSocketAddress getLocalAddress() {
+            return (InetSocketAddress)session.getLocalAddress();
         }
         
         @Override
-        public SocketAddress getRemoteAddress() {
-            return session.getRemoteAddress();
+        public InetSocketAddress getRemoteAddress() {
+            return (InetSocketAddress)session.getRemoteAddress();
         }
         
         @Override
