@@ -1,4 +1,4 @@
-package com.ardverk.dht.io.transport;
+package com.ardverk.dht.io.mina;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -13,6 +13,10 @@ import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.NioDatagramAcceptor;
+
+import com.ardverk.dht.io.Session;
+import com.ardverk.dht.io.transport.AbstractTransport;
+import com.ardverk.dht.io.transport.TransportListener;
 
 public class MinaTransport extends AbstractTransport implements Closeable {
 
@@ -29,8 +33,7 @@ public class MinaTransport extends AbstractTransport implements Closeable {
             @Override
             public void messageReceived(IoSession session, Object message)
                     throws IOException {
-                SocketAddress src = session.getRemoteAddress();
-                received(src, message);
+                received(new SessionImpl(session), message);
             }
         };
         
@@ -54,14 +57,28 @@ public class MinaTransport extends AbstractTransport implements Closeable {
         session.write(IoBuffer.wrap(message, offset, length));
     }
     
+    private static class SessionImpl implements Session {
+        
+        private final IoSession session;
+        
+        private SessionImpl(IoSession session) {
+            this.session = session;
+        }
+
+        @Override
+        public SocketAddress getRemoteAddress() {
+            return session.getRemoteAddress();
+        }
+    }
+    
     public static void main(String[] args) throws IOException {
         InetSocketAddress address = new InetSocketAddress(5555);
         MinaTransport transport = new MinaTransport(address);
         transport.addTransportListener(new TransportListener() {
             
             @Override
-            public void received(SocketAddress src, Object message) throws IOException {
-                System.out.println(src + ", " + message            );
+            public void received(Session session, Object message) throws IOException {
+                System.out.println(session + ", " + message);
             }
         });
         

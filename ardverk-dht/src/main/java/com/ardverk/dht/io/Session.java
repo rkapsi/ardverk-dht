@@ -1,4 +1,4 @@
-package com.ardverk.dht.io.mina;
+package com.ardverk.dht.io;
 
 import java.net.SocketAddress;
 

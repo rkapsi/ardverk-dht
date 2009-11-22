@@ -1,9 +1,10 @@
 package com.ardverk.dht.io.transport;
 
 import java.io.IOException;
-import java.net.SocketAddress;
+
+import com.ardverk.dht.io.Session;
 
 public interface TransportListener {
     
-    public void received(SocketAddress src, Object message) throws IOException;
+    public void received(Session session, Object message) throws IOException;
 }
