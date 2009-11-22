@@ -1,5 +1,6 @@
 package com.ardverk.dht.io.transport;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -13,7 +14,7 @@ import org.apache.mina.core.session.IoSession;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.NioDatagramAcceptor;
 
-public class MinaTransport extends AbstractTransport {
+public class MinaTransport extends AbstractTransport implements Closeable {
 
     private final NioDatagramAcceptor acceptor 
         = new NioDatagramAcceptor();

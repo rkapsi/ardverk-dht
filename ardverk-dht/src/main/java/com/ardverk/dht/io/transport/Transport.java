@@ -1,13 +1,12 @@
 package com.ardverk.dht.io.transport;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.net.SocketAddress;
 
 /**
  * 
  */
-public interface Transport extends Closeable {
+public interface Transport {
 
     /**
      * 
