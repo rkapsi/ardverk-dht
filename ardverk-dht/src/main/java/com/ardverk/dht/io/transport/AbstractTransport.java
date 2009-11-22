@@ -5,7 +5,7 @@ import java.net.SocketAddress;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.ardverk.dht.io.session.Session;
+import com.ardverk.dht.io.session.SessionContext;
 
 public abstract class AbstractTransport implements Transport {
 
@@ -43,7 +43,7 @@ public abstract class AbstractTransport implements Transport {
     /**
      * 
      */
-    protected void received(Session session, Object message) throws IOException {
+    protected void received(SessionContext session, Object message) throws IOException {
         for (TransportListener listener : listeners) {
             listener.received(session, message);
         }

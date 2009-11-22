@@ -1,6 +1,6 @@
 package com.ardverk.dht.message;
 
-import com.ardverk.dht.io.SessionContext;
+import com.ardverk.dht.io.session.SessionContext;
 
 public interface MessageFactory {
 

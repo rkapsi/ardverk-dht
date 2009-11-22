@@ -9,7 +9,7 @@ import java.net.SocketAddress;
 import org.ardverk.coding.BencodingOutputStream;
 
 import com.ardverk.dht.KUID;
-import com.ardverk.dht.io.SessionContext;
+import com.ardverk.dht.io.session.SessionContext;
 import com.ardverk.dht.routing.Contact;
 
 class MessageOutputStream extends BencodingOutputStream {

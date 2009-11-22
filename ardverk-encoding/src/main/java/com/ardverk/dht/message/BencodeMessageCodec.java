@@ -7,7 +7,7 @@ import java.io.IOException;
 import org.ardverk.coding.BencodingInputStream;
 import org.ardverk.coding.BencodingOutputStream;
 
-import com.ardverk.dht.io.SessionContext;
+import com.ardverk.dht.io.session.SessionContext;
 
 public class BencodeMessageCodec extends MessageCodec {
 

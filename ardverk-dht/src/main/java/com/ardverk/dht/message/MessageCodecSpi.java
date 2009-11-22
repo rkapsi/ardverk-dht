@@ -2,7 +2,7 @@ package com.ardverk.dht.message;
 
 import java.io.IOException;
 
-import com.ardverk.dht.io.SessionContext;
+import com.ardverk.dht.io.session.SessionContext;
 
 public abstract class MessageCodecSpi {
 

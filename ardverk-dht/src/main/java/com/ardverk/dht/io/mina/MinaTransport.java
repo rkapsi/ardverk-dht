@@ -14,8 +14,8 @@ import org.apache.mina.core.session.IoSession;
 import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.NioDatagramAcceptor;
 
-import com.ardverk.dht.io.session.AbstractSession;
-import com.ardverk.dht.io.session.Session;
+import com.ardverk.dht.io.session.AbstractSessionContext;
+import com.ardverk.dht.io.session.SessionContext;
 import com.ardverk.dht.io.transport.AbstractTransport;
 import com.ardverk.dht.io.transport.TransportListener;
 
@@ -58,7 +58,7 @@ public class MinaTransport extends AbstractTransport implements Closeable {
         session.write(IoBuffer.wrap(message, offset, length));
     }
     
-    private static class SessionImpl extends AbstractSession {
+    private static class SessionImpl extends AbstractSessionContext {
         
         private final IoSession session;
         
@@ -67,8 +67,18 @@ public class MinaTransport extends AbstractTransport implements Closeable {
         }
 
         @Override
+        public SocketAddress getLocalAddress() {
+            return session.getLocalAddress();
+        }
+        
+        @Override
         public SocketAddress getRemoteAddress() {
             return session.getRemoteAddress();
+        }
+        
+        @Override
+        public String toString() {
+            return session.toString();
         }
     }
     
@@ -78,7 +88,7 @@ public class MinaTransport extends AbstractTransport implements Closeable {
         transport.addTransportListener(new TransportListener() {
             
             @Override
-            public void received(Session session, Object message) throws IOException {
+            public void received(SessionContext session, Object message) throws IOException {
                 System.out.println(session + ", " + message);
             }
         });
