@@ -6,19 +6,36 @@ import java.net.SocketAddress;
 
 import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.io.transport.TransportListener;
+import com.ardverk.dht.message.Message;
+import com.ardverk.dht.message.MessageFactory;
 
 public class ArdverkDHT implements Closeable {
 
-    private final TransportListener listener = new Foo();
+    private final MessageFactory messageFactory;
+    
+    private final TransportListener transportListener
+            = new TransportListener() {
+        @Override
+        public void received(SocketAddress src, Object message)
+                throws IOException {
+            Message msg = messageFactory.decode(src, message);
+            handleMessage(src, msg);
+        }
+    };
     
     private final NodeManager nodeManager 
-        = new NodeManager();
+        = new NodeManager(this);
     
     private final Transport transport;
     
-    public ArdverkDHT(Transport transport, KUID nodeId) {
+    public ArdverkDHT(Transport transport, 
+            MessageFactory messageFactory, KUID nodeId) {
         if (transport == null) {
             throw new NullPointerException("transport");
+        }
+        
+        if (messageFactory == null) {
+            throw new NullPointerException("messageFactory");
         }
         
         if (nodeId == null) {
@@ -26,25 +43,36 @@ public class ArdverkDHT implements Closeable {
         }
         
         this.transport = transport;
-        nodeManager.add(nodeId);
+        this.messageFactory = messageFactory;
         
-        transport.addTransportListener(listener);
+        nodeManager.add(nodeId);
+        transport.addTransportListener(transportListener);
     }
     
     @Override
     public void close() {
-        transport.removeTransportListener(listener);
+        transport.removeTransportListener(transportListener);
     }
     
     public Transport getTransport() {
         return transport;
     }
     
-    private class Foo implements TransportListener {
-
-        @Override
-        public void received(SocketAddress src, Object message)
-                throws IOException {
+    public boolean addNode(KUID nodeId) {
+        return nodeManager.add(nodeId);
+    }
+    
+    public boolean removeNode(KUID nodeId) {
+        Node node = nodeManager.remove(nodeId);
+        if (node != null) {
+            node.close();
+            return true;
         }
+        return false;
+    }
+    
+    private void handleMessage(SocketAddress src, 
+            Message message) throws IOException {
+        
     }
 }

@@ -13,6 +13,16 @@ class NodeManager implements Closeable {
         = new PatriciaTrie<KUID, Node>(
             KUID.createKeyAnalyzer(160));
     
+    private final ArdverkDHT dht;
+    
+    public NodeManager(ArdverkDHT dht) {
+        if (dht == null) {
+            throw new NullPointerException("dht");
+        }
+        
+        this.dht = dht;
+    }
+    
     @Override
     public void close() {
         for (Node node : nodes.values()) {
@@ -26,7 +36,7 @@ class NodeManager implements Closeable {
         }
         
         if (!nodes.containsKey(nodeId)) {
-            nodes.put(nodeId, new Node(nodeId));
+            nodes.put(nodeId, new Node(dht, nodeId));
             return true;
         }
         return false;
