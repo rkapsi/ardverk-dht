@@ -11,7 +11,7 @@ import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.DefaultRouteTable;
 import com.ardverk.dht.routing.RouteTable;
 
-public class Node implements ContactPinger, Closeable {
+public class Node implements Closeable {
 
     private final RouteTable routeTable;
     
@@ -31,8 +31,15 @@ public class Node implements ContactPinger, Closeable {
         this.dht = dht;
         this.nodeId = nodeId;
         
+        ContactPinger pinger = new ContactPinger() {
+            @Override
+            public AsyncFuture<PingResponse> ping(Contact contact) {
+                return Node.this.ping(contact);
+            }
+        };
+        
         routeTable = new DefaultRouteTable(
-                this, null, 20, nodeId, 0, null);
+                pinger, null, 20, nodeId, 0, null);
     }
 
     @Override
@@ -44,8 +51,11 @@ public class Node implements ContactPinger, Closeable {
         return nodeId;
     }
     
-    @Override
-    public AsyncFuture<PingResponse> ping(Contact contact) {
+    public boolean isReady() {
+        return false;
+    }
+    
+    private AsyncFuture<PingResponse> ping(Contact contact) {
         return null;
     }
 
