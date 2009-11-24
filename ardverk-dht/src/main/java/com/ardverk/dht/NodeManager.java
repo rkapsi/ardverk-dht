@@ -65,4 +65,8 @@ class NodeManager implements Closeable {
         
         return nodes.selectValue(nodeId);
     }
+    
+    public synchronized Node[] getNodes() {
+        return nodes.values().toArray(new Node[0]);
+    }
 }

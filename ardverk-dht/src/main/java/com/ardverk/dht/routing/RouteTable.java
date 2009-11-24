@@ -21,6 +21,11 @@ public interface RouteTable {
     public int getK();
     
     /**
+     * 
+     */
+    public Contact get(KUID contactId);
+    
+    /**
      * See {@link #select(KUID, int)}
      */
     public Contact[] select(KUID contactId);

@@ -10,6 +10,8 @@ import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.io.transport.TransportListener;
 import com.ardverk.dht.message.Message;
 import com.ardverk.dht.message.MessageFactory;
+import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.RouteTable;
 
 public class ArdverkDHT extends AbstractDHT implements DHT, Closeable {
 
@@ -85,6 +87,19 @@ public class ArdverkDHT extends AbstractDHT implements DHT, Closeable {
         }
         return false;
     }
+    
+    @Override
+    public Contact getContact(KUID contactId) {
+        for (Node node : nodeManager.getNodes()) {
+            RouteTable routeTable = node.getRouteTable();
+            Contact contact = routeTable.get(contactId);
+            if (contact != null) {
+                return contact;
+            }
+        }
+        
+        return null;
+    }
 
     @Override
     public AsyncFuture<Pong> ping(SocketAddress dst) {
@@ -92,6 +107,15 @@ public class ArdverkDHT extends AbstractDHT implements DHT, Closeable {
         return null;
     }
     
+    @Override
+    public AsyncFuture<Pong> ping(Contact contact) {
+        // TODO: Need reference to Node. I guess we could use
+        // also a random Node to send the ping but it would be
+        // overall better to send the ping from the Node that
+        // is managing the given Contact.
+        return null;
+    }
+
     @Override
     public AsyncFuture<Object> put(KUID key, byte[] value) {
         Node node = nodeManager.select(key);

@@ -55,6 +55,10 @@ public class Node implements Closeable {
         return false;
     }
     
+    public RouteTable getRouteTable() {
+        return routeTable;
+    }
+    
     private AsyncFuture<PingResponse> ping(Contact contact) {
         return null;
     }
