@@ -266,7 +266,18 @@ public class DefaultRouteTable extends AbstractRouteTable {
     }
     
     @Override
-    public Contact[] select(KUID contactId, int count) {
+    public synchronized Contact get(KUID contactId) {
+        if (contactId == null) {
+            throw new NullPointerException("contactId");
+        }
+        
+        Bucket bucket = buckets.selectValue(contactId);
+        ContactEntity entity = bucket.get(contactId);
+        return entity != null ? entity.getContact() : null;
+    }
+
+    @Override
+    public synchronized Contact[] select(KUID contactId, int count) {
         List<Contact> dst = new ArrayList<Contact>(count);
         selectR(contactId, dst, count);
         return dst.toArray(new Contact[0]);
