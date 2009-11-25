@@ -1,6 +1,7 @@
 package com.ardverk.dht;
 
 import java.io.Closeable;
+import java.net.InetAddress;
 import java.net.SocketAddress;
 
 import org.ardverk.concurrent.AsyncFuture;
@@ -11,13 +12,17 @@ import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.DefaultRouteTable;
 import com.ardverk.dht.routing.RouteTable;
 
-public class Node implements Closeable {
+public class Node implements DHT, Closeable {
 
     private final RouteTable routeTable;
     
     private final ArdverkDHT dht;
     
     private final KUID nodeId;
+    
+    private boolean open = true;
+    
+    private boolean running = false;
     
     Node(ArdverkDHT dht, KUID nodeId) {
         if (dht == null) {
@@ -42,9 +47,38 @@ public class Node implements Closeable {
                 pinger, null, 20, nodeId, 0, null);
     }
 
-    @Override
-    public void close() {
+    public synchronized boolean isOpen() {
+        return open;
+    }
+
+    public synchronized boolean isRunning() {
+        return open && running;
+    }
+    
+    public synchronized void start() {
+        if (!open) {
+            throw new IllegalStateException();
+        }
         
+        if (running) {
+            throw new IllegalStateException();
+        }
+        
+        running = true;
+        // TODO: Start the thing!
+    }
+    
+    @Override
+    public synchronized void close() {
+        if (!open) {
+            return;
+        }
+        
+        open = false;
+        
+        if (running) {
+            // TODO: Stop that thing!
+        }
     }
     
     public KUID getNodeId() {
@@ -58,12 +92,48 @@ public class Node implements Closeable {
     public RouteTable getRouteTable() {
         return routeTable;
     }
-    
-    private AsyncFuture<PingResponse> ping(Contact contact) {
-        return null;
-    }
 
     public void handleMessage(SocketAddress src, Message message) {
         
+    }
+    
+    @Override
+    public Contact getContact(KUID contactId) {
+        return routeTable.get(contactId);
+    }
+
+    @Override
+    public AsyncFuture<Object> get(KUID key) {
+        return null;
+    }
+
+    @Override
+    public AsyncFuture<Object> lookup(KUID key) {
+        return null;
+    }
+
+    @Override
+    public AsyncFuture<PingResponse> ping(Contact contact) {
+        return null;
+    }
+
+    @Override
+    public AsyncFuture<PingResponse> ping(InetAddress address, int port) {
+        return null;
+    }
+
+    @Override
+    public AsyncFuture<PingResponse> ping(SocketAddress dst) {
+        return null;
+    }
+
+    @Override
+    public AsyncFuture<PingResponse> ping(String address, int port) {
+        return null;
+    }
+
+    @Override
+    public AsyncFuture<Object> put(KUID key, byte[] value) {
+        return null;
     }
 }

@@ -5,15 +5,17 @@ import java.net.InetSocketAddress;
 
 import org.ardverk.concurrent.AsyncFuture;
 
+import com.ardverk.dht.message.PingResponse;
+
 abstract class AbstractDHT implements DHT {
 
     @Override
-    public AsyncFuture<Pong> ping(String address, int port) {
+    public AsyncFuture<PingResponse> ping(String address, int port) {
         return ping(new InetSocketAddress(address, port));
     }
     
     @Override
-    public AsyncFuture<Pong> ping(InetAddress address, int port) {
+    public AsyncFuture<PingResponse> ping(InetAddress address, int port) {
         return ping(new InetSocketAddress(address, port));
     }
 }

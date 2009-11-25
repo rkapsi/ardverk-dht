@@ -10,8 +10,8 @@ import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.io.transport.TransportListener;
 import com.ardverk.dht.message.Message;
 import com.ardverk.dht.message.MessageFactory;
+import com.ardverk.dht.message.PingResponse;
 import com.ardverk.dht.routing.Contact;
-import com.ardverk.dht.routing.RouteTable;
 
 public class ArdverkDHT extends AbstractDHT implements DHT, Closeable {
 
@@ -65,6 +65,7 @@ public class ArdverkDHT extends AbstractDHT implements DHT, Closeable {
     @Override
     public void close() {
         transport.removeTransportListener(transportListener);
+        nodeManager.close();
     }
     
     public Transport getTransport() {
@@ -75,24 +76,22 @@ public class ArdverkDHT extends AbstractDHT implements DHT, Closeable {
         return keyFactory;
     }
     
-    public boolean addNode(KUID nodeId) {
+    public Node addNode(KUID nodeId) {
         return nodeManager.add(nodeId);
     }
     
-    public boolean removeNode(KUID nodeId) {
-        Node node = nodeManager.remove(nodeId);
-        if (node != null) {
-            node.close();
-            return true;
-        }
-        return false;
+    public Node removeNode(KUID nodeId) {
+        return nodeManager.remove(nodeId);
+    }
+    
+    public Node[] getNodes() {
+        return nodeManager.getNodes();
     }
     
     @Override
     public Contact getContact(KUID contactId) {
         for (Node node : nodeManager.getNodes()) {
-            RouteTable routeTable = node.getRouteTable();
-            Contact contact = routeTable.get(contactId);
+            Contact contact = node.getContact(contactId);
             if (contact != null) {
                 return contact;
             }
@@ -102,13 +101,12 @@ public class ArdverkDHT extends AbstractDHT implements DHT, Closeable {
     }
 
     @Override
-    public AsyncFuture<Pong> ping(SocketAddress dst) {
-        Node node = getRandomNode();
-        return null;
+    public AsyncFuture<PingResponse> ping(SocketAddress dst) {
+        return getRandomNode().ping(dst);
     }
     
     @Override
-    public AsyncFuture<Pong> ping(Contact contact) {
+    public AsyncFuture<PingResponse> ping(Contact contact) {
         // TODO: Need reference to Node. I guess we could use
         // also a random Node to send the ping but it would be
         // overall better to send the ping from the Node that
@@ -118,20 +116,17 @@ public class ArdverkDHT extends AbstractDHT implements DHT, Closeable {
 
     @Override
     public AsyncFuture<Object> put(KUID key, byte[] value) {
-        Node node = nodeManager.select(key);
-        return null;
+        return nodeManager.select(key).put(key, value);
     }
     
     @Override
     public AsyncFuture<Object> get(KUID key) {
-        Node node = nodeManager.select(key);
-        return null;
+        return nodeManager.select(key).get(key);
     }
     
     @Override
     public AsyncFuture<Object> lookup(KUID key) {
-        Node node = nodeManager.select(key);
-        return null;
+        return nodeManager.select(key).lookup(key);
     }
     
     private Node getRandomNode() {

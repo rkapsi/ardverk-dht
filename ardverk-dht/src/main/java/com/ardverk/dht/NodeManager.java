@@ -30,16 +30,18 @@ class NodeManager implements Closeable {
         }
     }
     
-    public synchronized boolean add(KUID nodeId) {
+    public synchronized Node add(KUID nodeId) {
         if (nodeId == null) {
             throw new NullPointerException("nodeId");
         }
         
-        if (!nodes.containsKey(nodeId)) {
-            nodes.put(nodeId, new Node(dht, nodeId));
-            return true;
+        if (nodes.containsKey(nodeId)) {
+            throw new IllegalArgumentException("nodeId=" + nodeId);
         }
-        return false;
+        
+        Node node = new Node(dht, nodeId);
+        nodes.put(nodeId, node);
+        return node;
     }
     
     public synchronized Node remove(KUID nodeId) {
