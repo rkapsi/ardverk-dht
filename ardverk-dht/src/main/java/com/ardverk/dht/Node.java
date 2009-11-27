@@ -5,7 +5,9 @@ import java.net.InetAddress;
 import java.net.SocketAddress;
 
 import org.ardverk.concurrent.AsyncFuture;
+import org.ardverk.concurrent.AsyncProcess;
 
+import com.ardverk.dht.io.process.PingProcess;
 import com.ardverk.dht.message.Message;
 import com.ardverk.dht.message.PingResponse;
 import com.ardverk.dht.routing.Contact;
@@ -14,6 +16,8 @@ import com.ardverk.dht.routing.RouteTable;
 
 public class Node implements DHT, Closeable {
 
+    private final RequestManager requestManager = new RequestManager();
+    
     private final RouteTable routeTable;
     
     private final ArdverkDHT dht;
@@ -76,6 +80,10 @@ public class Node implements DHT, Closeable {
         
         open = false;
         
+        if (requestManager != null) {
+            requestManager.close();
+        }
+        
         if (running) {
             // TODO: Stop that thing!
         }
@@ -104,36 +112,43 @@ public class Node implements DHT, Closeable {
 
     @Override
     public AsyncFuture<Object> get(KUID key) {
-        return null;
+        AsyncProcess<Object> process = null;
+        return requestManager.submit(process);
     }
 
     @Override
     public AsyncFuture<Object> lookup(KUID key) {
-        return null;
+        AsyncProcess<Object> process = null;
+        return requestManager.submit(process);
     }
 
     @Override
     public AsyncFuture<PingResponse> ping(Contact contact) {
-        return null;
+        AsyncProcess<PingResponse> process = new PingProcess();
+        return requestManager.submit(process);
     }
 
     @Override
     public AsyncFuture<PingResponse> ping(InetAddress address, int port) {
-        return null;
+        AsyncProcess<PingResponse> process = new PingProcess();
+        return requestManager.submit(process);
     }
 
     @Override
     public AsyncFuture<PingResponse> ping(SocketAddress dst) {
-        return null;
+        AsyncProcess<PingResponse> process = new PingProcess();
+        return requestManager.submit(process);
     }
 
     @Override
     public AsyncFuture<PingResponse> ping(String address, int port) {
-        return null;
+        AsyncProcess<PingResponse> process = new PingProcess();
+        return requestManager.submit(process);
     }
 
     @Override
     public AsyncFuture<Object> put(KUID key, byte[] value) {
-        return null;
+        AsyncProcess<Object> process = null;
+        return requestManager.submit(process);
     }
 }
