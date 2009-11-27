@@ -4,15 +4,18 @@ import java.io.Closeable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ardverk.concurrent.AsyncExecutorService;
 import org.ardverk.concurrent.AsyncExecutors;
 import org.ardverk.concurrent.AsyncFuture;
-import org.ardverk.concurrent.AsyncFutureListener;
+import org.ardverk.concurrent.AsyncFutureTask;
 import org.ardverk.concurrent.AsyncProcess;
 
 class RequestManager implements Closeable {
 
+    private static final AtomicInteger COUNTER = new AtomicInteger();
+    
     private static final AsyncExecutorService EXECUTOR 
         = AsyncExecutors.newCachedThreadPool(
                 AsyncExecutors.defaultThreadFactory(
@@ -21,8 +24,6 @@ class RequestManager implements Closeable {
     static {
         
     }
-    
-    private int counter = 0;
     
     private boolean open = true;
     
@@ -49,8 +50,12 @@ class RequestManager implements Closeable {
             throw new IllegalStateException();
         }
         
-        AsyncFuture<T> future = EXECUTOR.submit(process);
-        add(future);
+        AsyncRequestFuture<T> future 
+            = new AsyncRequestFuture<T>(process);
+        
+        EXECUTOR.execute(future);
+        futures.put(future.key, future);
+        
         return future;
     }
     
@@ -61,26 +66,33 @@ class RequestManager implements Closeable {
             throw new IllegalStateException();
         }
         
-        AsyncFuture<T> future = EXECUTOR.submit(process);
-        add(future);
+        AsyncRequestFuture<T> future 
+            = new AsyncRequestFuture<T>(process, timeout, unit);
+        
+        EXECUTOR.execute(future);
+        futures.put(future.key, future);
+        
         return future;
     }
     
-    private synchronized <T> Integer add(AsyncFuture<T> future) {
-        final Integer key = Integer.valueOf(counter++);
+    private class AsyncRequestFuture<T> extends AsyncFutureTask<T> {
         
-        future.addAsyncFutureListener(new AsyncFutureListener<T>() {
-            @Override
-            public void operationComplete(AsyncFuture<T> future) {
-                synchronized (RequestManager.this) {
-                    futures.remove(key);
-                }
+        private final Integer key = Integer.valueOf(COUNTER.incrementAndGet());
+        
+        public AsyncRequestFuture(AsyncProcess<T> process) {
+            super(process);
+        }
+        
+        public AsyncRequestFuture(AsyncProcess<T> process, 
+                long timeout, TimeUnit unit) {
+            super(process, timeout, unit);
+        }
+
+        @Override
+        protected void done() {
+            synchronized (RequestManager.this) {
+                futures.remove(key);
             }
-        });
-        
-        AsyncFuture<?> existing = futures.put(key, future);
-        assert (existing == null);
-        
-        return key;
+        }
     }
 }
