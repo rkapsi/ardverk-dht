@@ -40,7 +40,7 @@ public class PingProcess extends AbstractProcess<PingResponse> {
     }
 
     @Override
-    public void start(AsyncFuture<PingResponse> future) throws IOException {
+    protected void start0(AsyncFuture<PingResponse> future) throws IOException {
         sender.ping();
     }
     
