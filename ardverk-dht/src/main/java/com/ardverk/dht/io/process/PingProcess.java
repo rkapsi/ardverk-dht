@@ -1,5 +1,6 @@
 package com.ardverk.dht.io.process;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -39,11 +40,12 @@ public class PingProcess extends AbstractProcess<PingResponse> {
     }
 
     @Override
-    public void start(AsyncFuture<PingResponse> future) throws Exception {
+    public void start(AsyncFuture<PingResponse> future) throws IOException {
+        sender.ping();
     }
     
     private interface PingSender {
-        
+        public void ping() throws IOException;
     }
     
     private class SocketAddressPingSender implements PingSender {
@@ -61,6 +63,10 @@ public class PingProcess extends AbstractProcess<PingResponse> {
             
             this.address = address;
         }
+
+        @Override
+        public void ping() throws IOException {
+        }
     }
     
     private class ContactPingSender implements PingSender {
@@ -73,6 +79,10 @@ public class PingProcess extends AbstractProcess<PingResponse> {
             }
             
             this.contact = contact;
+        }
+        
+        @Override
+        public void ping() throws IOException {
         }
     }
 }
