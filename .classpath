@@ -14,7 +14,6 @@
 	<classpathentry kind="lib" path="ardverk-utils/lib/main/java/slf4j/slf4j-simple-1.5.6.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/patricia-trie"/>
 	<classpathentry kind="lib" path="ardverk-utils/lib/test/java/junit/junit-4.6.jar"/>
-	<classpathentry kind="lib" path="ardverk-encoding/lib/main/java/bee-encode-0.2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/AsyncFuture"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Bee-Encode"/>
 	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/mina/commons-lang-2.4.jar"/>

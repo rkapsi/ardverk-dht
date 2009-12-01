@@ -128,28 +128,28 @@ public class Node implements DHT, Closeable {
     @Override
     public AsyncFuture<PingResponse> ping(Contact contact) {
         AsyncProcess<PingResponse> process 
-            = new PingProcess(messageDispatcher);
+            = new PingProcess(messageDispatcher, contact);
         return requestManager.submit(process);
     }
 
     @Override
     public AsyncFuture<PingResponse> ping(InetAddress address, int port) {
         AsyncProcess<PingResponse> process 
-            = new PingProcess(messageDispatcher);
+            = new PingProcess(messageDispatcher, address, port);
         return requestManager.submit(process);
     }
 
     @Override
     public AsyncFuture<PingResponse> ping(SocketAddress dst) {
         AsyncProcess<PingResponse> process 
-            = new PingProcess(messageDispatcher);
+            = new PingProcess(messageDispatcher, dst);
         return requestManager.submit(process);
     }
 
     @Override
     public AsyncFuture<PingResponse> ping(String address, int port) {
         AsyncProcess<PingResponse> process 
-            = new PingProcess(messageDispatcher);
+            = new PingProcess(messageDispatcher, address, port);
         return requestManager.submit(process);
     }
 
