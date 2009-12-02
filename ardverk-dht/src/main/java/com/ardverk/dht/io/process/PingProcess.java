@@ -8,6 +8,7 @@ import java.net.SocketAddress;
 import org.ardverk.concurrent.AsyncFuture;
 
 import com.ardverk.dht.io.MessageDispatcher;
+import com.ardverk.dht.message.Message;
 import com.ardverk.dht.message.PingResponse;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.utils.NetworkUtils;
@@ -67,6 +68,8 @@ public class PingProcess extends AbstractProcess<PingResponse> {
 
         @Override
         public void ping() throws IOException {
+            Message message = null;
+            messageDispatcher.send(PingProcess.this, address, message);
         }
     }
     
@@ -84,6 +87,9 @@ public class PingProcess extends AbstractProcess<PingResponse> {
         
         @Override
         public void ping() throws IOException {
+            Message message = null;
+            messageDispatcher.send(PingProcess.this, 
+                    contact.getRemoteAddress(), message);
         }
     }
 }

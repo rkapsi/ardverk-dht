@@ -7,8 +7,12 @@ import com.ardverk.dht.message.Message;
 
 public abstract class MessageDispatcher {
 
-    public abstract void send(SocketAddress dst, 
-            Message message) throws IOException;
+    public abstract void send(Callback callback, 
+            SocketAddress dst, Message message) throws IOException;
     
     protected void received() {}
+    
+    public static interface Callback {
+        
+    }
 }

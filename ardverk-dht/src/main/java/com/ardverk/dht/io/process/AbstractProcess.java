@@ -4,8 +4,9 @@ import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncProcess;
 
 import com.ardverk.dht.io.MessageDispatcher;
+import com.ardverk.dht.io.MessageDispatcher.Callback;
 
-abstract class AbstractProcess<T> implements AsyncProcess<T> {
+abstract class AbstractProcess<T> implements AsyncProcess<T>, Callback {
 
     protected final MessageDispatcher messageDispatcher;
     
