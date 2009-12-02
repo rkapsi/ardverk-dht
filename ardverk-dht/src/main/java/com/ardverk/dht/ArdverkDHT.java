@@ -84,6 +84,10 @@ public class ArdverkDHT extends AbstractDHT implements DHT, Closeable {
         return nodeManager.remove(nodeId);
     }
     
+    public Node getNode(KUID nodeId) {
+        return nodeManager.get(nodeId);
+    }
+    
     public Node[] getNodes() {
         return nodeManager.getNodes();
     }

@@ -44,4 +44,12 @@ public class NetworkUtils {
         
         return Arrays.equals(mask.mask(a1), mask.mask(a2));
     }
+    
+    public static boolean isValidPort(int port) {
+        return 0 < port && port < 0xFFFF;
+    }
+    
+    public static boolean isValidPort(SocketAddress address) {
+        return isValidPort(((InetSocketAddress)address).getPort());
+    }
 }

@@ -10,6 +10,7 @@ import org.ardverk.concurrent.AsyncFuture;
 import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.message.PingResponse;
 import com.ardverk.dht.routing.Contact;
+import com.ardverk.utils.NetworkUtils;
 
 public class PingProcess extends AbstractProcess<PingResponse> {
 
@@ -57,9 +58,9 @@ public class PingProcess extends AbstractProcess<PingResponse> {
                 throw new NullPointerException("address");
             }
             
-            /*if (!NetworkUtils.isValidPort(address)) {
-                
-            }*/
+            if (!NetworkUtils.isValidPort(address)) {
+                throw new IllegalArgumentException("address=" + address);
+            }
             
             this.address = address;
         }
