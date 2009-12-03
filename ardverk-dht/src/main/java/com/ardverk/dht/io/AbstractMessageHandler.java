@@ -14,4 +14,8 @@ public abstract class AbstractMessageHandler<T extends Message>
         
         this.messageDispatcher = messageDispatcher;
     }
+    
+    public MessageDispatcher getMessageDispatcher() {
+        return messageDispatcher;
+    }
 }
