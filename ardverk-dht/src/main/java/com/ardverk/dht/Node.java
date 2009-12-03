@@ -8,7 +8,7 @@ import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncProcess;
 
 import com.ardverk.dht.io.MessageDispatcher;
-import com.ardverk.dht.io.process.PingProcess;
+import com.ardverk.dht.io.PingResponseHandler;
 import com.ardverk.dht.message.Message;
 import com.ardverk.dht.message.PingResponse;
 import com.ardverk.dht.routing.Contact;
@@ -128,28 +128,28 @@ public class Node implements DHT, Closeable {
     @Override
     public AsyncFuture<PingResponse> ping(Contact contact) {
         AsyncProcess<PingResponse> process 
-            = new PingProcess(messageDispatcher, contact);
+            = new PingResponseHandler(messageDispatcher, contact);
         return requestManager.submit(process);
     }
 
     @Override
     public AsyncFuture<PingResponse> ping(InetAddress address, int port) {
         AsyncProcess<PingResponse> process 
-            = new PingProcess(messageDispatcher, address, port);
+            = new PingResponseHandler(messageDispatcher, address, port);
         return requestManager.submit(process);
     }
 
     @Override
     public AsyncFuture<PingResponse> ping(SocketAddress dst) {
         AsyncProcess<PingResponse> process 
-            = new PingProcess(messageDispatcher, dst);
+            = new PingResponseHandler(messageDispatcher, dst);
         return requestManager.submit(process);
     }
 
     @Override
     public AsyncFuture<PingResponse> ping(String address, int port) {
         AsyncProcess<PingResponse> process 
-            = new PingProcess(messageDispatcher, address, port);
+            = new PingResponseHandler(messageDispatcher, address, port);
         return requestManager.submit(process);
     }
 

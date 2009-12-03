@@ -1,18 +1,99 @@
 package com.ardverk.dht.io;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+
 import org.ardverk.concurrent.AsyncFuture;
 
 import com.ardverk.dht.Pong;
+import com.ardverk.dht.message.Message;
 import com.ardverk.dht.message.PingResponse;
+import com.ardverk.dht.routing.Contact;
+import com.ardverk.utils.NetworkUtils;
 
-public class PingResponseHandler extends ResponseHandler<Pong, PingResponse> {
+public class PingResponseHandler extends ResponseHandler<PingResponse, PingResponse> {
 
-    @Override
-    protected void innerStart(AsyncFuture<Pong> future)
-            throws Exception {   
+    private final PingSender sender;
+    
+    public PingResponseHandler(MessageDispatcher messageDispatcher, 
+            String address, int port) {
+        this(messageDispatcher, new InetSocketAddress(address, port));
+    }
+    
+    public PingResponseHandler(MessageDispatcher messageDispatcher, 
+            InetAddress address, int port) {
+        this(messageDispatcher, new InetSocketAddress(address, port));
+    }
+    
+    public PingResponseHandler(MessageDispatcher messageDispatcher, 
+            SocketAddress address) {
+        super(messageDispatcher);
+        
+        sender = new SocketAddressPingSender(address);
+    }
+    
+    public PingResponseHandler(MessageDispatcher messageDispatcher, 
+            Contact contact) {
+        super(messageDispatcher);
+        
+        sender = new ContactPingSender(contact);
     }
     
     @Override
     public void handleMessage(PingResponse message) throws Exception {
+    }
+
+    @Override
+    protected void innerStart(AsyncFuture<PingResponse> future) throws IOException {
+        sender.ping();
+    }
+    
+    private interface PingSender {
+        public void ping() throws IOException;
+    }
+    
+    private class SocketAddressPingSender implements PingSender {
+        
+        private final SocketAddress address;
+        
+        public SocketAddressPingSender(SocketAddress address) {
+            if (address == null) {
+                throw new NullPointerException("address");
+            }
+            
+            if (!NetworkUtils.isValidPort(address)) {
+                throw new IllegalArgumentException("address=" + address);
+            }
+            
+            this.address = address;
+        }
+    
+        @Override
+        public void ping() throws IOException {
+            Message message = null;
+            messageDispatcher.send(PingResponseHandler.this, address, message);
+        }
+    }
+    
+    private class ContactPingSender implements PingSender {
+        
+        private final Contact contact;
+        
+        public ContactPingSender(Contact contact) {
+            if (contact == null) {
+                throw new NullPointerException("contact");
+            }
+            
+            this.contact = contact;
+        }
+        
+        @Override
+        public void ping() throws IOException {
+            Message message = null;
+            messageDispatcher.send(PingResponseHandler.this, 
+                    contact.getRemoteAddress(), message);
+        }
     }
 }
