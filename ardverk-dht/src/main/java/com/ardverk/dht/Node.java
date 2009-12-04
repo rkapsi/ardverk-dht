@@ -13,6 +13,7 @@ import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.io.PingResponseHandler;
+import com.ardverk.dht.io.StoreResponseHandler;
 import com.ardverk.dht.message.Message;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.DefaultRouteTable;
@@ -146,7 +147,8 @@ public class Node implements DHT, Closeable {
 
     @Override
     public AsyncFuture<StoreEntity> put(KUID key, byte[] value) {
-        AsyncProcess<StoreEntity> process = null;
+        AsyncProcess<StoreEntity> process 
+            = new StoreResponseHandler(messageDispatcher, key, value);
         return requestManager.submit(process);
     }
     
