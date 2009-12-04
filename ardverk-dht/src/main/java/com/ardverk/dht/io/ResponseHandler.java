@@ -4,10 +4,11 @@ import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.AsyncProcess;
 
+import com.ardverk.dht.entity.Entity;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.utils.Checkable;
 
-public abstract class ResponseHandler<V, T extends ResponseMessage> 
+public abstract class ResponseHandler<V extends Entity, T extends ResponseMessage> 
         extends AbstractMessageHandler<T> implements Checkable, AsyncProcess<V> {
     
     private volatile AsyncFuture<V> future = null;

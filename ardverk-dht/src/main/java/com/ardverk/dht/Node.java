@@ -7,10 +7,13 @@ import java.net.SocketAddress;
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncProcess;
 
+import com.ardverk.dht.entity.GetEntity;
+import com.ardverk.dht.entity.LookupEntity;
+import com.ardverk.dht.entity.PingEntity;
+import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.io.PingResponseHandler;
 import com.ardverk.dht.message.Message;
-import com.ardverk.dht.message.PingResponse;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.DefaultRouteTable;
 import com.ardverk.dht.routing.RouteTable;
@@ -45,7 +48,7 @@ public class Node implements DHT, Closeable {
         
         ContactPinger pinger = new ContactPinger() {
             @Override
-            public AsyncFuture<PingResponse> ping(Contact contact) {
+            public AsyncFuture<PingEntity> ping(Contact contact) {
                 return Node.this.ping(contact);
             }
         };
@@ -112,50 +115,50 @@ public class Node implements DHT, Closeable {
     public Contact getContact(KUID contactId) {
         return routeTable.get(contactId);
     }
-
+    
     @Override
-    public AsyncFuture<Object> get(KUID key) {
-        AsyncProcess<Object> process = null;
-        return requestManager.submit(process);
-    }
-
-    @Override
-    public AsyncFuture<Object> lookup(KUID key) {
-        AsyncProcess<Object> process = null;
-        return requestManager.submit(process);
-    }
-
-    @Override
-    public AsyncFuture<PingResponse> ping(Contact contact) {
-        AsyncProcess<PingResponse> process 
+    public AsyncFuture<PingEntity> ping(Contact contact) {
+        AsyncProcess<PingEntity> process 
             = new PingResponseHandler(messageDispatcher, contact);
         return requestManager.submit(process);
     }
 
     @Override
-    public AsyncFuture<PingResponse> ping(InetAddress address, int port) {
-        AsyncProcess<PingResponse> process 
+    public AsyncFuture<PingEntity> ping(InetAddress address, int port) {
+        AsyncProcess<PingEntity> process 
             = new PingResponseHandler(messageDispatcher, address, port);
         return requestManager.submit(process);
     }
 
     @Override
-    public AsyncFuture<PingResponse> ping(SocketAddress dst) {
-        AsyncProcess<PingResponse> process 
+    public AsyncFuture<PingEntity> ping(SocketAddress dst) {
+        AsyncProcess<PingEntity> process 
             = new PingResponseHandler(messageDispatcher, dst);
         return requestManager.submit(process);
     }
 
     @Override
-    public AsyncFuture<PingResponse> ping(String address, int port) {
-        AsyncProcess<PingResponse> process 
+    public AsyncFuture<PingEntity> ping(String address, int port) {
+        AsyncProcess<PingEntity> process 
             = new PingResponseHandler(messageDispatcher, address, port);
         return requestManager.submit(process);
     }
 
     @Override
-    public AsyncFuture<Object> put(KUID key, byte[] value) {
-        AsyncProcess<Object> process = null;
+    public AsyncFuture<StoreEntity> put(KUID key, byte[] value) {
+        AsyncProcess<StoreEntity> process = null;
+        return requestManager.submit(process);
+    }
+    
+    @Override
+    public AsyncFuture<GetEntity> get(KUID key) {
+        AsyncProcess<GetEntity> process = null;
+        return requestManager.submit(process);
+    }
+
+    @Override
+    public AsyncFuture<LookupEntity> lookup(KUID key) {
+        AsyncProcess<LookupEntity> process = null;
         return requestManager.submit(process);
     }
 }

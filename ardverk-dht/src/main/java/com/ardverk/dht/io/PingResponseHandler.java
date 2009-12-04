@@ -7,13 +7,13 @@ import java.net.SocketAddress;
 
 import org.ardverk.concurrent.AsyncFuture;
 
-import com.ardverk.dht.Pong;
+import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.message.Message;
 import com.ardverk.dht.message.PingResponse;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.utils.NetworkUtils;
 
-public class PingResponseHandler extends ResponseHandler<PingResponse, PingResponse> {
+public class PingResponseHandler extends ResponseHandler<PingEntity, PingResponse> {
 
     private final PingSender sender;
     
@@ -46,7 +46,7 @@ public class PingResponseHandler extends ResponseHandler<PingResponse, PingRespo
     }
 
     @Override
-    protected void innerStart(AsyncFuture<PingResponse> future) throws IOException {
+    protected void innerStart(AsyncFuture<PingEntity> future) throws IOException {
         sender.ping();
     }
     

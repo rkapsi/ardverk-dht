@@ -6,11 +6,14 @@ import java.net.SocketAddress;
 
 import org.ardverk.concurrent.AsyncFuture;
 
+import com.ardverk.dht.entity.GetEntity;
+import com.ardverk.dht.entity.LookupEntity;
+import com.ardverk.dht.entity.PingEntity;
+import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.io.transport.TransportListener;
 import com.ardverk.dht.message.Message;
 import com.ardverk.dht.message.MessageFactory;
-import com.ardverk.dht.message.PingResponse;
 import com.ardverk.dht.routing.Contact;
 
 public class ArdverkDHT extends AbstractDHT implements DHT, Closeable {
@@ -105,12 +108,12 @@ public class ArdverkDHT extends AbstractDHT implements DHT, Closeable {
     }
 
     @Override
-    public AsyncFuture<PingResponse> ping(SocketAddress dst) {
+    public AsyncFuture<PingEntity> ping(SocketAddress dst) {
         return getRandomNode().ping(dst);
     }
     
     @Override
-    public AsyncFuture<PingResponse> ping(Contact contact) {
+    public AsyncFuture<PingEntity> ping(Contact contact) {
         // TODO: Need reference to Node. I guess we could use
         // also a random Node to send the ping but it would be
         // overall better to send the ping from the Node that
@@ -119,17 +122,17 @@ public class ArdverkDHT extends AbstractDHT implements DHT, Closeable {
     }
 
     @Override
-    public AsyncFuture<Object> put(KUID key, byte[] value) {
+    public AsyncFuture<StoreEntity> put(KUID key, byte[] value) {
         return nodeManager.select(key).put(key, value);
     }
     
     @Override
-    public AsyncFuture<Object> get(KUID key) {
+    public AsyncFuture<GetEntity> get(KUID key) {
         return nodeManager.select(key).get(key);
     }
     
     @Override
-    public AsyncFuture<Object> lookup(KUID key) {
+    public AsyncFuture<LookupEntity> lookup(KUID key) {
         return nodeManager.select(key).lookup(key);
     }
     
