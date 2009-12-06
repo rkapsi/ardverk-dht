@@ -42,14 +42,14 @@ public class PingResponseHandler extends ResponseHandler<PingEntity, PingRespons
     }
     
     @Override
-    public void handleMessage(PingResponse message) throws Exception {
-    }
-
-    @Override
     protected void innerStart(AsyncFuture<PingEntity> future) throws IOException {
         sender.ping();
     }
     
+    @Override
+    public void handleMessage(PingResponse message) throws Exception {
+    }
+
     private interface PingSender {
         public void ping() throws IOException;
     }
