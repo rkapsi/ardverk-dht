@@ -2,7 +2,7 @@ package com.ardverk.dht.message;
 
 import com.ardverk.enumeration.IntegerValue;
 
-public enum OpCode implements IntegerValue {
+enum OpCode implements IntegerValue {
     
     PING_REQUEST(0x00),
     PING_RESPONSE(0x01),
@@ -55,5 +55,15 @@ public enum OpCode implements IntegerValue {
         }
         
         throw new IllegalArgumentException("value=" + value);
+    }
+    
+    public static OpCode valueOf(Message message) {
+        if (message instanceof PingRequest) {
+            return PING_REQUEST;
+        } else if (message instanceof PingResponse) {
+            return PING_RESPONSE;
+        }
+        
+        throw new IllegalArgumentException("message=" + message);
     }
 }

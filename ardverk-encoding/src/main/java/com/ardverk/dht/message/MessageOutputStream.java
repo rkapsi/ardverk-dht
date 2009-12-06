@@ -71,7 +71,7 @@ class MessageOutputStream extends BencodingOutputStream {
     public void writeMessage(Message message) throws IOException {
         
         writeByte(MessageUtils.VERSION);
-        writeEnum(message.getOpCode());
+        writeEnum(OpCode.valueOf(message));
         
         writeMessageId(message.getMessageId());
         

@@ -5,10 +5,8 @@ import com.ardverk.dht.routing.Contact;
 public class AbstractResponseMessage extends AbstractMessage 
         implements ResponseMessage {
 
-    public AbstractResponseMessage(OpCode opcode, 
+    public AbstractResponseMessage( 
             MessageId messageId, Contact contact) {
-        super(opcode, messageId, contact);
+        super(messageId, contact);
     }
-
-    
 }
