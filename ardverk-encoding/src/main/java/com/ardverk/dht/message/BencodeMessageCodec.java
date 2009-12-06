@@ -34,8 +34,8 @@ public class BencodeMessageCodec extends MessageCodec {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         BencodingOutputStream out = new BencodingOutputStream(baos);
         
-        out.writeObject(OpCode.valueOf(message));
-        out.writeObject(message.getMessageId().getBytes());
+        out.writeEnum(OpCode.valueOf(message));
+        out.writeBytes(message.getMessageId().getBytes());
         
         out.writeObject(context.getRemoteAddress().getAddress().getAddress());
         

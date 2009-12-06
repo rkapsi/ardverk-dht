@@ -11,6 +11,8 @@ import org.ardverk.coding.BencodingOutputStream;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.io.session.SessionContext;
 import com.ardverk.dht.routing.Contact;
+import com.ardverk.enumeration.IntegerValue;
+import com.ardverk.enumeration.StringValue;
 
 class MessageOutputStream extends BencodingOutputStream {
 
@@ -45,6 +47,17 @@ class MessageOutputStream extends BencodingOutputStream {
         }
     }
     
+    @Override
+    public void writeEnum(Enum<?> value) throws IOException {
+        if (value instanceof IntegerValue) {
+            writeInt(((IntegerValue)value).intValue());
+        } else if (value instanceof StringValue) {
+            writeString(((StringValue)value).stringValue());
+        } else {
+            super.writeEnum(value);
+        }
+    }
+
     public void writeInetAddress(InetAddress address) throws IOException {
         writeString(address.getHostName());
     }
