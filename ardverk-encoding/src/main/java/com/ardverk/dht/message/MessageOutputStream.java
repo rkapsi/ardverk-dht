@@ -87,12 +87,12 @@ class MessageOutputStream extends BencodingOutputStream {
         writeEnum(OpCode.valueOf(message));
         writeMessageId(message.getMessageId());
         
-        // The Localhost and its Time
-        writeContact(message.getContact());
-        writeLong(System.currentTimeMillis());
+        // Write the source and destination
+        writeContact(message.getSource());
+        writeContact(message.getDestination());
         
-        // The Remote Host's Address
-        writeInetAddress(context.getRemoteAddress().getAddress());
+        // Write the local time
+        writeLong(System.currentTimeMillis());
         
         if (message instanceof PingRequest) {
             writePingRequest((PingRequest)message);

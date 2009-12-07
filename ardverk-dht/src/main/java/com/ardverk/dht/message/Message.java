@@ -1,7 +1,5 @@
 package com.ardverk.dht.message;
 
-import java.net.InetAddress;
-
 import com.ardverk.dht.routing.Contact;
 
 public interface Message {
@@ -10,9 +8,9 @@ public interface Message {
     
     public MessageId getMessageId();
     
-    public Contact getContact();
+    public Contact getSource();
     
     public long getRemoteTime();
     
-    public InetAddress getAddress();
+    public Contact getDestination();
 }

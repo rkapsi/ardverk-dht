@@ -1,9 +1,7 @@
 package com.ardverk.dht.message;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 
 import org.junit.Test;
 
@@ -23,10 +21,14 @@ public class BencodeMessageCodecTest {
         SessionContext context = new DefaultSessionContext();
         MessageId messageId = new MessageId(new byte[20]);
         KUID contactId = new KUID(new byte[20]);
-        Contact contact = new DefaultContact(Type.SOLICITED, 
+        Contact source = new DefaultContact(Type.SOLICITED, 
                 contactId, 0, new InetSocketAddress("localhost", 6666));
-        PingRequest request = new DefaultPingRequest(messageId, contact, 
-                System.currentTimeMillis(), InetAddress.getByName("localhost"));
+        
+        Contact destination = new DefaultContact(Type.SOLICITED, 
+                contactId, 0, new InetSocketAddress("localhost", 6666));
+        
+        PingRequest request = new DefaultPingRequest(messageId, source, 
+                destination, System.currentTimeMillis());
         
         byte[] data = codec.encode(context, request);
         Message message = codec.decode(context, data);

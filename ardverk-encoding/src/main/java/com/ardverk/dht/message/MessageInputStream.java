@@ -99,19 +99,18 @@ class MessageInputStream extends BencodingInputStream {
         
         OpCode opcode = readEnum(OpCode.class);
         MessageId messageId = readMessageId();
-        Contact contact = readContact(opcode.isRequest() 
+        Contact source = readContact(opcode.isRequest() 
                 ? Type.UNSOLICITED : Type.SOLICITED);
+        Contact destination = readContact(Type.UNKNOWN);
         long time = readLong();
-        
-        InetAddress address = readInetAddress();
         
         switch (opcode) {
             case PING_REQUEST:
                 return new DefaultPingRequest(messageId, 
-                        contact, time, address);
+                        source, destination, time);
             case PING_RESPONSE:
                 return new DefaultPingResponse(messageId, 
-                        contact, time, address);
+                        source, destination, time);
         }
         
         throw new IOException("opcode=" + opcode);
