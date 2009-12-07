@@ -88,7 +88,7 @@ class MessageInputStream extends BencodingInputStream {
         int instanceId = readInt();
         SocketAddress address = readSocketAddress();
         return new DefaultContact(type, contactId, 
-                instanceId, address, null);
+                instanceId, address);
     }
     
     public Message readMessage() throws IOException {
@@ -105,6 +105,15 @@ class MessageInputStream extends BencodingInputStream {
         
         InetAddress address = readInetAddress();
         
-        return null;
+        switch (opcode) {
+            case PING_REQUEST:
+                return new DefaultPingRequest(messageId, 
+                        contact, time, address);
+            case PING_RESPONSE:
+                return new DefaultPingResponse(messageId, 
+                        contact, time, address);
+        }
+        
+        throw new IOException("opcode=" + opcode);
     }
 }

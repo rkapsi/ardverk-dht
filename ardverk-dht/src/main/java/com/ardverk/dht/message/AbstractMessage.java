@@ -1,5 +1,7 @@
 package com.ardverk.dht.message;
 
+import java.net.InetAddress;
+
 import com.ardverk.dht.routing.Contact;
 
 public abstract class AbstractMessage implements Message {
@@ -10,7 +12,12 @@ public abstract class AbstractMessage implements Message {
     
     private final Contact contact;
     
-    public AbstractMessage(MessageId messageId, Contact contact) {
+    private final long time;
+    
+    private final InetAddress address;
+    
+    public AbstractMessage(MessageId messageId, Contact contact, 
+            long time, InetAddress address) {
         
         if (messageId == null) {
             throw new NullPointerException("messageId");
@@ -22,6 +29,8 @@ public abstract class AbstractMessage implements Message {
         
         this.messageId = messageId;
         this.contact = contact;
+        this.time = time;
+        this.address = address;
     }
     
     @Override
@@ -37,5 +46,15 @@ public abstract class AbstractMessage implements Message {
     @Override
     public Contact getContact() {
         return contact;
+    }
+
+    @Override
+    public long getRemoteTime() {
+        return time;
+    }
+    
+    @Override
+    public InetAddress getAddress() {
+        return address;
     }
 }

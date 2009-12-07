@@ -24,6 +24,11 @@ public class DefaultContact implements Contact {
     private Map<Object, Object> attributes;
     
     public DefaultContact(Type type, KUID contactId, 
+            int instanceId, SocketAddress address) {
+        this(type, contactId, instanceId, address, null);
+    }
+    
+    public DefaultContact(Type type, KUID contactId, 
             int instanceId, SocketAddress address, 
             Map<?, ?> attributes) {
         
