@@ -34,10 +34,10 @@ class MessageInputStream extends BencodingInputStream {
 
     @Override
     public <T extends Enum<T>> T readEnum(Class<T> clazz) throws IOException {
-        if (clazz.isInstance(IntegerValue.class)) {
+        if (IntegerValue.class.isAssignableFrom(clazz)) {
             int value = readInt();
             return readEnum(clazz, "valueOf", int.class, value);
-        } else if (clazz.isInstance(StringValue.class)) {
+        } else if (StringValue.class.isAssignableFrom(clazz)) {
             String value = readString();
             return readEnum(clazz, "from", String.class, value);
         } else {
