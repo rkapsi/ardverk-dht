@@ -27,6 +27,18 @@ enum OpCode implements IntegerValue {
         return value;
     }
     
+    public boolean isRequest() {
+        switch (this) {
+            case PING_REQUEST:
+            case FIND_NODE_REQUEST:
+            case FIND_VALUE_REQUEST:
+            case STORE_REQUEST:
+                return true;
+            default:
+                return false;
+        }
+    }
+    
     @Override
     public String toString() {
         return name() + " (" + intValue() + ")";

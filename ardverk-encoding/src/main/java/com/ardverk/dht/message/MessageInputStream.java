@@ -11,15 +11,25 @@ import java.net.SocketAddress;
 import org.ardverk.coding.BencodingInputStream;
 
 import com.ardverk.dht.KUID;
+import com.ardverk.dht.io.session.SessionContext;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.DefaultContact;
+import com.ardverk.dht.routing.Contact.Type;
 import com.ardverk.enumeration.IntegerValue;
 import com.ardverk.enumeration.StringValue;
 
 class MessageInputStream extends BencodingInputStream {
 
-    public MessageInputStream(InputStream in) {
+    private final SessionContext context;
+    
+    public MessageInputStream(InputStream in, SessionContext context) {
         super(in);
+        
+        if (context == null) {
+            throw new NullPointerException("context");
+        }
+        
+        this.context = context;
     }
 
     @Override
@@ -81,7 +91,7 @@ class MessageInputStream extends BencodingInputStream {
                 instanceId, address, null);
     }
     
-    public Message readMessage(Contact.Type type) throws IOException {
+    public Message readMessage() throws IOException {
         int version = readUnsignedByte();
         if (version != MessageUtils.VERSION) {
             throw new IOException("version=" + version);
@@ -89,7 +99,8 @@ class MessageInputStream extends BencodingInputStream {
         
         OpCode opcode = readEnum(OpCode.class);
         MessageId messageId = readMessageId();
-        Contact contact = readContact(type);
+        Contact contact = readContact(opcode.isRequest() 
+                ? Type.UNSOLICITED : Type.SOLICITED);
         long time = readLong();
         
         InetAddress address = readInetAddress();

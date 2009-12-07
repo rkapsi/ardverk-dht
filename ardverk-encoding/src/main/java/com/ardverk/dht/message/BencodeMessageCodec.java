@@ -4,9 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import org.ardverk.coding.BencodingInputStream;
-import org.ardverk.coding.BencodingOutputStream;
-
 import com.ardverk.dht.io.session.SessionContext;
 
 public class BencodeMessageCodec extends MessageCodec {
@@ -20,26 +17,21 @@ public class BencodeMessageCodec extends MessageCodec {
     @Override
     public Message decode(SessionContext context, byte[] data)
             throws IOException {
-        BencodingInputStream in = new BencodingInputStream(
-                new ByteArrayInputStream(data));
+        MessageInputStream in = new MessageInputStream(
+                new ByteArrayInputStream(data), context);
         
-        OpCode opcode = OpCode.valueOf((String)in.readObject());
-        //MessageId messageId = MessageFactory.
-        return null;
+        return in.readMessage();
     }
     
     @Override
     public byte[] encode(SessionContext context, Message message)
             throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        BencodingOutputStream out = new BencodingOutputStream(baos);
+        MessageOutputStream out = new MessageOutputStream(baos, context);
         
-        out.writeEnum(OpCode.valueOf(message));
-        out.writeBytes(message.getMessageId().getBytes());
-        
-        out.writeObject(context.getRemoteAddress().getAddress().getAddress());
-        
+        out.writeMessage(message);
         out.close();
+        
         return baos.toByteArray();
     }
 }
