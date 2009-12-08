@@ -167,9 +167,12 @@ public abstract class MessageDispatcher implements Closeable {
         }
         
         MessageEntity entity = entityManager.get(response);
+        boolean success = false;
         if (entity != null) {
-            entity.handleResponse(response);
-        } else {
+            success = entity.handleResponse(response);
+        }
+        
+        if (!success) {
             lateResponse(response);
         }
     }
@@ -177,7 +180,8 @@ public abstract class MessageDispatcher implements Closeable {
     /**
      * 
      */
-    protected abstract void lateResponse(ResponseMessage message) throws IOException;
+    protected abstract void lateResponse(
+            ResponseMessage message) throws IOException;
     
     /**
      * 
@@ -234,7 +238,11 @@ public abstract class MessageDispatcher implements Closeable {
                             = callbacks.remove(messageId);
                         
                         if (entity != null) {
-                            entity.handleTimeout();
+                            try {
+                                entity.handleTimeout();
+                            } catch (IOException err) {
+                                LOG.error("IOException", err);
+                            }
                         }
                     }
                 };
@@ -252,12 +260,7 @@ public abstract class MessageDispatcher implements Closeable {
          * 
          */
         public MessageEntity get(ResponseMessage message) {
-            MessageEntity entity = callbacks.remove(
-                    message.getMessageId());
-            if (entity != null) {
-                entity.close();
-            }
-            return entity;
+            return callbacks.remove(message.getMessageId());
         }
     }
 
@@ -300,37 +303,32 @@ public abstract class MessageDispatcher implements Closeable {
         @Override
         public void close() {
             future.cancel(true);
+            done.set(true);
         }
         
         /**
          * 
          */
-        public void handleResponse(ResponseMessage response) {
-            close();
+        public boolean handleResponse(ResponseMessage response) throws IOException {
+            future.cancel(true);
             
-            try {
-                if (!done.getAndSet(true)) {
-                    long time = System.currentTimeMillis() - creationTime;
-                    callback.handleResponse(response, time, TimeUnit.MILLISECONDS);
-                }
-            } catch (IOException err) {
-                LOG.error("Exception", err);
+            if (!done.getAndSet(true)) {
+                long time = System.currentTimeMillis() - creationTime;
+                callback.handleResponse(response, time, TimeUnit.MILLISECONDS);
+                return true;
             }
+            return false;
         }
 
         /**
          * 
          */
-        public void handleTimeout() {
-            close();
+        public void handleTimeout() throws IOException {
+            future.cancel(true);
             
-            try {
-                if (!done.getAndSet(true)) {
-                    long time = System.currentTimeMillis() - creationTime;
-                    callback.handleTimeout(request, time, TimeUnit.MILLISECONDS);
-                }
-            } catch (IOException err) {
-                LOG.error("Exception", err);
+            if (!done.getAndSet(true)) {
+                long time = System.currentTimeMillis() - creationTime;
+                callback.handleTimeout(request, time, TimeUnit.MILLISECONDS);
             }
         }
     }
