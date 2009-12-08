@@ -11,7 +11,6 @@ import java.net.SocketAddress;
 import org.ardverk.coding.BencodingInputStream;
 
 import com.ardverk.dht.KUID;
-import com.ardverk.dht.io.session.SessionContext;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.DefaultContact;
 import com.ardverk.dht.routing.Contact.Type;
@@ -19,17 +18,9 @@ import com.ardverk.enumeration.IntegerValue;
 import com.ardverk.enumeration.StringValue;
 
 class MessageInputStream extends BencodingInputStream {
-
-    private final SessionContext context;
     
-    public MessageInputStream(InputStream in, SessionContext context) {
+    public MessageInputStream(InputStream in) {
         super(in);
-        
-        if (context == null) {
-            throw new NullPointerException("context");
-        }
-        
-        this.context = context;
     }
 
     @Override

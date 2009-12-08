@@ -49,7 +49,7 @@ public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
     }
 
     @Override
-    public void handleResponse(ResponseMessage response) throws Exception {
+    public void handleResponse(ResponseMessage response) throws IOException {
     }
 
     @Override

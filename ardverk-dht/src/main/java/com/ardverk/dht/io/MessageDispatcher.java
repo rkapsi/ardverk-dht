@@ -66,7 +66,7 @@ public abstract class MessageDispatcher implements Closeable {
     }
     
     public void send(ResponseMessage message) throws IOException {
-        byte[] data = codec.encode(context, message);
+        byte[] data = codec.encode(message);
         transport.send(message.getAddress(), data);
     }
     
@@ -74,14 +74,14 @@ public abstract class MessageDispatcher implements Closeable {
             RequestMessage message, long timeout, 
             TimeUnit unit) throws IOException {
         
-        byte[] data = codec.encode(context, message);
+        byte[] data = codec.encode(message);
         
         entityManager.add(callback, message, timeout, unit);
         transport.send(message.getAddress(), data);
     }
     
-    private void received(SocketAddress src, byte[] data) {
-        Message message = codec.decode(context, data);
+    private void received(SocketAddress src, byte[] data) throws IOException {
+        Message message = codec.decode(data);
         if (message instanceof RequestMessage) {
             request(src, (RequestMessage)message);
         } else {
@@ -91,9 +91,10 @@ public abstract class MessageDispatcher implements Closeable {
     
     protected abstract void request(SocketAddress src, RequestMessage message);
     
-    private void response(SocketAddress src, ResponseMessage message) throws Exception {
-        MessageEntity entity = entityManager.get(message);
+    private void response(SocketAddress src, 
+            ResponseMessage message) throws IOException {
         
+        MessageEntity entity = entityManager.get(message);
         if (entity != null) {
             entity.handleResponse(message);
         } else {
@@ -101,7 +102,7 @@ public abstract class MessageDispatcher implements Closeable {
         }
     }
     
-    protected abstract void lateResponse(ResponseMessage message);
+    protected abstract void lateResponse(ResponseMessage message) throws IOException;
     
     private static class MessageEntityManager implements Closeable {
         
@@ -219,7 +220,7 @@ public abstract class MessageDispatcher implements Closeable {
                 if (!done.getAndSet(true)) {
                     callback.handleResponse(response);
                 }
-            } catch (Exception err) {
+            } catch (IOException err) {
                 LOG.error("Exception", err);
             }
         }
@@ -231,7 +232,7 @@ public abstract class MessageDispatcher implements Closeable {
                 if (!done.getAndSet(true)) {
                     callback.handleTimeout(request);
                 }
-            } catch (Exception err) {
+            } catch (IOException err) {
                 LOG.error("Exception", err);
             }
         }

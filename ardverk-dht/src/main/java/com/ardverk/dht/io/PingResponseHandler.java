@@ -48,7 +48,7 @@ public class PingResponseHandler extends ResponseHandler<PingEntity> {
     }
     
     @Override
-    public void handleResponse(ResponseMessage response) throws Exception {
+    public void handleResponse(ResponseMessage response) throws IOException {
     }
     
     @Override

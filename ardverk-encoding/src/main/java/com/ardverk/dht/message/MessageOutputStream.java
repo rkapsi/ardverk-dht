@@ -9,23 +9,14 @@ import java.net.SocketAddress;
 import org.ardverk.coding.BencodingOutputStream;
 
 import com.ardverk.dht.KUID;
-import com.ardverk.dht.io.session.SessionContext;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.enumeration.IntegerValue;
 import com.ardverk.enumeration.StringValue;
 
 class MessageOutputStream extends BencodingOutputStream {
-
-    private final SessionContext context;
     
-    public MessageOutputStream(OutputStream out, SessionContext context) {
+    public MessageOutputStream(OutputStream out) {
         super(out);
-        
-        if (context == null) {
-            throw new NullPointerException("context");
-        }
-        
-        this.context = context;
     }
 
     @Override

@@ -4,8 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import com.ardverk.dht.io.session.SessionContext;
-
 public class BencodeMessageCodec extends MessageCodec {
 
     public static final String NAME = "bencode";
@@ -15,19 +13,19 @@ public class BencodeMessageCodec extends MessageCodec {
     }
 
     @Override
-    public Message decode(SessionContext context, byte[] data)
+    public Message decode(byte[] data)
             throws IOException {
         MessageInputStream in = new MessageInputStream(
-                new ByteArrayInputStream(data), context);
+                new ByteArrayInputStream(data));
         
         return in.readMessage();
     }
     
     @Override
-    public byte[] encode(SessionContext context, Message message)
+    public byte[] encode(Message message)
             throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        MessageOutputStream out = new MessageOutputStream(baos, context);
+        MessageOutputStream out = new MessageOutputStream(baos);
         
         out.writeMessage(message);
         out.close();

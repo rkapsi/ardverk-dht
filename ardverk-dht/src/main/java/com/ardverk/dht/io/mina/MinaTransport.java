@@ -33,7 +33,10 @@ public class MinaTransport extends AbstractTransport implements Closeable {
             @Override
             public void messageReceived(IoSession session, Object message)
                     throws IOException {
-                received(session.getRemoteAddress(), message);
+                IoBuffer buffer = (IoBuffer)message;
+                byte[] data = new byte[buffer.remaining()];
+                buffer.get(data);
+                received(session.getRemoteAddress(), data);
             }
         };
         

@@ -2,8 +2,6 @@ package com.ardverk.dht.message;
 
 import java.io.IOException;
 
-import com.ardverk.dht.io.session.SessionContext;
-
 public abstract class MessageCodecSpi {
 
     private final String name;
@@ -20,9 +18,9 @@ public abstract class MessageCodecSpi {
         return name;
     }
     
-    public abstract byte[] encode(SessionContext context, Message message) throws IOException;
+    public abstract byte[] encode(Message message) throws IOException;
     
-    public abstract Message decode(SessionContext context, byte[] in) throws IOException;
+    public abstract Message decode(byte[] in) throws IOException;
     
     @Override
     public String toString() {
