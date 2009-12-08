@@ -6,7 +6,7 @@ import java.util.Random;
 
 public abstract class AbstractMessageFactory implements MessageFactory {
 
-    private final Random GENERATOR = new SecureRandom();
+    private static final Random GENERATOR = new SecureRandom();
     
     private final int length;
     
