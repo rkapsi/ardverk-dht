@@ -5,9 +5,9 @@ import org.ardverk.concurrent.AsyncFuture;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.entity.LookupEntity;
 import com.ardverk.dht.entity.StoreEntity;
-import com.ardverk.dht.message.ResponseMessage;
+import com.ardverk.dht.message.Message;
 
-public class StoreResponseHandler extends ResponseHandler<StoreEntity, ResponseMessage> {
+public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
 
     private final KUID key;
     
@@ -46,6 +46,6 @@ public class StoreResponseHandler extends ResponseHandler<StoreEntity, ResponseM
     }
 
     @Override
-    public void handleMessage(ResponseMessage message) throws Exception {
+    public void handleMessage(Message message) throws Exception {
     }
 }

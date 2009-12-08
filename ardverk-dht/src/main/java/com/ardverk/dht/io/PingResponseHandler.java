@@ -9,11 +9,10 @@ import org.ardverk.concurrent.AsyncFuture;
 
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.message.Message;
-import com.ardverk.dht.message.PingResponse;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.utils.NetworkUtils;
 
-public class PingResponseHandler extends ResponseHandler<PingEntity, PingResponse> {
+public class PingResponseHandler extends ResponseHandler<PingEntity> {
 
     private final PingSender sender;
     
@@ -47,7 +46,7 @@ public class PingResponseHandler extends ResponseHandler<PingEntity, PingRespons
     }
     
     @Override
-    public void handleMessage(PingResponse message) throws Exception {
+    public void handleMessage(Message message) throws Exception {
     }
 
     private interface PingSender {

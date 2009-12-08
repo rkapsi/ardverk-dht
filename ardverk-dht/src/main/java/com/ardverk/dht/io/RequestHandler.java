@@ -1,9 +1,6 @@
 package com.ardverk.dht.io;
 
-import com.ardverk.dht.message.RequestMessage;
-
-public abstract class RequestHandler<T extends RequestMessage> 
-        extends AbstractMessageHandler<T> {
+public abstract class RequestHandler extends AbstractMessageHandler {
     
     public RequestHandler(MessageDispatcher messageDispatcher) {
         super(messageDispatcher);

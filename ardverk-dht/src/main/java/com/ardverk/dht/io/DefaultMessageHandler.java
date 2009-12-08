@@ -7,7 +7,7 @@ import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
 
-public class DefaultMessageHandler implements MessageHandler<Message> {
+public class DefaultMessageHandler implements MessageCallback {
 
     private final RouteTable routeTable;
     

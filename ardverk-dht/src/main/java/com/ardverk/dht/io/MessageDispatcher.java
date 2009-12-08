@@ -26,8 +26,8 @@ public abstract class MessageDispatcher implements Closeable {
         }
     };
     
-    private final Map<MessageId, MessageHandler<? extends Message>> callbacks 
-        = new ConcurrentHashMap<MessageId, MessageHandler<? extends Message>>();
+    private final Map<MessageId, MessageCallback> callbacks 
+        = new ConcurrentHashMap<MessageId, MessageCallback>();
     
     private final Transport transport;
     
@@ -53,8 +53,9 @@ public abstract class MessageDispatcher implements Closeable {
         transport.removeTransportListener(listener);
     }
     
-    public void send(MessageHandler<? extends Message> callback, 
-            SocketAddress dst, Message message, long timeout, TimeUnit unit) throws IOException {
+    public void send(MessageCallback callback, 
+            SocketAddress dst, Message message, 
+            long timeout, TimeUnit unit) throws IOException {
         byte[] data = codec.encode(context, message);
         transport.send(dst, data);
     }
@@ -72,8 +73,7 @@ public abstract class MessageDispatcher implements Closeable {
     
     private void response(SocketAddress src, ResponseMessage message) {
         MessageId messageId = message.getMessageId();
-        MessageHandler<? extends Message> callback 
-            = callbacks.remove(messageId);
+        MessageCallback callback = callbacks.remove(messageId);
         
         if (callback != null) {
             response(callback, src, message);
@@ -82,9 +82,9 @@ public abstract class MessageDispatcher implements Closeable {
         }
     }
     
-    private void response(MessageHandler<? extends Message> callback, 
-            SocketAddress src, Message ResponseMessage) {
-        
+    private void response(MessageCallback callback, 
+            SocketAddress src, ResponseMessage message) throws Exception {
+        callback.handleMessage(message);
     }
     
     protected abstract void lateResponse(
