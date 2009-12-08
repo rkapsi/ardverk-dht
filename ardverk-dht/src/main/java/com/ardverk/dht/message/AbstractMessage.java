@@ -55,4 +55,10 @@ public abstract class AbstractMessage implements Message {
     public SocketAddress getAddress() {
         return address;
     }
+    
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "(" + messageId 
+                    + ", " + contact + ", " + address + ")";
+    }
 }

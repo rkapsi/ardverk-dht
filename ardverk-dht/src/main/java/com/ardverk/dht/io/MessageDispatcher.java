@@ -83,13 +83,13 @@ public abstract class MessageDispatcher implements Closeable {
     private void received(SocketAddress src, byte[] data) throws IOException {
         Message message = codec.decode(data);
         if (message instanceof RequestMessage) {
-            request(src, (RequestMessage)message);
+            handleRequest(src, (RequestMessage)message);
         } else {
             response(src, (ResponseMessage)message);
         }
     }
     
-    protected abstract void request(SocketAddress src, RequestMessage message);
+    protected abstract void handleRequest(SocketAddress src, RequestMessage message) throws IOException;
     
     private void response(SocketAddress src, 
             ResponseMessage message) throws IOException {
@@ -141,6 +141,10 @@ public abstract class MessageDispatcher implements Closeable {
                     throw new IllegalStateException();
                 }
                 
+                if (callbacks.containsKey(messageId)) {
+                    throw new IllegalArgumentException("messageId=" + messageId);
+                }
+                
                 Runnable task = new Runnable() {
                     @Override
                     public void run() {
@@ -178,6 +182,8 @@ public abstract class MessageDispatcher implements Closeable {
      * 
      */
     private static class MessageEntity implements Closeable {
+        
+        private final long creationTime = System.currentTimeMillis();
         
         private final ScheduledFuture<?> future;
 
@@ -218,7 +224,8 @@ public abstract class MessageDispatcher implements Closeable {
             
             try {
                 if (!done.getAndSet(true)) {
-                    callback.handleResponse(response);
+                    long time = System.currentTimeMillis() - creationTime;
+                    callback.handleResponse(response, time, TimeUnit.MILLISECONDS);
                 }
             } catch (IOException err) {
                 LOG.error("Exception", err);
@@ -230,7 +237,8 @@ public abstract class MessageDispatcher implements Closeable {
             
             try {
                 if (!done.getAndSet(true)) {
-                    callback.handleTimeout(request);
+                    long time = System.currentTimeMillis() - creationTime;
+                    callback.handleTimeout(request, time, TimeUnit.MILLISECONDS);
                 }
             } catch (IOException err) {
                 LOG.error("Exception", err);

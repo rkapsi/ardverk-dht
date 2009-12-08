@@ -1,6 +1,7 @@
 package com.ardverk.dht.io;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
@@ -31,10 +32,10 @@ public class DefaultMessageHandler implements MessageCallback {
     }
     
     @Override
-    public void handleResponse(ResponseMessage response) throws IOException {
+    public void handleResponse(ResponseMessage response, long time, TimeUnit unit) throws IOException {
     }
     
     @Override
-    public void handleTimeout(RequestMessage request) throws IOException {
+    public void handleTimeout(RequestMessage request, long time, TimeUnit unit) throws IOException {
     }
 }

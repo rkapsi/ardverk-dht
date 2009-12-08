@@ -1,6 +1,7 @@
 package com.ardverk.dht.io;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
@@ -75,5 +76,5 @@ public abstract class ResponseHandler<V extends Entity>
     /**
      * 
      */
-    public abstract void handleTimeout(RequestMessage request) throws IOException;
+    public abstract void handleTimeout(RequestMessage request, long time, TimeUnit unit) throws IOException;
 }
