@@ -4,26 +4,22 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.ardverk.concurrent.AsyncFuture;
 
-import com.ardverk.dht.KUID;
 import com.ardverk.dht.entity.PingEntity;
-import com.ardverk.dht.message.DefaultPingRequest;
-import com.ardverk.dht.message.MessageId;
+import com.ardverk.dht.message.MessageFactory;
+import com.ardverk.dht.message.PingRequest;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
-import com.ardverk.dht.routing.DefaultContact;
-import com.ardverk.dht.routing.Contact.Type;
 import com.ardverk.utils.NetworkUtils;
 
 public class PingResponseHandler extends ResponseHandler<PingEntity> {
-
-    private static final Random GENERATOR = new Random();
+    
+    private static final long TIMEOUT = 10L; // SECONDS
     
     private final PingSender sender;
     
@@ -99,20 +95,10 @@ public class PingResponseHandler extends ResponseHandler<PingEntity> {
     
         @Override
         public void ping() throws IOException {
-            byte[] id = new byte[20];
-            GENERATOR.nextBytes(id);
-            
-            MessageId messageId = new MessageId(id);
-            KUID contactId = new KUID(new byte[] { 4, 5, 6 });
-            
-            Contact contact = new DefaultContact(Type.SOLICITED, 
-                    contactId, 0, new InetSocketAddress("localhost", 6666));
-            
-            RequestMessage message = new DefaultPingRequest(
-                    messageId, contact, address);
-            
+            MessageFactory factory = messageDispatcher.getMessageFactory();
+            PingRequest request = factory.createPingRequest(address);
             messageDispatcher.send(PingResponseHandler.this, 
-                    message, 10L, TimeUnit.SECONDS);
+                    request, TIMEOUT, TimeUnit.SECONDS);
         }
     }
     
@@ -130,9 +116,10 @@ public class PingResponseHandler extends ResponseHandler<PingEntity> {
         
         @Override
         public void ping() throws IOException {
-            RequestMessage message = null;
+            MessageFactory factory = messageDispatcher.getMessageFactory();
+            PingRequest request = factory.createPingRequest(contact);
             messageDispatcher.send(PingResponseHandler.this, 
-                    message, 10L, TimeUnit.SECONDS);
+                    request, TIMEOUT, TimeUnit.SECONDS);
         }
     }
 }

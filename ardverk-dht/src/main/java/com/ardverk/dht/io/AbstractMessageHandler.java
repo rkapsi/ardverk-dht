@@ -1,5 +1,7 @@
 package com.ardverk.dht.io;
 
+import com.ardverk.dht.message.MessageFactory;
+
 public abstract class AbstractMessageHandler {
 
     protected final MessageDispatcher messageDispatcher;
@@ -14,5 +16,9 @@ public abstract class AbstractMessageHandler {
     
     public MessageDispatcher getMessageDispatcher() {
         return messageDispatcher;
+    }
+    
+    public MessageFactory getMessageFactory() {
+        return messageDispatcher.getMessageFactory();
     }
 }

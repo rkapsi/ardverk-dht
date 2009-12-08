@@ -18,6 +18,7 @@ import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.io.transport.TransportListener;
 import com.ardverk.dht.message.Message;
 import com.ardverk.dht.message.MessageCodec;
+import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.MessageId;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
@@ -42,11 +43,19 @@ public abstract class MessageDispatcher implements Closeable {
     
     private final Transport transport;
     
+    private final MessageFactory factory;
+    
     private final MessageCodec codec;
     
-    public MessageDispatcher(Transport transport, MessageCodec codec) {
+    public MessageDispatcher(Transport transport, 
+            MessageFactory factory, MessageCodec codec) {
+        
         if (transport == null) {
             throw new NullPointerException("transport");
+        }
+        
+        if (factory == null) {
+            throw new NullPointerException("factory");
         }
         
         if (codec == null) {
@@ -54,9 +63,22 @@ public abstract class MessageDispatcher implements Closeable {
         }
         
         this.transport = transport;
+        this.factory = factory;
         this.codec = codec;
         
         transport.addTransportListener(listener);
+    }
+    
+    public Transport getTransport() {
+        return transport;
+    }
+    
+    public MessageFactory getMessageFactory() {
+        return factory;
+    }
+    
+    public MessageCodec getMessageCodec() {
+        return codec;
     }
     
     @Override
