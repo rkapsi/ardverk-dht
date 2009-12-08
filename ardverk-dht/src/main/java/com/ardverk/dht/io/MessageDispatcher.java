@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.io.transport.TransportListener;
@@ -53,7 +54,7 @@ public abstract class MessageDispatcher implements Closeable {
     }
     
     public void send(MessageHandler<? extends Message> callback, 
-            SocketAddress dst, Message message) throws IOException {
+            SocketAddress dst, Message message, long timeout, TimeUnit unit) throws IOException {
         byte[] data = codec.encode(context, message);
         transport.send(dst, data);
     }
