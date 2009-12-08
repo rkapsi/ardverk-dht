@@ -160,7 +160,8 @@ public abstract class MessageDispatcher implements Closeable {
         MessageId messageId = response.getMessageId();
         if (!factory.isFor(messageId, src)) {
             if (LOG.isErrorEnabled()) {
-                LOG.error("");
+                LOG.error("Wrong MessageId signature: " 
+                        + src + ", " + messageId);
             }
             return;
         }
