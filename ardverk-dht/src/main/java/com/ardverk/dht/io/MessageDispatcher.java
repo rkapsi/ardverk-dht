@@ -24,6 +24,9 @@ import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.logging.LoggerUtils;
 
+/**
+ * 
+ */
 public abstract class MessageDispatcher implements Closeable {
     
     private static final Logger LOG 
@@ -34,7 +37,7 @@ public abstract class MessageDispatcher implements Closeable {
         @Override
         public void received(SocketAddress src, 
                 byte[] message) throws IOException {
-            MessageDispatcher.this.received(src, message);
+            MessageDispatcher.this.handleMessage(src, message);
         }
     };
     
@@ -47,6 +50,9 @@ public abstract class MessageDispatcher implements Closeable {
     
     private final MessageCodec codec;
     
+    /**
+     * 
+     */
     public MessageDispatcher(Transport transport, 
             MessageFactory factory, MessageCodec codec) {
         
@@ -69,14 +75,23 @@ public abstract class MessageDispatcher implements Closeable {
         transport.addTransportListener(listener);
     }
     
+    /**
+     * 
+     */
     public Transport getTransport() {
         return transport;
     }
     
+    /**
+     * 
+     */
     public MessageFactory getMessageFactory() {
         return factory;
     }
     
+    /**
+     * 
+     */
     public MessageCodec getMessageCodec() {
         return codec;
     }
@@ -87,11 +102,17 @@ public abstract class MessageDispatcher implements Closeable {
         entityManager.close();
     }
     
+    /**
+     * 
+     */
     public void send(ResponseMessage message) throws IOException {
         byte[] data = codec.encode(message);
         transport.send(message.getAddress(), data);
     }
     
+    /**
+     * 
+     */
     public void send(MessageCallback callback, 
             RequestMessage message, long timeout, 
             TimeUnit unit) throws IOException {
@@ -102,30 +123,64 @@ public abstract class MessageDispatcher implements Closeable {
         transport.send(message.getAddress(), data);
     }
     
-    private void received(SocketAddress src, byte[] data) throws IOException {
+    /**
+     * 
+     */
+    private void handleMessage(SocketAddress src, 
+            byte[] data) throws IOException {
         Message message = codec.decode(data);
+        handleMessage(src, message);
+    }
+    
+    /**
+     * 
+     */
+    protected void handleMessage(SocketAddress src, 
+            Message message) throws IOException {
+        
         if (message instanceof RequestMessage) {
             handleRequest(src, (RequestMessage)message);
         } else {
-            response(src, (ResponseMessage)message);
+            handleResponse(src, (ResponseMessage)message);
         }
     }
     
-    protected abstract void handleRequest(SocketAddress src, RequestMessage message) throws IOException;
+    /**
+     * 
+     */
+    protected abstract void handleRequest(SocketAddress src, 
+            RequestMessage message) throws IOException;
     
-    private void response(SocketAddress src, 
-            ResponseMessage message) throws IOException {
+    /**
+     * 
+     */
+    protected void handleResponse(SocketAddress src, 
+            ResponseMessage response) throws IOException {
         
-        MessageEntity entity = entityManager.get(message);
+        MessageId messageId = response.getMessageId();
+        if (!factory.isFor(messageId, src)) {
+            if (LOG.isErrorEnabled()) {
+                LOG.error("");
+            }
+            return;
+        }
+        
+        MessageEntity entity = entityManager.get(response);
         if (entity != null) {
-            entity.handleResponse(message);
+            entity.handleResponse(response);
         } else {
-            lateResponse(message);
+            lateResponse(response);
         }
     }
     
+    /**
+     * 
+     */
     protected abstract void lateResponse(ResponseMessage message) throws IOException;
     
+    /**
+     * 
+     */
     private static class MessageEntityManager implements Closeable {
         
         private static final ScheduledExecutorService EXECUTOR 
@@ -152,6 +207,9 @@ public abstract class MessageDispatcher implements Closeable {
             }
         }
         
+        /**
+         * 
+         */
         public void add(MessageCallback callback, RequestMessage message, 
                 long timeout, TimeUnit unit) {
             
@@ -188,6 +246,9 @@ public abstract class MessageDispatcher implements Closeable {
             }
         }
         
+        /**
+         * 
+         */
         public MessageEntity get(ResponseMessage message) {
             synchronized (callbacks) {
                 MessageEntity entity = callbacks.remove(
@@ -241,6 +302,9 @@ public abstract class MessageDispatcher implements Closeable {
             future.cancel(true);
         }
         
+        /**
+         * 
+         */
         public void handleResponse(ResponseMessage response) {
             close();
             
@@ -254,6 +318,9 @@ public abstract class MessageDispatcher implements Closeable {
             }
         }
 
+        /**
+         * 
+         */
         public void handleTimeout() {
             close();
             
