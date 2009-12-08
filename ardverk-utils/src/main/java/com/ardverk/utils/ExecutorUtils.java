@@ -19,6 +19,10 @@ public class ExecutorUtils {
                 new SimpleThreadFactory(name));
     }
     
+    public static ScheduledThreadPoolExecutor newSingleThreadScheduledExecutor(String name) {
+        return newScheduledThreadPool(1, name);
+    }
+    
     public static ScheduledThreadPoolExecutor newScheduledThreadPool(int count, String name) {
 
         final ScheduledThreadPoolExecutor executor 

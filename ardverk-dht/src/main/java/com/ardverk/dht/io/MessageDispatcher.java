@@ -6,7 +6,6 @@ import java.net.SocketAddress;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -23,6 +22,7 @@ import com.ardverk.dht.message.MessageId;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.logging.LoggerUtils;
+import com.ardverk.utils.ExecutorUtils;
 
 /**
  * 
@@ -184,7 +184,8 @@ public abstract class MessageDispatcher implements Closeable {
     private static class MessageEntityManager implements Closeable {
         
         private static final ScheduledExecutorService EXECUTOR 
-            = Executors.newSingleThreadScheduledExecutor();
+            = ExecutorUtils.newSingleThreadScheduledExecutor(
+                    "MessageDispatcherThread");
         
         private final Map<MessageId, MessageEntity> callbacks 
             = Collections.synchronizedMap(new HashMap<MessageId, MessageEntity>());
