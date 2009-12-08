@@ -1,11 +1,14 @@
 package com.ardverk.dht.io;
 
+import java.io.IOException;
+
 import org.ardverk.concurrent.AsyncFuture;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.entity.LookupEntity;
 import com.ardverk.dht.entity.StoreEntity;
-import com.ardverk.dht.message.Message;
+import com.ardverk.dht.message.RequestMessage;
+import com.ardverk.dht.message.ResponseMessage;
 
 public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
 
@@ -46,6 +49,10 @@ public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
     }
 
     @Override
-    public void handleMessage(Message message) throws Exception {
+    public void handleResponse(ResponseMessage response) throws Exception {
+    }
+
+    @Override
+    public void handleTimeout(RequestMessage request) throws IOException {
     }
 }

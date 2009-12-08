@@ -1,7 +1,6 @@
 package com.ardverk.dht.io;
 
-public abstract class AbstractMessageHandler
-        implements MessageCallback {
+public abstract class AbstractMessageHandler {
 
     protected final MessageDispatcher messageDispatcher;
     

@@ -1,14 +1,17 @@
 package com.ardverk.dht.io;
 
+import java.io.IOException;
+
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.AsyncProcess;
 
 import com.ardverk.dht.entity.Entity;
+import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.utils.Checkable;
 
 public abstract class ResponseHandler<V extends Entity> 
-        extends AbstractMessageHandler implements Checkable, AsyncProcess<V> {
+        extends AbstractMessageHandler implements MessageCallback, Checkable, AsyncProcess<V> {
     
     private volatile AsyncFuture<V> future = null;
     
@@ -68,4 +71,9 @@ public abstract class ResponseHandler<V extends Entity>
     
     protected abstract void innerStart(
             AsyncFuture<V> future) throws Exception;
+    
+    /**
+     * 
+     */
+    public abstract void handleTimeout(RequestMessage request) throws IOException;
 }

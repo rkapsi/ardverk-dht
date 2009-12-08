@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncFuture;
 
 import com.ardverk.dht.entity.PingEntity;
-import com.ardverk.dht.message.Message;
+import com.ardverk.dht.message.RequestMessage;
+import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.utils.NetworkUtils;
 
@@ -46,9 +48,13 @@ public class PingResponseHandler extends ResponseHandler<PingEntity> {
     }
     
     @Override
-    public void handleMessage(Message message) throws Exception {
+    public void handleResponse(ResponseMessage response) throws Exception {
     }
-
+    
+    @Override
+    public void handleTimeout(RequestMessage request) throws IOException {
+    }
+    
     private interface PingSender {
         public void ping() throws IOException;
     }
@@ -71,8 +77,9 @@ public class PingResponseHandler extends ResponseHandler<PingEntity> {
     
         @Override
         public void ping() throws IOException {
-            Message message = null;
-            messageDispatcher.send(PingResponseHandler.this, address, message);
+            RequestMessage message = null;
+            messageDispatcher.send(PingResponseHandler.this, 
+                    message, 10L, TimeUnit.SECONDS);
         }
     }
     
@@ -90,9 +97,9 @@ public class PingResponseHandler extends ResponseHandler<PingEntity> {
         
         @Override
         public void ping() throws IOException {
-            Message message = null;
+            RequestMessage message = null;
             messageDispatcher.send(PingResponseHandler.this, 
-                    contact.getRemoteAddress(), message);
+                    message, 10L, TimeUnit.SECONDS);
         }
     }
 }

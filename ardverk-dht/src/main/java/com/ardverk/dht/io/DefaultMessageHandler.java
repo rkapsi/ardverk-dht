@@ -1,9 +1,7 @@
 package com.ardverk.dht.io;
 
-import com.ardverk.dht.message.Message;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
-import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
 
@@ -26,25 +24,15 @@ public class DefaultMessageHandler implements MessageCallback {
         this.database = database;
     }
     
+    public void handleRequest(RequestMessage request) throws Exception {
+        
+    }
+    
     @Override
-    public void handleMessage(Message message) {
-        Contact contact = message.getContact();
-        /*if (contact.isFirewalled()) {
-            return;
-        }*/
-        
-        if (message instanceof RequestMessage) {
-            handleRequest((RequestMessage)message);
-        } else {
-            handleResponse((ResponseMessage)message);
-        }
+    public void handleResponse(ResponseMessage response) throws Exception {
     }
     
-    private void handleRequest(RequestMessage message) {
-        
-    }
-    
-    private void handleResponse(ResponseMessage message) {
-        
+    @Override
+    public void handleTimeout(RequestMessage request) throws Exception {
     }
 }
