@@ -87,7 +87,7 @@ public class MinaTransport extends AbstractTransport implements Closeable {
         transport.addTransportListener(new TransportListener() {
             
             @Override
-            public void received(SocketAddress src, Object message) throws IOException {
+            public void received(SocketAddress src, byte[] message) throws IOException {
                 System.out.println(src + ", " + message);
             }
         });

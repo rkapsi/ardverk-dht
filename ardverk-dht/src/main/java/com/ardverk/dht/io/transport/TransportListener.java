@@ -6,5 +6,5 @@ import java.net.SocketAddress;
 
 public interface TransportListener {
     
-    public void received(SocketAddress src, Object message) throws IOException;
+    public void received(SocketAddress src, byte[] message) throws IOException;
 }

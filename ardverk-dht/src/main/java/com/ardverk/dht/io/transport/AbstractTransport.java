@@ -41,7 +41,7 @@ public abstract class AbstractTransport implements Transport {
     /**
      * 
      */
-    protected void received(SocketAddress src, Object message) throws IOException {
+    protected void received(SocketAddress src, byte[] message) throws IOException {
         for (TransportListener listener : listeners) {
             listener.received(src, message);
         }

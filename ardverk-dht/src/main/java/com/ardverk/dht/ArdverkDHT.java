@@ -30,7 +30,7 @@ public class ArdverkDHT extends AbstractDHT implements DHT, Closeable {
     private final TransportListener transportListener
             = new TransportListener() {
         @Override
-        public void received(SocketAddress src, Object message)
+        public void received(SocketAddress src, byte[] message)
                 throws IOException {
             Message msg = messageFactory.decode(src, message);
             handleMessage(src, msg);
