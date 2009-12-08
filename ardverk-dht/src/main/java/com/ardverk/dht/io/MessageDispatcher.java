@@ -6,6 +6,7 @@ import java.net.SocketAddress;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -13,6 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 
+import com.ardverk.collection.FixedSizeHashSet;
 import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.io.transport.TransportListener;
 import com.ardverk.dht.message.Message;
@@ -40,6 +42,9 @@ public abstract class MessageDispatcher implements Closeable {
             MessageDispatcher.this.handleMessage(src, message);
         }
     };
+    
+    private final Set<MessageId> history 
+        = new FixedSizeHashSet<MessageId>(512);
     
     private final MessageEntityManager entityManager 
         = new MessageEntityManager();
@@ -158,6 +163,14 @@ public abstract class MessageDispatcher implements Closeable {
             ResponseMessage response) throws IOException {
         
         MessageId messageId = response.getMessageId();
+        if (!history.add(messageId)) {
+            if (LOG.isErrorEnabled()) {
+                LOG.error("Multiple respones: " 
+                        + src + ", " + messageId);
+            }
+            return;
+        }
+        
         if (!factory.isFor(messageId, src)) {
             if (LOG.isErrorEnabled()) {
                 LOG.error("Wrong MessageId signature: " 
