@@ -1,5 +1,7 @@
 package com.ardverk.dht.message;
 
+import java.net.SocketAddress;
+
 import com.ardverk.dht.routing.Contact;
 
 public class AbstractResponseMessage extends AbstractMessage 
@@ -7,7 +9,7 @@ public class AbstractResponseMessage extends AbstractMessage
 
     public AbstractResponseMessage( 
             MessageId messageId, Contact source, 
-            Contact destination, long time) {
-        super(messageId, source, destination, time);
+            SocketAddress address) {
+        super(messageId, source, address);
     }
 }

@@ -28,7 +28,7 @@ public class DefaultMessageHandler implements MessageCallback {
     
     @Override
     public void handleMessage(Message message) {
-        Contact contact = message.getSource();
+        Contact contact = message.getContact();
         /*if (contact.isFirewalled()) {
             return;
         }*/

@@ -88,11 +88,8 @@ class MessageOutputStream extends BencodingOutputStream {
         writeMessageId(message.getMessageId());
         
         // Write the source and destination
-        writeContact(message.getSource());
-        writeContact(message.getDestination());
-        
-        // Write the local time
-        writeLong(System.currentTimeMillis());
+        writeContact(message.getContact());
+        writeSocketAddress(message.getAddress());
         
         if (message instanceof PingRequest) {
             writePingRequest((PingRequest)message);

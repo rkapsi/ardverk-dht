@@ -1,16 +1,26 @@
 package com.ardverk.dht.message;
 
+import java.net.SocketAddress;
+
 import com.ardverk.dht.routing.Contact;
 
+/**
+ * 
+ */
 public interface Message {
-
-    public long getCreationTime();
     
+    /**
+     * Returns the unique identifier of the {@link Message}
+     */
     public MessageId getMessageId();
     
-    public Contact getSource();
+    /**
+     * Returns the origin of the {@link Message}
+     */
+    public Contact getContact();
     
-    public long getRemoteTime();
-    
-    public Contact getDestination();
+    /**
+     * Returns the destination {@link SocketAddress} of the {@link Message}.
+     */
+    public SocketAddress getAddress();
 }
