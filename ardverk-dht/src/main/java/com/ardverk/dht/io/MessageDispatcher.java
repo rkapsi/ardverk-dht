@@ -250,14 +250,12 @@ public abstract class MessageDispatcher implements Closeable {
          * 
          */
         public MessageEntity get(ResponseMessage message) {
-            synchronized (callbacks) {
-                MessageEntity entity = callbacks.remove(
-                        message.getMessageId());
-                if (entity != null) {
-                    entity.close();
-                }
-                return entity;
+            MessageEntity entity = callbacks.remove(
+                    message.getMessageId());
+            if (entity != null) {
+                entity.close();
             }
+            return entity;
         }
     }
 
