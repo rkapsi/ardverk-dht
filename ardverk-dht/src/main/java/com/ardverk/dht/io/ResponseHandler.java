@@ -9,6 +9,7 @@ import org.ardverk.concurrent.AsyncProcess;
 
 import com.ardverk.dht.entity.Entity;
 import com.ardverk.dht.message.RequestMessage;
+import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.utils.Checkable;
 
 public abstract class ResponseHandler<V extends Entity> 
@@ -93,9 +94,30 @@ public abstract class ResponseHandler<V extends Entity>
     protected abstract void innerStart(
             AsyncFuture<V> future) throws Exception;
     
-    /**
-     * 
-     */
-    public abstract void handleTimeout(RequestMessage request, 
+    
+    @Override
+    public void handleResponse(RequestMessage request,
+            ResponseMessage response, long time, TimeUnit unit)
+            throws IOException {
+        
+        if (!isDone()) {
+            processResponse(request, response, time, unit);
+        }
+    }
+    
+    protected abstract void processResponse(RequestMessage request,
+            ResponseMessage response, long time, TimeUnit unit)
+            throws IOException;
+
+    @Override
+    public void handleTimeout(RequestMessage request, 
+            long time, TimeUnit unit) throws IOException {
+        
+        if (!isDone()) {
+            processTimeout(request, time, unit);
+        }
+    }
+    
+    protected abstract void processTimeout(RequestMessage request, 
             long time, TimeUnit unit) throws IOException;
 }

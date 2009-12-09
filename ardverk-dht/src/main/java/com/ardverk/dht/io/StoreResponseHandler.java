@@ -50,10 +50,12 @@ public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
     }
 
     @Override
-    public void handleResponse(RequestMessage request, ResponseMessage response, long time, TimeUnit unit) throws IOException {
+    protected void processResponse(RequestMessage request, 
+            ResponseMessage response, long time, TimeUnit unit) throws IOException {
     }
 
     @Override
-    public void handleTimeout(RequestMessage request, long time, TimeUnit unit) throws IOException {
+    protected void processTimeout(RequestMessage request, 
+            long time, TimeUnit unit) throws IOException {
     }
 }
