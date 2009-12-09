@@ -12,7 +12,8 @@ import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.utils.Checkable;
 
 public abstract class ResponseHandler<V extends Entity> 
-        extends AbstractMessageHandler implements MessageCallback, Checkable, AsyncProcess<V> {
+        extends AbstractMessageHandler implements MessageCallback, 
+            Checkable, AsyncProcess<V> {
     
     private volatile AsyncFuture<V> future = null;
     
@@ -26,6 +27,9 @@ public abstract class ResponseHandler<V extends Entity>
         return future != null && !future.isDone();
     }
 
+    /**
+     * 
+     */
     protected boolean isDone() {
         AsyncFuture<V> future = this.future;
         if (future != null) {
@@ -34,6 +38,9 @@ public abstract class ResponseHandler<V extends Entity>
         throw new IllegalStateException();
     }
 
+    /**
+     * 
+     */
     protected void setValue(V value) {
         AsyncFuture<V> future = this.future;
         if (future != null) {
@@ -43,6 +50,9 @@ public abstract class ResponseHandler<V extends Entity>
         throw new IllegalStateException();
     }
     
+    /**
+     * 
+     */
     protected void setException(Throwable t) {
         AsyncFuture<V> future = this.future;
         if (future != null) {
@@ -50,6 +60,16 @@ public abstract class ResponseHandler<V extends Entity>
             return;
         }
         throw new IllegalStateException();
+    }
+    
+    /**
+     * 
+     */
+    public void send(RequestMessage message, 
+            long timeout, TimeUnit unit) throws IOException {
+        if (!isDone()) {
+            messageDispatcher.send(this, message, timeout, unit);
+        }
     }
     
     @Override
@@ -76,5 +96,6 @@ public abstract class ResponseHandler<V extends Entity>
     /**
      * 
      */
-    public abstract void handleTimeout(RequestMessage request, long time, TimeUnit unit) throws IOException;
+    public abstract void handleTimeout(RequestMessage request, 
+            long time, TimeUnit unit) throws IOException;
 }

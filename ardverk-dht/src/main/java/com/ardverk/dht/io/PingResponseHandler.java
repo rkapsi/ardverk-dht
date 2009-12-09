@@ -93,8 +93,7 @@ public class PingResponseHandler extends ResponseHandler<PingEntity> {
         public void ping() throws IOException {
             MessageFactory factory = messageDispatcher.getMessageFactory();
             PingRequest request = factory.createPingRequest(address);
-            messageDispatcher.send(PingResponseHandler.this, 
-                    request, TIMEOUT, TimeUnit.SECONDS);
+            send(request, TIMEOUT, TimeUnit.SECONDS);
         }
     }
     
@@ -114,8 +113,7 @@ public class PingResponseHandler extends ResponseHandler<PingEntity> {
         public void ping() throws IOException {
             MessageFactory factory = messageDispatcher.getMessageFactory();
             PingRequest request = factory.createPingRequest(contact);
-            messageDispatcher.send(PingResponseHandler.this, 
-                    request, TIMEOUT, TimeUnit.SECONDS);
+            send(request, TIMEOUT, TimeUnit.SECONDS);
         }
     }
 }
