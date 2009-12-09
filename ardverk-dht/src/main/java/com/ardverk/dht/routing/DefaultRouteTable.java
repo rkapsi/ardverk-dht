@@ -67,7 +67,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         this.keyAnalyzer = KUID.createKeyAnalyzer(lengthInBits);
         
-        this.localhost = contactFactory.createSolicited(contactId, instanceId, address);
+        this.localhost = contactFactory.createSolicited(contactId, instanceId, null, address);
         this.buckets = new PatriciaTrie<KUID, Bucket>(keyAnalyzer);
         
         init();
@@ -167,7 +167,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
     private static final int MAX_PER_BUCKET = Integer.MAX_VALUE;
     
     private synchronized boolean isOkayToAdd(Bucket bucket, Contact contact) {
-        SocketAddress address = contact.getRemoteAddress();
+        SocketAddress address = contact.getAddress();
         return bucket.getActiveCount(address) < MAX_PER_BUCKET;
     }
     
@@ -491,8 +491,8 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         public boolean isSameRemoteAddress(Contact contact) {
             return NetworkUtils.isSameAddress(
-                    this.contact.getRemoteAddress(), 
-                    contact.getRemoteAddress());
+                    this.contact.getAddress(), 
+                    contact.getAddress());
         }
         
         private static final long X = 5L*60L*1000L;
@@ -653,7 +653,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
                 
             if (hasOrMakeSpace()) {
                 active.put(contactId, entity);
-                counter.add(contact.getRemoteAddress());
+                counter.add(contact.getAddress());
                 return true;
             }
             
@@ -726,7 +726,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
             ContactEntity other = active.remove(entity.getContactId());
             assert (entity == other);
             
-            SocketAddress address = other.getContact().getRemoteAddress();
+            SocketAddress address = other.getContact().getAddress();
             counter.remove(address);
         }
         

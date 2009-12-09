@@ -21,8 +21,11 @@ import com.ardverk.dht.message.Message;
 import com.ardverk.dht.message.MessageCodec;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.MessageId;
+import com.ardverk.dht.message.PingRequest;
+import com.ardverk.dht.message.PingResponse;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
+import com.ardverk.dht.routing.Contact;
 import com.ardverk.logging.LoggerUtils;
 import com.ardverk.utils.ExecutorUtils;
 
@@ -133,59 +136,56 @@ public abstract class MessageDispatcher implements Closeable {
      */
     private void handleMessage(SocketAddress src, 
             byte[] data) throws IOException {
-        Message message = codec.decode(data);
-        handleMessage(src, message);
+        Message message = codec.decode(src, data);
+        handleMessage(message);
     }
     
     /**
      * 
      */
-    protected void handleMessage(SocketAddress src, 
-            Message message) throws IOException {
+    protected void handleMessage(Message message) throws IOException {
         
         if (message instanceof RequestMessage) {
-            handleRequest(src, (RequestMessage)message);
+            handleRequest((RequestMessage)message);
         } else {
-            handleResponse(src, (ResponseMessage)message);
+            handleResponse((ResponseMessage)message);
         }
     }
     
     /**
      * 
      */
-    protected abstract void handleRequest(SocketAddress src, 
-            RequestMessage message) throws IOException;
+    protected abstract void handleRequest(RequestMessage message) throws IOException;
     
     /**
      * 
      */
-    protected void handleResponse(SocketAddress src, 
-            ResponseMessage response) throws IOException {
+    protected void handleResponse(ResponseMessage response) throws IOException {
         
         MessageId messageId = response.getMessageId();
         if (!history.add(messageId)) {
             if (LOG.isErrorEnabled()) {
-                LOG.error("Multiple respones: " 
-                        + src + ", " + messageId);
+                LOG.error("Multiple respones: " + response);
             }
             return;
         }
         
-        if (!factory.isFor(messageId, src)) {
+        Contact contact = response.getContact();
+        if (!factory.isFor(messageId, contact.getAddress())) {
             if (LOG.isErrorEnabled()) {
-                LOG.error("Wrong MessageId signature: " 
-                        + src + ", " + messageId);
+                LOG.error("Wrong MessageId signature: " + response);
             }
             return;
         }
         
         MessageEntity entity = entityManager.get(response);
-        boolean success = false;
         if (entity != null) {
-            success = entity.handleResponse(response);
-        }
-        
-        if (!success) {
+            if (entity.check(response)) {
+                entity.handleResponse(response);
+            } else {
+                // TODO
+            }
+        } else {
             lateResponse(response);
         }
     }
@@ -193,8 +193,21 @@ public abstract class MessageDispatcher implements Closeable {
     /**
      * 
      */
-    protected abstract void lateResponse(
-            ResponseMessage message) throws IOException;
+    protected void lateResponse(ResponseMessage message) throws IOException {
+        
+    }
+    
+    protected void handleResponse(MessageCallback callback, 
+            RequestMessage request, ResponseMessage response, 
+            long time, TimeUnit unit) throws IOException {
+        callback.handleResponse(response, time, unit);
+    }
+    
+    protected void handleTimeout(MessageCallback callback, 
+            RequestMessage request, long time, TimeUnit unit) 
+                throws IOException {
+        callback.handleTimeout(request, time, unit);
+    }
     
     /**
      * 
@@ -317,6 +330,17 @@ public abstract class MessageDispatcher implements Closeable {
         public void close() {
             future.cancel(true);
             done.set(true);
+        }
+        
+        /**
+         * 
+         */
+        public boolean check(ResponseMessage response) {
+            if (request instanceof PingRequest) {
+                return response instanceof PingResponse;
+            }
+            
+            return false;
         }
         
         /**

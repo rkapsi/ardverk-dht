@@ -20,17 +20,25 @@ public class DefaultMessageFactory extends AbstractMessageFactory {
         contact = new DefaultContact(
                 Type.SOLICITED, 
                 contactId, 0, 
+                new InetSocketAddress("localhost", 6666),
                 new InetSocketAddress("localhost", 6666));
     }
     
     @Override
     public PingRequest createPingRequest(Contact dst) {
-        return createPingRequest(dst.getRemoteAddress());
+        return createPingRequest(dst.getAddress());
     }
 
     @Override
     public PingRequest createPingRequest(SocketAddress dst) {
         MessageId messageId = createMessageId(dst);
         return new DefaultPingRequest(messageId, contact, dst);
+    }
+
+    @Override
+    public PingResponse createPingResponse(PingRequest request) {
+        MessageId messageId = request.getMessageId();
+        Contact destination = request.getContact();
+        return new DefaultPingResponse(messageId, contact, destination);
     }
 }

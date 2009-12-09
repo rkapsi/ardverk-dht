@@ -74,15 +74,15 @@ class MessageInputStream extends BencodingInputStream {
                 Integer.parseInt(value.substring(++p)));
     }
     
-    public Contact readContact(Contact.Type type) throws IOException {
+    public Contact readContact(Contact.Type type, SocketAddress src) throws IOException {
         KUID contactId = readKUID();
         int instanceId = readInt();
         SocketAddress address = readSocketAddress();
         return new DefaultContact(type, contactId, 
-                instanceId, address);
+                instanceId, src, address);
     }
     
-    public Message readMessage() throws IOException {
+    public Message readMessage(SocketAddress src) throws IOException {
         int version = readUnsignedByte();
         if (version != MessageUtils.VERSION) {
             throw new IOException("version=" + version);
@@ -91,7 +91,7 @@ class MessageInputStream extends BencodingInputStream {
         OpCode opcode = readEnum(OpCode.class);
         MessageId messageId = readMessageId();
         Contact contact = readContact(opcode.isRequest() 
-                ? Type.UNSOLICITED : Type.SOLICITED);
+                ? Type.UNSOLICITED : Type.SOLICITED, src);
         SocketAddress address = readSocketAddress();
         
         switch (opcode) {

@@ -20,4 +20,6 @@ public interface MessageFactory {
     public PingRequest createPingRequest(SocketAddress dst);
     
     public PingRequest createPingRequest(Contact dst);
+    
+    public PingResponse createPingResponse(PingRequest request);
 }

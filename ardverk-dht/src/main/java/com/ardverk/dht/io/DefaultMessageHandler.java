@@ -27,7 +27,7 @@ public class DefaultMessageHandler implements MessageCallback {
         this.database = database;
     }
     
-    public void handleRequest(RequestMessage request) throws Exception {
+    public void handleRequest(RequestMessage request) throws IOException {
         
     }
     

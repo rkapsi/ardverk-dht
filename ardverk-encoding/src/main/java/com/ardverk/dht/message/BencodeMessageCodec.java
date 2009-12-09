@@ -3,6 +3,7 @@ package com.ardverk.dht.message;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.SocketAddress;
 
 public class BencodeMessageCodec extends MessageCodec {
 
@@ -13,12 +14,12 @@ public class BencodeMessageCodec extends MessageCodec {
     }
 
     @Override
-    public Message decode(byte[] data)
+    public Message decode(SocketAddress src, byte[] data)
             throws IOException {
         MessageInputStream in = new MessageInputStream(
                 new ByteArrayInputStream(data));
         
-        return in.readMessage();
+        return in.readMessage(src);
     }
     
     @Override

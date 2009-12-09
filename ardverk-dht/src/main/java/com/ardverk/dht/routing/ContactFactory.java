@@ -11,22 +11,25 @@ public interface ContactFactory {
     public KeyFactory getKeyFactory();
     
     public Contact createUnsolicited(KUID contactId, 
-            int instanceId, SocketAddress address);
+            int instanceId, SocketAddress remoteAddress, SocketAddress address);
     
     public Contact createUnsolicited(KUID contactId, 
-            int instanceId, SocketAddress address, Map<?, ?> attributes);
+            int instanceId, SocketAddress remoteAddress, 
+            SocketAddress address, Map<?, ?> attributes);
     
     public Contact createSolicited(KUID contactId, 
-            int instanceId, SocketAddress address);
+            int instanceId, SocketAddress remoteAddress, SocketAddress address);
     
     public Contact createSolicited(KUID contactId, 
-            int instanceId, SocketAddress address, Map<?, ?> attributes);
+            int instanceId, SocketAddress remoteAddress, 
+            SocketAddress address, Map<?, ?> attributes);
     
     public Contact createUnknown(KUID contactId, 
-            int instanceId, SocketAddress address);
+            int instanceId, SocketAddress remoteAddress, SocketAddress address);
     
     public Contact createUnknown(KUID contactId, 
-            int instanceId, SocketAddress address, Map<?, ?> attributes);
+            int instanceId, SocketAddress remoteAddress, 
+            SocketAddress address, Map<?, ?> attributes);
     
     public Contact merge(Contact existing, Contact contact);
 }

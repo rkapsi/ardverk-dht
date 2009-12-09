@@ -15,26 +15,29 @@ public class DefaultContactFactory extends AbstractContactFactory {
 
     @Override
     public Contact createUnsolicited(KUID contactId, int instanceId,
-            SocketAddress address, Map<?, ?> attributes)  {
+            SocketAddress remoteAddress, SocketAddress address, 
+            Map<?, ?> attributes)  {
         
         return new DefaultContact(Type.UNSOLICITED, contactId, 
-                instanceId, address, attributes);
+                instanceId, remoteAddress, address, attributes);
     }
     
     @Override
     public Contact createSolicited(KUID contactId, int instanceId,
-            SocketAddress address, Map<?, ?> attributes)  {
+            SocketAddress remoteAddress, SocketAddress address, 
+            Map<?, ?> attributes)  {
         
         return new DefaultContact(Type.SOLICITED, contactId, 
-                instanceId, address, attributes);
+                instanceId, remoteAddress, address, attributes);
     }
     
     @Override
     public Contact createUnknown(KUID contactId, int instanceId,
-            SocketAddress address, Map<?, ?> attributes)  {
+            SocketAddress remoteAddress, SocketAddress address, 
+            Map<?, ?> attributes)  {
         
         return new DefaultContact(Type.UNKNOWN, contactId, 
-                instanceId, address, attributes);
+                instanceId, remoteAddress, address, attributes);
     }
 
     @Override

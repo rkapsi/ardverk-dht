@@ -27,7 +27,7 @@ public class BencodeMessageCodecTest {
         PingRequest request = new DefaultPingRequest(messageId, contact, address);
         
         byte[] data = codec.encode(request);
-        Message message = codec.decode(data);
+        Message message = codec.decode(null, data);
         
         System.out.println(message);
     }

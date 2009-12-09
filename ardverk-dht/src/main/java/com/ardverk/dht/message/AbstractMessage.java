@@ -14,15 +14,20 @@ public abstract class AbstractMessage implements Message {
     
     private final SocketAddress address;
     
-    public AbstractMessage(MessageId messageId, Contact source, 
+    public AbstractMessage(MessageId messageId, 
+            Contact contact, Contact destination) {
+        this(messageId, contact, destination.getAddress());
+    }
+    
+    public AbstractMessage(MessageId messageId, Contact contact, 
             SocketAddress address) {
         
         if (messageId == null) {
             throw new NullPointerException("messageId");
         }
         
-        if (source == null) {
-            throw new NullPointerException("source");
+        if (contact == null) {
+            throw new NullPointerException("contact");
         }
         
         if (address == null) {
@@ -30,7 +35,7 @@ public abstract class AbstractMessage implements Message {
         }
         
         this.messageId = messageId;
-        this.contact = source;
+        this.contact = contact;
         this.address = address;
     }
     

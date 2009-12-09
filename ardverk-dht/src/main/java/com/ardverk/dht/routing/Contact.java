@@ -42,6 +42,8 @@ public interface Contact {
     
     public int getInstanceId();
     
+    public SocketAddress getAddress();
+    
     public SocketAddress getRemoteAddress();
     
     public Type getType();

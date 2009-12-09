@@ -8,8 +8,14 @@ public class AbstractResponseMessage extends AbstractMessage
         implements ResponseMessage {
 
     public AbstractResponseMessage( 
-            MessageId messageId, Contact source, 
+            MessageId messageId, Contact contact, 
+            Contact destination) {
+        super(messageId, contact, destination.getAddress());
+    }
+    
+    public AbstractResponseMessage( 
+            MessageId messageId, Contact contact, 
             SocketAddress address) {
-        super(messageId, source, address);
+        super(messageId, contact, address);
     }
 }

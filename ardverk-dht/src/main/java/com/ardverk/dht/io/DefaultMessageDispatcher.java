@@ -2,49 +2,52 @@ package com.ardverk.dht.io;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.util.concurrent.ExecutionException;
 
 import org.ardverk.concurrent.AsyncExecutorService;
 import org.ardverk.concurrent.AsyncExecutors;
 import org.ardverk.concurrent.AsyncFuture;
+import org.slf4j.Logger;
 
-import com.ardverk.dht.KUID;
 import com.ardverk.dht.io.mina.MinaTransport;
 import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.message.BencodeMessageCodec;
 import com.ardverk.dht.message.DefaultMessageFactory;
-import com.ardverk.dht.message.DefaultPingResponse;
 import com.ardverk.dht.message.MessageCodec;
 import com.ardverk.dht.message.MessageFactory;
+import com.ardverk.dht.message.PingRequest;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
-import com.ardverk.dht.routing.Contact;
-import com.ardverk.dht.routing.DefaultContact;
-import com.ardverk.dht.routing.Contact.Type;
+import com.ardverk.logging.LoggerUtils;
 
 public class DefaultMessageDispatcher extends MessageDispatcher {
 
+    private static final Logger LOG 
+        = LoggerUtils.getLogger(DefaultMessageDispatcher.class);
+    
+    private final PingRequestHandler ping;
+    
     public DefaultMessageDispatcher(Transport transport, 
             MessageFactory factory, MessageCodec codec) {
         super(transport, factory, codec);
+        
+        ping = new PingRequestHandler(this);
     }
 
     @Override
-    protected void handleRequest(SocketAddress src, 
-            RequestMessage message) throws IOException {
+    protected void handleRequest(RequestMessage message) throws IOException {
         
-        System.out.println("REQUEST: " + src + ", " + message);
-        
-        KUID contactId = new KUID(new byte[] { 7, 8, 9 });
-        
-        Contact contact = new DefaultContact(Type.SOLICITED, 
-                contactId, 0, new InetSocketAddress("localhost", 6666));
-        
-        ResponseMessage response = new DefaultPingResponse(
-                message.getMessageId(), contact, src);
-        
-        send(response);
+        if (message instanceof PingRequest) {
+            ping.handleRequest(message);
+        } else {
+            unhandledRequest(message);
+        }
+    }
+    
+    protected void unhandledRequest(RequestMessage message) throws IOException {
+        if (LOG.isErrorEnabled()) {
+            LOG.error("Unhandled Request: " + message);
+        }
     }
     
     @Override
@@ -70,8 +73,8 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
                     "localhost", 6666);
         
             AsyncFuture<?> future = executor.submit(handler);
-            future.get();
-            System.out.println("Done!");
+            Object value = future.get();
+            System.out.println("Value: " + value);
         }
     }
 }
