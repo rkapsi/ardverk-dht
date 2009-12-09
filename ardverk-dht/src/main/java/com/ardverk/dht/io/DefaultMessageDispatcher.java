@@ -17,7 +17,6 @@ import com.ardverk.dht.message.MessageCodec;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.PingRequest;
 import com.ardverk.dht.message.RequestMessage;
-import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.logging.LoggerUtils;
 
 public class DefaultMessageDispatcher extends MessageDispatcher {
@@ -48,10 +47,6 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
         if (LOG.isErrorEnabled()) {
             LOG.error("Unhandled Request: " + message);
         }
-    }
-    
-    @Override
-    protected void lateResponse(ResponseMessage message) throws IOException {
     }
     
     public static void main(String[] args) throws IOException, InterruptedException, ExecutionException {

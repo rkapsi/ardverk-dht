@@ -54,8 +54,8 @@ public class PingResponseHandler extends ResponseHandler<PingEntity> {
     }
     
     @Override
-    public void handleResponse(ResponseMessage response, 
-            long time, TimeUnit unit) throws IOException {
+    public void handleResponse(RequestMessage request, 
+            ResponseMessage response, long time, TimeUnit unit) throws IOException {
         System.out.println("RESPONSE: " + response + ", " + time + ", " + unit);
         
         setValue(new PingEntity(time, unit));

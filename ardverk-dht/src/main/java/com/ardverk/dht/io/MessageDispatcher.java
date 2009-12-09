@@ -37,6 +37,10 @@ public abstract class MessageDispatcher implements Closeable {
     private static final Logger LOG 
         = LoggerUtils.getLogger(MessageDispatcher.class);
     
+    private static final ScheduledExecutorService EXECUTOR 
+        = ExecutorUtils.newSingleThreadScheduledExecutor(
+            "MessageDispatcherThread");
+    
     private final TransportListener listener 
             = new TransportListener() {
         @Override
@@ -143,7 +147,7 @@ public abstract class MessageDispatcher implements Closeable {
     /**
      * 
      */
-    protected void handleMessage(Message message) throws IOException {
+    private void handleMessage(Message message) throws IOException {
         
         if (message instanceof RequestMessage) {
             handleRequest((RequestMessage)message);
@@ -155,12 +159,7 @@ public abstract class MessageDispatcher implements Closeable {
     /**
      * 
      */
-    protected abstract void handleRequest(RequestMessage message) throws IOException;
-    
-    /**
-     * 
-     */
-    protected void handleResponse(ResponseMessage response) throws IOException {
+    private void handleResponse(ResponseMessage response) throws IOException {
         
         MessageId messageId = response.getMessageId();
         if (!history.add(messageId)) {
@@ -180,11 +179,7 @@ public abstract class MessageDispatcher implements Closeable {
         
         MessageEntity entity = entityManager.get(response);
         if (entity != null) {
-            if (entity.check(response)) {
-                entity.handleResponse(response);
-            } else {
-                // TODO
-            }
+            entity.handleResponse(response);
         } else {
             lateResponse(response);
         }
@@ -193,16 +188,27 @@ public abstract class MessageDispatcher implements Closeable {
     /**
      * 
      */
-    protected void lateResponse(ResponseMessage message) throws IOException {
+    protected abstract void handleRequest(RequestMessage message) throws IOException;
+    
+    /**
+     * 
+     */
+    protected void lateResponse(ResponseMessage response) throws IOException {
         
     }
     
+    /**
+     * 
+     */
     protected void handleResponse(MessageCallback callback, 
             RequestMessage request, ResponseMessage response, 
             long time, TimeUnit unit) throws IOException {
-        callback.handleResponse(response, time, unit);
+        callback.handleResponse(request, response, time, unit);
     }
     
+    /**
+     * 
+     */
     protected void handleTimeout(MessageCallback callback, 
             RequestMessage request, long time, TimeUnit unit) 
                 throws IOException {
@@ -212,11 +218,7 @@ public abstract class MessageDispatcher implements Closeable {
     /**
      * 
      */
-    private static class MessageEntityManager implements Closeable {
-        
-        private static final ScheduledExecutorService EXECUTOR 
-            = ExecutorUtils.newSingleThreadScheduledExecutor(
-                    "MessageDispatcherThread");
+    private class MessageEntityManager implements Closeable {
         
         private final Map<MessageId, MessageEntity> callbacks 
             = Collections.synchronizedMap(new HashMap<MessageId, MessageEntity>());
@@ -232,7 +234,7 @@ public abstract class MessageDispatcher implements Closeable {
                 open = false;
                 
                 for (MessageEntity entity : callbacks.values()) {
-                    entity.close();
+                    entity.cancel();
                 }
                 
                 callbacks.clear();
@@ -293,7 +295,7 @@ public abstract class MessageDispatcher implements Closeable {
     /**
      * 
      */
-    private static class MessageEntity implements Closeable {
+    private class MessageEntity {
         
         private final long creationTime = System.currentTimeMillis();
         
@@ -303,7 +305,7 @@ public abstract class MessageDispatcher implements Closeable {
         
         private final RequestMessage request;
         
-        private final AtomicBoolean done = new AtomicBoolean();
+        private final AtomicBoolean open = new AtomicBoolean(true);
         
         private MessageEntity(ScheduledFuture<?> future, 
                 MessageCallback callback, 
@@ -326,10 +328,9 @@ public abstract class MessageDispatcher implements Closeable {
             this.request = request;
         }
 
-        @Override
-        public void close() {
+        public boolean cancel() {
             future.cancel(true);
-            done.set(true);
+            return open.getAndSet(false);
         }
         
         /**
@@ -346,26 +347,22 @@ public abstract class MessageDispatcher implements Closeable {
         /**
          * 
          */
-        public boolean handleResponse(ResponseMessage response) throws IOException {
-            future.cancel(true);
-            
-            if (!done.getAndSet(true)) {
+        public void handleResponse(ResponseMessage response) throws IOException {
+            if (cancel() && check(response)) {
                 long time = System.currentTimeMillis() - creationTime;
-                callback.handleResponse(response, time, TimeUnit.MILLISECONDS);
-                return true;
+                MessageDispatcher.this.handleResponse(callback, request, 
+                        response, time, TimeUnit.MILLISECONDS);
             }
-            return false;
         }
 
         /**
          * 
          */
         public void handleTimeout() throws IOException {
-            future.cancel(true);
-            
-            if (!done.getAndSet(true)) {
+            if (cancel()) {
                 long time = System.currentTimeMillis() - creationTime;
-                callback.handleTimeout(request, time, TimeUnit.MILLISECONDS);
+                MessageDispatcher.this.handleTimeout(callback, request, 
+                        time, TimeUnit.MILLISECONDS);
             }
         }
     }

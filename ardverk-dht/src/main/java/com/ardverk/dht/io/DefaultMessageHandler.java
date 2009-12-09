@@ -32,8 +32,8 @@ public class DefaultMessageHandler implements MessageCallback {
     }
     
     @Override
-    public void handleResponse(ResponseMessage response, 
-            long time, TimeUnit unit) throws IOException {
+    public void handleResponse(RequestMessage request, 
+            ResponseMessage response, long time, TimeUnit unit) throws IOException {
     }
     
     @Override
