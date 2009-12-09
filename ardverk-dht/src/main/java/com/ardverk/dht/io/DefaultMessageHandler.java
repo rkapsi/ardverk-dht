@@ -5,12 +5,10 @@ import java.util.concurrent.TimeUnit;
 
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
-import com.ardverk.dht.routing.RouteTable;
-import com.ardverk.dht.storage.Database;
 
 public class DefaultMessageHandler implements MessageCallback {
 
-    private final RouteTable routeTable;
+    /*private final RouteTable routeTable;
     
     private final Database database;
     
@@ -25,7 +23,7 @@ public class DefaultMessageHandler implements MessageCallback {
         
         this.routeTable = routeTable;
         this.database = database;
-    }
+    }*/
     
     public void handleRequest(RequestMessage request) throws IOException {
         
@@ -34,6 +32,10 @@ public class DefaultMessageHandler implements MessageCallback {
     @Override
     public void handleResponse(RequestMessage request, 
             ResponseMessage response, long time, TimeUnit unit) throws IOException {
+    }
+    
+    public void handleLateResponse(ResponseMessage message) throws IOException {
+        
     }
     
     @Override

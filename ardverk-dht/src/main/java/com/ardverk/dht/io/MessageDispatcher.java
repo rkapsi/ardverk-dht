@@ -188,14 +188,12 @@ public abstract class MessageDispatcher implements Closeable {
     /**
      * 
      */
-    protected abstract void handleRequest(RequestMessage message) throws IOException;
+    protected abstract void handleRequest(RequestMessage request) throws IOException;
     
     /**
      * 
      */
-    protected void lateResponse(ResponseMessage response) throws IOException {
-        
-    }
+    protected abstract void lateResponse(ResponseMessage response) throws IOException;
     
     /**
      * 
