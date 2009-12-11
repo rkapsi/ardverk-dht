@@ -6,10 +6,10 @@ import java.net.SocketAddress;
 
 import org.ardverk.concurrent.AsyncFuture;
 
-import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.StoreEntity;
+import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.io.transport.TransportListener;
 import com.ardverk.dht.message.Message;
@@ -32,8 +32,8 @@ public class ArdverkDHT extends AbstractDHT implements DHT, Closeable {
         @Override
         public void received(SocketAddress src, byte[] message)
                 throws IOException {
-            Message msg = messageFactory.decode(src, message);
-            handleMessage(src, msg);
+            //Message msg = messageFactory.decode(src, message);
+            //handleMessage(src, msg);
         }
     };
     

@@ -10,7 +10,7 @@ import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 
 public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
-
+    
     public NodeResponseHandler(MessageDispatcher messageDispatcher) {
         super(messageDispatcher);
     }
