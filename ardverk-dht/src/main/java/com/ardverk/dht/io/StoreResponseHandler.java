@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 import org.ardverk.concurrent.AsyncFuture;
 
 import com.ardverk.dht.KUID;
-import com.ardverk.dht.entity.LookupEntity;
+import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
@@ -17,7 +17,7 @@ public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
     
     private final byte[] value;
     
-    private final LookupEntity entity;
+    private final NodeEntity entity;
     
     public StoreResponseHandler(
             MessageDispatcher messageDispatcher, 
@@ -27,7 +27,7 @@ public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
     
     public StoreResponseHandler(
             MessageDispatcher messageDispatcher, 
-            LookupEntity entity,
+            NodeEntity entity,
             KUID key, byte[] value) {
         super(messageDispatcher);
         
@@ -37,7 +37,7 @@ public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
     }
 
     @Override
-    protected void innerStart(AsyncFuture<StoreEntity> future) throws Exception {
+    protected void go(AsyncFuture<StoreEntity> future) throws Exception {
         if (entity == null) {
             // DO LOOKUP
         } else {
@@ -45,7 +45,7 @@ public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
         }
     }
     
-    private void store(LookupEntity entity) {
+    private void store(NodeEntity entity) {
         
     }
 

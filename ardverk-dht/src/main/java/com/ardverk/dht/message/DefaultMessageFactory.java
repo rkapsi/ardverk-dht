@@ -26,7 +26,7 @@ public class DefaultMessageFactory extends AbstractMessageFactory {
     
     @Override
     public PingRequest createPingRequest(Contact dst) {
-        return createPingRequest(dst.getAddress());
+        return createPingRequest(dst.getRemoteAddress());
     }
 
     @Override

@@ -167,7 +167,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
     private static final int MAX_PER_BUCKET = Integer.MAX_VALUE;
     
     private synchronized boolean isOkayToAdd(Bucket bucket, Contact contact) {
-        SocketAddress address = contact.getAddress();
+        SocketAddress address = contact.getRemoteAddress();
         return bucket.getActiveCount(address) < MAX_PER_BUCKET;
     }
     
@@ -491,8 +491,8 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         public boolean isSameRemoteAddress(Contact contact) {
             return NetworkUtils.isSameAddress(
-                    this.contact.getAddress(), 
-                    contact.getAddress());
+                    this.contact.getRemoteAddress(), 
+                    contact.getRemoteAddress());
         }
         
         private static final long X = 5L*60L*1000L;
@@ -653,7 +653,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
                 
             if (hasOrMakeSpace()) {
                 active.put(contactId, entity);
-                counter.add(contact.getAddress());
+                counter.add(contact.getRemoteAddress());
                 return true;
             }
             
@@ -726,7 +726,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
             ContactEntity other = active.remove(entity.getContactId());
             assert (entity == other);
             
-            SocketAddress address = other.getContact().getAddress();
+            SocketAddress address = other.getContact().getRemoteAddress();
             counter.remove(address);
         }
         

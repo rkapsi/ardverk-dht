@@ -1,5 +1,6 @@
 package com.ardverk.dht.routing;
 
+import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.Map;
 
@@ -42,8 +43,20 @@ public interface Contact {
     
     public int getInstanceId();
     
-    public SocketAddress getAddress();
+    /**
+     * Returns the {@link SocketAddress} as reported by the {@link Socket}.
+     */
+    public SocketAddress getSocketAddress();
     
+    /**
+     * Returns the {@link SocketAddress} as reported in the 
+     * requests and responses
+     */
+    public SocketAddress getContactAddress();
+    
+    /**
+     * Returns the {@link SocketAddress} of the remote {@link Contact}
+     */
     public SocketAddress getRemoteAddress();
     
     public Type getType();

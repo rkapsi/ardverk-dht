@@ -8,7 +8,7 @@ import com.ardverk.dht.KUID;
 import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.io.StoreResponseHandler;
 
-public class LookupEntity extends AbstractEntity {
+public class NodeEntity extends AbstractEntity {
 
     private final AsyncExecutorService executor = null;
     

@@ -16,9 +16,12 @@ import com.ardverk.dht.message.BencodeMessageCodec;
 import com.ardverk.dht.message.DefaultMessageFactory;
 import com.ardverk.dht.message.MessageCodec;
 import com.ardverk.dht.message.MessageFactory;
+import com.ardverk.dht.message.NodeRequest;
 import com.ardverk.dht.message.PingRequest;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
+import com.ardverk.dht.message.StoreRequest;
+import com.ardverk.dht.message.ValueRequest;
 import com.ardverk.logging.LoggerUtils;
 
 public class DefaultMessageDispatcher extends MessageDispatcher {
@@ -30,12 +33,21 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
     
     private final PingRequestHandler ping;
     
+    private final NodeRequestHandler node;
+    
+    private final ValueRequestHandler value;
+    
+    private final StoreRequestHandler store;
+    
     public DefaultMessageDispatcher(Transport transport, 
             MessageFactory factory, MessageCodec codec) {
         super(transport, factory, codec);
         
         defaultHandler = new DefaultMessageHandler();
         ping = new PingRequestHandler(this);
+        node = new NodeRequestHandler(this);
+        value = new ValueRequestHandler(this);
+        store = new StoreRequestHandler(this);
     }
 
     @Override
@@ -45,6 +57,12 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
         
         if (request instanceof PingRequest) {
             ping.handleRequest(request);
+        } else if (request instanceof NodeRequest) {
+            node.handleRequest(request);
+        } else if (request instanceof ValueRequest) {
+            value.handleRequest(request);
+        } else if (request instanceof StoreRequest) {
+            store.handleRequest(request);
         } else {
             unhandledRequest(request);
         }
@@ -64,7 +82,6 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
             RequestMessage request, long time, TimeUnit unit)
             throws IOException {
         
-        Thread.dumpStack();
         super.handleTimeout(callback, request, time, unit);
         defaultHandler.handleTimeout(request, time, unit);
     }

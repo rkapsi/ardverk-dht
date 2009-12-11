@@ -19,19 +19,21 @@ public class DefaultContact implements Contact {
     
     private final int instanceId;
     
-    private final SocketAddress address;
+    private final SocketAddress socketAddress;
     
-    private final SocketAddress remoteAddress;
+    private final SocketAddress contactAddress;
     
     private Map<Object, Object> attributes;
     
     public DefaultContact(Type type, KUID contactId, 
-            int instanceId, SocketAddress remoteAddress, SocketAddress address) {
-        this(type, contactId, instanceId, remoteAddress, address, null);
+            int instanceId, SocketAddress socketAddress, 
+            SocketAddress contactAddress) {
+        this(type, contactId, instanceId, socketAddress, 
+                contactAddress, null);
     }
     
     public DefaultContact(Type type, KUID contactId, int instanceId, 
-            SocketAddress remoteAddress, SocketAddress address,
+            SocketAddress socketAddress, SocketAddress contactAddress,
             Map<?, ?> attributes) {
         
         if (type == null) {
@@ -42,12 +44,12 @@ public class DefaultContact implements Contact {
             throw new NullPointerException("contactId");
         }
         
-        if (remoteAddress == null) {
-            throw new NullPointerException("remoteAddress");
+        if (socketAddress == null) {
+            throw new NullPointerException("socketAddress");
         }
         
-        if (address == null) {
-            address = remoteAddress;
+        if (contactAddress == null) {
+            contactAddress = socketAddress;
         }
         
         this.type = type;
@@ -56,8 +58,8 @@ public class DefaultContact implements Contact {
         
         this.contactId = contactId;
         this.instanceId = instanceId;
-        this.remoteAddress = remoteAddress;
-        this.address = address;
+        this.socketAddress = socketAddress;
+        this.contactAddress = contactAddress;
         
         if (attributes != null && !attributes.isEmpty()) {
             this.attributes = new HashMap<Object, Object>(attributes);
@@ -88,8 +90,8 @@ public class DefaultContact implements Contact {
         
         this.contactId = existing.getContactId();
         this.instanceId = contact.getInstanceId();
-        this.address = contact.getAddress();
-        this.remoteAddress = contact.getRemoteAddress();
+        this.socketAddress = contact.getSocketAddress();
+        this.contactAddress = contact.getContactAddress();
         this.type = contact.getType();
         
         copyAttributes(existing, contact);
@@ -109,8 +111,8 @@ public class DefaultContact implements Contact {
         
         this.contactId = contact.getContactId();
         this.instanceId = contact.getInstanceId();
-        this.address = contact.getAddress();
-        this.remoteAddress = contact.getRemoteAddress();
+        this.socketAddress = contact.getSocketAddress();
+        this.contactAddress = contact.getContactAddress();
         this.type = type;
         
         copyAttributes(contact);
@@ -137,15 +139,20 @@ public class DefaultContact implements Contact {
     }
 
     @Override
-    public SocketAddress getAddress() {
-        return address;
+    public SocketAddress getSocketAddress() {
+        return socketAddress;
     }
     
     @Override
-    public SocketAddress getRemoteAddress() {
-        return remoteAddress;
+    public SocketAddress getContactAddress() {
+        return contactAddress;
     }
 
+    @Override
+    public SocketAddress getRemoteAddress() {
+        return contactAddress;
+    }
+    
     @Override
     public Type getType() {
         return type;
@@ -234,6 +241,6 @@ public class DefaultContact implements Contact {
     @Override
     public String toString() {
         return getContactId() + "(" + getInstanceId() 
-            + ", " + getRemoteAddress() + ", " + getAddress() + ")";
+            + ", " + getSocketAddress() + ", " + getRemoteAddress() + ")";
     }
 }

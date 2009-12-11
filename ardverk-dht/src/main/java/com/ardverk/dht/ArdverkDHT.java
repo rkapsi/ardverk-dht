@@ -6,8 +6,8 @@ import java.net.SocketAddress;
 
 import org.ardverk.concurrent.AsyncFuture;
 
-import com.ardverk.dht.entity.GetEntity;
-import com.ardverk.dht.entity.LookupEntity;
+import com.ardverk.dht.entity.ValueEntity;
+import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.io.transport.Transport;
@@ -127,12 +127,12 @@ public class ArdverkDHT extends AbstractDHT implements DHT, Closeable {
     }
     
     @Override
-    public AsyncFuture<GetEntity> get(KUID key) {
+    public AsyncFuture<ValueEntity> get(KUID key) {
         return nodeManager.select(key).get(key);
     }
     
     @Override
-    public AsyncFuture<LookupEntity> lookup(KUID key) {
+    public AsyncFuture<NodeEntity> lookup(KUID key) {
         return nodeManager.select(key).lookup(key);
     }
     

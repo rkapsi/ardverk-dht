@@ -5,8 +5,8 @@ import java.net.SocketAddress;
 
 import org.ardverk.concurrent.AsyncFuture;
 
-import com.ardverk.dht.entity.GetEntity;
-import com.ardverk.dht.entity.LookupEntity;
+import com.ardverk.dht.entity.ValueEntity;
+import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.routing.Contact;
@@ -49,10 +49,10 @@ interface DHT {
     /**
      * 
      */
-    public AsyncFuture<GetEntity> get(KUID key);
+    public AsyncFuture<ValueEntity> get(KUID key);
     
     /**
      * 
      */
-    public AsyncFuture<LookupEntity> lookup(KUID key);
+    public AsyncFuture<NodeEntity> lookup(KUID key);
 }

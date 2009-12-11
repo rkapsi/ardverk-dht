@@ -48,7 +48,7 @@ public class PingResponseHandler extends ResponseHandler<PingEntity> {
     }
     
     @Override
-    protected void innerStart(AsyncFuture<PingEntity> future) throws IOException {
+    protected void go(AsyncFuture<PingEntity> future) throws IOException {
         System.out.println("PING");
         sender.ping();
     }

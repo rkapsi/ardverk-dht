@@ -16,7 +16,7 @@ public abstract class AbstractMessage implements Message {
     
     public AbstractMessage(MessageId messageId, 
             Contact contact, Contact destination) {
-        this(messageId, contact, destination.getAddress());
+        this(messageId, contact, destination.getRemoteAddress());
     }
     
     public AbstractMessage(MessageId messageId, Contact contact, 

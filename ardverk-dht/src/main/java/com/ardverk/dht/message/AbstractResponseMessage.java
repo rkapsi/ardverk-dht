@@ -10,7 +10,7 @@ public class AbstractResponseMessage extends AbstractMessage
     public AbstractResponseMessage( 
             MessageId messageId, Contact contact, 
             Contact destination) {
-        super(messageId, contact, destination.getAddress());
+        super(messageId, contact, destination);
     }
     
     public AbstractResponseMessage( 

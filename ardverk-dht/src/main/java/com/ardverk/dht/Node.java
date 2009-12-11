@@ -7,8 +7,8 @@ import java.net.SocketAddress;
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncProcess;
 
-import com.ardverk.dht.entity.GetEntity;
-import com.ardverk.dht.entity.LookupEntity;
+import com.ardverk.dht.entity.ValueEntity;
+import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.io.MessageDispatcher;
@@ -153,14 +153,14 @@ public class Node implements DHT, Closeable {
     }
     
     @Override
-    public AsyncFuture<GetEntity> get(KUID key) {
-        AsyncProcess<GetEntity> process = null;
+    public AsyncFuture<ValueEntity> get(KUID key) {
+        AsyncProcess<ValueEntity> process = null;
         return requestManager.submit(process);
     }
 
     @Override
-    public AsyncFuture<LookupEntity> lookup(KUID key) {
-        AsyncProcess<LookupEntity> process = null;
+    public AsyncFuture<NodeEntity> lookup(KUID key) {
+        AsyncProcess<NodeEntity> process = null;
         return requestManager.submit(process);
     }
 }

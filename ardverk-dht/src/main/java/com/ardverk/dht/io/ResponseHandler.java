@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncFuture;
-import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.AsyncProcess;
 
 import com.ardverk.dht.entity.Entity;
@@ -68,7 +67,8 @@ public abstract class ResponseHandler<V extends Entity>
      */
     public void send(RequestMessage message, 
             long timeout, TimeUnit unit) throws IOException {
-        if (!isDone()) {
+        
+        if (isOpen()) {
             messageDispatcher.send(this, message, timeout, unit);
         }
     }
@@ -79,20 +79,11 @@ public abstract class ResponseHandler<V extends Entity>
             throw new NullPointerException("future");
         }
         
-        AsyncFutureListener<V> listener = new AsyncFutureListener<V>() {
-            @Override
-            public void operationComplete(AsyncFuture<V> future) {
-                // KILL NETWORK TASK
-            }
-        };
-        future.addAsyncFutureListener(listener);
-        
         this.future = future;
-        innerStart(future);
+        go(future);
     }
     
-    protected abstract void innerStart(
-            AsyncFuture<V> future) throws Exception;
+    protected abstract void go(AsyncFuture<V> future) throws Exception;
     
     
     @Override
@@ -100,7 +91,7 @@ public abstract class ResponseHandler<V extends Entity>
             ResponseMessage response, long time, TimeUnit unit)
             throws IOException {
         
-        if (!isDone()) {
+        if (isOpen()) {
             processResponse(request, response, time, unit);
         }
     }
@@ -113,7 +104,7 @@ public abstract class ResponseHandler<V extends Entity>
     public void handleTimeout(RequestMessage request, 
             long time, TimeUnit unit) throws IOException {
         
-        if (!isDone()) {
+        if (isOpen()) {
             processTimeout(request, time, unit);
         }
     }

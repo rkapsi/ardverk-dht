@@ -50,9 +50,6 @@ public abstract class MessageDispatcher implements Closeable {
         }
     };
     
-    private final Set<MessageId> history 
-        = new FixedSizeHashSet<MessageId>(512);
-    
     private final MessageEntityManager entityManager 
         = new MessageEntityManager();
     
@@ -61,6 +58,8 @@ public abstract class MessageDispatcher implements Closeable {
     private final MessageFactory factory;
     
     private final MessageCodec codec;
+    
+    private final ResponseChecker checker;
     
     /**
      * 
@@ -83,6 +82,7 @@ public abstract class MessageDispatcher implements Closeable {
         this.transport = transport;
         this.factory = factory;
         this.codec = codec;
+        this.checker = new ResponseChecker(factory, 512);
         
         transport.addTransportListener(listener);
     }
@@ -161,19 +161,7 @@ public abstract class MessageDispatcher implements Closeable {
      */
     private void handleResponse(ResponseMessage response) throws IOException {
         
-        MessageId messageId = response.getMessageId();
-        if (!history.add(messageId)) {
-            if (LOG.isErrorEnabled()) {
-                LOG.error("Multiple respones: " + response);
-            }
-            return;
-        }
-        
-        Contact contact = response.getContact();
-        if (!factory.isFor(messageId, contact.getAddress())) {
-            if (LOG.isErrorEnabled()) {
-                LOG.error("Wrong MessageId signature: " + response);
-            }
+        if (!checker.check(response)) {
             return;
         }
         
@@ -362,6 +350,46 @@ public abstract class MessageDispatcher implements Closeable {
                 MessageDispatcher.this.handleTimeout(callback, request, 
                         time, TimeUnit.MILLISECONDS);
             }
+        }
+    }
+    
+    private static class ResponseChecker {
+        
+        private static final Logger LOG 
+            = LoggerUtils.getLogger(ResponseChecker.class);
+        
+        private final MessageFactory factory;
+        
+        private final Set<MessageId> history;
+        
+        public ResponseChecker(MessageFactory factory, int historySize) {
+            if (factory == null) {
+                throw new NullPointerException("factory");
+            }
+            
+            this.factory = factory;
+            this.history = Collections.synchronizedSet(
+                    new FixedSizeHashSet<MessageId>(historySize));
+        }
+        
+        public boolean check(ResponseMessage response) {
+            MessageId messageId = response.getMessageId();
+            if (!history.add(messageId)) {
+                if (LOG.isErrorEnabled()) {
+                    LOG.error("Multiple respones: " + response);
+                }
+                return false;
+            }
+            
+            Contact contact = response.getContact();
+            if (!factory.isFor(messageId, contact.getRemoteAddress())) {
+                if (LOG.isErrorEnabled()) {
+                    LOG.error("Wrong MessageId signature: " + response);
+                }
+                return false;
+            }
+            
+            return true;
         }
     }
 }

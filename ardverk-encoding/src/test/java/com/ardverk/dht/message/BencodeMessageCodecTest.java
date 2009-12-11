@@ -21,7 +21,9 @@ public class BencodeMessageCodecTest {
         MessageId messageId = new MessageId(new byte[20]);
         KUID contactId = new KUID(new byte[20]);
         Contact contact = new DefaultContact(Type.SOLICITED, 
-                contactId, 0, new InetSocketAddress("localhost", 6666));
+                contactId, 0, 
+                new InetSocketAddress("localhost", 6666),
+                new InetSocketAddress("localhost", 6666));
         
         SocketAddress address = new InetSocketAddress("localhost", 6666);
         PingRequest request = new DefaultPingRequest(messageId, contact, address);
