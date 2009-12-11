@@ -23,7 +23,7 @@ import com.ardverk.collection.FixedSizeHashMap;
 import com.ardverk.dht.ContactPinger;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.KeyFactory;
-import com.ardverk.dht.message.PingResponse;
+import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.routing.Contact.Type;
 import com.ardverk.logging.LoggerUtils;
 import com.ardverk.net.NetworkConstants;
@@ -337,7 +337,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
     }
     
     private synchronized void ping(ContactEntity entity, 
-            AsyncFutureListener<PingResponse> listener) {
+            AsyncFutureListener<PingEntity> listener) {
         /*AsyncFutureListener<PingResponse> listener 
                 = new AsyncFutureListener<PingResponse>() {
             @Override
@@ -355,7 +355,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
             }
         };*/
         
-        AsyncFuture<PingResponse> future 
+        AsyncFuture<PingEntity> future 
             = pinger.ping(entity.getContact());
         
         if (listener != null) {

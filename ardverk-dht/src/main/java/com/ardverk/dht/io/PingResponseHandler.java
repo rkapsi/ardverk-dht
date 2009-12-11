@@ -5,13 +5,13 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.ardverk.concurrent.AsyncFuture;
 
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.PingRequest;
+import com.ardverk.dht.message.PingResponse;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
@@ -49,24 +49,19 @@ public class PingResponseHandler extends ResponseHandler<PingEntity> {
     
     @Override
     protected void go(AsyncFuture<PingEntity> future) throws IOException {
-        System.out.println("PING");
         sender.ping();
     }
     
     @Override
     protected void processResponse(RequestMessage request, 
-            ResponseMessage response, long time, TimeUnit unit) throws IOException {
-        System.out.println("RESPONSE: " + response + ", " + time + ", " + unit);
-        
-        setValue(new PingEntity(time, unit));
+            ResponseMessage response, long time, TimeUnit unit) {
+        setValue(new PingEntity((PingResponse)response, time, unit));
     }
     
     @Override
     protected void processTimeout(RequestMessage request, 
             long time, TimeUnit unit) throws IOException {
-        System.out.println("TIMEOUT: " + request + ", " + time + ", " + unit);
-        
-        setException(new TimeoutException());
+        setException(new TimeoutIoException(request, time, unit));
     }
     
     private interface PingSender {
