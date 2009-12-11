@@ -19,8 +19,6 @@ import com.ardverk.utils.NetworkUtils;
 
 public class PingResponseHandler extends ResponseHandler<PingEntity> {
     
-    private static final long TIMEOUT = 10L; // SECONDS
-    
     private final PingSender sender;
     
     public PingResponseHandler(MessageDispatcher messageDispatcher, 
@@ -64,6 +62,10 @@ public class PingResponseHandler extends ResponseHandler<PingEntity> {
         setException(new TimeoutIoException(request, time, unit));
     }
     
+    private long getTimeoutInMillis() {
+        return future.getTimeout(TimeUnit.MILLISECONDS);
+    }
+    
     private interface PingSender {
         public void ping() throws IOException;
     }
@@ -88,7 +90,7 @@ public class PingResponseHandler extends ResponseHandler<PingEntity> {
         public void ping() throws IOException {
             MessageFactory factory = messageDispatcher.getMessageFactory();
             PingRequest request = factory.createPingRequest(address);
-            send(request, TIMEOUT, TimeUnit.SECONDS);
+            send(request, getTimeoutInMillis(), TimeUnit.MILLISECONDS);
         }
     }
     
@@ -108,7 +110,7 @@ public class PingResponseHandler extends ResponseHandler<PingEntity> {
         public void ping() throws IOException {
             MessageFactory factory = messageDispatcher.getMessageFactory();
             PingRequest request = factory.createPingRequest(contact);
-            send(request, TIMEOUT, TimeUnit.SECONDS);
+            send(request, getTimeoutInMillis(), TimeUnit.MILLISECONDS);
         }
     }
 }

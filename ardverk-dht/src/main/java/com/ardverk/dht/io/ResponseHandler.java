@@ -15,7 +15,7 @@ public abstract class ResponseHandler<V extends Entity>
         extends AbstractMessageHandler implements MessageCallback, 
             Checkable, AsyncProcess<V> {
     
-    private volatile AsyncFuture<V> future = null;
+    protected volatile AsyncFuture<V> future = null;
     
     public ResponseHandler(MessageDispatcher messageDispatcher) {
         super(messageDispatcher);

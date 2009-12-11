@@ -1,5 +1,7 @@
 package com.ardverk.dht.entity;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncExecutorService;
@@ -9,6 +11,7 @@ import org.ardverk.concurrent.AsyncProcess;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.io.StoreResponseHandler;
+import com.ardverk.dht.routing.Contact;
 
 public class NodeEntity extends AbstractEntity {
 
@@ -24,5 +27,9 @@ public class NodeEntity extends AbstractEntity {
         AsyncProcess<StoreEntity> process = new StoreResponseHandler(
                 messageDispatcher, this, key, value);
         return executor.submit(process);
+    }
+    
+    public Collection<Contact> getContact() {
+        return Collections.emptySet();
     }
 }
