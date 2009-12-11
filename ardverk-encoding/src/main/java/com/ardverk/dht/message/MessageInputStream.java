@@ -96,20 +96,63 @@ class MessageInputStream extends BencodingInputStream {
         
         switch (opcode) {
             case PING_REQUEST:
-                return new DefaultPingRequest(messageId, 
-                        contact, address);
+                return readPingRequest(messageId, contact, address);
             case PING_RESPONSE:
-                return new DefaultPingResponse(messageId, 
-                        contact, address);
+                return readPingResponse(messageId, contact, address);
             case FIND_NODE_REQUEST:
+                return readNodeRequest(messageId, contact, address);
             case FIND_NODE_RESPONSE:
+                return readNodeResponse(messageId, contact, address);
             case FIND_VALUE_REQUEST:
+                return readValueRequest(messageId, contact, address);
             case FIND_VALUE_RESPONSE:
+                return readValueResponse(messageId, contact, address);
             case STORE_REQUEST:
+                return readStoreRequest(messageId, contact, address);
             case STORE_RESPONSE:
-                throw new IllegalArgumentException("IMPLEMENT=" + opcode);
+                return readStoreResponse(messageId, contact, address);
+            default:
+                throw new IllegalArgumentException("opcode=" + opcode);
         }
-        
-        throw new IOException("opcode=" + opcode);
+    }
+    
+    private PingRequest readPingRequest(MessageId messageId, 
+            Contact contact, SocketAddress address) throws IOException {
+        return new DefaultPingRequest(messageId, contact, address);
+    }
+    
+    private PingResponse readPingResponse(MessageId messageId, 
+            Contact contact, SocketAddress address) throws IOException {
+        return new DefaultPingResponse(messageId, contact, address);
+    }
+    
+    private NodeRequest readNodeRequest(MessageId messageId, 
+            Contact contact, SocketAddress address) throws IOException {
+        throw new IOException();
+    }
+    
+    private NodeResponse readNodeResponse(MessageId messageId, 
+            Contact contact, SocketAddress address) throws IOException {
+        throw new IOException();
+    }
+    
+    private ValueRequest readValueRequest(MessageId messageId, 
+            Contact contact, SocketAddress address) throws IOException {
+        throw new IOException();
+    }
+    
+    private ValueResponse readValueResponse(MessageId messageId, 
+            Contact contact, SocketAddress address) throws IOException {
+        throw new IOException();
+    }
+    
+    private StoreRequest readStoreRequest(MessageId messageId, 
+            Contact contact, SocketAddress address) throws IOException {
+        throw new IOException();
+    }
+    
+    private StoreResponse readStoreResponse(MessageId messageId, 
+            Contact contact, SocketAddress address) throws IOException {
+        throw new IOException();
     }
 }
