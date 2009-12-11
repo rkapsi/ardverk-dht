@@ -101,6 +101,13 @@ class MessageInputStream extends BencodingInputStream {
             case PING_RESPONSE:
                 return new DefaultPingResponse(messageId, 
                         contact, address);
+            case FIND_NODE_REQUEST:
+            case FIND_NODE_RESPONSE:
+            case FIND_VALUE_REQUEST:
+            case FIND_VALUE_RESPONSE:
+            case STORE_REQUEST:
+            case STORE_RESPONSE:
+                throw new IllegalArgumentException("IMPLEMENT=" + opcode);
         }
         
         throw new IOException("opcode=" + opcode);

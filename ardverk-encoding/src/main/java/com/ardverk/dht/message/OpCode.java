@@ -74,6 +74,18 @@ enum OpCode implements IntegerValue {
             return PING_REQUEST;
         } else if (message instanceof PingResponse) {
             return PING_RESPONSE;
+        } else if (message instanceof NodeRequest) {
+            return FIND_NODE_REQUEST;
+        } else if (message instanceof NodeResponse) {
+            return FIND_NODE_RESPONSE;
+        } else if (message instanceof ValueRequest) {
+            return FIND_VALUE_REQUEST;
+        } else if (message instanceof ValueResponse) {
+            return FIND_VALUE_RESPONSE;
+        } else if (message instanceof StoreRequest) {
+            return STORE_REQUEST;
+        } else if (message instanceof StoreResponse) {
+            return STORE_RESPONSE;
         }
         
         throw new IllegalArgumentException("message=" + message);

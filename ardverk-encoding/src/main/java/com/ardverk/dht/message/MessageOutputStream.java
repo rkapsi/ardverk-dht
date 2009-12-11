@@ -75,17 +75,42 @@ class MessageOutputStream extends BencodingOutputStream {
     public void writeMessage(Message message) throws IOException {
         
         writeByte(MessageUtils.VERSION);
-        writeEnum(OpCode.valueOf(message));
+        
+        OpCode opcode = OpCode.valueOf(message);
+        writeEnum(opcode);
         writeMessageId(message.getMessageId());
         
         // Write the source and destination
         writeContact(message.getContact());
         writeSocketAddress(message.getAddress());
         
-        if (message instanceof PingRequest) {
-            writePingRequest((PingRequest)message);
-        } else if (message instanceof PingResponse) {
-            writePingResponse((PingResponse)message);
+        switch (opcode) {
+            case PING_REQUEST:
+                writePingRequest((PingRequest)message);
+                break;
+            case PING_RESPONSE:
+                writePingResponse((PingResponse)message);
+                break;
+            case FIND_NODE_REQUEST:
+                writeNodeRequest((NodeRequest)message);
+                break;
+            case FIND_NODE_RESPONSE:
+                writeNodeResponse((NodeResponse)message);
+                break;
+            case FIND_VALUE_REQUEST:
+                writeValueRequest((ValueRequest)message);
+                break;
+            case FIND_VALUE_RESPONSE:
+                writeValueResponse((ValueResponse)message);
+                break;
+            case STORE_REQUEST:
+                writeStoreRequest((StoreRequest)message);
+                break;
+            case STORE_RESPONSE:
+                writeStoreResponse((StoreResponse)message);
+                break;
+            default:
+                throw new IllegalArgumentException("opcode=" + opcode);
         }
     }
     
@@ -93,5 +118,23 @@ class MessageOutputStream extends BencodingOutputStream {
     }
     
     private void writePingResponse(PingResponse message) throws IOException {
+    }
+    
+    private void writeNodeRequest(NodeRequest message) throws IOException {
+    }
+    
+    private void writeNodeResponse(NodeResponse message) throws IOException {
+    }
+    
+    private void writeValueRequest(ValueRequest message) throws IOException {
+    }
+    
+    private void writeValueResponse(ValueResponse message) throws IOException {
+    }
+    
+    private void writeStoreRequest(StoreRequest message) throws IOException {
+    }
+    
+    private void writeStoreResponse(StoreResponse message) throws IOException {
     }
 }
