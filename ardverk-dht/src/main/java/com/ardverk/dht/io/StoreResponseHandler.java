@@ -2,6 +2,7 @@ package com.ardverk.dht.io;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -13,11 +14,31 @@ import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.message.StoreResponse;
+import com.ardverk.dht.routing.Contact;
 
 public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
 
-    private static final NodeEntity QUERY 
-        = new NodeEntity(0L, TimeUnit.MILLISECONDS);
+    private static final NodeEntity QUERY = new NodeEntity() {
+        @Override
+        public Collection<Contact> getContact() {
+            return null;
+        }
+
+        @Override
+        public AsyncFuture<StoreEntity> store(KUID key, byte[] value) {
+            return null;
+        }
+
+        @Override
+        public long getTime(TimeUnit unit) {
+            return 0;
+        }
+
+        @Override
+        public long getTimeInMillis() {
+            return 0;
+        }
+    };
     
     private final NodeEntity entity;
     

@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncFuture;
 
+import com.ardverk.dht.entity.DefaultPingEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.PingRequest;
@@ -53,7 +54,7 @@ public class PingResponseHandler extends ResponseHandler<PingEntity> {
     @Override
     protected void processResponse(RequestMessage request, 
             ResponseMessage response, long time, TimeUnit unit) {
-        setValue(new PingEntity((PingResponse)response, time, unit));
+        setValue(new DefaultPingEntity((PingResponse)response, time, unit));
     }
     
     @Override
