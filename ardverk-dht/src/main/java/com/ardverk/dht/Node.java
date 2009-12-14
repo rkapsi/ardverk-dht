@@ -7,11 +7,12 @@ import java.net.SocketAddress;
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncProcess;
 
-import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.StoreEntity;
+import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.io.MessageDispatcher;
+import com.ardverk.dht.io.NodeResponseHandler;
 import com.ardverk.dht.io.PingResponseHandler;
 import com.ardverk.dht.io.StoreResponseHandler;
 import com.ardverk.dht.message.Message;
@@ -160,7 +161,8 @@ public class Node implements DHT, Closeable {
 
     @Override
     public AsyncFuture<NodeEntity> lookup(KUID key) {
-        AsyncProcess<NodeEntity> process = null;
+        AsyncProcess<NodeEntity> process 
+            = new NodeResponseHandler(messageDispatcher, routeTable, key);
         return requestManager.submit(process);
     }
 }
