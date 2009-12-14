@@ -16,6 +16,9 @@ import com.ardverk.dht.message.StoreResponse;
 
 public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
 
+    private static final NodeEntity QUERY 
+        = new NodeEntity(0L, TimeUnit.MILLISECONDS);
+    
     private final NodeEntity entity;
     
     private final KUID key;
@@ -24,6 +27,11 @@ public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
     
     private final List<StoreResponse> responses 
         = new ArrayList<StoreResponse>();
+    
+    public StoreResponseHandler(MessageDispatcher messageDispatcher, 
+            KUID key, byte[] value) {
+        this(messageDispatcher, QUERY, key, value);
+    }
     
     public StoreResponseHandler(
             MessageDispatcher messageDispatcher, 
@@ -49,6 +57,14 @@ public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
 
     @Override
     protected void go(AsyncFuture<StoreEntity> future) throws Exception {
+        if (entity == QUERY) {
+            
+        } else {
+            store(entity);
+        }
+    }
+    
+    private void store(NodeEntity entity) {
         
     }
 
