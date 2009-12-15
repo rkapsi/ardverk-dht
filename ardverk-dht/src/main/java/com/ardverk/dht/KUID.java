@@ -11,9 +11,10 @@ import org.ardverk.collection.KeyAnalyzer;
 
 import com.ardverk.coding.CodingUtils;
 import com.ardverk.io.Writable;
+import com.ardverk.lang.Negation;
 import com.ardverk.lang.Xor;
 
-public class KUID implements Xor<KUID>, Writable, Serializable, Comparable<KUID> {
+public class KUID implements Xor<KUID>, Negation<KUID>, Writable, Serializable, Comparable<KUID> {
 
     private static final long serialVersionUID = -4611363711131603626L;
     
@@ -71,7 +72,8 @@ public class KUID implements Xor<KUID>, Writable, Serializable, Comparable<KUID>
         return new KUID(data);
     }
 
-    public KUID inverse() {
+    @Override
+    public KUID negate() {
         byte[] data = new byte[length()];
         for (int i = 0; i < key.length; i++) {
             data[i] = (byte)(~key[i]);
