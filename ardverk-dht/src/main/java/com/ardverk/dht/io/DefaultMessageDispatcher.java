@@ -8,8 +8,14 @@ import java.util.concurrent.TimeUnit;
 import org.ardverk.concurrent.AsyncExecutorService;
 import org.ardverk.concurrent.AsyncExecutors;
 import org.ardverk.concurrent.AsyncFuture;
+import org.ardverk.concurrent.AsyncProcess;
 import org.slf4j.Logger;
 
+import com.ardverk.dht.ContactPinger;
+import com.ardverk.dht.DefaultKeyFactory;
+import com.ardverk.dht.KUID;
+import com.ardverk.dht.KeyFactory;
+import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.io.mina.MinaTransport;
 import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.message.BencodeMessageCodec;
@@ -22,6 +28,11 @@ import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.message.StoreRequest;
 import com.ardverk.dht.message.ValueRequest;
+import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.ContactFactory;
+import com.ardverk.dht.routing.DefaultContactFactory;
+import com.ardverk.dht.routing.DefaultRouteTable;
+import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.logging.LoggerUtils;
 
 public class DefaultMessageDispatcher extends MessageDispatcher {
@@ -40,12 +51,13 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
     private final StoreRequestHandler store;
     
     public DefaultMessageDispatcher(Transport transport, 
-            MessageFactory factory, MessageCodec codec) {
+            MessageFactory factory, MessageCodec codec, 
+            RouteTable routeTable) {
         super(transport, factory, codec);
         
         defaultHandler = new DefaultMessageHandler();
         ping = new PingRequestHandler(this);
-        node = new NodeRequestHandler(this);
+        node = new NodeRequestHandler(this, routeTable);
         value = new ValueRequestHandler(this);
         store = new StoreRequestHandler(this);
     }
@@ -101,21 +113,44 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
         
         AsyncExecutorService executor = AsyncExecutors.newCachedThreadPool();
         
+        ContactPinger pinger = new ContactPinger() {
+            @Override
+            public AsyncFuture<PingEntity> ping(Contact contact) {
+                return null;
+            }
+        };
+        
+        KeyFactory keyFactory = new DefaultKeyFactory(20);
+        ContactFactory contactFactory = new DefaultContactFactory(keyFactory);
+        KUID contactId = keyFactory.createRandomKey();
+        
+        RouteTable routeTable = new DefaultRouteTable(pinger, 
+                contactFactory, 20, contactId, 
+                0, new InetSocketAddress("localhost", 6666));
+        
+        Contact contact = routeTable.getLocalhost();
+        
         Transport transport = new MinaTransport(new InetSocketAddress(6666));
-        MessageFactory factory = new DefaultMessageFactory(20);
+        MessageFactory factory = new DefaultMessageFactory(20, contact);
         MessageCodec codec = new BencodeMessageCodec();
+        
         MessageDispatcher messageDispatcher 
-            = new DefaultMessageDispatcher(transport, factory, codec);
+            = new DefaultMessageDispatcher(transport, factory, codec, routeTable);
         
         for (int i = 0; i < 10; i++) {
             System.out.println("Sending: " + i);
             
-            PingResponseHandler handler 
+            /*AsyncProcess<?> process 
                 = new PingResponseHandler(
                     messageDispatcher, 
-                    "localhost", 6666);
+                    "localhost", 6666);*/
+            
+            KUID key = keyFactory.createRandomKey();
+            AsyncProcess<?> process 
+                = new NodeResponseHandler(
+                    messageDispatcher, routeTable, key);
         
-            AsyncFuture<?> future = executor.submit(handler);
+            AsyncFuture<?> future = executor.submit(process);
             Object value = future.get();
             System.out.println("Value: " + value);
         }

@@ -2,6 +2,7 @@ package com.ardverk.dht.message;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.SocketAddress;
 
@@ -22,6 +23,8 @@ public class BencodeMessageCodec extends MessageCodec {
         return in.readMessage(src);
     }
     
+    private static int COUNTER = 0;
+    
     @Override
     public byte[] encode(Message message)
             throws IOException {
@@ -30,6 +33,10 @@ public class BencodeMessageCodec extends MessageCodec {
         
         out.writeMessage(message);
         out.close();
+        
+        /*FileOutputStream fos = new FileOutputStream("out-" + (COUNTER++) + ".dat");
+        fos.write(baos.toByteArray());
+        fos.close();*/
         
         return baos.toByteArray();
     }

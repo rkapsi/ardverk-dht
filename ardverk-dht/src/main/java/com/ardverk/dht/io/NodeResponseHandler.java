@@ -118,6 +118,10 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         
         private final TimeCounter timeoutCounter = new TimeCounter();
         
+        private final Contact[] contacts;
+        
+        private int index = 0;
+        
         public LookupManager(RouteTable routeTable, KUID key) {
             if (routeTable == null) {
                 throw new NullPointerException("routeTable");
@@ -129,6 +133,8 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
             
             this.routeTable = routeTable;
             this.key = key;
+            
+            this.contacts = routeTable.select(key);
         }
         
         public void handleResponse(ResponseMessage response, 
@@ -152,15 +158,11 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         }
         
         public boolean hasNext() {
-            return false;
+            return index < contacts.length;
         }
         
         public Contact next() {
-            return null;
-        }
-        
-        public Contact[] select(int count) {
-            return routeTable.select(key, count);
+            return contacts[index++];
         }
     }
     

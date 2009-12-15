@@ -67,7 +67,8 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         this.keyAnalyzer = KUID.createKeyAnalyzer(lengthInBits);
         
-        this.localhost = contactFactory.createSolicited(contactId, instanceId, null, address);
+        this.localhost = contactFactory.createSolicited(
+                contactId, instanceId, address, address);
         this.buckets = new PatriciaTrie<KUID, Bucket>(keyAnalyzer);
         
         init();
@@ -528,7 +529,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
                 throw new NullPointerException("bucketId");
             }
             
-            if (depth <= 0) {
+            if (depth < 0) {
                 throw new IllegalArgumentException("depth=" + depth);
             }
             
