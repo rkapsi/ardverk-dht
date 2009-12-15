@@ -78,14 +78,19 @@ class MessageInputStream extends BencodingInputStream {
         KUID contactId = readKUID();
         int instanceId = readInt();
         SocketAddress address = readSocketAddress();
+        
+        if (type == Contact.Type.UNKNOWN) {
+            src = address;
+        }
+        
         return new DefaultContact(type, contactId, 
                 instanceId, src, address);
     }
     
-    public Contact[] readContacts(SocketAddress src) throws IOException {
+    public Contact[] readContacts(Contact.Type type, SocketAddress src) throws IOException {
         Contact[] contacts = new Contact[readInt()];
         for (int i = 0; i < contacts.length; i++) {
-            contacts[i] = readContact(Contact.Type.UNSOLICITED, src);
+            contacts[i] = readContact(type, src);
         }
         return contacts;
     }
@@ -143,7 +148,7 @@ class MessageInputStream extends BencodingInputStream {
     private NodeResponse readNodeResponse(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
         
-        Contact[] contacts = readContacts(address);
+        Contact[] contacts = readContacts(Contact.Type.UNKNOWN, address);
         return new DefaultNodeResponse(messageId, contact, address, contacts);
     }
     
