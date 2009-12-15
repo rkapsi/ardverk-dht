@@ -21,6 +21,8 @@ import com.ardverk.dht.message.Message;
 import com.ardverk.dht.message.MessageCodec;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.MessageId;
+import com.ardverk.dht.message.NodeRequest;
+import com.ardverk.dht.message.NodeResponse;
 import com.ardverk.dht.message.PingRequest;
 import com.ardverk.dht.message.PingResponse;
 import com.ardverk.dht.message.RequestMessage;
@@ -204,6 +206,18 @@ public abstract class MessageDispatcher implements Closeable {
     /**
      * 
      */
+    protected void handleIllegalResponse(MessageCallback callback, 
+            RequestMessage request, ResponseMessage response, 
+            long time, TimeUnit unit) throws IOException {
+        
+        if (LOG.isErrorEnabled()) {
+            LOG.error("Illegal Response: " + request + " -> " + response);
+        }
+    }
+    
+    /**
+     * 
+     */
     private class MessageEntityManager implements Closeable {
         
         private final Map<MessageId, MessageEntity> callbacks 
@@ -250,6 +264,8 @@ public abstract class MessageDispatcher implements Closeable {
                     public void run() {
                         MessageEntity entity 
                             = callbacks.remove(messageId);
+                        
+                        System.out.println("ENTITY: " + messageId + " -> " + entity);
                         
                         if (entity != null) {
                             try {
@@ -325,6 +341,8 @@ public abstract class MessageDispatcher implements Closeable {
         public boolean check(ResponseMessage response) {
             if (request instanceof PingRequest) {
                 return response instanceof PingResponse;
+            } else if (request instanceof NodeRequest) {
+                return response instanceof NodeResponse;
             }
             
             return false;
@@ -334,10 +352,16 @@ public abstract class MessageDispatcher implements Closeable {
          * 
          */
         public void handleResponse(ResponseMessage response) throws IOException {
-            if (cancel() && check(response)) {
+            if (cancel()) {
                 long time = System.currentTimeMillis() - creationTime;
-                MessageDispatcher.this.handleResponse(callback, request, 
-                        response, time, TimeUnit.MILLISECONDS);
+                
+                if (check(response)) {
+                    MessageDispatcher.this.handleResponse(callback, request, 
+                            response, time, TimeUnit.MILLISECONDS);
+                } else {
+                    MessageDispatcher.this.handleIllegalResponse(callback, request, 
+                            response, time, TimeUnit.MILLISECONDS);
+                }
             }
         }
 

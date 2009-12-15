@@ -26,9 +26,9 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
     
     private final int k = K;
     
-    private final long timeout = 10L;
+    private final long timeout = 3L;
     
-    private final TimeUnit unit = TimeUnit.MILLISECONDS;
+    private final TimeUnit unit = TimeUnit.SECONDS;
     
     public NodeResponseHandler(MessageDispatcher messageDispatcher, 
             RouteTable routeTable, KUID key) {
@@ -90,6 +90,8 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
             ResponseMessage response, long time, TimeUnit unit)
             throws IOException {
         
+        System.out.println("RESPONSE: " + response);
+        
         try {
             lookupManager.handleResponse(response, time, unit);
         } finally {
@@ -100,6 +102,8 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
     @Override
     protected synchronized void processTimeout(RequestMessage request, 
             long time, TimeUnit unit) throws IOException {
+        
+        System.out.println("TIMEOUT: " + request);
         
         try {
             lookupManager.handleTimeout(time, unit);
