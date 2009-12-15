@@ -7,6 +7,7 @@ import org.ardverk.concurrent.AsyncFuture;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.entity.NodeEntity;
+import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
@@ -24,6 +25,10 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
     
     private final int k = K;
     
+    private final long timeout = 10L;
+    
+    private final TimeUnit unit = TimeUnit.MILLISECONDS;
+    
     public NodeResponseHandler(MessageDispatcher messageDispatcher, 
             RouteTable routeTable, KUID key) {
         super(messageDispatcher);
@@ -37,12 +42,11 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
     }
 
     @Override
-    protected void go(AsyncFuture<NodeEntity> future)
-            throws Exception {
+    protected void go(AsyncFuture<NodeEntity> future) throws IOException {
         process(0);
     }
     
-    private synchronized void process(int pop) {
+    private synchronized void process(int pop) throws IOException {
         try {
             preProcess(pop);
             while (lookupCounter.hasNext()) {
@@ -50,8 +54,9 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
                     break;
                 }
                 
-                // TODO: lookup
                 Contact contact = lookupManager.next();
+                lookup(contact);
+                
                 lookupCounter.push();
             }
         } finally {
@@ -66,10 +71,17 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
     }
     
     private synchronized void postProcess() {
-        int count = lookupCounter.count();
+        int count = lookupCounter.getCount();
         if (count == 0) {
             setException(new IOException());
         }
+    }
+    
+    private void lookup(Contact contact) throws IOException {
+        MessageFactory factory = messageDispatcher.getMessageFactory();
+        RequestMessage message = factory.createNodeRequest(
+                contact, lookupManager.key);
+        messageDispatcher.send(this, message, timeout, unit);
     }
 
     @Override
@@ -88,7 +100,11 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
     protected synchronized void processTimeout(RequestMessage request, 
             long time, TimeUnit unit) throws IOException {
         
-        process(1);
+        try {
+            lookupManager.handleTimeout(time, unit);
+        } finally {
+            process(1);
+        }
     }
     
     private static class LookupManager {
@@ -97,7 +113,9 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         
         private final KUID key;
         
-        private long time = 0L;
+        private final TimeCounter responseCounter = new TimeCounter();
+        
+        private final TimeCounter timeoutCounter = new TimeCounter();
         
         public LookupManager(RouteTable routeTable, KUID key) {
             if (routeTable == null) {
@@ -112,10 +130,24 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
             this.key = key;
         }
         
-        public void handleResponse(ResponseMessage response, long time, TimeUnit unit) {
-            this.time += unit.toMillis(time);
+        public void handleResponse(ResponseMessage response, 
+                long time, TimeUnit unit) {
+            responseCounter.addTime(time, unit);
             
             // TODO process response
+        }
+        
+        public void handleTimeout(long time, TimeUnit unit) {
+            timeoutCounter.addTime(time, unit);
+        }
+        
+        public long getTime(TimeUnit unit) {
+            return responseCounter.getTime(unit) 
+                    + timeoutCounter.getTime(unit);
+        }
+        
+        public long getTimeInMillis() {
+            return getTime(TimeUnit.MILLISECONDS);
         }
         
         public boolean hasNext() {
@@ -128,14 +160,6 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         
         public Contact[] select(int count) {
             return routeTable.select(key, count);
-        }
-        
-        public long getTime(TimeUnit unit) {
-            return unit.convert(time, TimeUnit.MILLISECONDS);
-        }
-        
-        public long getTimeInMillis() {
-            return getTime(TimeUnit.MILLISECONDS);
         }
     }
     
@@ -171,8 +195,32 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
             }
         }
         
-        public int count() {
+        public int getCount() {
             return counter;
+        }
+    }
+    
+    private static class TimeCounter {
+        
+        private long time = 0L;
+        
+        private int count = 0;
+        
+        public void addTime(long time, TimeUnit unit) {
+            this.time += unit.toNanos(time);
+            ++count;
+        }
+        
+        public long getTime(TimeUnit unit) {
+            return unit.convert(time, TimeUnit.NANOSECONDS);
+        }
+        
+        public long getTimeInMillis() {
+            return getTime(TimeUnit.MILLISECONDS);
+        }
+        
+        public int getCount() {
+            return count;
         }
     }
 }

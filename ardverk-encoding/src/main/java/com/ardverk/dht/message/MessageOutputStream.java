@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.Arrays;
 
 import org.ardverk.coding.BencodingOutputStream;
 
@@ -121,9 +122,12 @@ class MessageOutputStream extends BencodingOutputStream {
     }
     
     private void writeNodeRequest(NodeRequest message) throws IOException {
+        writeKUID(message.getKey());
     }
     
     private void writeNodeResponse(NodeResponse message) throws IOException {
+        Contact[] contacts = message.getContacts();
+        writeCollection(Arrays.asList(contacts));
     }
     
     private void writeValueRequest(ValueRequest message) throws IOException {

@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.Collection;
 
 import org.ardverk.coding.BencodingInputStream;
 
@@ -128,12 +129,15 @@ class MessageInputStream extends BencodingInputStream {
     
     private NodeRequest readNodeRequest(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
-        throw new IOException();
+        KUID key = readKUID();
+        return new DefaultNodeRequest(messageId, contact, address, key);
     }
     
     private NodeResponse readNodeResponse(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
-        throw new IOException();
+        Collection<Contact> contacts = readList(Contact.class);
+        return new DefaultNodeResponse(messageId, contact, 
+                address, contacts.toArray(new Contact[0]));
     }
     
     private ValueRequest readValueRequest(MessageId messageId, 

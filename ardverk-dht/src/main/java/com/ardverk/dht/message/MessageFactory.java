@@ -2,6 +2,7 @@ package com.ardverk.dht.message;
 
 import java.net.SocketAddress;
 
+import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
 
 public interface MessageFactory {
@@ -22,4 +23,8 @@ public interface MessageFactory {
     public PingRequest createPingRequest(Contact dst);
     
     public PingResponse createPingResponse(PingRequest request);
+    
+    public NodeRequest createNodeRequest(Contact dst, KUID key);
+    
+    public NodeResponse createNodeResponse(NodeRequest request, Contact[] contacts);
 }

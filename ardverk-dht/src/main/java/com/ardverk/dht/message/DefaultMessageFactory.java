@@ -41,4 +41,19 @@ public class DefaultMessageFactory extends AbstractMessageFactory {
         Contact destination = request.getContact();
         return new DefaultPingResponse(messageId, contact, destination);
     }
+
+    @Override
+    public NodeRequest createNodeRequest(Contact dst, KUID key) {
+        MessageId messageId = createMessageId(dst.getRemoteAddress());
+        return new DefaultNodeRequest(messageId, contact, dst, key);
+    }
+
+    @Override
+    public NodeResponse createNodeResponse(NodeRequest request,
+            Contact[] contacts) {
+        MessageId messageId = request.getMessageId();
+        Contact destination = request.getContact();
+        return new DefaultNodeResponse(messageId, contact, 
+                destination, contacts);
+    }
 }
