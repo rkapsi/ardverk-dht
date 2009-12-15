@@ -8,6 +8,7 @@ import org.ardverk.concurrent.AsyncFuture;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.message.MessageFactory;
+import com.ardverk.dht.message.NodeRequest;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
@@ -77,10 +78,10 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         }
     }
     
-    private void lookup(Contact contact) throws IOException {
+    private void lookup(Contact dst) throws IOException {
         MessageFactory factory = messageDispatcher.getMessageFactory();
-        RequestMessage message = factory.createNodeRequest(
-                contact, lookupManager.key);
+        NodeRequest message = factory.createNodeRequest(
+                dst, lookupManager.key);
         messageDispatcher.send(this, message, timeout, unit);
     }
 
