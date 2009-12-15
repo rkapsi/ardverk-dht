@@ -1,8 +1,11 @@
 package com.ardverk.dht.io;
 
 import java.io.IOException;
+import java.util.Comparator;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.collection.PatriciaTrie;
 import org.ardverk.concurrent.AsyncFuture;
 
 import com.ardverk.dht.KUID;
@@ -118,6 +121,9 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
      */
     private static class LookupManager {
         
+        private final Map<KUID, Contact> respones 
+            = new PatriciaTrie<KUID, Contact>(KUID.createKeyAnalyzer(20));
+        
         private final RouteTable routeTable;
         
         private final KUID key;
@@ -152,11 +158,14 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
             responseCounter.addTime(time, unit);
             
             Contact src = response.getContact();
+            KUID contactId = src.getContactId();
             
-            if (clostest == null || src.getContactId().isCloserTo(
+            if (clostest == null || contactId.isCloserTo(
                     key, clostest.getContactId())) {
                 clostest = src;
             }
+            
+            respones.put(contactId, src);
             
             Contact[] contacts = response.getContacts();
             for (Contact contact : contacts) {
@@ -256,6 +265,24 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         @Override
         public String toString() {
             return getTimeInMillis() + " ms @ " + getCount();
+        }
+    }
+    
+    private static class XorComparator implements Comparator<KUID> {
+
+        private final KUID key;
+        
+        public XorComparator(KUID key) {
+            if (key == null) {
+                throw new NullPointerException("key");
+            }
+            
+            this.key = key;
+        }
+        
+        @Override
+        public int compare(KUID o1, KUID o2) {
+            return o1.xor(key).compareTo(o2.xor(key));
         }
     }
 }
