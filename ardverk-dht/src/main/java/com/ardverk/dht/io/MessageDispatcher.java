@@ -265,8 +265,6 @@ public abstract class MessageDispatcher implements Closeable {
                         MessageEntity entity 
                             = callbacks.remove(messageId);
                         
-                        System.out.println("ENTITY: " + messageId + " -> " + entity);
-                        
                         if (entity != null) {
                             try {
                                 entity.handleTimeout();

@@ -158,6 +158,16 @@ public class KUID implements Writable, Serializable, Comparable<KUID> {
         return lengthInBits;
     }
     
+    /**
+     * Returns true if this {@link KUID} is closer in terms of XOR distance
+     * to the given key than the other {@link KUID} is to the key.
+     */
+    public boolean isCloserTo(KUID key, KUID otherId) {
+        KUID xor1 = xor(key);
+        KUID xor2 = key.xor(otherId);
+        return xor1.compareTo(xor2) < 0;
+    }
+    
     @Override
     public int compareTo(KUID otherId) {
         return compareTo(otherId, lengthInBits());

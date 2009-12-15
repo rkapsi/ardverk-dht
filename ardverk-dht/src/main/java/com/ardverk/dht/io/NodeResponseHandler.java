@@ -9,6 +9,7 @@ import com.ardverk.dht.KUID;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.NodeRequest;
+import com.ardverk.dht.message.NodeResponse;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
@@ -93,7 +94,7 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         System.out.println("RESPONSE: " + response);
         
         try {
-            lookupManager.handleResponse(response, time, unit);
+            lookupManager.handleResponse((NodeResponse)response, time, unit);
         } finally {
             process(1);
         }
@@ -112,6 +113,9 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         }
     }
     
+    /**
+     * 
+     */
     private static class LookupManager {
         
         private final RouteTable routeTable;
@@ -123,6 +127,8 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         private final TimeCounter timeoutCounter = new TimeCounter();
         
         private final Contact[] contacts;
+        
+        private Contact clostest = null;
         
         private int index = 0;
         
@@ -141,10 +147,21 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
             this.contacts = routeTable.select(key);
         }
         
-        public void handleResponse(ResponseMessage response, 
+        public void handleResponse(NodeResponse response, 
                 long time, TimeUnit unit) {
             responseCounter.addTime(time, unit);
             
+            Contact src = response.getContact();
+            
+            if (clostest == null || src.getContactId().isCloserTo(
+                    key, clostest.getContactId())) {
+                clostest = src;
+            }
+            
+            Contact[] contacts = response.getContacts();
+            for (Contact contact : contacts) {
+                System.out.println(contact);
+            }
             // TODO process response
         }
         
@@ -170,6 +187,9 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         }
     }
     
+    /**
+     * 
+     */
     private static class LookupCounter {
         
         private final int max;
@@ -207,6 +227,9 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         }
     }
     
+    /**
+     * 
+     */
     private static class TimeCounter {
         
         private long time = 0L;
@@ -228,6 +251,11 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         
         public int getCount() {
             return count;
+        }
+        
+        @Override
+        public String toString() {
+            return getTimeInMillis() + " ms @ " + getCount();
         }
     }
 }
