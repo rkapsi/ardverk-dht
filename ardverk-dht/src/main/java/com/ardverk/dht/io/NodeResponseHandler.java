@@ -1,7 +1,6 @@
 package com.ardverk.dht.io;
 
 import java.io.IOException;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
@@ -17,6 +16,7 @@ import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
+import com.ardverk.dht.utils.XorComparator;
 
 public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
     
@@ -267,24 +267,6 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         @Override
         public String toString() {
             return getTimeInMillis() + " ms @ " + getCount();
-        }
-    }
-    
-    private static class XorComparator implements Comparator<KUID> {
-
-        private final KUID key;
-        
-        public XorComparator(KUID key) {
-            if (key == null) {
-                throw new NullPointerException("key");
-            }
-            
-            this.key = key;
-        }
-        
-        @Override
-        public int compare(KUID o1, KUID o2) {
-            return o1.xor(key).compareTo(o2.xor(key));
         }
     }
 }
