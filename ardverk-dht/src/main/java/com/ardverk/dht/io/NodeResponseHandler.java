@@ -3,6 +3,7 @@ package com.ardverk.dht.io;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.collection.PatriciaTrie;
@@ -121,12 +122,11 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
      */
     private static class LookupManager {
         
-        private final Map<KUID, Contact> respones 
-            = new PatriciaTrie<KUID, Contact>(KUID.createKeyAnalyzer(20));
-        
         private final RouteTable routeTable;
         
         private final KUID key;
+        
+        private final Map<KUID, Contact> respones;
         
         private final TimeCounter responseCounter = new TimeCounter();
         
@@ -146,6 +146,9 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
             if (key == null) {
                 throw new NullPointerException("key");
             }
+            
+            this.respones = new TreeMap<KUID, Contact>(
+                    new XorComparator(key));
             
             this.routeTable = routeTable;
             this.key = key;
