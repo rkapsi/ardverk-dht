@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.collection.PatriciaTrie;
 import org.ardverk.concurrent.AsyncFuture;
 
 import com.ardverk.dht.KUID;
