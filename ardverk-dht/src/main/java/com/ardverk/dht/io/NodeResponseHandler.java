@@ -319,7 +319,7 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         public boolean add(Contact contact) {
             KUID contactId = contact.getContactId();
             
-            if (!history.add(contactId)) {
+            if (history.add(contactId)) {
                 query.put(contactId, contact);
                 return true;
             }
@@ -336,5 +336,48 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
             Map.Entry<KUID, Contact> entry = query.pollFirstEntry();
             return entry != null ? entry.getValue() : null;
         }
+        
+        @Override
+        public String toString() {
+            return query.keySet().toString();
+        }
     }
+    
+    /*public static void main(String[] args) {
+        KUID key = new KUID(new byte[] { 1, 2, 3 });
+        System.out.println(key);
+        
+        QueryPath query = new QueryPath(key);
+        Map<KUID, KUID> foo = new TreeMap<KUID, KUID>();
+        
+        Random generator = new Random();
+        
+        for (int i = 0; i < 100; i++) {
+            byte[] contactId = new byte[3];
+            generator.nextBytes(contactId);
+            KUID bla = new KUID(contactId);
+            
+            query.add(new DefaultContact(Type.SOLICITED, 
+                    bla, 0, 
+                    new InetSocketAddress("localhost", 6666), 
+                    new InetSocketAddress("localhost", 6666)));
+            
+            foo.put(key.xor(bla), bla);
+            System.out.println("XOR: " + key.xor(bla));
+        }
+        
+        System.out.println(foo.keySet());
+        System.out.println(foo.values());
+        System.out.println(query);
+        
+        System.out.println();
+        System.out.println(query.get());
+        
+        query.add(new DefaultContact(Type.SOLICITED, 
+                key, 0, 
+                new InetSocketAddress("localhost", 6666), 
+                new InetSocketAddress("localhost", 6666)));
+        
+        System.out.println(query.get());
+    }*/
 }
