@@ -55,7 +55,7 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
             RouteTable routeTable) {
         super(transport, factory, codec);
         
-        defaultHandler = new DefaultMessageHandler();
+        defaultHandler = new DefaultMessageHandler(this, routeTable);
         ping = new PingRequestHandler(this);
         node = new NodeRequestHandler(this, routeTable);
         value = new ValueRequestHandler(this);
