@@ -1,15 +1,18 @@
 package com.ardverk.dht.io;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncFuture;
 
 import com.ardverk.dht.KUID;
+import com.ardverk.dht.entity.DefaultNodeEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.NodeRequest;
@@ -80,7 +83,15 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
     private synchronized void postProcess() {
         int count = lookupCounter.getCount();
         if (count == 0) {
-            setException(new IOException());
+            Contact[] contacts = lookupManager.getContacts();
+            long time = lookupManager.getTimeInMillis();
+            
+            if (contacts.length == 0) {
+                setException(new IOException());                
+            } else {
+                setValue(new DefaultNodeEntity(
+                        contacts, time, TimeUnit.MILLISECONDS));
+            }
         }
     }
     
@@ -129,13 +140,11 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         
         private final NavigableMap<KUID, Contact> respones;
         
-        private final NavigableMap<KUID, Contact> query;
+        private final QueryPath query;
         
         private final TimeCounter responseCounter = new TimeCounter();
         
         private final TimeCounter timeoutCounter = new TimeCounter();
-        
-        private Contact clostest = null;
         
         public LookupManager(RouteTable routeTable, KUID key) {
             if (routeTable == null) {
@@ -149,15 +158,14 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
             this.respones = new TreeMap<KUID, Contact>(
                     new XorComparator(key));
             
-            this.query = new TreeMap<KUID, Contact>(
-                    new XorComparator(key));
+            this.query = new QueryPath(key);
             
             this.routeTable = routeTable;
             this.key = key;
             
             Contact[] contacts = routeTable.select(key);
             for (Contact contact : contacts) {
-                query.put(contact.getContactId(), contact);
+                query.add(contact);
             }
         }
         
@@ -166,18 +174,11 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
             responseCounter.addTime(time, unit);
             
             Contact src = response.getContact();
-            KUID contactId = src.getContactId();
-            
-            if (clostest == null || contactId.isCloserTo(
-                    key, clostest.getContactId())) {
-                clostest = src;
-            }
-            
-            respones.put(contactId, src);
+            respones.put(src.getContactId(), src);
             
             Contact[] contacts = response.getContacts();
             for (Contact contact : contacts) {
-                query.put(contact.getContactId(), contact);
+                query.add(contact);
             }
         }
         
@@ -194,28 +195,38 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
             return getTime(TimeUnit.MILLISECONDS);
         }
         
-        public boolean hasNext() {
-            Map.Entry<KUID, Contact> entry = query.firstEntry();
+        public Contact[] getContacts() {
+            return respones.values().toArray(new Contact[0]);
+        }
+        
+        private boolean isCloserThanClosest(Contact contact) {
+            Map.Entry<KUID, Contact> entry = respones.firstEntry();
+            if (entry == null) {
+                return true;
+            }
             
-            if (entry != null) {
-                Contact contact = entry.getValue();
-                KUID contactId = contact.getContactId();
-                
-                if (clostest == null || contactId.isCloserTo(
-                        key, clostest.getContactId())) {
-                    return true;
-                }
+            KUID contactId = contact.getContactId();
+            KUID closestId = entry.getKey();
+            
+            return contactId.isCloserTo(key, closestId);
+        }
+        
+        public boolean hasNext() {
+            Contact contact = query.get();
+            
+            if (contact != null && isCloserThanClosest(contact)) {
+                return true;
             }
             
             return false;
         }
         
         public Contact next() {
-            Map.Entry<KUID, Contact> entry = query.pollFirstEntry();
-            if (entry == null) {
+            Contact contact = query.poll();
+            if (contact == null) {
                 throw new NoSuchElementException();
             }
-            return entry.getValue();
+            return contact;
         }
     }
     
@@ -288,6 +299,42 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         @Override
         public String toString() {
             return getTimeInMillis() + " ms @ " + getCount();
+        }
+    }
+    
+    private static class QueryPath {
+        
+        private final Set<KUID> history = new HashSet<KUID>();
+        
+        private final NavigableMap<KUID, Contact> query;
+        
+        public QueryPath(KUID key) {
+            query = new TreeMap<KUID, Contact>(new XorComparator(key));
+        }
+        
+        public boolean contains(Contact contact) {
+            return history.contains(contact.getContactId());
+        }
+        
+        public boolean add(Contact contact) {
+            KUID contactId = contact.getContactId();
+            
+            if (!history.add(contactId)) {
+                query.put(contactId, contact);
+                return true;
+            }
+            
+            return false; 
+        }
+        
+        public Contact get() {
+            Map.Entry<KUID, Contact> entry = query.firstEntry();
+            return entry != null ? entry.getValue() : null;
+        }
+        
+        public Contact poll() {
+            Map.Entry<KUID, Contact> entry = query.pollFirstEntry();
+            return entry != null ? entry.getValue() : null;
         }
     }
 }

@@ -1,7 +1,5 @@
 package com.ardverk.dht.entity;
 
-import java.util.Collection;
-
 import org.ardverk.concurrent.AsyncFuture;
 
 import com.ardverk.dht.KUID;
@@ -11,5 +9,5 @@ public interface NodeEntity extends Entity {
     
     public AsyncFuture<StoreEntity> store(KUID key, byte[] value);
     
-    public Collection<Contact> getContact();
+    public Contact[] getContact();
 }

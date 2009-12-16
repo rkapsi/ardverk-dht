@@ -1,7 +1,5 @@
 package com.ardverk.dht.entity;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncExecutorService;
@@ -19,8 +17,16 @@ public class DefaultNodeEntity extends AbstractEntity implements NodeEntity {
     
     private final MessageDispatcher messageDispatcher = null;
     
-    public DefaultNodeEntity(long time, TimeUnit unit) {
+    private final Contact[] contacts;
+    
+    public DefaultNodeEntity(Contact[] contacts, long time, TimeUnit unit) {
         super(time, unit);
+        
+        if (contacts == null) {
+            throw new NullPointerException("contacts");
+        }
+        
+        this.contacts = contacts;
     }
     
     @Override
@@ -31,7 +37,7 @@ public class DefaultNodeEntity extends AbstractEntity implements NodeEntity {
     }
     
     @Override
-    public Collection<Contact> getContact() {
-        return Collections.emptySet();
+    public Contact[] getContact() {
+        return contacts;
     }
 }

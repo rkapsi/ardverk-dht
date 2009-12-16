@@ -2,7 +2,6 @@ package com.ardverk.dht.io;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -20,7 +19,7 @@ public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
 
     private static final NodeEntity QUERY = new NodeEntity() {
         @Override
-        public Collection<Contact> getContact() {
+        public Contact[] getContact() {
             return null;
         }
 
