@@ -1,6 +1,7 @@
 package com.ardverk.dht.io;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.NavigableMap;
@@ -157,17 +158,23 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
                 throw new NullPointerException("key");
             }
             
+            Contact localhost = routeTable.getLocalhost();
+            KUID contactId = localhost.getContactId();
+            
             this.respones = new TreeMap<KUID, Contact>(
                     new XorComparator(key));
             
-            this.query = new QueryPath(key);
+            this.query = new QueryPath(contactId, key);
             
             this.routeTable = routeTable;
             this.key = key;
             
             Contact[] contacts = routeTable.select(key);
-            for (Contact contact : contacts) {
-                query.add(contact);
+            
+            if (0 < contacts.length) {
+                for (Contact contact : contacts) {
+                    query.add(contact);
+                }
             }
         }
         
@@ -180,7 +187,11 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
             
             Contact[] contacts = response.getContacts();
             for (Contact contact : contacts) {
-                query.add(contact);
+                if (query.add(contact)) {
+                    routeTable.add(contact);
+                } else if (DefaultMessageDispatcher.foo != null && DefaultMessageDispatcher.foo.equals(contact.getContactId())) {
+                    //System.out.println("BOOM: " + src + "\n" + contact + "\n" + Arrays.toString(contacts));
+                }
             }
         }
         
@@ -198,6 +209,8 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         }
         
         public Contact[] getContacts() {
+            Contact localhost = routeTable.getLocalhost();
+            //respones.put(localhost.getContactId(), localhost);
             return respones.values().toArray(new Contact[0]);
         }
         
@@ -207,17 +220,26 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
                 return true;
             }
             
-            KUID contactId = contact.getContactId();
             KUID closestId = entry.getKey();
+            /*Contact localhost = routeTable.getLocalhost();
+            if (closestId.equals(localhost.getContactId())) {
+                return true;
+            }*/
             
+            
+            KUID contactId = contact.getContactId();
             return contactId.isCloserTo(key, closestId);
         }
         
         public boolean hasNext() {
             Contact contact = query.get();
             
-            if (contact != null && (respones.size() < routeTable.getK() 
+            /*if (contact != null && (respones.size() < routeTable.getK() 
                     || isCloserThanClosest(contact) || EXHAUSTIVE)) {
+                return true;
+            }*/
+            
+            if (contact != null && (isCloserThanClosest(contact) || EXHAUSTIVE)) {
                 return true;
             }
             
@@ -311,8 +333,13 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         
         private final NavigableMap<KUID, Contact> query;
         
-        public QueryPath(KUID key) {
-            query = new TreeMap<KUID, Contact>(new XorComparator(key));
+        public QueryPath(KUID contactId, KUID key) {
+            if (contactId == null) {
+                throw new NullPointerException("contactId");
+            }
+            
+            history.add(contactId);
+            this.query = new TreeMap<KUID, Contact>(new XorComparator(key));
         }
         
         public boolean contains(Contact contact) {

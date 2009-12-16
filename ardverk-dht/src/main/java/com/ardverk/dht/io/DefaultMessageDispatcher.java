@@ -5,6 +5,7 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -113,6 +114,8 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
         }
     }
     
+    public static KUID foo = null;
+    
     public static void main(String[] args) throws IOException, InterruptedException, ExecutionException {
         List<SimpleDHT> list = new ArrayList<SimpleDHT>();
         for (int i = 0; i < 100; i++) {
@@ -146,17 +149,24 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
         KUID contactId = dht.getContactId();
         dht.lookup(contactId).get();
         
-        //Thread.sleep(5000L);
+        foo = contactId;
+        Thread.sleep(5000L);
         
-        // Try first
-        AsyncFuture<NodeEntity> future = list.get(0).lookup(contactId);
-        NodeEntity entity = future.get();
-        System.out.println(contactId + " -> " + Arrays.toString(entity.getContacts()));
-        
-        // Try last
-        future = list.get(list.size()-1).lookup(contactId);
-        entity = future.get();
-        System.out.println(contactId + " -> " + Arrays.toString(entity.getContacts()));
+        Random generator = new Random();
+        for (int i = 0; i < list.size(); i++) {
+            //int index = generator.nextInt(list.size());
+            int index = i;
+            
+            SimpleDHT bla = list.get(index);
+            
+            System.out.println("---" + Arrays.asList(bla.getRouteTable().select(contactId, 3)));
+            
+            AsyncFuture<NodeEntity> future = bla.lookup(contactId);
+            NodeEntity entity = future.get();
+            System.out.println(index + ": " + contactId 
+                    + " -> " + entity.getContacts().length 
+                    + " @ " + Arrays.toString(entity.getContacts()));
+        }
     }
     
     private static class SimpleDHT {
