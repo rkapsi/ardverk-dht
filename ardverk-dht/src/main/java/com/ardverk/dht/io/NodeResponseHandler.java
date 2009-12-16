@@ -2,6 +2,8 @@ package com.ardverk.dht.io;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.NavigableMap;
+import java.util.NoSuchElementException;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
@@ -125,17 +127,15 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         
         private final KUID key;
         
-        private final Map<KUID, Contact> respones;
+        private final NavigableMap<KUID, Contact> respones;
+        
+        private final NavigableMap<KUID, Contact> query;
         
         private final TimeCounter responseCounter = new TimeCounter();
         
         private final TimeCounter timeoutCounter = new TimeCounter();
         
-        private final Contact[] contacts;
-        
         private Contact clostest = null;
-        
-        private int index = 0;
         
         public LookupManager(RouteTable routeTable, KUID key) {
             if (routeTable == null) {
@@ -149,10 +149,16 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
             this.respones = new TreeMap<KUID, Contact>(
                     new XorComparator(key));
             
+            this.query = new TreeMap<KUID, Contact>(
+                    new XorComparator(key));
+            
             this.routeTable = routeTable;
             this.key = key;
             
-            this.contacts = routeTable.select(key);
+            Contact[] contacts = routeTable.select(key);
+            for (Contact contact : contacts) {
+                query.put(contact.getContactId(), contact);
+            }
         }
         
         public void handleResponse(NodeResponse response, 
@@ -171,9 +177,8 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
             
             Contact[] contacts = response.getContacts();
             for (Contact contact : contacts) {
-                System.out.println(contact);
+                query.put(contact.getContactId(), contact);
             }
-            // TODO process response
         }
         
         public void handleTimeout(long time, TimeUnit unit) {
@@ -190,11 +195,27 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         }
         
         public boolean hasNext() {
-            return index < contacts.length;
+            Map.Entry<KUID, Contact> entry = query.firstEntry();
+            
+            if (entry != null) {
+                Contact contact = entry.getValue();
+                KUID contactId = contact.getContactId();
+                
+                if (clostest == null || contactId.isCloserTo(
+                        key, clostest.getContactId())) {
+                    return true;
+                }
+            }
+            
+            return false;
         }
         
         public Contact next() {
-            return contacts[index++];
+            Map.Entry<KUID, Contact> entry = query.pollFirstEntry();
+            if (entry == null) {
+                throw new NoSuchElementException();
+            }
+            return entry.getValue();
         }
     }
     
