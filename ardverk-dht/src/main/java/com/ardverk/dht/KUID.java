@@ -167,9 +167,7 @@ public class KUID implements Xor<KUID>, Negation<KUID>, Writable, Serializable, 
      * to the given key than the other {@link KUID} is to the key.
      */
     public boolean isCloserTo(KUID key, KUID otherId) {
-        KUID xor1 = xor(key);
-        KUID xor2 = key.xor(otherId);
-        return xor1.compareTo(xor2) < 0;
+        return xor(key).compareTo(key.xor(otherId)) < 0;
     }
     
     @Override
