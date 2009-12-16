@@ -15,6 +15,7 @@ import com.ardverk.dht.ContactPinger;
 import com.ardverk.dht.DefaultKeyFactory;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.KeyFactory;
+import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.io.mina.MinaTransport;
 import com.ardverk.dht.io.transport.Transport;
@@ -153,6 +154,83 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
             AsyncFuture<?> future = executor.submit(process);
             Object value = future.get();
             System.out.println("Value: " + value);
+        }
+    }
+    
+    private static class SimpleDHT {
+        
+        private static final int KEY_SIZE = 20;
+        
+        private static final int MESSAGE_ID_SIZE = 20;
+        
+        private static final int K = 20;
+        
+        private static final AsyncExecutorService EXECUTOR 
+            = AsyncExecutors.newCachedThreadPool();
+        
+        private static final KeyFactory KEY_FACTORY 
+            = new DefaultKeyFactory(KEY_SIZE);
+        
+        private static final ContactFactory CONTACT_FACTORY 
+            = new DefaultContactFactory(KEY_FACTORY);
+        
+        private static final MessageCodec CODEC 
+            = new BencodeMessageCodec();
+        
+        private final KUID contactId;
+        
+        private final RouteTable routeTable;
+        
+        private final Transport transport;
+        
+        private final MessageFactory messageFactory;
+        
+        private final MessageDispatcher messageDispatcher;
+        
+        public SimpleDHT(int port) throws IOException {
+            contactId = KEY_FACTORY.createRandomKey();
+            
+            ContactPinger pinger = new ContactPinger() {
+                @Override
+                public AsyncFuture<PingEntity> ping(Contact contact) {
+                    return SimpleDHT.this.ping(contact);
+                }
+            };
+            
+            routeTable = new DefaultRouteTable(pinger, 
+                    CONTACT_FACTORY, K, contactId, 
+                    0, new InetSocketAddress("localhost", port));
+            
+            Contact contact = routeTable.getLocalhost();
+            
+            transport = new MinaTransport(new InetSocketAddress(port));
+            messageFactory = new DefaultMessageFactory(
+                    MESSAGE_ID_SIZE, contact);
+            
+            messageDispatcher = new DefaultMessageDispatcher(
+                    transport, messageFactory, CODEC, routeTable);
+        }
+        
+        public KUID getContactId() {
+            return contactId;
+        }
+        
+        public AsyncFuture<PingEntity> ping(String host, int port) {
+            AsyncProcess<PingEntity> process 
+                = new PingResponseHandler(messageDispatcher, host, port);
+            return EXECUTOR.submit(process);
+        }
+        
+        public AsyncFuture<PingEntity> ping(Contact dst) {
+            AsyncProcess<PingEntity> process 
+                = new PingResponseHandler(messageDispatcher, dst);
+            return EXECUTOR.submit(process);
+        }
+        
+        public AsyncFuture<NodeEntity> lookup(KUID key) {
+            AsyncProcess<NodeEntity> process 
+                = new NodeResponseHandler(messageDispatcher, routeTable, key);
+            return EXECUTOR.submit(process);
         }
     }
 }
