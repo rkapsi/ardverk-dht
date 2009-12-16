@@ -134,6 +134,8 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
      */
     private static class LookupManager {
         
+        private static final boolean EXHAUSTIVE = false;
+        
         private final RouteTable routeTable;
         
         private final KUID key;
@@ -212,15 +214,14 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         }
         
         public boolean hasNext() {
-            /*Contact contact = query.get();
+            Contact contact = query.get();
             
-            if (contact != null && isCloserThanClosest(contact)) {
+            if (contact != null && (respones.size() < routeTable.getK() 
+                    || isCloserThanClosest(contact) || EXHAUSTIVE)) {
                 return true;
             }
             
-            return false;*/
-            
-            return !query.isEmpty();
+            return false;
         }
         
         public Contact next() {

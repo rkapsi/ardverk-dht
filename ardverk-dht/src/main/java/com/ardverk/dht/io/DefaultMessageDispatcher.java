@@ -90,7 +90,7 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
             TimeUnit unit) throws IOException {
         
         super.handleResponse(callback, request, response, time, unit);
-        defaultHandler.handleTimeout(request, time, unit);
+        defaultHandler.handleResponse(request, response, time, unit);
     }
 
     @Override
@@ -145,6 +145,8 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
         // Bootstrap
         KUID contactId = dht.getContactId();
         dht.lookup(contactId).get();
+        
+        //Thread.sleep(5000L);
         
         // Try first
         AsyncFuture<NodeEntity> future = list.get(0).lookup(contactId);
@@ -222,19 +224,19 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
         public AsyncFuture<PingEntity> ping(String host, int port) {
             AsyncProcess<PingEntity> process 
                 = new PingResponseHandler(messageDispatcher, host, port);
-            return EXECUTOR.submit(process, 10L, TimeUnit.SECONDS);
+            return EXECUTOR.submit(process, 30L, TimeUnit.SECONDS);
         }
         
         public AsyncFuture<PingEntity> ping(Contact dst) {
             AsyncProcess<PingEntity> process 
                 = new PingResponseHandler(messageDispatcher, dst);
-            return EXECUTOR.submit(process, 10L, TimeUnit.SECONDS);
+            return EXECUTOR.submit(process, 30L, TimeUnit.SECONDS);
         }
         
         public AsyncFuture<NodeEntity> lookup(KUID key) {
             AsyncProcess<NodeEntity> process 
                 = new NodeResponseHandler(messageDispatcher, routeTable, key);
-            return EXECUTOR.submit(process, 10L, TimeUnit.SECONDS);
+            return EXECUTOR.submit(process, 30L, TimeUnit.SECONDS);
         }
     }
 }
