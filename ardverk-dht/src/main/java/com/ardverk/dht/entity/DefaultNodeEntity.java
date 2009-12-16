@@ -37,7 +37,7 @@ public class DefaultNodeEntity extends AbstractEntity implements NodeEntity {
     }
     
     @Override
-    public Contact[] getContact() {
+    public Contact[] getContacts() {
         return contacts;
     }
 }

@@ -107,7 +107,7 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
             ResponseMessage response, long time, TimeUnit unit)
             throws IOException {
         
-        System.out.println("RESPONSE: " + response);
+        //System.out.println("RESPONSE: " + response);
         
         try {
             lookupManager.handleResponse((NodeResponse)response, time, unit);
@@ -120,7 +120,7 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
     protected synchronized void processTimeout(RequestMessage request, 
             long time, TimeUnit unit) throws IOException {
         
-        System.out.println("TIMEOUT: " + request);
+        //System.out.println("TIMEOUT: " + request);
         
         try {
             lookupManager.handleTimeout(time, unit);
@@ -212,13 +212,15 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         }
         
         public boolean hasNext() {
-            Contact contact = query.get();
+            /*Contact contact = query.get();
             
             if (contact != null && isCloserThanClosest(contact)) {
                 return true;
             }
             
-            return false;
+            return false;*/
+            
+            return !query.isEmpty();
         }
         
         public Contact next() {
@@ -314,6 +316,10 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         
         public boolean contains(Contact contact) {
             return history.contains(contact.getContactId());
+        }
+        
+        public boolean isEmpty() {
+            return query.isEmpty();
         }
         
         public boolean add(Contact contact) {

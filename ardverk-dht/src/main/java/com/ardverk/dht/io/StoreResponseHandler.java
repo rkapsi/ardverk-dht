@@ -19,7 +19,7 @@ public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
 
     private static final NodeEntity QUERY = new NodeEntity() {
         @Override
-        public Contact[] getContact() {
+        public Contact[] getContacts() {
             return null;
         }
 

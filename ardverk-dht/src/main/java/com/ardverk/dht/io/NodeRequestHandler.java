@@ -29,7 +29,7 @@ public class NodeRequestHandler extends RequestHandler {
     @Override
     public void handleRequest(RequestMessage message) throws IOException {
         
-        System.out.println("REQUEST: " + message);
+        //System.out.println("REQUEST: " + message);
         
         NodeRequest request = (NodeRequest)message;
         KUID key = request.getKey();

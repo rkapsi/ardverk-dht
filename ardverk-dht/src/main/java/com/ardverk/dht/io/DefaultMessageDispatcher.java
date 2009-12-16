@@ -2,6 +2,9 @@ package com.ardverk.dht.io;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -111,50 +114,47 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
     }
     
     public static void main(String[] args) throws IOException, InterruptedException, ExecutionException {
-        
-        AsyncExecutorService executor = AsyncExecutors.newCachedThreadPool();
-        
-        ContactPinger pinger = new ContactPinger() {
-            @Override
-            public AsyncFuture<PingEntity> ping(Contact contact) {
-                return null;
-            }
-        };
-        
-        KeyFactory keyFactory = new DefaultKeyFactory(20);
-        ContactFactory contactFactory = new DefaultContactFactory(keyFactory);
-        KUID contactId = keyFactory.createRandomKey();
-        
-        RouteTable routeTable = new DefaultRouteTable(pinger, 
-                contactFactory, 20, contactId, 
-                0, new InetSocketAddress("localhost", 6666));
-        
-        Contact contact = routeTable.getLocalhost();
-        
-        Transport transport = new MinaTransport(new InetSocketAddress(6666));
-        MessageFactory factory = new DefaultMessageFactory(20, contact);
-        MessageCodec codec = new BencodeMessageCodec();
-        
-        MessageDispatcher messageDispatcher 
-            = new DefaultMessageDispatcher(transport, factory, codec, routeTable);
-        
-        for (int i = 0; i < 10; i++) {
-            System.out.println("Sending: " + i);
-            
-            /*AsyncProcess<?> process 
-                = new PingResponseHandler(
-                    messageDispatcher, 
-                    "localhost", 6666);*/
-            
-            KUID key = keyFactory.createRandomKey();
-            AsyncProcess<?> process 
-                = new NodeResponseHandler(
-                    messageDispatcher, routeTable, key);
-        
-            AsyncFuture<?> future = executor.submit(process);
-            Object value = future.get();
-            System.out.println("Value: " + value);
+        List<SimpleDHT> list = new ArrayList<SimpleDHT>();
+        for (int i = 0; i < 100; i++) {
+            list.add(new SimpleDHT(2000 + i));
         }
+        
+        for (int i = 0; i < list.size(); i++) {
+            SimpleDHT dht = list.get(i);
+            
+            for (int j = 0; j < list.size(); j++) {
+                if (j != i) {
+                    dht.ping("localhost", 2000 + j).get();
+                }
+            }
+        }
+        
+        for (int i = 0; i < list.size(); i++) {
+            SimpleDHT dht = list.get(i);
+            dht.lookup(dht.getContactId()).get();
+        }
+        
+        /*for (int i = 0; i < list.size(); i++) {
+            SimpleDHT dht = list.get(i);
+            System.out.println(dht.getRouteTable().select(dht.getContactId(), 1000).length);
+        }*/
+        
+        SimpleDHT dht = new SimpleDHT(5000);
+        dht.ping("localhost", 2000).get();
+        
+        // Bootstrap
+        KUID contactId = dht.getContactId();
+        dht.lookup(contactId).get();
+        
+        // Try first
+        AsyncFuture<NodeEntity> future = list.get(0).lookup(contactId);
+        NodeEntity entity = future.get();
+        System.out.println(contactId + " -> " + Arrays.toString(entity.getContacts()));
+        
+        // Try last
+        future = list.get(list.size()-1).lookup(contactId);
+        entity = future.get();
+        System.out.println(contactId + " -> " + Arrays.toString(entity.getContacts()));
     }
     
     private static class SimpleDHT {
@@ -215,22 +215,26 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
             return contactId;
         }
         
+        public RouteTable getRouteTable() {
+            return routeTable;
+        }
+        
         public AsyncFuture<PingEntity> ping(String host, int port) {
             AsyncProcess<PingEntity> process 
                 = new PingResponseHandler(messageDispatcher, host, port);
-            return EXECUTOR.submit(process);
+            return EXECUTOR.submit(process, 10L, TimeUnit.SECONDS);
         }
         
         public AsyncFuture<PingEntity> ping(Contact dst) {
             AsyncProcess<PingEntity> process 
                 = new PingResponseHandler(messageDispatcher, dst);
-            return EXECUTOR.submit(process);
+            return EXECUTOR.submit(process, 10L, TimeUnit.SECONDS);
         }
         
         public AsyncFuture<NodeEntity> lookup(KUID key) {
             AsyncProcess<NodeEntity> process 
                 = new NodeResponseHandler(messageDispatcher, routeTable, key);
-            return EXECUTOR.submit(process);
+            return EXECUTOR.submit(process, 10L, TimeUnit.SECONDS);
         }
     }
 }

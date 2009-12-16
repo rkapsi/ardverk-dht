@@ -2,12 +2,8 @@ package com.ardverk.dht.routing;
 
 import java.net.SocketAddress;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Random;
-import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.ardverk.collection.Cursor;
@@ -770,7 +766,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
     }
     
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         TreeMap<KUID, KUID> tree = new TreeMap<KUID, KUID>();
         Trie<KUID, KUID> trie = new PatriciaTrie<KUID, KUID>(KUID.createKeyAnalyzer(160));
         
@@ -818,5 +814,5 @@ public class DefaultRouteTable extends AbstractRouteTable {
         };
         
         trie.select(lookupKey, cursor);
-    }
+    }*/
 }
