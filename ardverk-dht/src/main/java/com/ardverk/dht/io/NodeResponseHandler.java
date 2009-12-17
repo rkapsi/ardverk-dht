@@ -247,7 +247,7 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         public boolean hasNext() {
             if (!query.isEmpty()) {
                 Contact contact = query.first();
-                if (responses.size() < routeTable.getK() 
+                if (closest.size() < routeTable.getK() 
                         || isCloserThanClosest(contact) 
                         || EXHAUSTIVE) {
                     return true;
