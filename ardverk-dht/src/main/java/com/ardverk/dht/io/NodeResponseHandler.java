@@ -191,10 +191,10 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
             this.closest = new TreeSet<Contact>(comparator);
             this.query = new TreeSet<Contact>(comparator);
             
+            history.put(contactId, 0);
             Contact[] contacts = routeTable.select(key);
             
             if (0 < contacts.length) {
-                history.put(contactId, 0);
                 addToResponses(localhost);
                 
                 for (Contact contact : contacts) {
