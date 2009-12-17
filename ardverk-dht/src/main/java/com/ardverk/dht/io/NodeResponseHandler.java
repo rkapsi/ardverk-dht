@@ -53,9 +53,7 @@ public class NodeResponseHandler extends LookupResponseHandler<NodeEntity> {
         if (contacts.length == 0) {
             setException(new IOException());                
         } else {
-            setValue(new DefaultNodeEntity(
-                    contacts, hop, 
-                    time, TimeUnit.MILLISECONDS));
+            setValue(new DefaultNodeEntity(contacts, hop, time, unit));
         }
     }
 }

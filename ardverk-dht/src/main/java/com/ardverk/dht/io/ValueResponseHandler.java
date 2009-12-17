@@ -57,7 +57,7 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
         if (contacts.length == 0) {
             setException(new IOException());                
         } else {
-            setValue(new DefaultValueEntity(time, TimeUnit.MILLISECONDS));
+            setValue(new DefaultValueEntity(time, unit));
         }
     }
 }
