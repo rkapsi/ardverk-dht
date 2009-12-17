@@ -40,6 +40,8 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
     
     private final TimeUnit unit = TimeUnit.SECONDS;
     
+    private long startTime = -1L;
+    
     public NodeResponseHandler(MessageDispatcher messageDispatcher, 
             RouteTable routeTable, KUID key) {
         super(messageDispatcher);
@@ -70,15 +72,16 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
                 
                 lookupCounter.push();
             }
-        } catch (IOException err) {
-            err.printStackTrace();
-            throw err;
         } finally {
             postProcess();
         }
     }
     
     private synchronized void preProcess(int pop) {
+        if (startTime == -1L) {
+            startTime = System.currentTimeMillis();
+        }
+        
         while (0 < pop--) {
             lookupCounter.pop();
         }
@@ -88,14 +91,14 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         int count = lookupCounter.getCount();
         if (count == 0) {
             Contact[] contacts = lookupManager.getContacts();
-            int hops = lookupManager.getCurrentHop();
-            long time = lookupManager.getTimeInMillis();
+            int currentHop = lookupManager.getCurrentHop();
+            long time = System.currentTimeMillis() - startTime;
             
             if (contacts.length == 0) {
                 setException(new IOException());                
             } else {
                 setValue(new DefaultNodeEntity(
-                        contacts, hops, 
+                        contacts, currentHop, 
                         time, TimeUnit.MILLISECONDS));
             }
         }
@@ -158,7 +161,8 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         private final NavigableSet<Contact> query;
         
         /**
-         * 
+         * A history of all {@link KUID}s that were added to the 
+         * {@link #query} {@link NavigableSet}.
          */
         private final Map<KUID, Integer> history 
             = new HashMap<KUID, Integer>();
