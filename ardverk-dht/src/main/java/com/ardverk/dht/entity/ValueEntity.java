@@ -1,4 +1,4 @@
 package com.ardverk.dht.entity;
 
-public interface ValueEntity extends Entity {
+public interface ValueEntity extends LookupEntity {
 }

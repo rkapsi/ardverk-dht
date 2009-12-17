@@ -51,4 +51,17 @@ public class DefaultMessageFactory extends AbstractMessageFactory {
         return new DefaultNodeResponse(messageId, contact, 
                 destination, contacts);
     }
+
+    @Override
+    public ValueRequest createValueRequest(Contact dst, KUID key) {
+        MessageId messageId = createMessageId(dst.getRemoteAddress());
+        return new DefaultValueRequest(messageId, contact, dst, key);
+    }
+
+    @Override
+    public ValueResponse createValueResponse(LookupRequest request) {
+        MessageId messageId = request.getMessageId();
+        Contact destination = request.getContact();
+        return new DefaultValueResponse(messageId, contact, destination);
+    }
 }

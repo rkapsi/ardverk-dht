@@ -20,4 +20,8 @@ public interface MessageFactory {
     public NodeRequest createNodeRequest(Contact dst, KUID key);
     
     public NodeResponse createNodeResponse(LookupRequest request, Contact[] contacts);
+    
+    public ValueRequest createValueRequest(Contact dst, KUID key);
+    
+    public ValueResponse createValueResponse(LookupRequest request);
 }

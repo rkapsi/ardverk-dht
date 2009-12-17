@@ -5,7 +5,7 @@ import org.ardverk.concurrent.AsyncFuture;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
 
-public interface NodeEntity extends Entity {
+public interface NodeEntity extends LookupEntity {
     
     public AsyncFuture<StoreEntity> store(KUID key, byte[] value);
     
