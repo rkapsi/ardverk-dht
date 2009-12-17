@@ -220,7 +220,13 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         
         public void handleTimeout(RequestMessage request, 
                 long time, TimeUnit unit) {
-            timeoutCounter.addTime(time, unit);
+            
+            Contact contact = request.getContact();
+            KUID contactId = contact.getContactId();
+            
+            if (history.containsKey(contactId)) {
+                timeoutCounter.addTime(time, unit);
+            }
         }
         
         public long getTime(TimeUnit unit) {
@@ -242,16 +248,17 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         
         private boolean addToResponses(Contact contact) {
             KUID contactId = contact.getContactId();
-            
-            if (responses.add(contact) && history.containsKey(contactId)) {
-                closest.add(contact);
-                
-                if (closest.size() > routeTable.getK()) {
-                    closest.pollLast();
+            if (history.containsKey(contactId)) {
+                if (responses.add(contact)) {
+                    closest.add(contact);
+                    
+                    if (closest.size() > routeTable.getK()) {
+                        closest.pollLast();
+                    }
+                    
+                    currentHop = history.get(contactId);
+                    return true;
                 }
-                
-                currentHop = history.get(contactId);
-                return true;
             }
             
             return false;
