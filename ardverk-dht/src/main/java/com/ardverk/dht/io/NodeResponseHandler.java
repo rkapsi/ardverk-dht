@@ -167,11 +167,9 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         private final Map<KUID, Integer> history 
             = new HashMap<KUID, Integer>();
         
-        private final TimeCounter responseCounter = new TimeCounter();
-        
-        private final TimeCounter timeoutCounter = new TimeCounter();
-        
         private int currentHop = 0;
+        
+        private int timeouts = 0;
         
         public LookupManager(RouteTable routeTable, KUID key) {
             if (routeTable == null) {
@@ -182,6 +180,9 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
                 throw new NullPointerException("key");
             }
             
+            this.routeTable = routeTable;
+            this.key = key;
+            
             Contact localhost = routeTable.getLocalhost();
             KUID contactId = localhost.getContactId();
             
@@ -189,9 +190,6 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
             this.responses = new TreeSet<Contact>(comparator);
             this.closest = new TreeSet<Contact>(comparator);
             this.query = new TreeSet<Contact>(comparator);
-            
-            this.routeTable = routeTable;
-            this.key = key;
             
             Contact[] contacts = routeTable.select(key);
             
@@ -213,7 +211,6 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
                 return;
             }
             
-            responseCounter.addTime(time, unit);
             Contact[] contacts = response.getContacts();
             for (Contact contact : contacts) {
                 if (addToQuery(contact, currentHop+1)) {
@@ -224,22 +221,7 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         
         public void handleTimeout(RequestMessage request, 
                 long time, TimeUnit unit) {
-            
-            Contact contact = request.getContact();
-            KUID contactId = contact.getContactId();
-            
-            if (history.containsKey(contactId)) {
-                timeoutCounter.addTime(time, unit);
-            }
-        }
-        
-        public long getTime(TimeUnit unit) {
-            return responseCounter.getTime(unit) 
-                    + timeoutCounter.getTime(unit);
-        }
-        
-        public long getTimeInMillis() {
-            return getTime(TimeUnit.MILLISECONDS);
+            timeouts++;
         }
         
         public Contact[] getContacts() {
@@ -250,19 +232,21 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
             return currentHop;
         }
         
+        public int getTimeouts() {
+            return timeouts;
+        }
+        
         private boolean addToResponses(Contact contact) {
-            KUID contactId = contact.getContactId();
-            if (history.containsKey(contactId)) {
-                if (responses.add(contact)) {
-                    closest.add(contact);
-                    
-                    if (closest.size() > routeTable.getK()) {
-                        closest.pollLast();
-                    }
-                    
-                    currentHop = history.get(contactId);
-                    return true;
+            if (responses.add(contact)) {
+                closest.add(contact);
+                
+                if (closest.size() > routeTable.getK()) {
+                    closest.pollLast();
                 }
+                
+                KUID contactId = contact.getContactId();
+                currentHop = history.get(contactId);
+                return true;
             }
             
             return false;
@@ -349,38 +333,6 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         
         public int getCount() {
             return counter;
-        }
-    }
-    
-    /**
-     * 
-     */
-    private static class TimeCounter {
-        
-        private long time = 0L;
-        
-        private int count = 0;
-        
-        public void addTime(long time, TimeUnit unit) {
-            this.time += unit.toNanos(time);
-            ++count;
-        }
-        
-        public long getTime(TimeUnit unit) {
-            return unit.convert(time, TimeUnit.NANOSECONDS);
-        }
-        
-        public long getTimeInMillis() {
-            return getTime(TimeUnit.MILLISECONDS);
-        }
-        
-        public int getCount() {
-            return count;
-        }
-        
-        @Override
-        public String toString() {
-            return getTimeInMillis() + " ms @ " + getCount();
         }
     }
     
