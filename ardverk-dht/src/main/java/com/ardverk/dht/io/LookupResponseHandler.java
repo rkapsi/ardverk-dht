@@ -18,6 +18,7 @@ import org.ardverk.concurrent.AsyncFuture;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.entity.LookupEntity;
 import com.ardverk.dht.message.RequestMessage;
+import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 
@@ -113,27 +114,47 @@ abstract class LookupResponseHandler<T extends LookupEntity> extends ResponseHan
     protected abstract void complete(Contact[] contacts, 
             int hop, long time, TimeUnit unit);
     
-    /**
-     * 
-     */
-    protected synchronized void processResponse(Contact src, 
-            Contact[] contacts, long time, TimeUnit unit) throws IOException {
+    
+    @Override
+    protected final synchronized void processResponse(RequestMessage request,
+            ResponseMessage response, long time, TimeUnit unit)
+            throws IOException {
+        
         try {
-            lookupManager.handleResponse(src, contacts, time, unit);
+            processResponse0(request, response, time, unit);
         } finally {
             process(1);
         }
     }
+    
+    /**
+     * 
+     */
+    protected abstract void processResponse0(RequestMessage request,
+            ResponseMessage response, long time, TimeUnit unit) throws IOException;
+
+    /**
+     * 
+     */
+    protected synchronized void processContacts(Contact src, 
+            Contact[] contacts, long time, TimeUnit unit) throws IOException {
+        lookupManager.handleResponse(src, contacts, time, unit);
+    }
 
     @Override
-    protected synchronized void processTimeout(RequestMessage request, 
+    protected final synchronized void processTimeout(RequestMessage request, 
             long time, TimeUnit unit) throws IOException {
         
         try {
-            lookupManager.handleTimeout(time, unit);
+            processTimeout0(request, time, unit);
         } finally {
             process(1);
         }
+    }
+    
+    protected synchronized void processTimeout0(RequestMessage request, 
+            long time, TimeUnit unit) throws IOException {
+        lookupManager.handleTimeout(time, unit);
     }
     
     /**

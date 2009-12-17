@@ -27,17 +27,6 @@ public class NodeResponseHandler extends LookupResponseHandler<NodeEntity> {
     }
     
     @Override
-    protected synchronized void processResponse(RequestMessage request,
-            ResponseMessage response, long time, TimeUnit unit)
-            throws IOException {
-        
-        Contact src = response.getContact();
-        Contact[] contacts = ((NodeResponse)response).getContacts();
-        processResponse(src, contacts, time, unit);
-    }
-    
-    
-    @Override
     protected void lookup(Contact dst, KUID key, 
             long timeout, TimeUnit unit) throws IOException {
         
@@ -55,5 +44,15 @@ public class NodeResponseHandler extends LookupResponseHandler<NodeEntity> {
         } else {
             setValue(new DefaultNodeEntity(contacts, hop, time, unit));
         }
+    }
+    
+    @Override
+    protected synchronized void processResponse0(RequestMessage request,
+            ResponseMessage response, long time, TimeUnit unit)
+            throws IOException {
+        
+        Contact src = response.getContact();
+        Contact[] contacts = ((NodeResponse)response).getContacts();
+        processContacts(src, contacts, time, unit);
     }
 }
