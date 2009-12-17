@@ -17,10 +17,7 @@ import org.ardverk.concurrent.AsyncFuture;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.entity.LookupEntity;
-import com.ardverk.dht.message.LookupRequest;
-import com.ardverk.dht.message.NodeResponse;
 import com.ardverk.dht.message.RequestMessage;
-import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 
@@ -68,7 +65,7 @@ abstract class LookupResponseHandler<T extends LookupEntity> extends ResponseHan
                 }
                 
                 Contact contact = lookupManager.next();
-                lookup(contact);
+                lookup(contact, lookupManager.key, timeout, unit);
                 
                 lookupCounter.push();
             }
@@ -107,29 +104,22 @@ abstract class LookupResponseHandler<T extends LookupEntity> extends ResponseHan
     /**
      * 
      */
+    protected abstract void lookup(Contact dst, KUID key, 
+            long timeout, TimeUnit unit) throws IOException;
+    
+    /**
+     * 
+     */
     protected abstract void complete(Contact[] contacts, 
             int hop, long time, TimeUnit unit);
     
     /**
      * 
      */
-    protected abstract LookupRequest createLookupRequest(Contact dst, KUID key);
-    
-    /**
-     * 
-     */
-    private void lookup(Contact dst) throws IOException {
-        LookupRequest message = createLookupRequest(dst, lookupManager.key);
-        messageDispatcher.send(this, message, timeout, unit);
-    }
-
-    @Override
-    protected synchronized void processResponse(RequestMessage request,
-            ResponseMessage response, long time, TimeUnit unit)
-            throws IOException {
-        
+    protected synchronized void processResponse(Contact src, 
+            Contact[] contacts, long time, TimeUnit unit) throws IOException {
         try {
-            lookupManager.handleResponse((NodeResponse)response, time, unit);
+            lookupManager.handleResponse(src, contacts, time, unit);
         } finally {
             process(1);
         }
@@ -140,7 +130,7 @@ abstract class LookupResponseHandler<T extends LookupEntity> extends ResponseHan
             long time, TimeUnit unit) throws IOException {
         
         try {
-            lookupManager.handleTimeout(request, time, unit);
+            lookupManager.handleTimeout(time, unit);
         } finally {
             process(1);
         }
@@ -217,15 +207,14 @@ abstract class LookupResponseHandler<T extends LookupEntity> extends ResponseHan
             }
         }
         
-        public void handleResponse(NodeResponse response, 
+        public void handleResponse(Contact src, Contact[] contacts, 
                 long time, TimeUnit unit) {
             
-            boolean success = addToResponses(response.getContact());
+            boolean success = addToResponses(src);
             if (!success) {
                 return;
             }
             
-            Contact[] contacts = response.getContacts();
             for (Contact contact : contacts) {
                 if (addToQuery(contact, currentHop+1)) {
                     routeTable.add(contact);
@@ -233,8 +222,7 @@ abstract class LookupResponseHandler<T extends LookupEntity> extends ResponseHan
             }
         }
         
-        public void handleTimeout(RequestMessage request, 
-                long time, TimeUnit unit) {
+        public void handleTimeout(long time, TimeUnit unit) {
             timeouts++;
         }
         
