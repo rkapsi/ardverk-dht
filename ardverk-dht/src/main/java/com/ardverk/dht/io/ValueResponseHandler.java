@@ -59,7 +59,10 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
         values.add(response);
         
         if (!EXHAUSTIVE) {
-            setValue(new DefaultValueEntity(time, unit));
+            State state = getState();
+            setValue(new DefaultValueEntity(
+                    state.getTimeInMillis(), 
+                    TimeUnit.MILLISECONDS));
         }
     }
     
@@ -73,14 +76,17 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     }
     
     @Override
-    protected void complete(Contact[] contacts, int hop, 
-            long time, TimeUnit unit) {
+    protected void complete(State state) {
+        
+        Contact[] contacts = state.getContacts();
+        int hop = state.getHop();
+        long time = state.getTimeInMillis();
         
         if (values.isEmpty()) {
             setException(new NoSuchValueException(
-                    contacts, hop, time, unit));
+                    contacts, hop, time, TimeUnit.MILLISECONDS));
         } else {
-            setValue(new DefaultValueEntity(time, unit));
+            setValue(new DefaultValueEntity(time, TimeUnit.MILLISECONDS));
         }
     }
     

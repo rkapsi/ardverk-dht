@@ -94,11 +94,8 @@ abstract class LookupResponseHandler<T extends LookupEntity> extends ResponseHan
     private synchronized void postProcess() {
         int count = lookupCounter.getCount();
         if (count == 0) {
-            Contact[] contacts = lookupManager.getContacts();
-            int currentHop = lookupManager.getCurrentHop();
-            long time = System.currentTimeMillis() - startTime;
-            
-            complete(contacts, currentHop, time, TimeUnit.MILLISECONDS);
+            State state = getState();
+            complete(state);
         }
     }
     
@@ -111,8 +108,7 @@ abstract class LookupResponseHandler<T extends LookupEntity> extends ResponseHan
     /**
      * 
      */
-    protected abstract void complete(Contact[] contacts, 
-            int hop, long time, TimeUnit unit);
+    protected abstract void complete(State state);
     
     
     @Override
@@ -155,6 +151,18 @@ abstract class LookupResponseHandler<T extends LookupEntity> extends ResponseHan
     protected synchronized void processTimeout0(RequestMessage request, 
             long time, TimeUnit unit) throws IOException {
         lookupManager.handleTimeout(time, unit);
+    }
+    
+    protected synchronized State getState() {
+        if (startTime == -1L) {
+            throw new IllegalStateException("startTime=" + startTime);
+        }
+        
+        Contact[] contacts = lookupManager.getContacts();
+        int hop = lookupManager.getCurrentHop();
+        long time = System.currentTimeMillis() - startTime;
+        
+        return new State(contacts, hop, time, TimeUnit.MILLISECONDS);
     }
     
     /**
@@ -400,6 +408,48 @@ abstract class LookupResponseHandler<T extends LookupEntity> extends ResponseHan
         @Override
         public int compare(Contact o1, Contact o2) {
             return o1.getContactId().xor(key).compareTo(o2.getContactId().xor(key));
+        }
+    }
+    
+    static class State {
+        
+        private final Contact[] contacts;
+        
+        private final int hop;
+        
+        private final long time;
+        
+        private final TimeUnit unit;
+        
+        private State(Contact[] contacts, int hop, long time, TimeUnit unit) {
+            if (contacts == null) {
+                throw new NullPointerException("contacts");
+            }
+            
+            if (unit == null) {
+                throw new NullPointerException("unit");
+            }
+            
+            this.contacts = contacts;
+            this.hop = hop;
+            this.time = time;
+            this.unit = unit;
+        }
+
+        public Contact[] getContacts() {
+            return contacts;
+        }
+        
+        public int getHop() {
+            return hop;
+        }
+
+        public long getTime(TimeUnit unit) {
+            return unit.convert(time, this.unit);
+        }
+        
+        public long getTimeInMillis() {
+            return getTime(TimeUnit.MILLISECONDS);
         }
     }
 }

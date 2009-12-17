@@ -36,13 +36,17 @@ public class NodeResponseHandler extends LookupResponseHandler<NodeEntity> {
     }
 
     @Override
-    protected void complete(Contact[] contacts, int hop, 
-            long time, TimeUnit unit) {
+    protected void complete(State state) {
+        
+        Contact[] contacts = state.getContacts();
+        int hop = state.getHop();
+        long time = state.getTimeInMillis();
         
         if (contacts.length == 0) {
             setException(new IOException());                
         } else {
-            setValue(new DefaultNodeEntity(contacts, hop, time, unit));
+            setValue(new DefaultNodeEntity(contacts, 
+                    hop, time, TimeUnit.MILLISECONDS));
         }
     }
     
