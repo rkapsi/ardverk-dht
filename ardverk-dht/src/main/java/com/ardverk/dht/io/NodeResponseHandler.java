@@ -113,8 +113,6 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
             ResponseMessage response, long time, TimeUnit unit)
             throws IOException {
         
-        //System.out.println("RESPONSE: " + response);
-        
         try {
             lookupManager.handleResponse((NodeResponse)response, time, unit);
         } finally {
@@ -125,8 +123,6 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
     @Override
     protected synchronized void processTimeout(RequestMessage request, 
             long time, TimeUnit unit) throws IOException {
-        
-        //System.out.println("TIMEOUT: " + request);
         
         try {
             lookupManager.handleTimeout(request, time, unit);
@@ -207,10 +203,13 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         
         public void handleResponse(NodeResponse response, 
                 long time, TimeUnit unit) {
+            
+            boolean success = addToResponses(response.getContact());
+            if (!success) {
+                return;
+            }
+            
             responseCounter.addTime(time, unit);
-            
-            addToResponses(response.getContact());
-            
             Contact[] contacts = response.getContacts();
             for (Contact contact : contacts) {
                 if (addToQuery(contact, currentHop+1)) {
@@ -242,18 +241,19 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         }
         
         private boolean addToResponses(Contact contact) {
-            if (responses.add(contact)) {
+            KUID contactId = contact.getContactId();
+            
+            if (responses.add(contact) && history.containsKey(contactId)) {
                 closest.add(contact);
                 
                 if (closest.size() > routeTable.getK()) {
                     closest.pollLast();
                 }
                 
-                KUID contactId = contact.getContactId();
                 currentHop = history.get(contactId);
-                
                 return true;
             }
+            
             return false;
         }
         
