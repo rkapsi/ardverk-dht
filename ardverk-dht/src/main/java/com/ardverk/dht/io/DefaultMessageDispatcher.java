@@ -3,7 +3,6 @@ package com.ardverk.dht.io;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
@@ -38,6 +37,7 @@ import com.ardverk.dht.routing.ContactFactory;
 import com.ardverk.dht.routing.DefaultContactFactory;
 import com.ardverk.dht.routing.DefaultRouteTable;
 import com.ardverk.dht.routing.RouteTable;
+import com.ardverk.dht.storage.Database;
 import com.ardverk.logging.LoggerUtils;
 
 public class DefaultMessageDispatcher extends MessageDispatcher {
@@ -57,14 +57,14 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
     
     public DefaultMessageDispatcher(Transport transport, 
             MessageFactory factory, MessageCodec codec, 
-            RouteTable routeTable) {
+            RouteTable routeTable, Database database) {
         super(transport, factory, codec);
         
         defaultHandler = new DefaultMessageHandler(this, routeTable);
         ping = new PingRequestHandler(this);
         node = new NodeRequestHandler(this, routeTable);
-        value = new ValueRequestHandler(this);
-        store = new StoreRequestHandler(this);
+        value = new ValueRequestHandler(this, routeTable, database);
+        store = new StoreRequestHandler(this, routeTable, database);
     }
 
     @Override
@@ -197,6 +197,8 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
         
         private final RouteTable routeTable;
         
+        private final Database database;
+        
         private final Transport transport;
         
         private final MessageFactory messageFactory;
@@ -217,6 +219,8 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
                     CONTACT_FACTORY, K, contactId, 
                     0, new InetSocketAddress("localhost", port));
             
+            database = new Database() {};
+            
             Contact contact = routeTable.getLocalhost();
             
             transport = new MinaTransport(new InetSocketAddress(port));
@@ -224,7 +228,8 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
                     MESSAGE_ID_SIZE, contact);
             
             messageDispatcher = new DefaultMessageDispatcher(
-                    transport, messageFactory, CODEC, routeTable);
+                    transport, messageFactory, CODEC, 
+                    routeTable, database);
         }
         
         public KUID getContactId() {

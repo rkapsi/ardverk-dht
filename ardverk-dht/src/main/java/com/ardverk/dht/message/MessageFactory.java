@@ -6,13 +6,6 @@ import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
 
 public interface MessageFactory {
-
-    //public Message decode(SocketAddress src, 
-    //        Object message) throws IOException;
-    
-    //public MessageId createMessageId(byte[] messageId);
-    
-    //public MessageId createMessageId(SessionContext context);
     
     public MessageId createMessageId(SocketAddress dst);
     
@@ -26,5 +19,5 @@ public interface MessageFactory {
     
     public NodeRequest createNodeRequest(Contact dst, KUID key);
     
-    public NodeResponse createNodeResponse(NodeRequest request, Contact[] contacts);
+    public NodeResponse createNodeResponse(LookupRequest request, Contact[] contacts);
 }

@@ -2,8 +2,10 @@ package com.ardverk.dht.io;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
 import java.util.NoSuchElementException;
@@ -26,15 +28,11 @@ import com.ardverk.dht.routing.RouteTable;
 
 public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
     
-    private static final int K = 20;
-    
     private static final int ALPHA = 4;
     
     private final LookupManager lookupManager;
     
     private final LookupCounter lookupCounter;
-    
-    private final int k = K;
     
     private final long timeout = 3L;
     
@@ -44,14 +42,15 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
     
     public NodeResponseHandler(MessageDispatcher messageDispatcher, 
             RouteTable routeTable, KUID key) {
+        this(messageDispatcher, routeTable, key, ALPHA);
+    }
+    
+    public NodeResponseHandler(MessageDispatcher messageDispatcher, 
+            RouteTable routeTable, KUID key, int alpha) {
         super(messageDispatcher);
         
-        if (k < 0) {
-            throw new IllegalArgumentException("k=" + k);
-        }
-        
         lookupManager = new LookupManager(routeTable, key);
-        lookupCounter = new LookupCounter(ALPHA);
+        lookupCounter = new LookupCounter(alpha);
     }
 
     @Override
@@ -140,6 +139,8 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
     private static class LookupManager {
         
         private static final boolean EXHAUSTIVE = false;
+        
+        private static final boolean RANDOMIZE = true;
         
         private final RouteTable routeTable;
         
@@ -288,7 +289,28 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         }
         
         public Contact next() {
-            Contact contact = query.pollFirst();
+            Contact contact = null;
+            
+            if (RANDOMIZE) {
+                
+                // TODO: There is a much better way to do this!
+                if (!query.isEmpty()) {
+                    List<Contact> contacts = new ArrayList<Contact>();
+                    for (Contact c : query) {
+                        contacts.add(c);
+                        if (contacts.size() >= routeTable.getK()) {
+                            break;
+                        }
+                    }
+                    
+                    contact = contacts.get((int)(Math.random() * contacts.size()));
+                    query.remove(contact);
+                }
+                
+            } else {
+                contact = query.pollFirst();
+            }
+            
             if (contact == null) {
                 throw new NoSuchElementException();
             }

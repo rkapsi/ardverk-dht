@@ -5,14 +5,22 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncFuture;
 
+import com.ardverk.dht.KUID;
 import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
+import com.ardverk.dht.routing.RouteTable;
 
 public class ValueResponseHandler extends ResponseHandler<ValueEntity> {
 
-    public ValueResponseHandler(MessageDispatcher messageDispatcher) {
+    private final NodeResponseHandler bla;
+    
+    public ValueResponseHandler(
+            MessageDispatcher messageDispatcher, 
+            RouteTable routeTable, KUID key) {
         super(messageDispatcher);
+        
+        bla = new NodeResponseHandler(messageDispatcher, routeTable, key);
     }
 
     @Override

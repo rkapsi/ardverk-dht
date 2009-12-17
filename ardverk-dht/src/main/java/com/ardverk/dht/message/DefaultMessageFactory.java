@@ -44,7 +44,7 @@ public class DefaultMessageFactory extends AbstractMessageFactory {
     }
 
     @Override
-    public NodeResponse createNodeResponse(NodeRequest request,
+    public NodeResponse createNodeResponse(LookupRequest request,
             Contact[] contacts) {
         MessageId messageId = request.getMessageId();
         Contact destination = request.getContact();
