@@ -150,7 +150,7 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
         dht.lookup(contactId).get();
         
         foo = contactId;
-        Thread.sleep(5000L);
+        Thread.sleep(1000L);
         
         Random generator = new Random();
         for (int i = 0; i < list.size(); i++) {
@@ -159,13 +159,17 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
             
             SimpleDHT bla = list.get(index);
             
-            System.out.println("---" + Arrays.asList(bla.getRouteTable().select(contactId, 3)));
+            //System.out.println(index + "-a: " + contactId + " -> " + Arrays.asList(bla.getRouteTable().select(contactId, 1)));
             
             AsyncFuture<NodeEntity> future = bla.lookup(contactId);
             NodeEntity entity = future.get();
-            System.out.println(index + ": " + contactId 
+            System.out.println(index + "-b: " + contactId 
                     + " -> " + entity.getContacts().length 
-                    + " @ " + Arrays.toString(entity.getContacts()));
+                    + " @ " + entity.getContacts()[0]);
+            
+            /*System.out.println(index + "-c: " + contactId 
+                    + " -> " + entity.getContacts().length 
+                    + " @ " + Arrays.asList(entity.getContacts()));*/
         }
     }
     

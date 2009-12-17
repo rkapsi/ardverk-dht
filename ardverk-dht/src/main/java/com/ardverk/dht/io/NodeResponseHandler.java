@@ -1,13 +1,13 @@
 package com.ardverk.dht.io;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.io.Serializable;
+import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.NavigableMap;
+import java.util.NavigableSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncFuture;
@@ -22,7 +22,6 @@ import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
-import com.ardverk.dht.utils.XorComparator;
 
 public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
     
@@ -141,9 +140,20 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         
         private final KUID key;
         
-        private final NavigableMap<KUID, Contact> respones;
+        /**
+         * A {@link Set} of all responses
+         */
+        private final NavigableSet<Contact> responses;
         
-        private final QueryPath query;
+        /**
+         * A {@link Set} of the k-closest responses
+         */
+        private final NavigableSet<Contact> closest;
+        
+        /**
+         * A {@link Set} of {@link Contact}s to query
+         */
+        private final NavigableSet<Contact> query;
         
         private final TimeCounter responseCounter = new TimeCounter();
         
@@ -161,20 +171,22 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
             Contact localhost = routeTable.getLocalhost();
             KUID contactId = localhost.getContactId();
             
-            this.respones = new TreeMap<KUID, Contact>(
-                    new XorComparator(key));
-            
-            this.query = new QueryPath(contactId, key);
+            XorComparator comparator = new XorComparator(key);
+            this.responses = new TreeSet<Contact>(comparator);
+            this.closest = new TreeSet<Contact>(comparator);
+            this.query = new QueryPath(comparator, contactId);
             
             this.routeTable = routeTable;
             this.key = key;
             
             Contact[] contacts = routeTable.select(key);
             
-            if (0 < contacts.length) {
-                for (Contact contact : contacts) {
-                    query.add(contact);
-                }
+            for (Contact contact : contacts) {
+                query.add(contact);
+            }
+            
+            if (!query.isEmpty()) {
+                addToResponses(localhost);
             }
         }
         
@@ -182,15 +194,12 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
                 long time, TimeUnit unit) {
             responseCounter.addTime(time, unit);
             
-            Contact src = response.getContact();
-            respones.put(src.getContactId(), src);
+            addToResponses(response.getContact());
             
             Contact[] contacts = response.getContacts();
             for (Contact contact : contacts) {
                 if (query.add(contact)) {
                     routeTable.add(contact);
-                } else if (DefaultMessageDispatcher.foo != null && DefaultMessageDispatcher.foo.equals(contact.getContactId())) {
-                    //System.out.println("BOOM: " + src + "\n" + contact + "\n" + Arrays.toString(contacts));
                 }
             }
         }
@@ -209,45 +218,47 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         }
         
         public Contact[] getContacts() {
-            Contact localhost = routeTable.getLocalhost();
-            //respones.put(localhost.getContactId(), localhost);
-            return respones.values().toArray(new Contact[0]);
+            return responses.toArray(new Contact[0]);
         }
         
-        private boolean isCloserThanClosest(Contact contact) {
-            Map.Entry<KUID, Contact> entry = respones.firstEntry();
-            if (entry == null) {
+        private boolean addToResponses(Contact contact) {
+            if (responses.add(contact)) {
+                closest.add(contact);
+                
+                if (closest.size() > routeTable.getK()) {
+                    closest.pollLast();
+                }
                 return true;
             }
+            return false;
+        }
+        
+        private boolean isCloserThanClosest(Contact other) {
+            if (!closest.isEmpty()) {
+                Contact contact = closest.last();
+                KUID contactId = contact.getContactId();
+                KUID otherId = other.getContactId();
+                return otherId.isCloserTo(key, contactId);
+            }
             
-            KUID closestId = entry.getKey();
-            /*Contact localhost = routeTable.getLocalhost();
-            if (closestId.equals(localhost.getContactId())) {
-                return true;
-            }*/
-            
-            
-            KUID contactId = contact.getContactId();
-            return contactId.isCloserTo(key, closestId);
+            return true;
         }
         
         public boolean hasNext() {
-            Contact contact = query.get();
-            
-            /*if (contact != null && (respones.size() < routeTable.getK() 
-                    || isCloserThanClosest(contact) || EXHAUSTIVE)) {
-                return true;
-            }*/
-            
-            if (contact != null && (isCloserThanClosest(contact) || EXHAUSTIVE)) {
-                return true;
+            if (!query.isEmpty()) {
+                Contact contact = query.first();
+                if (responses.size() < routeTable.getK() 
+                        || isCloserThanClosest(contact) 
+                        || EXHAUSTIVE) {
+                    return true;
+                }
             }
             
             return false;
         }
         
         public Contact next() {
-            Contact contact = query.poll();
+            Contact contact = query.pollFirst();
             if (contact == null) {
                 throw new NoSuchElementException();
             }
@@ -327,53 +338,55 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         }
     }
     
-    private static class QueryPath {
+    private static class QueryPath extends TreeSet<Contact> {
+        
+        private static final long serialVersionUID = -8700866833637036503L;
         
         private final Set<KUID> history = new HashSet<KUID>();
         
-        private final NavigableMap<KUID, Contact> query;
-        
-        public QueryPath(KUID contactId, KUID key) {
+        public QueryPath(Comparator<? super Contact> c, KUID contactId) {
+            super(c);
+            
             if (contactId == null) {
                 throw new NullPointerException("contactId");
             }
             
             history.add(contactId);
-            this.query = new TreeMap<KUID, Contact>(new XorComparator(key));
         }
         
-        public boolean contains(Contact contact) {
-            return history.contains(contact.getContactId());
-        }
-        
-        public boolean isEmpty() {
-            return query.isEmpty();
-        }
-        
+        @Override
         public boolean add(Contact contact) {
             KUID contactId = contact.getContactId();
             
             if (history.add(contactId)) {
-                query.put(contactId, contact);
+                super.add(contact);
                 return true;
             }
             
             return false; 
         }
+    }
+    
+    /**
+     * 
+     */
+    private static class XorComparator implements Comparator<Contact>, Serializable {
         
-        public Contact get() {
-            Map.Entry<KUID, Contact> entry = query.firstEntry();
-            return entry != null ? entry.getValue() : null;
-        }
+        private static final long serialVersionUID = -7543333434594933816L;
         
-        public Contact poll() {
-            Map.Entry<KUID, Contact> entry = query.pollFirstEntry();
-            return entry != null ? entry.getValue() : null;
+        private final KUID key;
+        
+        public XorComparator(KUID key) {
+            if (key == null) {
+                throw new NullPointerException("key");
+            }
+            
+            this.key = key;
         }
         
         @Override
-        public String toString() {
-            return query.keySet().toString();
+        public int compare(Contact o1, Contact o2) {
+            return o1.getContactId().xor(key).compareTo(o2.getContactId().xor(key));
         }
     }
     
