@@ -10,4 +10,6 @@ public interface NodeEntity extends Entity {
     public AsyncFuture<StoreEntity> store(KUID key, byte[] value);
     
     public Contact[] getContacts();
+    
+    public int getHops();
 }

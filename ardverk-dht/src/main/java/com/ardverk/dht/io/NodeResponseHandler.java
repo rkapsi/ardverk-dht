@@ -3,7 +3,9 @@ package com.ardverk.dht.io;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.NavigableSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -84,13 +86,15 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         int count = lookupCounter.getCount();
         if (count == 0) {
             Contact[] contacts = lookupManager.getContacts();
+            int hops = lookupManager.getHops();
             long time = lookupManager.getTimeInMillis();
             
             if (contacts.length == 0) {
                 setException(new IOException());                
             } else {
                 setValue(new DefaultNodeEntity(
-                        contacts, time, TimeUnit.MILLISECONDS));
+                        contacts, hops, 
+                        time, TimeUnit.MILLISECONDS));
             }
         }
     }
@@ -123,7 +127,7 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         //System.out.println("TIMEOUT: " + request);
         
         try {
-            lookupManager.handleTimeout(time, unit);
+            lookupManager.handleTimeout(request, time, unit);
         } finally {
             process(1);
         }
@@ -159,6 +163,13 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         
         private final TimeCounter timeoutCounter = new TimeCounter();
         
+        /**
+         * 
+         */
+        private final Map<KUID, Integer> hopsMap = new HashMap<KUID, Integer>();
+        
+        private int hops = 0;
+        
         public LookupManager(RouteTable routeTable, KUID key) {
             if (routeTable == null) {
                 throw new NullPointerException("routeTable");
@@ -182,10 +193,11 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
             Contact[] contacts = routeTable.select(key);
             
             for (Contact contact : contacts) {
-                query.add(contact);
+                addToQuery(contact, hops+1);
             }
             
             if (!query.isEmpty()) {
+                hopsMap.put(contactId, hops);
                 addToResponses(localhost);
             }
         }
@@ -198,14 +210,19 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
             
             Contact[] contacts = response.getContacts();
             for (Contact contact : contacts) {
-                if (query.add(contact)) {
+                if (addToQuery(contact, hops+1)) {
                     routeTable.add(contact);
                 }
             }
         }
         
-        public void handleTimeout(long time, TimeUnit unit) {
+        public void handleTimeout(RequestMessage request, 
+                long time, TimeUnit unit) {
             timeoutCounter.addTime(time, unit);
+            
+            Contact contact = request.getContact();
+            KUID contactId = contact.getContactId();
+            hopsMap.remove(contactId);
         }
         
         public long getTime(TimeUnit unit) {
@@ -221,6 +238,10 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
             return responses.toArray(new Contact[0]);
         }
         
+        public int getHops() {
+            return hops;
+        }
+        
         private boolean addToResponses(Contact contact) {
             if (responses.add(contact)) {
                 closest.add(contact);
@@ -228,6 +249,25 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
                 if (closest.size() > routeTable.getK()) {
                     closest.pollLast();
                 }
+                
+                Integer hops = hopsMap.remove(contact.getContactId());
+                if (hops != null) {
+                    this.hops = hops;
+                }
+                
+                return true;
+            }
+            return false;
+        }
+        
+        private boolean addToQuery(Contact contact, int hop) {
+            if (query.add(contact)) {
+                
+                KUID contactId = contact.getContactId();
+                if (!hopsMap.containsKey(contactId)) {
+                    hopsMap.put(contactId, hop);
+                }
+                
                 return true;
             }
             return false;

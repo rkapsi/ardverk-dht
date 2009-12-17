@@ -164,7 +164,7 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
             AsyncFuture<NodeEntity> future = bla.lookup(contactId);
             NodeEntity entity = future.get();
             System.out.println(index + "-b: " + contactId 
-                    + " -> " + entity.getContacts().length 
+                    + " -> " + entity + ", " + entity.getContacts().length 
                     + " @ " + entity.getContacts()[0]);
             
             /*System.out.println(index + "-c: " + contactId 

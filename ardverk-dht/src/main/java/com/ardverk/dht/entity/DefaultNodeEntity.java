@@ -19,7 +19,9 @@ public class DefaultNodeEntity extends AbstractEntity implements NodeEntity {
     
     private final Contact[] contacts;
     
-    public DefaultNodeEntity(Contact[] contacts, long time, TimeUnit unit) {
+    private final int hops;
+    
+    public DefaultNodeEntity(Contact[] contacts, int hops, long time, TimeUnit unit) {
         super(time, unit);
         
         if (contacts == null) {
@@ -27,6 +29,7 @@ public class DefaultNodeEntity extends AbstractEntity implements NodeEntity {
         }
         
         this.contacts = contacts;
+        this.hops = hops;
     }
     
     @Override
@@ -39,5 +42,15 @@ public class DefaultNodeEntity extends AbstractEntity implements NodeEntity {
     @Override
     public Contact[] getContacts() {
         return contacts;
+    }
+
+    @Override
+    public int getHops() {
+        return hops;
+    }
+    
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + " (" + hops + ", " + time + ", " + unit + ")";
     }
 }

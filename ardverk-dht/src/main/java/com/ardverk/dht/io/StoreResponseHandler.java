@@ -22,6 +22,11 @@ public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
         public Contact[] getContacts() {
             return null;
         }
+        
+        @Override
+        public int getHops() {
+            return 0;
+        }
 
         @Override
         public AsyncFuture<StoreEntity> store(KUID key, byte[] value) {
