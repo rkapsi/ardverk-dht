@@ -118,7 +118,7 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
     
     public static void main(String[] args) throws IOException, InterruptedException, ExecutionException {
         List<SimpleDHT> list = new ArrayList<SimpleDHT>();
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 200; i++) {
             list.add(new SimpleDHT(2000 + i));
         }
         

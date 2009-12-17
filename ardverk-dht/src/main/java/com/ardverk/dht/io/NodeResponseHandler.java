@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.NavigableSet;
 import java.util.NoSuchElementException;
@@ -71,6 +70,9 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
                 
                 lookupCounter.push();
             }
+        } catch (IOException err) {
+            err.printStackTrace();
+            throw err;
         } finally {
             postProcess();
         }
@@ -86,7 +88,7 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         int count = lookupCounter.getCount();
         if (count == 0) {
             Contact[] contacts = lookupManager.getContacts();
-            int hops = lookupManager.getHops();
+            int hops = lookupManager.getCurrentHop();
             long time = lookupManager.getTimeInMillis();
             
             if (contacts.length == 0) {
@@ -159,16 +161,17 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
          */
         private final NavigableSet<Contact> query;
         
+        /**
+         * 
+         */
+        private final Map<KUID, Integer> history 
+            = new HashMap<KUID, Integer>();
+        
         private final TimeCounter responseCounter = new TimeCounter();
         
         private final TimeCounter timeoutCounter = new TimeCounter();
         
-        /**
-         * 
-         */
-        private final Map<KUID, Integer> hopsMap = new HashMap<KUID, Integer>();
-        
-        private int hops = 0;
+        private int currentHop = 0;
         
         public LookupManager(RouteTable routeTable, KUID key) {
             if (routeTable == null) {
@@ -185,20 +188,20 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
             XorComparator comparator = new XorComparator(key);
             this.responses = new TreeSet<Contact>(comparator);
             this.closest = new TreeSet<Contact>(comparator);
-            this.query = new QueryPath(comparator, contactId);
+            this.query = new TreeSet<Contact>(comparator);
             
             this.routeTable = routeTable;
             this.key = key;
             
             Contact[] contacts = routeTable.select(key);
             
-            for (Contact contact : contacts) {
-                addToQuery(contact, hops+1);
-            }
-            
-            if (!query.isEmpty()) {
-                hopsMap.put(contactId, hops);
+            if (0 < contacts.length) {
+                history.put(contactId, 0);
                 addToResponses(localhost);
+                
+                for (Contact contact : contacts) {
+                    addToQuery(contact, 1);
+                }
             }
         }
         
@@ -210,7 +213,7 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
             
             Contact[] contacts = response.getContacts();
             for (Contact contact : contacts) {
-                if (addToQuery(contact, hops+1)) {
+                if (addToQuery(contact, currentHop+1)) {
                     routeTable.add(contact);
                 }
             }
@@ -219,10 +222,6 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         public void handleTimeout(RequestMessage request, 
                 long time, TimeUnit unit) {
             timeoutCounter.addTime(time, unit);
-            
-            Contact contact = request.getContact();
-            KUID contactId = contact.getContactId();
-            hopsMap.remove(contactId);
         }
         
         public long getTime(TimeUnit unit) {
@@ -238,8 +237,8 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
             return responses.toArray(new Contact[0]);
         }
         
-        public int getHops() {
-            return hops;
+        public int getCurrentHop() {
+            return currentHop;
         }
         
         private boolean addToResponses(Contact contact) {
@@ -250,10 +249,8 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
                     closest.pollLast();
                 }
                 
-                Integer hops = hopsMap.remove(contact.getContactId());
-                if (hops != null) {
-                    this.hops = hops;
-                }
+                KUID contactId = contact.getContactId();
+                currentHop = history.get(contactId);
                 
                 return true;
             }
@@ -261,15 +258,13 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         }
         
         private boolean addToQuery(Contact contact, int hop) {
-            if (query.add(contact)) {
-                
-                KUID contactId = contact.getContactId();
-                if (!hopsMap.containsKey(contactId)) {
-                    hopsMap.put(contactId, hop);
-                }
-                
+            KUID contactId = contact.getContactId();
+            if (!history.containsKey(contactId)) { 
+                history.put(contactId, hop);
+                query.add(contact);
                 return true;
             }
+            
             return false;
         }
         
@@ -375,35 +370,6 @@ public class NodeResponseHandler extends ResponseHandler<NodeEntity> {
         @Override
         public String toString() {
             return getTimeInMillis() + " ms @ " + getCount();
-        }
-    }
-    
-    private static class QueryPath extends TreeSet<Contact> {
-        
-        private static final long serialVersionUID = -8700866833637036503L;
-        
-        private final Set<KUID> history = new HashSet<KUID>();
-        
-        public QueryPath(Comparator<? super Contact> c, KUID contactId) {
-            super(c);
-            
-            if (contactId == null) {
-                throw new NullPointerException("contactId");
-            }
-            
-            history.add(contactId);
-        }
-        
-        @Override
-        public boolean add(Contact contact) {
-            KUID contactId = contact.getContactId();
-            
-            if (history.add(contactId)) {
-                super.add(contact);
-                return true;
-            }
-            
-            return false; 
         }
     }
     
