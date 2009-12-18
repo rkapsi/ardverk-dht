@@ -2,7 +2,10 @@ package com.ardverk.dht.io;
 
 import java.io.IOException;
 
+import com.ardverk.dht.KUID;
+import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.RequestMessage;
+import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.message.StoreRequest;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
@@ -34,5 +37,14 @@ public class StoreRequestHandler extends RequestHandler {
     @Override
     public void handleRequest(RequestMessage message) throws IOException {
         StoreRequest request = (StoreRequest)message;
+        
+        KUID key = request.getKey();
+        byte[] value = request.getValue();
+        
+        database.put(key, value);
+        
+        MessageFactory factory = messageDispatcher.getMessageFactory();
+        ResponseMessage response = factory.createStoreResponse(request);
+        messageDispatcher.send(response);
     }
 }

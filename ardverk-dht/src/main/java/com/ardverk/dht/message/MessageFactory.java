@@ -23,5 +23,9 @@ public interface MessageFactory {
     
     public ValueRequest createValueRequest(Contact dst, KUID key);
     
-    public ValueResponse createValueResponse(LookupRequest request);
+    public ValueResponse createValueResponse(LookupRequest request, byte[] value);
+    
+    public StoreRequest createStoreRequest(Contact dst, KUID key, byte[] value);
+    
+    public StoreResponse createStoreResponse(StoreRequest request);
 }

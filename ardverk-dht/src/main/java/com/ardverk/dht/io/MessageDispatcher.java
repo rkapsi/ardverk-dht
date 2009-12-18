@@ -27,6 +27,10 @@ import com.ardverk.dht.message.PingRequest;
 import com.ardverk.dht.message.PingResponse;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
+import com.ardverk.dht.message.StoreRequest;
+import com.ardverk.dht.message.StoreResponse;
+import com.ardverk.dht.message.ValueRequest;
+import com.ardverk.dht.message.ValueResponse;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.logging.LoggerUtils;
 import com.ardverk.utils.ExecutorUtils;
@@ -341,6 +345,11 @@ public abstract class MessageDispatcher implements Closeable {
                 return response instanceof PingResponse;
             } else if (request instanceof NodeRequest) {
                 return response instanceof NodeResponse;
+            } else if (request instanceof ValueRequest) {
+                return response instanceof ValueResponse 
+                    || response instanceof NodeResponse;
+            } else if (request instanceof StoreRequest) {
+                return response instanceof StoreResponse;
             }
             
             return false;

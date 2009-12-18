@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.message.MessageFactory;
-import com.ardverk.dht.message.NodeResponse;
 import com.ardverk.dht.message.RequestMessage;
+import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.message.ValueRequest;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
@@ -40,10 +40,18 @@ public class ValueRequestHandler extends RequestHandler {
         ValueRequest request = (ValueRequest)message;
         
         KUID key = request.getKey();
+        byte[] value = database.get(key);
         
-        Contact[] contacts = routeTable.select(key);
         MessageFactory factory = messageDispatcher.getMessageFactory();
-        NodeResponse response = factory.createNodeResponse(request, contacts);
+        ResponseMessage response = null;
+        
+        if (value != null) {
+            response = factory.createValueResponse(request, value);
+        } else {
+            Contact[] contacts = routeTable.select(key);
+            response = factory.createNodeResponse(request, contacts);
+        }
+        
         messageDispatcher.send(response);
     }
 }

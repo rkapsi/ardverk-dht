@@ -28,7 +28,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity> extends Resp
     
     private final LookupManager lookupManager;
     
-    private final LookupCounter lookupCounter;
+    private final MaxStackCounter lookupCounter;
     
     private final long timeout = 3L;
     
@@ -46,7 +46,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity> extends Resp
         super(messageDispatcher);
         
         lookupManager = new LookupManager(routeTable, key);
-        lookupCounter = new LookupCounter(alpha);
+        lookupCounter = new MaxStackCounter(alpha);
     }
 
     @Override
@@ -345,46 +345,6 @@ public abstract class LookupResponseHandler<T extends LookupEntity> extends Resp
                 throw new NoSuchElementException();
             }
             return contact;
-        }
-    }
-    
-    /**
-     * 
-     */
-    private static class LookupCounter {
-        
-        private final int max;
-        
-        private int counter = 0;
-        
-        public LookupCounter(int max) {
-            if (max < 0) {
-                throw new IllegalArgumentException("max=" + max);
-            }
-            
-            this.max = max;
-        }
-        
-        public boolean hasNext() {
-            return counter < max;
-        }
-        
-        public boolean push() {
-            if (counter < max) {
-                ++counter;
-                return true;
-            }
-            return false;
-        }
-        
-        public void pop() {
-            if (0 < counter) {
-                --counter;
-            }
-        }
-        
-        public int getCount() {
-            return counter;
         }
     }
     

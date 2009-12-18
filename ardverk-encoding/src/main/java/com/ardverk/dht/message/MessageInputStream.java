@@ -154,21 +154,25 @@ class MessageInputStream extends BencodingInputStream {
     
     private ValueRequest readValueRequest(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
-        throw new IOException();
+        KUID key = readKUID();
+        return new DefaultValueRequest(messageId, contact, address, key);
     }
     
     private ValueResponse readValueResponse(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
-        throw new IOException();
+        byte[] value = readBytes();
+        return new DefaultValueResponse(messageId, contact, address, value);
     }
     
     private StoreRequest readStoreRequest(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
-        throw new IOException();
+        KUID key = readKUID();
+        byte[] value = readBytes();
+        return new DefaultStoreRequest(messageId, contact, address, key, value);
     }
     
     private StoreResponse readStoreResponse(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
-        throw new IOException();
+        return new DefaultStoreResponse(messageId, contact, address);
     }
 }

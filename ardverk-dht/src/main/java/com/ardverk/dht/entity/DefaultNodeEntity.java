@@ -48,6 +48,16 @@ public class DefaultNodeEntity extends AbstractEntity implements NodeEntity {
     }
     
     @Override
+    public Contact getContact(int index) {
+        return contacts[index];
+    }
+
+    @Override
+    public int size() {
+        return contacts.length;
+    }
+
+    @Override
     public Contact[] getContacts() {
         return contacts;
     }

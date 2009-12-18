@@ -138,12 +138,16 @@ class MessageOutputStream extends BencodingOutputStream {
     }
     
     private void writeValueRequest(ValueRequest message) throws IOException {
+        writeKUID(message.getKey());
     }
     
     private void writeValueResponse(ValueResponse message) throws IOException {
+        writeBytes(message.getValue());
     }
     
     private void writeStoreRequest(StoreRequest message) throws IOException {
+        writeKUID(message.getKey());
+        writeBytes(message.getValue());
     }
     
     private void writeStoreResponse(StoreResponse message) throws IOException {

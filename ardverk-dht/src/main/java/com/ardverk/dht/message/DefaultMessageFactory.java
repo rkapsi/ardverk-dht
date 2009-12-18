@@ -59,9 +59,22 @@ public class DefaultMessageFactory extends AbstractMessageFactory {
     }
 
     @Override
-    public ValueResponse createValueResponse(LookupRequest request) {
+    public ValueResponse createValueResponse(LookupRequest request, byte[] value) {
         MessageId messageId = request.getMessageId();
         Contact destination = request.getContact();
-        return new DefaultValueResponse(messageId, contact, destination);
+        return new DefaultValueResponse(messageId, contact, destination, value);
+    }
+
+    @Override
+    public StoreRequest createStoreRequest(Contact dst, KUID key, byte[] value) {
+        MessageId messageId = createMessageId(dst.getRemoteAddress());
+        return new DefaultStoreRequest(messageId, contact, dst, key, value);
+    }
+
+    @Override
+    public StoreResponse createStoreResponse(StoreRequest request) {
+        MessageId messageId = request.getMessageId();
+        Contact destination = request.getContact();
+        return new DefaultStoreResponse(messageId, contact, destination);
     }
 }

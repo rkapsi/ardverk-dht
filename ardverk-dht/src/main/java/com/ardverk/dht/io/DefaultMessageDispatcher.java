@@ -38,6 +38,7 @@ import com.ardverk.dht.routing.DefaultContactFactory;
 import com.ardverk.dht.routing.DefaultRouteTable;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
+import com.ardverk.dht.storage.DefaultDatabase;
 import com.ardverk.logging.LoggerUtils;
 
 public class DefaultMessageDispatcher extends MessageDispatcher {
@@ -219,7 +220,7 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
                     CONTACT_FACTORY, K, contactId, 
                     0, new InetSocketAddress("localhost", port));
             
-            database = new Database() {};
+            database = new DefaultDatabase();
             
             Contact contact = routeTable.getLocalhost();
             
