@@ -5,17 +5,35 @@ import java.net.SocketAddress;
 
 import org.ardverk.concurrent.AsyncFuture;
 
-import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.StoreEntity;
+import com.ardverk.dht.entity.ValueEntity;
+import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.RouteTable;
+import com.ardverk.dht.storage.Database;
 
 /**
  * 
  */
 interface DHT {
 
+    /**
+     * 
+     */
+    public Transport getTransport();
+    
+    /**
+     * 
+     */
+    public RouteTable getRouteTable();
+    
+    /**
+     * 
+     */
+    public Database getDatabase();
+    
     /**
      * 
      */

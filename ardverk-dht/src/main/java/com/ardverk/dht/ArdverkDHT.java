@@ -2,147 +2,164 @@ package com.ardverk.dht;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
 import org.ardverk.concurrent.AsyncFuture;
+import org.ardverk.concurrent.AsyncProcess;
 
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.entity.ValueEntity;
+import com.ardverk.dht.io.DefaultMessageDispatcher;
+import com.ardverk.dht.io.MessageDispatcher;
+import com.ardverk.dht.io.NodeResponseHandler;
+import com.ardverk.dht.io.PingResponseHandler;
+import com.ardverk.dht.io.StoreResponseHandler;
+import com.ardverk.dht.io.mina.MinaTransport;
 import com.ardverk.dht.io.transport.Transport;
-import com.ardverk.dht.io.transport.TransportListener;
-import com.ardverk.dht.message.Message;
+import com.ardverk.dht.message.BencodeMessageCodec;
+import com.ardverk.dht.message.DefaultMessageFactory;
+import com.ardverk.dht.message.MessageCodec;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.ContactFactory;
+import com.ardverk.dht.routing.DefaultContactFactory;
+import com.ardverk.dht.routing.DefaultRouteTable;
+import com.ardverk.dht.routing.RouteTable;
+import com.ardverk.dht.storage.Database;
+import com.ardverk.dht.storage.DefaultDatabase;
 
-public class ArdverkDHT extends AbstractDHT implements DHT, Closeable {
+public class ArdverkDHT extends AbstractDHT implements Closeable {
 
+    private static final int K = 20;
+    
+    private static final int KEY_SIZE = 20;
+    
+    private static final int MESSAGE_ID_SIZE = 20;
+    
+    private static final KeyFactory KEY_FACTORY 
+        = new DefaultKeyFactory(KEY_SIZE);
+    
+    private static final ContactFactory CONTACT_FACTORY 
+        = new DefaultContactFactory(KEY_FACTORY);
+
+    private static final MessageCodec CODEC 
+        = new BencodeMessageCodec();
+    
+    private final RequestManager requestManager = new RequestManager();
+    
+    private final KUID contactId = KEY_FACTORY.createRandomKey();
+    
     private final Transport transport;
 
-    private final KeyFactory keyFactory;
+    private final RouteTable routeTable;
+    
+    private final Database database;
     
     private final MessageFactory messageFactory;
-
-    private final NodeManager nodeManager 
-        = new NodeManager(this);
-
-    private final TransportListener transportListener
-            = new TransportListener() {
-        @Override
-        public void received(SocketAddress src, byte[] message)
-                throws IOException {
-            //Message msg = messageFactory.decode(src, message);
-            //handleMessage(src, msg);
-        }
-    };
     
-    public ArdverkDHT(Transport transport, 
-            KeyFactory keyFactory, 
-            MessageFactory messageFactory, 
-            KUID nodeId) {
+    private final MessageDispatcher messageDispatcher;
+    
+    public ArdverkDHT(int port) throws IOException {
+        ContactPinger pinger = new ContactPinger() {
+            @Override
+            public AsyncFuture<PingEntity> ping(Contact contact) {
+                return ArdverkDHT.this.ping(contact);
+            }
+        };
         
-        if (transport == null) {
-            throw new NullPointerException("transport");
-        }
+        transport = new MinaTransport(new InetSocketAddress(port));
         
-        if (keyFactory == null) {
-            throw new NullPointerException("keyFactory");
-        }
-        if (messageFactory == null) {
-            throw new NullPointerException("messageFactory");
-        }
+        routeTable = new DefaultRouteTable(pinger, 
+                CONTACT_FACTORY, K, contactId, 
+                0, new InetSocketAddress("localhost", port));
         
-        if (nodeId == null) {
-            throw new NullPointerException("nodeId");
-        }
+        database = new DefaultDatabase();
         
-        this.transport = transport;
-        this.keyFactory = keyFactory;
-        this.messageFactory = messageFactory;
+        Contact contact = routeTable.getLocalhost();
+        messageFactory = new DefaultMessageFactory(
+                MESSAGE_ID_SIZE, contact);
         
-        nodeManager.add(nodeId);
-        transport.addTransportListener(transportListener);
+        messageDispatcher = new DefaultMessageDispatcher(
+                transport, messageFactory, CODEC, 
+                routeTable, database);
     }
     
     @Override
-    public void close() {
-        transport.removeTransportListener(transportListener);
-        nodeManager.close();
+    public Database getDatabase() {
+        return database;
     }
     
+    @Override
+    public RouteTable getRouteTable() {
+        return routeTable;
+    }
+    
+    @Override
     public Transport getTransport() {
         return transport;
     }
-    
-    public KeyFactory getKeyFactory() {
-        return keyFactory;
-    }
-    
-    public Node addNode(KUID nodeId) {
-        return nodeManager.add(nodeId);
-    }
-    
-    public Node removeNode(KUID nodeId) {
-        return nodeManager.remove(nodeId);
-    }
-    
-    public Node getNode(KUID nodeId) {
-        return nodeManager.get(nodeId);
-    }
-    
-    public Node[] getNodes() {
-        return nodeManager.getNodes();
-    }
-    
+
     @Override
-    public Contact getContact(KUID contactId) {
-        for (Node node : nodeManager.getNodes()) {
-            Contact contact = node.getContact(contactId);
-            if (contact != null) {
-                return contact;
-            }
+    public void close() {
+        if (requestManager != null) {
+            requestManager.close();
         }
-        
-        return null;
     }
 
     @Override
-    public AsyncFuture<PingEntity> ping(SocketAddress dst) {
-        return getRandomNode().ping(dst);
+    public Contact getContact(KUID contactId) {
+        return routeTable.get(contactId);
     }
     
     @Override
     public AsyncFuture<PingEntity> ping(Contact contact) {
-        // TODO: Need reference to Node. I guess we could use
-        // also a random Node to send the ping but it would be
-        // overall better to send the ping from the Node that
-        // is managing the given Contact.
-        return null;
+        AsyncProcess<PingEntity> process 
+            = new PingResponseHandler(messageDispatcher, contact);
+        return requestManager.submit(process);
+    }
+
+    @Override
+    public AsyncFuture<PingEntity> ping(InetAddress address, int port) {
+        AsyncProcess<PingEntity> process 
+            = new PingResponseHandler(messageDispatcher, address, port);
+        return requestManager.submit(process);
+    }
+
+    @Override
+    public AsyncFuture<PingEntity> ping(SocketAddress dst) {
+        AsyncProcess<PingEntity> process 
+            = new PingResponseHandler(messageDispatcher, dst);
+        return requestManager.submit(process);
+    }
+
+    @Override
+    public AsyncFuture<PingEntity> ping(String address, int port) {
+        AsyncProcess<PingEntity> process 
+            = new PingResponseHandler(messageDispatcher, address, port);
+        return requestManager.submit(process);
     }
 
     @Override
     public AsyncFuture<StoreEntity> put(KUID key, byte[] value) {
-        return nodeManager.select(key).put(key, value);
+        AsyncProcess<StoreEntity> process 
+            = new StoreResponseHandler(messageDispatcher, null, key, value);
+        return requestManager.submit(process);
     }
     
     @Override
     public AsyncFuture<ValueEntity> get(KUID key) {
-        return nodeManager.select(key).get(key);
+        AsyncProcess<ValueEntity> process = null;
+        return requestManager.submit(process);
     }
-    
+
     @Override
     public AsyncFuture<NodeEntity> lookup(KUID key) {
-        return nodeManager.select(key).lookup(key);
-    }
-    
-    private Node getRandomNode() {
-        KUID randomId = keyFactory.createRandomKey();
-        return nodeManager.select(randomId);
-    }
-    
-    private void handleMessage(SocketAddress src, 
-            Message message) throws IOException {
-        
+        AsyncProcess<NodeEntity> process 
+            = new NodeResponseHandler(messageDispatcher, routeTable, key);
+        return requestManager.submit(process);
     }
 }

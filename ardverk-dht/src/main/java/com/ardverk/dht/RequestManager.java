@@ -21,10 +21,6 @@ class RequestManager implements Closeable {
                 AsyncExecutors.defaultThreadFactory(
                         "RequestManagerThread"));
     
-    static {
-        
-    }
-    
     private boolean open = true;
     
     private final Map<Integer, AsyncFuture<?>> futures 
