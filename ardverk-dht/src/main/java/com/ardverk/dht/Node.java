@@ -149,7 +149,7 @@ public class Node implements DHT, Closeable {
     @Override
     public AsyncFuture<StoreEntity> put(KUID key, byte[] value) {
         AsyncProcess<StoreEntity> process 
-            = new StoreResponseHandler(messageDispatcher, key, value);
+            = new StoreResponseHandler(messageDispatcher, null, key, value);
         return requestManager.submit(process);
     }
     

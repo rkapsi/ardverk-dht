@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import org.ardverk.concurrent.AsyncFuture;
 
 import com.ardverk.dht.KUID;
+import com.ardverk.dht.entity.DefaultStoreEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.message.MessageFactory;
@@ -59,6 +60,8 @@ public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
     private final List<StoreResponse> responses 
         = new ArrayList<StoreResponse>();
     
+    private long startTime = -1L;
+    
     public StoreResponseHandler(
             MessageDispatcher messageDispatcher, 
             NodeEntity entity, KUID key, byte[] value) {
@@ -102,13 +105,25 @@ public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
     }
     
     private synchronized void preProcess(int pop) {
+        if (startTime == -1L) {
+            startTime = System.currentTimeMillis();
+        }
+        
         while (0 < pop--) {
             counter.pop();
         }
     }
     
     private synchronized void postProcess() {
-        
+        if (counter.getCount() == 0) {
+            StoreResponse[] values = responses.toArray(new StoreResponse[0]);
+            if (values.length == 0) {
+                setException(new IOException());
+            } else {
+                long time = System.currentTimeMillis() - startTime;
+                setValue(new DefaultStoreEntity(time, TimeUnit.MILLISECONDS));
+            }
+        }
     }
     
     private void store(Contact dst) throws IOException {
@@ -123,7 +138,7 @@ public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
         StoreResponse message = (StoreResponse)response;
         
         try {
-            
+            responses.add(message);
         } finally {
             process(1);
         }
@@ -132,13 +147,7 @@ public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
     @Override
     protected void processTimeout(RequestMessage request, 
             long time, TimeUnit unit) throws IOException {
-        //setException(new TimeoutIoException(request, time, unit));
-        
-        try {
-            
-        } finally {
-            process(1);
-        }
+        process(1);
     }
     
     private static class StoreManager {

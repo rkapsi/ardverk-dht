@@ -20,6 +20,8 @@ import com.ardverk.dht.KUID;
 import com.ardverk.dht.KeyFactory;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
+import com.ardverk.dht.entity.StoreEntity;
+import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.io.mina.MinaTransport;
 import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.message.BencodeMessageCodec;
@@ -256,6 +258,18 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
         public AsyncFuture<NodeEntity> lookup(KUID key) {
             AsyncProcess<NodeEntity> process 
                 = new NodeResponseHandler(messageDispatcher, routeTable, key);
+            return EXECUTOR.submit(process, 30L, TimeUnit.SECONDS);
+        }
+        
+        public AsyncFuture<ValueEntity> get(KUID key) {
+            AsyncProcess<ValueEntity> process 
+                = new ValueResponseHandler(messageDispatcher, routeTable, key);
+            return EXECUTOR.submit(process, 30L, TimeUnit.SECONDS);
+        }
+        
+        public AsyncFuture<StoreEntity> put(NodeEntity entity, KUID key, byte[] value) {
+            AsyncProcess<StoreEntity> process 
+                = new StoreResponseHandler(messageDispatcher, entity, key, value);
             return EXECUTOR.submit(process, 30L, TimeUnit.SECONDS);
         }
     }
