@@ -1,41 +1,48 @@
 package com.ardverk.dht.io;
 
 /**
- * 
+ * TODO: Find a better name for this
  */
 class MaxStackCounter {
     
-    private final int max;
+    private final int maxStack;
     
-    private int counter = 0;
+    private int stack = 0;
     
-    public MaxStackCounter(int max) {
-        if (max < 0) {
-            throw new IllegalArgumentException("max=" + max);
+    private int count = 0;
+    
+    public MaxStackCounter(int maxStack) {
+        if (maxStack < 0) {
+            throw new IllegalArgumentException("maxStack=" + maxStack);
         }
         
-        this.max = max;
+        this.maxStack = maxStack;
     }
     
     public boolean hasNext() {
-        return counter < max;
+        return stack < maxStack;
     }
     
     public boolean push() {
-        if (counter < max) {
-            ++counter;
+        if (stack < maxStack) {
+            ++stack;
+            ++count;
             return true;
         }
         return false;
     }
     
     public void pop() {
-        if (0 < counter) {
-            --counter;
+        if (0 < stack) {
+            --stack;
         }
     }
     
+    public int getStack() {
+        return stack;
+    }
+    
     public int getCount() {
-        return counter;
+        return count;
     }
 }

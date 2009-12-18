@@ -92,7 +92,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity> extends Resp
      * 
      */
     private synchronized void postProcess() {
-        int count = lookupCounter.getCount();
+        int count = lookupCounter.getStack();
         if (count == 0) {
             State state = getState();
             complete(state);

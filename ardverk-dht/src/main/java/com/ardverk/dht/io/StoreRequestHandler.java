@@ -36,11 +36,14 @@ public class StoreRequestHandler extends RequestHandler {
 
     @Override
     public void handleRequest(RequestMessage message) throws IOException {
+        
         StoreRequest request = (StoreRequest)message;
         
         KUID key = request.getKey();
         byte[] value = request.getValue();
         
+        //System.out.println("STORE: " + routeTable.getLocalhost().getContactId() + " > " + key + " = " + new String(value));
+
         database.put(key, value);
         
         MessageFactory factory = messageDispatcher.getMessageFactory();

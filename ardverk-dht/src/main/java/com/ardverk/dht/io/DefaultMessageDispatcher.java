@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -117,8 +116,6 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
         }
     }
     
-    public static KUID foo = null;
-    
     public static void main(String[] args) throws IOException, InterruptedException, ExecutionException {
         List<SimpleDHT> list = new ArrayList<SimpleDHT>();
         for (int i = 0; i < 200; i++) {
@@ -140,11 +137,6 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
             dht.lookup(dht.getContactId()).get();
         }
         
-        /*for (int i = 0; i < list.size(); i++) {
-            SimpleDHT dht = list.get(i);
-            System.out.println(dht.getRouteTable().select(dht.getContactId(), 1000).length);
-        }*/
-        
         SimpleDHT dht = new SimpleDHT(5000);
         dht.ping("localhost", 2000).get();
         
@@ -152,28 +144,30 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
         KUID contactId = dht.getContactId();
         dht.lookup(contactId).get();
         
-        foo = contactId;
         Thread.sleep(1000L);
         
-        Random generator = new Random();
         for (int i = 0; i < list.size(); i++) {
-            //int index = generator.nextInt(list.size());
-            int index = i;
+            SimpleDHT inst = list.get(i);
             
-            SimpleDHT bla = list.get(index);
-            
-            //System.out.println(index + "-a: " + contactId + " -> " + Arrays.asList(bla.getRouteTable().select(contactId, 1)));
-            
-            AsyncFuture<NodeEntity> future = bla.lookup(contactId);
+            AsyncFuture<NodeEntity> future = inst.lookup(contactId);
             NodeEntity entity = future.get();
-            System.out.println(index + "-b: " + contactId 
+            System.out.println(i + ": " + contactId 
                     + " -> " + entity + ", " + entity.getContacts().length 
                     + " @ " + entity.getContacts()[0]);
-            
-            /*System.out.println(index + "-c: " + contactId 
-                    + " -> " + entity.getContacts().length 
-                    + " @ " + Arrays.asList(entity.getContacts()));*/
         }
+        
+        KUID key = SimpleDHT.KEY_FACTORY.createRandomKey();
+        byte[] value = "Hello World!".getBytes();
+        
+        AsyncFuture<NodeEntity> future = dht.lookup(key);
+        NodeEntity entity = future.get();
+        
+        System.out.println(entity.size());
+        
+        AsyncFuture<StoreEntity> store = dht.put(entity, key, value);
+        StoreEntity storeEntity = store.get();
+        
+        System.out.println(storeEntity);
     }
     
     private static class SimpleDHT {

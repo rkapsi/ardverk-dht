@@ -49,7 +49,7 @@ public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
         }
     };*/
     
-    private final MaxStackCounter counter = new MaxStackCounter(4);
+    private final MaxStackCounter counter = new MaxStackCounter(K / 4);
     
     private final StoreManager storeManager;
     
@@ -61,6 +61,8 @@ public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
         = new ArrayList<StoreResponse>();
     
     private long startTime = -1L;
+    
+    private int total = 0;
     
     public StoreResponseHandler(
             MessageDispatcher messageDispatcher, 
@@ -89,7 +91,7 @@ public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
         try {
             preProcess(pop);
             
-            while (counter.hasNext() && responses.size() < K) {
+            while (counter.hasNext() && counter.getCount() < K) {
                 if (!storeManager.hasNext()) {
                     break;
                 }
@@ -99,6 +101,7 @@ public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
                 
                 counter.push();
             }
+            
         } finally {
             postProcess();
         }
@@ -115,7 +118,7 @@ public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
     }
     
     private synchronized void postProcess() {
-        if (counter.getCount() == 0) {
+        if (counter.getStack() == 0) {
             StoreResponse[] values = responses.toArray(new StoreResponse[0]);
             if (values.length == 0) {
                 setException(new IOException());
@@ -126,14 +129,14 @@ public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
         }
     }
     
-    private void store(Contact dst) throws IOException {
+    private synchronized void store(Contact dst) throws IOException {
         MessageFactory factory = messageDispatcher.getMessageFactory();
         StoreRequest request = factory.createStoreRequest(dst, key, value);
         messageDispatcher.send(this, request, 10L, TimeUnit.SECONDS);
     }
     
     @Override
-    protected void processResponse(RequestMessage request, 
+    protected synchronized void processResponse(RequestMessage request, 
             ResponseMessage response, long time, TimeUnit unit) throws IOException {
         StoreResponse message = (StoreResponse)response;
         
@@ -145,7 +148,7 @@ public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
     }
 
     @Override
-    protected void processTimeout(RequestMessage request, 
+    protected synchronized void processTimeout(RequestMessage request, 
             long time, TimeUnit unit) throws IOException {
         process(1);
     }
