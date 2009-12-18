@@ -169,9 +169,11 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
         
         System.out.println(storeEntity);
         
-        SimpleDHT foo = list.get(list.size()/2);
-        AsyncFuture<ValueEntity> valueFuture = foo.get(key);
-        System.out.println(valueFuture.get().getValueAsString());
+        for (int i = 0; i < 100; i++) {
+            SimpleDHT foo = list.get((int)(Math.random() * list.size()));
+            AsyncFuture<ValueEntity> valueFuture = foo.get(key);
+            System.out.println(valueFuture.get().getValueAsString());
+        }
     }
     
     private static class SimpleDHT {
