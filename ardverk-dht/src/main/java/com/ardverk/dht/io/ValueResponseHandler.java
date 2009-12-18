@@ -21,7 +21,7 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     
     private static final boolean EXHAUSTIVE = false;
     
-    private final List<Object> values = new ArrayList<Object>();
+    private final List<byte[]> values = new ArrayList<byte[]>();
     
     public ValueResponseHandler(MessageDispatcher messageDispatcher,
             RouteTable routeTable, KUID key, int alpha) {
@@ -56,11 +56,11 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     private synchronized void processValueResponse(ValueResponse response, 
             long time, TimeUnit unit) throws IOException {
         
-        values.add(response);
+        values.add(response.getValue());
         
         if (!EXHAUSTIVE) {
             State state = getState();
-            setValue(new DefaultValueEntity(state));
+            setValue(new DefaultValueEntity(state, response.getValue()));
         }
     }
     
@@ -76,15 +76,10 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     @Override
     protected void complete(State state) {
         
-        Contact[] contacts = state.getContacts();
-        int hop = state.getHop();
-        long time = state.getTimeInMillis();
-        
         if (values.isEmpty()) {
-            setException(new NoSuchValueException(
-                    contacts, hop, time, TimeUnit.MILLISECONDS));
+            setException(new NoSuchValueException(state));
         } else {
-            setValue(new DefaultValueEntity(time, TimeUnit.MILLISECONDS));
+            setValue(new DefaultValueEntity(state, values.get(0)));
         }
     }
     
@@ -92,37 +87,26 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
         
         private static final long serialVersionUID = -2753236114164880872L;
 
-        private final Contact[] contacts;
+        private final State state;
         
-        private final int hop;
-        
-        private final long time;
-        
-        private final TimeUnit unit;
-        
-        private NoSuchValueException(Contact[] contacts, int hop, 
-                long time, TimeUnit unit) {
-            
-            this.contacts = contacts;
-            this.hop = hop;
-            this.time = time;
-            this.unit = unit;
+        private NoSuchValueException(State state) {
+            this.state = state;
         }
 
         public Contact[] getContacts() {
-            return contacts;
+            return state.getContacts();
         }
 
         public int getHop() {
-            return hop;
+            return state.getHop();
         }
 
         public long getTime(TimeUnit unit) {
-            return unit.convert(time, this.unit);
+            return state.getTime(unit);
         }
         
         public long getTimeInMillis() {
-            return getTime(TimeUnit.MILLISECONDS);
+            return state.getTimeInMillis();
         }
     }
 }
