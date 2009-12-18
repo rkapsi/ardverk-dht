@@ -24,7 +24,7 @@ public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
         }
         
         @Override
-        public int getHops() {
+        public int getHop() {
             return 0;
         }
 

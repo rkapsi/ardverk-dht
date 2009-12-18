@@ -60,9 +60,7 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
         
         if (!EXHAUSTIVE) {
             State state = getState();
-            setValue(new DefaultValueEntity(
-                    state.getTimeInMillis(), 
-                    TimeUnit.MILLISECONDS));
+            setValue(new DefaultValueEntity(state));
         }
     }
     

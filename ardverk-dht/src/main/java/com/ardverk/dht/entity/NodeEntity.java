@@ -11,5 +11,5 @@ public interface NodeEntity extends LookupEntity {
     
     public Contact[] getContacts();
     
-    public int getHops();
+    public int getHop();
 }

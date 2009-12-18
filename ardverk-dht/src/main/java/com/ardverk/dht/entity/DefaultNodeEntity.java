@@ -9,6 +9,7 @@ import org.ardverk.concurrent.AsyncProcess;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.io.StoreResponseHandler;
+import com.ardverk.dht.io.LookupResponseHandler.State;
 import com.ardverk.dht.routing.Contact;
 
 public class DefaultNodeEntity extends AbstractEntity implements NodeEntity {
@@ -19,7 +20,7 @@ public class DefaultNodeEntity extends AbstractEntity implements NodeEntity {
     
     private final Contact[] contacts;
     
-    private final int hops;
+    private final int hop;
     
     public DefaultNodeEntity(Contact[] contacts, int hops, long time, TimeUnit unit) {
         super(time, unit);
@@ -29,7 +30,14 @@ public class DefaultNodeEntity extends AbstractEntity implements NodeEntity {
         }
         
         this.contacts = contacts;
-        this.hops = hops;
+        this.hop = hops;
+    }
+    
+    public DefaultNodeEntity(State state) {
+        super(state.getTimeInMillis(), TimeUnit.MILLISECONDS);
+        
+        this.contacts = state.getContacts();
+        this.hop = state.getHop();
     }
     
     @Override
@@ -45,12 +53,12 @@ public class DefaultNodeEntity extends AbstractEntity implements NodeEntity {
     }
 
     @Override
-    public int getHops() {
-        return hops;
+    public int getHop() {
+        return hop;
     }
     
     @Override
     public String toString() {
-        return getClass().getSimpleName() + " (" + hops + ", " + time + ", " + unit + ")";
+        return getClass().getSimpleName() + " (" + hop + ", " + time + ", " + unit + ")";
     }
 }

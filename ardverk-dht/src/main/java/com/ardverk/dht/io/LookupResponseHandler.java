@@ -22,7 +22,7 @@ import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 
-abstract class LookupResponseHandler<T extends LookupEntity> extends ResponseHandler<T> {
+public abstract class LookupResponseHandler<T extends LookupEntity> extends ResponseHandler<T> {
     
     private static final int ALPHA = 4;
     
@@ -411,7 +411,7 @@ abstract class LookupResponseHandler<T extends LookupEntity> extends ResponseHan
         }
     }
     
-    static class State {
+    public static class State {
         
         private final Contact[] contacts;
         
