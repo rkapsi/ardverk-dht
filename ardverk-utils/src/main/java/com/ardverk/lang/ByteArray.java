@@ -1,14 +1,17 @@
 package com.ardverk.lang;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import com.ardverk.coding.CodingUtils;
+import com.ardverk.io.Writable;
 
 public final class ByteArray implements Serializable, 
-        Comparable<ByteArray>, Iterable<Byte> {
+        Comparable<ByteArray>, Writable, Iterable<Byte> {
     
     private static final long serialVersionUID = -8073557453824859383L;
 
@@ -58,6 +61,12 @@ public final class ByteArray implements Serializable,
     }
     
     public int length() {
+        return data.length;
+    }
+
+    @Override
+    public int write(OutputStream out) throws IOException {
+        out.write(data);
         return data.length;
     }
 
