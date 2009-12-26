@@ -7,6 +7,7 @@ import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.message.StoreRequest;
+import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
 
@@ -39,12 +40,13 @@ public class StoreRequestHandler extends RequestHandler {
         
         StoreRequest request = (StoreRequest)message;
         
+        Contact src = message.getContact();
         KUID key = request.getKey();
         byte[] value = request.getValue();
         
         //System.out.println("STORE: " + routeTable.getLocalhost().getContactId() + " > " + key + " = " + new String(value));
 
-        database.put(key, value);
+        database.put(src, key, value);
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
         ResponseMessage response = factory.createStoreResponse(request);

@@ -1,10 +1,11 @@
 package com.ardverk.dht.storage;
 
 import com.ardverk.dht.KUID;
+import com.ardverk.dht.routing.Contact;
 
 public interface Database {
 
     public byte[] get(KUID key);
     
-    public byte[] put(KUID key, byte[] value);
+    public byte[] put(Contact src, KUID key, byte[] value);
 }

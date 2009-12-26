@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.ardverk.dht.KUID;
+import com.ardverk.dht.routing.Contact;
 
 public class DefaultDatabase implements Database {
 
@@ -16,7 +17,7 @@ public class DefaultDatabase implements Database {
     }
 
     @Override
-    public byte[] put(KUID key, byte[] value) {
+    public byte[] put(Contact src, KUID key, byte[] value) {
         return database.put(key, value);
     }
 }
