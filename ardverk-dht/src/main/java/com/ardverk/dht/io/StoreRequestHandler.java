@@ -46,7 +46,7 @@ public class StoreRequestHandler extends RequestHandler {
         
         //System.out.println("STORE: " + routeTable.getLocalhost().getContactId() + " > " + key + " = " + new String(value));
 
-        database.put(src, key, value);
+        database.store(src, key, value);
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
         ResponseMessage response = factory.createStoreResponse(request);

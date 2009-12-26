@@ -7,5 +7,5 @@ public interface Database {
 
     public byte[] get(KUID key);
     
-    public byte[] put(Contact src, KUID key, byte[] value);
+    public byte[] store(Contact src, KUID key, byte[] value);
 }
