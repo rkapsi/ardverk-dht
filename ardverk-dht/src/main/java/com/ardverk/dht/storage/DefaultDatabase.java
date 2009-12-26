@@ -14,7 +14,7 @@ public class DefaultDatabase implements Database {
     @Override
     public byte[] get(KUID key) {
         ValueEntity entity = database.get(key);
-        return entity != null ? entity.value : null;
+        return entity != null ? entity.getValue() : null;
     }
 
     @Override
@@ -26,7 +26,7 @@ public class DefaultDatabase implements Database {
             existing = database.remove(key);
         }
         
-        return existing != null ? existing.value : null;
+        return existing != null ? existing.getValue() : null;
     }
     
     private static class ValueEntity {
