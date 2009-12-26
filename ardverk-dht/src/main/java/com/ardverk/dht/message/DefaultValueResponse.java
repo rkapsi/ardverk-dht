@@ -4,7 +4,7 @@ import java.net.SocketAddress;
 
 import com.ardverk.dht.routing.Contact;
 
-public class DefaultValueResponse extends AbstractResponseMessage 
+public class DefaultValueResponse extends AbstractLookupResponse 
         implements ValueResponse {
 
     private final byte[] value;

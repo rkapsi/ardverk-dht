@@ -4,7 +4,7 @@ import java.net.SocketAddress;
 
 import com.ardverk.dht.routing.Contact;
 
-public class DefaultNodeResponse extends AbstractResponseMessage 
+public class DefaultNodeResponse extends AbstractLookupResponse 
         implements NodeResponse {
 
     private final Contact[] contacts;
