@@ -8,6 +8,16 @@ import com.ardverk.dht.routing.Contact;
 
 public class DefaultDatabase implements Database {
 
+    public static enum DefaultStatus implements Status {
+        SUCCESS,
+        FAILURE;
+
+        @Override
+        public boolean isSuccess() {
+            return this == SUCCESS;
+        }
+    }
+    
     private final Map<KUID, ValueEntity> database 
         = new ConcurrentHashMap<KUID, ValueEntity>();
     
@@ -18,7 +28,7 @@ public class DefaultDatabase implements Database {
     }
 
     @Override
-    public byte[] store(Contact src, KUID key, byte[] value) {
+    public Status store(Contact src, KUID key, byte[] value) {
         ValueEntity existing = null;
         if (value != null) {
             existing = database.put(key, new ValueEntity(src, key, value));
@@ -26,7 +36,7 @@ public class DefaultDatabase implements Database {
             existing = database.remove(key);
         }
         
-        return existing != null ? existing.getValue() : null;
+        return DefaultStatus.SUCCESS;
     }
     
     private static class ValueEntity {

@@ -10,6 +10,7 @@ import org.ardverk.coding.BencodingOutputStream;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.storage.Database.Status;
 import com.ardverk.enumeration.IntegerValue;
 import com.ardverk.enumeration.StringValue;
 
@@ -74,6 +75,10 @@ class MessageOutputStream extends BencodingOutputStream {
     
     public void writeContacts(Contact[] contacts) throws IOException {
         writeArray(contacts);
+    }
+    
+    public void writeStatus(Status status) throws IOException {
+        writeString(status.name());
     }
     
     public void writeMessage(Message message) throws IOException {
@@ -151,5 +156,6 @@ class MessageOutputStream extends BencodingOutputStream {
     }
     
     private void writeStoreResponse(StoreResponse message) throws IOException {
+        writeStatus(message.getStatus());
     }
 }

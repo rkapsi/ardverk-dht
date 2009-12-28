@@ -4,6 +4,7 @@ import java.net.SocketAddress;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.storage.Database.Status;
 
 public class DefaultMessageFactory extends AbstractMessageFactory {
 
@@ -72,9 +73,9 @@ public class DefaultMessageFactory extends AbstractMessageFactory {
     }
 
     @Override
-    public StoreResponse createStoreResponse(StoreRequest request) {
+    public StoreResponse createStoreResponse(StoreRequest request, Status status) {
         MessageId messageId = request.getMessageId();
         Contact destination = request.getContact();
-        return new DefaultStoreResponse(messageId, contact, destination);
+        return new DefaultStoreResponse(messageId, contact, destination, status);
     }
 }

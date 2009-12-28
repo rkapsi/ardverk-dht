@@ -10,6 +10,7 @@ import com.ardverk.dht.message.StoreRequest;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
+import com.ardverk.dht.storage.Database.Status;
 
 public class StoreRequestHandler extends RequestHandler {
 
@@ -46,10 +47,10 @@ public class StoreRequestHandler extends RequestHandler {
         
         //System.out.println("STORE: " + routeTable.getLocalhost().getContactId() + " > " + key + " = " + new String(value));
 
-        database.store(src, key, value);
+        Status status = database.store(src, key, value);
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
-        ResponseMessage response = factory.createStoreResponse(request);
+        ResponseMessage response = factory.createStoreResponse(request, status);
         messageDispatcher.send(response);
     }
 }
