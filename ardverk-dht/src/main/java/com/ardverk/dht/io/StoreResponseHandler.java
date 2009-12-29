@@ -18,7 +18,7 @@ import com.ardverk.dht.message.StoreRequest;
 import com.ardverk.dht.message.StoreResponse;
 import com.ardverk.dht.routing.Contact;
 
-public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
+public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
 
     private static final int K = 20;
     
@@ -57,6 +57,10 @@ public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
     
     private final byte[] value;
     
+    private final long timeout;
+    
+    private final TimeUnit unit;
+    
     private final List<StoreResponse> responses 
         = new ArrayList<StoreResponse>();
     
@@ -67,6 +71,13 @@ public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
     public StoreResponseHandler(
             MessageDispatcher messageDispatcher, 
             NodeEntity entity, KUID key, byte[] value) {
+        this(messageDispatcher, entity, key, value, 10L, TimeUnit.SECONDS);
+    }
+    
+    public StoreResponseHandler(
+            MessageDispatcher messageDispatcher, 
+            NodeEntity entity, KUID key, byte[] value, 
+            long timeout, TimeUnit unit) {
         super(messageDispatcher);
         
         if (key == null) {
@@ -77,9 +88,19 @@ public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
             throw new NullPointerException("value");
         }
         
+        if (timeout < 0L) {
+            throw new IllegalArgumentException("timeout=" + timeout);
+        }
+        
+        if (unit == null) {
+            throw new NullPointerException("unit");
+        }
+        
         this.storeManager = new StoreManager(entity);
         this.key = key;
         this.value = value;
+        this.timeout = timeout;
+        this.unit = unit;
     }
 
     @Override
@@ -132,7 +153,7 @@ public class StoreResponseHandler extends ResponseHandler<StoreEntity> {
     private synchronized void store(Contact dst) throws IOException {
         MessageFactory factory = messageDispatcher.getMessageFactory();
         StoreRequest request = factory.createStoreRequest(dst, key, value);
-        messageDispatcher.send(this, request, 10L, TimeUnit.SECONDS);
+        send(request, timeout, unit);
     }
     
     @Override

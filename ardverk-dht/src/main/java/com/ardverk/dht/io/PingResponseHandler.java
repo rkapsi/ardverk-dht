@@ -18,7 +18,7 @@ import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.utils.NetworkUtils;
 
-public class PingResponseHandler extends ResponseHandler<PingEntity> {
+public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
     
     private final PingSender sender;
     

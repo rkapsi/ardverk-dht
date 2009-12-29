@@ -7,7 +7,7 @@ import com.ardverk.dht.message.PingRequest;
 import com.ardverk.dht.message.PingResponse;
 import com.ardverk.dht.message.RequestMessage;
 
-public class PingRequestHandler extends RequestHandler {
+public class PingRequestHandler extends AbstractRequestHandler {
     
     public PingRequestHandler(MessageDispatcher messageDispatcher) {
         super(messageDispatcher);

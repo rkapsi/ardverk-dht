@@ -70,7 +70,7 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
         LookupRequest message = factory.createValueRequest(dst, key);
-        messageDispatcher.send(this, message, timeout, unit);
+        send(message, timeout, unit);
     }
     
     @Override

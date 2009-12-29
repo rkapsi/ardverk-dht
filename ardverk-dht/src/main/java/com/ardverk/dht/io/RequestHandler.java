@@ -4,11 +4,7 @@ import java.io.IOException;
 
 import com.ardverk.dht.message.RequestMessage;
 
-public abstract class RequestHandler extends AbstractMessageHandler {
+public interface RequestHandler {
     
-    public RequestHandler(MessageDispatcher messageDispatcher) {
-        super(messageDispatcher);
-    }
-    
-    public abstract void handleRequest(RequestMessage request) throws IOException;
+    public void handleRequest(RequestMessage request) throws IOException;
 }

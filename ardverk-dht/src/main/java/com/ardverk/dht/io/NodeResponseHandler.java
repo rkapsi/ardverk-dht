@@ -32,7 +32,7 @@ public class NodeResponseHandler extends LookupResponseHandler<NodeEntity> {
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
         LookupRequest message = factory.createNodeRequest(dst, key);
-        messageDispatcher.send(this, message, timeout, unit);
+        send(message, timeout, unit);
     }
 
     @Override

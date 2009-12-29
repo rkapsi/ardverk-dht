@@ -12,7 +12,7 @@ import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
 import com.ardverk.dht.storage.Database.Status;
 
-public class StoreRequestHandler extends RequestHandler {
+public class StoreRequestHandler extends AbstractRequestHandler {
 
     private final RouteTable routeTable;
     

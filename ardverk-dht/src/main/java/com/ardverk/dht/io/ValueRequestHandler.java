@@ -11,7 +11,7 @@ import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
 
-public class ValueRequestHandler extends RequestHandler {
+public class ValueRequestHandler extends AbstractRequestHandler {
 
     private final RouteTable routeTable;
     

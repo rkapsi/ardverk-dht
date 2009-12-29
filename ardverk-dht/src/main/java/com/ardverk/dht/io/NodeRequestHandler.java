@@ -10,7 +10,7 @@ import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 
-public class NodeRequestHandler extends RequestHandler {
+public class NodeRequestHandler extends AbstractRequestHandler {
 
     private final RouteTable routeTable;
     
