@@ -1,5 +1,7 @@
 package com.ardverk.dht.storage;
 
+import java.util.concurrent.TimeUnit;
+
 import com.ardverk.coding.CodingUtils;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
@@ -23,6 +25,11 @@ public class DefaultValueEntity implements ValueEntity {
     @Override
     public long getCreationTime() {
         return creationTime;
+    }
+    
+    @Override
+    public long getAge(TimeUnit unit) {
+        return unit.convert(System.currentTimeMillis() - creationTime, TimeUnit.MILLISECONDS);
     }
 
     @Override

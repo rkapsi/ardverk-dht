@@ -10,7 +10,7 @@ import com.ardverk.dht.message.StoreRequest;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
-import com.ardverk.dht.storage.Database.Status;
+import com.ardverk.dht.storage.Database.Condition;
 
 public class StoreRequestHandler extends AbstractRequestHandler {
 
@@ -45,7 +45,7 @@ public class StoreRequestHandler extends AbstractRequestHandler {
         KUID key = request.getKey();
         byte[] value = request.getValue();
         
-        Status status = database.store(src, key, value);
+        Condition status = database.store(src, key, value);
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
         ResponseMessage response = factory.createStoreResponse(request, status);

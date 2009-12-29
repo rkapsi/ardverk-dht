@@ -3,16 +3,16 @@ package com.ardverk.dht.message;
 import java.net.SocketAddress;
 
 import com.ardverk.dht.routing.Contact;
-import com.ardverk.dht.storage.Database.Status;
+import com.ardverk.dht.storage.Database.Condition;
 
 public class DefaultStoreResponse extends AbstractResponseMessage 
         implements StoreResponse {
 
-    private final Status status;
+    private final Condition status;
     
     public DefaultStoreResponse(
             MessageId messageId, Contact contact, 
-            Contact destination, Status status) {
+            Contact destination, Condition status) {
         super(messageId, contact, destination);
         
         if (status == null) {
@@ -24,7 +24,7 @@ public class DefaultStoreResponse extends AbstractResponseMessage
     
     public DefaultStoreResponse(
             MessageId messageId, Contact contact, 
-            SocketAddress address, Status status) {
+            SocketAddress address, Condition status) {
         super(messageId, contact, address);
         
         if (status == null) {
@@ -34,7 +34,7 @@ public class DefaultStoreResponse extends AbstractResponseMessage
         this.status = status;
     }
     
-    public Status getStatus() {
+    public Condition getStatus() {
         return status;
     }
 }

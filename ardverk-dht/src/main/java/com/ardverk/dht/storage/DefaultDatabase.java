@@ -1,5 +1,7 @@
 package com.ardverk.dht.storage;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -8,7 +10,7 @@ import com.ardverk.dht.routing.Contact;
 
 public class DefaultDatabase extends AbstractDatabase {
 
-    public static enum DefaultStatus implements Status {
+    public static enum DefaultCondition implements Condition {
         SUCCESS,
         FAILURE;
 
@@ -27,14 +29,14 @@ public class DefaultDatabase extends AbstractDatabase {
     }
 
     @Override
-    public Status store(Contact src, KUID key, byte[] value) {
+    public Condition store(Contact src, KUID key, byte[] value) {
         if (value != null) {
             database.put(key, new DefaultValueEntity(src, key, value));
         } else {
             database.remove(key);
         }
         
-        return DefaultStatus.SUCCESS;
+        return DefaultCondition.SUCCESS;
     }
     
     @Override
@@ -48,6 +50,34 @@ public class DefaultDatabase extends AbstractDatabase {
         return database.size();
     }
     
+    @Override
+    public ValueEntity[] select(final KUID key) {
+        if (key == null) {
+            throw new NullPointerException("key");
+        }
+        
+        ValueEntity[] values = values();
+        Comparator<ValueEntity> comparator 
+                = new Comparator<ValueEntity>() {
+            @Override
+            public int compare(ValueEntity o1, ValueEntity o2) {
+                KUID xor1 = o1.getKey().xor(key);
+                KUID xor2 = o2.getKey().xor(key);
+                return xor1.compareTo(xor2);
+            }
+        };
+        
+        Arrays.sort(values, comparator);
+        return values;
+    }
+    
+    
+
+    @Override
+    public ValueEntity[] values() {
+        return database.values().toArray(new ValueEntity[0]);
+    }
+
     @Override
     public String toString() {
         StringBuilder buffer = new StringBuilder();

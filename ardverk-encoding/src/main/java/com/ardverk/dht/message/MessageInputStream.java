@@ -14,8 +14,8 @@ import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.DefaultContact;
 import com.ardverk.dht.routing.Contact.Type;
-import com.ardverk.dht.storage.Database.Status;
-import com.ardverk.dht.storage.DefaultDatabase.DefaultStatus;
+import com.ardverk.dht.storage.Database.Condition;
+import com.ardverk.dht.storage.DefaultDatabase.DefaultCondition;
 import com.ardverk.enumeration.IntegerValue;
 import com.ardverk.enumeration.StringValue;
 
@@ -97,9 +97,9 @@ class MessageInputStream extends BencodingInputStream {
         return contacts;
     }
     
-    public Status readStatus() throws IOException {
+    public Condition readCondition() throws IOException {
         String value = readString();
-        return DefaultStatus.valueOf(value);
+        return DefaultCondition.valueOf(value);
     }
     
     public Message readMessage(SocketAddress src) throws IOException {
@@ -180,7 +180,7 @@ class MessageInputStream extends BencodingInputStream {
     
     private StoreResponse readStoreResponse(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
-        Status status = readStatus();
+        Condition status = readCondition();
         return new DefaultStoreResponse(messageId, contact, address, status);
     }
 }

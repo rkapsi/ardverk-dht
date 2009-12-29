@@ -4,7 +4,7 @@ import java.net.SocketAddress;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
-import com.ardverk.dht.storage.Database.Status;
+import com.ardverk.dht.storage.Database.Condition;
 
 public interface MessageFactory {
     
@@ -28,5 +28,5 @@ public interface MessageFactory {
     
     public StoreRequest createStoreRequest(Contact dst, KUID key, byte[] value);
     
-    public StoreResponse createStoreResponse(StoreRequest request, Status status);
+    public StoreResponse createStoreResponse(StoreRequest request, Condition status);
 }
