@@ -14,5 +14,11 @@ public interface Database {
     
     public Status store(Contact src, KUID key, byte[] value);
     
-    public byte[] get(KUID key);
+    public byte[] lookup(KUID key);
+    
+    public ValueEntity get(KUID key);
+    
+    public int size();
+    
+    public boolean isEmpty();
 }

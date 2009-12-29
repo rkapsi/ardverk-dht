@@ -45,12 +45,10 @@ public class StoreRequestHandler extends AbstractRequestHandler {
         KUID key = request.getKey();
         byte[] value = request.getValue();
         
-        //System.out.println("STORE: " + routeTable.getLocalhost().getContactId() + " > " + key + " = " + new String(value));
-
         Status status = database.store(src, key, value);
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
         ResponseMessage response = factory.createStoreResponse(request, status);
-        messageDispatcher.send(response);
+        send(response);
     }
 }

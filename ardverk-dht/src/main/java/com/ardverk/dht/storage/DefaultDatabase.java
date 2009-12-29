@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
 
-public class DefaultDatabase implements Database {
+public class DefaultDatabase extends AbstractDatabase {
 
     public static enum DefaultStatus implements Status {
         SUCCESS,
@@ -18,51 +18,44 @@ public class DefaultDatabase implements Database {
         }
     }
     
-    private final Map<KUID, ValueEntity> database 
-        = new ConcurrentHashMap<KUID, ValueEntity>();
+    private final Map<KUID, DefaultValueEntity> database 
+        = new ConcurrentHashMap<KUID, DefaultValueEntity>();
     
     @Override
-    public byte[] get(KUID key) {
-        ValueEntity entity = database.get(key);
-        return entity != null ? entity.getValue() : null;
+    public ValueEntity get(KUID key) {
+        return database.get(key);
     }
 
     @Override
     public Status store(Contact src, KUID key, byte[] value) {
-        ValueEntity existing = null;
         if (value != null) {
-            existing = database.put(key, new ValueEntity(src, key, value));
+            database.put(key, new DefaultValueEntity(src, key, value));
         } else {
-            existing = database.remove(key);
+            database.remove(key);
         }
         
         return DefaultStatus.SUCCESS;
     }
     
-    private static class ValueEntity {
-        
-        private final Contact src;
-        
-        private final KUID key;
-        
-        private final byte[] value;
-        
-        public ValueEntity(Contact src, KUID key, byte[] value) {
-            this.src = src;
-            this.key = key;
-            this.value = value;
-        }
+    @Override
+    public byte[] lookup(KUID key) {
+        ValueEntity entity = database.get(key);
+        return entity != null ? entity.getValue() : null;
+    }
 
-        public Contact getContact() {
-            return src;
+    @Override
+    public int size() {
+        return database.size();
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder buffer = new StringBuilder();
+        
+        for (ValueEntity entity : database.values()) {
+            buffer.append(entity).append("\n");
         }
-
-        public KUID getKey() {
-            return key;
-        }
-
-        public byte[] getValue() {
-            return value;
-        }
+        
+        return buffer.toString();
     }
 }

@@ -40,7 +40,7 @@ public class ValueRequestHandler extends AbstractRequestHandler {
         ValueRequest request = (ValueRequest)message;
         
         KUID key = request.getKey();
-        byte[] value = database.get(key);
+        byte[] value = database.lookup(key);
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
         ResponseMessage response = null;
@@ -52,6 +52,6 @@ public class ValueRequestHandler extends AbstractRequestHandler {
             response = factory.createNodeResponse(request, contacts);
         }
         
-        messageDispatcher.send(response);
+        send(response);
     }
 }

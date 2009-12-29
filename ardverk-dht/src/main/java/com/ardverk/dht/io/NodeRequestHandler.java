@@ -38,6 +38,6 @@ public class NodeRequestHandler extends AbstractRequestHandler {
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
         NodeResponse response = factory.createNodeResponse(request, contacts);
-        messageDispatcher.send(response);
+        send(response);
     }
 }
