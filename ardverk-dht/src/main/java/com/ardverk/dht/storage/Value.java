@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
 
-public interface ValueEntity {
+public interface Value {
 
     public long getCreationTime();
     

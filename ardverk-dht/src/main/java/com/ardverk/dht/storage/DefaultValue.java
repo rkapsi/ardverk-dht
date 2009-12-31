@@ -6,7 +6,7 @@ import com.ardverk.coding.CodingUtils;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
 
-public class DefaultValueEntity implements ValueEntity {
+public class DefaultValue implements Value {
     
     private final long creationTime = System.currentTimeMillis();
     
@@ -16,7 +16,7 @@ public class DefaultValueEntity implements ValueEntity {
     
     private final byte[] value;
     
-    public DefaultValueEntity(Contact src, KUID key, byte[] value) {
+    public DefaultValue(Contact src, KUID key, byte[] value) {
         this.src = src;
         this.key = key;
         this.value = value;

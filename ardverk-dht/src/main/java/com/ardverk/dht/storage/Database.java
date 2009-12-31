@@ -16,11 +16,11 @@ public interface Database {
     
     public byte[] lookup(KUID key);
     
-    public ValueEntity get(KUID key);
+    public Value get(KUID key);
     
-    public ValueEntity[] select(KUID key);
+    public Value[] select(KUID key);
     
-    public ValueEntity[] values();
+    public Value[] values();
     
     public int size();
     

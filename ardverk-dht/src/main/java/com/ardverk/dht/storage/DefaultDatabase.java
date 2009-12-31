@@ -20,18 +20,18 @@ public class DefaultDatabase extends AbstractDatabase {
         }
     }
     
-    private final Map<KUID, DefaultValueEntity> database 
-        = new ConcurrentHashMap<KUID, DefaultValueEntity>();
+    private final Map<KUID, DefaultValue> database 
+        = new ConcurrentHashMap<KUID, DefaultValue>();
     
     @Override
-    public ValueEntity get(KUID key) {
+    public Value get(KUID key) {
         return database.get(key);
     }
 
     @Override
     public Condition store(Contact src, KUID key, byte[] value) {
         if (value != null) {
-            database.put(key, new DefaultValueEntity(src, key, value));
+            database.put(key, new DefaultValue(src, key, value));
         } else {
             database.remove(key);
         }
@@ -41,7 +41,7 @@ public class DefaultDatabase extends AbstractDatabase {
     
     @Override
     public byte[] lookup(KUID key) {
-        ValueEntity entity = database.get(key);
+        Value entity = database.get(key);
         return entity != null ? entity.getValue() : null;
     }
 
@@ -51,16 +51,16 @@ public class DefaultDatabase extends AbstractDatabase {
     }
     
     @Override
-    public ValueEntity[] select(final KUID key) {
+    public Value[] select(final KUID key) {
         if (key == null) {
             throw new NullPointerException("key");
         }
         
-        ValueEntity[] values = values();
-        Comparator<ValueEntity> comparator 
-                = new Comparator<ValueEntity>() {
+        Value[] values = values();
+        Comparator<Value> comparator 
+                = new Comparator<Value>() {
             @Override
-            public int compare(ValueEntity o1, ValueEntity o2) {
+            public int compare(Value o1, Value o2) {
                 KUID xor1 = o1.getKey().xor(key);
                 KUID xor2 = o2.getKey().xor(key);
                 return xor1.compareTo(xor2);
@@ -71,18 +71,16 @@ public class DefaultDatabase extends AbstractDatabase {
         return values;
     }
     
-    
-
     @Override
-    public ValueEntity[] values() {
-        return database.values().toArray(new ValueEntity[0]);
+    public Value[] values() {
+        return database.values().toArray(new Value[0]);
     }
 
     @Override
     public String toString() {
         StringBuilder buffer = new StringBuilder();
         
-        for (ValueEntity entity : database.values()) {
+        for (Value entity : database.values()) {
             buffer.append(entity).append("\n");
         }
         
