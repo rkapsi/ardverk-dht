@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncFuture;
+import org.ardverk.concurrent.AsyncFutureListener;
 
 import com.ardverk.dht.entity.Entity;
 import com.ardverk.dht.message.RequestMessage;
@@ -78,6 +79,16 @@ public abstract class AbstractResponseHandler<V extends Entity>
         
         this.future = future;
         go(future);
+        
+        future.addAsyncFutureListener(new AsyncFutureListener<V>() {
+            @Override
+            public void operationComplete(AsyncFuture<V> future) {
+                done();
+            }
+        });
+    }
+    
+    protected void done() {
     }
     
     protected abstract void go(AsyncFuture<V> future) throws Exception;

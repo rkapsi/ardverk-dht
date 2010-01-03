@@ -49,7 +49,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
         }
     };*/
     
-    private final MaxStackCounter counter = new MaxStackCounter(K / 4);
+    private final ProcessCounter counter = new ProcessCounter(K / 4);
     
     private final StoreManager storeManager;
     
@@ -120,7 +120,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
                 Contact contact = storeManager.next();
                 store(contact);
                 
-                counter.push();
+                counter.increment();
             }
             
         } finally {
@@ -134,12 +134,12 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
         }
         
         while (0 < pop--) {
-            counter.pop();
+            counter.decrement();
         }
     }
     
     private synchronized void postProcess() {
-        if (counter.getStack() == 0) {
+        if (counter.getProcesses() == 0) {
             StoreResponse[] values = responses.toArray(new StoreResponse[0]);
             if (values.length == 0) {
                 setException(new IOException());

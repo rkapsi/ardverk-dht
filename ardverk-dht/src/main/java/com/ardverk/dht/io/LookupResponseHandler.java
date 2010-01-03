@@ -29,7 +29,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     
     private final LookupManager lookupManager;
     
-    private final MaxStackCounter lookupCounter;
+    private final ProcessCounter lookupCounter;
     
     private final long timeout = 3L;
     
@@ -47,7 +47,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         super(messageDispatcher);
         
         lookupManager = new LookupManager(routeTable, key);
-        lookupCounter = new MaxStackCounter(alpha);
+        lookupCounter = new ProcessCounter(alpha);
     }
 
     @Override
@@ -69,7 +69,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
                 Contact contact = lookupManager.next();
                 lookup(contact, lookupManager.key, timeout, unit);
                 
-                lookupCounter.push();
+                lookupCounter.increment();
             }
         } finally {
             postProcess();
@@ -85,7 +85,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         }
         
         while (0 < pop--) {
-            lookupCounter.pop();
+            lookupCounter.decrement();
         }
     }
     
@@ -93,7 +93,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
      * 
      */
     private synchronized void postProcess() {
-        int count = lookupCounter.getStack();
+        int count = lookupCounter.getProcesses();
         if (count == 0) {
             State state = getState();
             complete(state);
