@@ -11,9 +11,11 @@ import java.util.NavigableSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncFuture;
+import org.slf4j.Logger;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.entity.LookupEntity;
@@ -21,10 +23,15 @@ import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
+import com.ardverk.dht.utils.SchedulingUtils;
+import com.ardverk.logging.LoggerUtils;
 
 public abstract class LookupResponseHandler<T extends LookupEntity> 
         extends AbstractResponseHandler<T> {
     
+    private static final Logger LOG 
+        = LoggerUtils.getLogger(LookupResponseHandler.class);
+        
     private static final int ALPHA = 4;
     
     private final LookupManager lookupManager;
@@ -36,6 +43,10 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     private final TimeUnit unit = TimeUnit.SECONDS;
     
     private long startTime = -1L;
+    
+    private volatile ScheduledFuture<?> boostFuture;
+    
+    private long lastResponseTime = -1L;
     
     public LookupResponseHandler(MessageDispatcher messageDispatcher, 
             RouteTable routeTable, KUID key) {
@@ -52,7 +63,44 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
 
     @Override
     protected void go(AsyncFuture<T> future) throws IOException {
+        Runnable task = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    boost();                    
+                } catch (IOException err) {
+                    LOG.error("IOException", err);
+                }
+            }
+        };
+        
+        long frequency = 1000L;
+        boostFuture = SchedulingUtils.scheduleWithFixedDelay(
+                task, frequency, frequency, TimeUnit.MILLISECONDS);
+        
         process(0);
+    }
+    
+    @Override
+    protected final void done() {
+        if (boostFuture != null) {
+            boostFuture.cancel(true);
+        }
+    }
+
+    private synchronized void boost() throws IOException {
+        if (lookupManager.hasNext(true)) {
+            long time = System.currentTimeMillis() - lastResponseTime;
+            if (time >= 1000L) {
+                try {
+                    Contact contact = lookupManager.next();
+                    lookup(contact, lookupManager.key, timeout, unit);
+                    lookupCounter.increment(true);
+                } finally {
+                    postProcess();
+                }
+            }
+        }
     }
     
     /**
@@ -118,6 +166,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
             throws IOException {
         
         try {
+            lastResponseTime = System.currentTimeMillis();
             processResponse0(request, response, time, unit);
         } finally {
             process(1);
@@ -307,9 +356,13 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         }
         
         public boolean hasNext() {
+            return hasNext(false);
+        }
+        
+        public boolean hasNext(boolean force) {
             if (!query.isEmpty()) {
                 Contact contact = query.first();
-                if (closest.size() < routeTable.getK() 
+                if (force || closest.size() < routeTable.getK() 
                         || isCloserThanClosest(contact) 
                         || EXHAUSTIVE) {
                     return true;
