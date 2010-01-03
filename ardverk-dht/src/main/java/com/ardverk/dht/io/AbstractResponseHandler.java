@@ -18,8 +18,42 @@ public abstract class AbstractResponseHandler<V extends Entity>
     
     private final AtomicBoolean done = new AtomicBoolean(false);
     
+    private volatile long lastSendTime = -1L;
+    
+    private volatile long lastResponseTime = -1L;
+    
     public AbstractResponseHandler(MessageDispatcher messageDispatcher) {
         super(messageDispatcher);
+    }
+    
+    /**
+     * 
+     */
+    public long getLastSendTime(TimeUnit unit) {
+        return convertTime(lastSendTime, unit);
+    }
+    
+    /**
+     * 
+     */
+    public long getLastResponseTime(TimeUnit unit) {
+        return convertTime(lastResponseTime, unit);
+    }
+    
+    /**
+     * 
+     */
+    private long convertTime(long timeInMillis, TimeUnit unit) {
+        if (unit == null) {
+            throw new NullPointerException("unit");
+        }
+        
+        if (timeInMillis == -1L) {
+            return -1L;
+        }
+        
+        long time = System.currentTimeMillis() - timeInMillis;
+        return unit.convert(time, TimeUnit.MILLISECONDS);
     }
     
     @Override
@@ -77,6 +111,7 @@ public abstract class AbstractResponseHandler<V extends Entity>
         
         if (isOpen()) {
             messageDispatcher.send(this, message, timeout, unit);
+            lastSendTime = System.currentTimeMillis();
         }
     }
     
@@ -111,6 +146,7 @@ public abstract class AbstractResponseHandler<V extends Entity>
             throws IOException {
         
         if (isOpen()) {
+            lastResponseTime = System.currentTimeMillis();
             processResponse(request, response, time, unit);
         }
     }

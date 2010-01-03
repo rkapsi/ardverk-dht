@@ -44,9 +44,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     
     private long startTime = -1L;
     
-    private volatile ScheduledFuture<?> boostFuture;
-    
-    private long lastResponseTime = -1L;
+    private ScheduledFuture<?> boostFuture;
     
     public LookupResponseHandler(MessageDispatcher messageDispatcher, 
             RouteTable routeTable, KUID key) {
@@ -91,11 +89,13 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         }
     }
     
+    /**
+     * 
+     */
     private synchronized void boost() throws IOException {
         if (lookupManager.hasNext(true)) {
             long boostTimeout = 1000L;
-            if ((System.currentTimeMillis() - lastResponseTime) 
-                    >= boostTimeout) {
+            if (getLastResponseTime(TimeUnit.MILLISECONDS) >= boostTimeout) {
                 try {
                     Contact contact = lookupManager.next();
                     lookup(contact, lookupManager.key, timeout, unit);
@@ -170,7 +170,6 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
             throws IOException {
         
         try {
-            lastResponseTime = System.currentTimeMillis();
             processResponse0(request, response, time, unit);
         } finally {
             process(1);
