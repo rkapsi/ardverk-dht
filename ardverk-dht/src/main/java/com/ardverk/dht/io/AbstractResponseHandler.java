@@ -2,6 +2,7 @@ package com.ardverk.dht.io;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
@@ -14,6 +15,8 @@ public abstract class AbstractResponseHandler<V extends Entity>
         extends AbstractMessageHandler implements ResponseHandler<V> {
     
     protected volatile AsyncFuture<V> future = null;
+    
+    private final AtomicBoolean done = new AtomicBoolean(false);
     
     public AbstractResponseHandler(MessageDispatcher messageDispatcher) {
         super(messageDispatcher);
@@ -43,6 +46,9 @@ public abstract class AbstractResponseHandler<V extends Entity>
         AsyncFuture<V> future = this.future;
         if (future != null) {
             future.setValue(value);
+            if (!done.getAndSet(true)) {
+                done();
+            }
             return;
         }
         throw new IllegalStateException();
@@ -55,6 +61,9 @@ public abstract class AbstractResponseHandler<V extends Entity>
         AsyncFuture<V> future = this.future;
         if (future != null) {
             future.setException(t);
+            if (!done.getAndSet(true)) {
+                done();
+            }
             return;
         }
         throw new IllegalStateException();
@@ -83,7 +92,9 @@ public abstract class AbstractResponseHandler<V extends Entity>
         future.addAsyncFutureListener(new AsyncFutureListener<V>() {
             @Override
             public void operationComplete(AsyncFuture<V> future) {
-                done();
+                if (!done.getAndSet(true)) {
+                    done();
+                }
             }
         });
     }

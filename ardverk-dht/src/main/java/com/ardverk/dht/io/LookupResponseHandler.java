@@ -62,36 +62,40 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     }
 
     @Override
-    protected void go(AsyncFuture<T> future) throws IOException {
-        Runnable task = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    boost();                    
-                } catch (IOException err) {
-                    LOG.error("IOException", err);
-                }
-            }
-        };
+    protected synchronized void go(AsyncFuture<T> future) throws IOException {
         
-        long frequency = 1000L;
-        boostFuture = SchedulingUtils.scheduleWithFixedDelay(
-                task, frequency, frequency, TimeUnit.MILLISECONDS);
+        long boostFrequency = 1000L;
+        if (0L < boostFrequency) {
+            Runnable task = new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        boost();                    
+                    } catch (IOException err) {
+                        LOG.error("IOException", err);
+                    }
+                }
+            };
+            
+            boostFuture = SchedulingUtils.scheduleWithFixedDelay(
+                    task, boostFrequency, boostFrequency, TimeUnit.MILLISECONDS);
+        }
         
         process(0);
     }
     
     @Override
-    protected final void done() {
+    protected synchronized void done() {
         if (boostFuture != null) {
             boostFuture.cancel(true);
         }
     }
-
+    
     private synchronized void boost() throws IOException {
         if (lookupManager.hasNext(true)) {
-            long time = System.currentTimeMillis() - lastResponseTime;
-            if (time >= 1000L) {
+            long boostTimeout = 1000L;
+            if ((System.currentTimeMillis() - lastResponseTime) 
+                    >= boostTimeout) {
                 try {
                     Contact contact = lookupManager.next();
                     lookup(contact, lookupManager.key, timeout, unit);
@@ -106,9 +110,9 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     /**
      * 
      */
-    private synchronized void process(int pop) throws IOException {
+    private synchronized void process(int decrement) throws IOException {
         try {
-            preProcess(pop);
+            preProcess(decrement);
             while (lookupCounter.hasNext()) {
                 if (!lookupManager.hasNext()) {
                     break;
@@ -127,12 +131,12 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     /**
      * 
      */
-    private synchronized void preProcess(int pop) {
+    private synchronized void preProcess(int decrement) {
         if (startTime == -1L) {
             startTime = System.currentTimeMillis();
         }
         
-        while (0 < pop--) {
+        while (0 < decrement--) {
             lookupCounter.decrement();
         }
     }
