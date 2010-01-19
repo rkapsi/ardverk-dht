@@ -2,7 +2,6 @@ package com.ardverk.dht.message;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.SocketAddress;
 
@@ -23,7 +22,7 @@ public class BencodeMessageCodec extends MessageCodec {
         return in.readMessage(src);
     }
     
-    private static int COUNTER = 0;
+    //private static int COUNTER = 0;
     
     @Override
     public byte[] encode(Message message)
