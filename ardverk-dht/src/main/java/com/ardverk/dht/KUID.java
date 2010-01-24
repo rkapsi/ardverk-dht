@@ -23,6 +23,8 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
 
     private static final long serialVersionUID = -4611363711131603626L;
     
+    private static final int MSB_MASK = 0x80;
+    
     private final byte[] key;
     
     private final int hashCode;
@@ -186,6 +188,32 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
         }
         
         return this;
+    }
+    
+    public int diff(KUID otherId) {
+        if (otherId == null) {
+            throw new NullPointerException("otherId");
+        }
+        
+        int lengthInBits = lengthInBits();
+        if (lengthInBits != otherId.lengthInBits()) {
+            throw new IllegalArgumentException("otherId=" + otherId);
+        }
+        
+        int bitIndex = 0;
+        for (int i = 0; i < key.length; i++) {
+            int value = (int)(key[i] ^ otherId.key[i]);
+            
+            for (int j = 0; j < 8 && bitIndex < lengthInBits; j++) {
+                if ((value & (MSB_MASK >>> j)) != 0) {
+                    return bitIndex;
+                }
+                
+                ++bitIndex;
+            }
+        }
+        
+        return -1;
     }
     
     /**
@@ -373,5 +401,12 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
             return keyAnalyzer.compare(o1 != null ? o1.key : null, 
                     o2 != null ? o2.key : null);
         }
+    }
+    
+    public static void main(String[] args) {
+        int bit = 0x100;
+        
+        bit >>>= 0;
+        System.out.println(Integer.toBinaryString(bit));
     }
 }
