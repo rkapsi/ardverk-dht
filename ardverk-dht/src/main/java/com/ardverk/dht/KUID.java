@@ -15,7 +15,11 @@ import com.ardverk.io.Writable;
 import com.ardverk.lang.Negation;
 import com.ardverk.lang.Xor;
 
-public class KUID implements Xor<KUID>, Negation<KUID>, Writable, Serializable, Comparable<KUID> {
+/**
+ * Kademlia Unique Identifier ({@link KUID}) 
+ */
+public class KUID implements Xor<KUID>, Negation<KUID>, 
+        Writable, Serializable, Comparable<KUID> {
 
     private static final long serialVersionUID = -4611363711131603626L;
     
@@ -29,26 +33,39 @@ public class KUID implements Xor<KUID>, Negation<KUID>, Writable, Serializable, 
         }
         
         if (key.length == 0) {
-            throw new IllegalArgumentException("key.length=" + key.length);
+            throw new IllegalArgumentException(
+                    "key.length=" + key.length);
         }
         
         this.key = key;
         this.hashCode = Arrays.hashCode(key);
     }
 
+    /**
+     * Returns the {@link KUID}'s bytes.
+     */
     public byte[] getBytes() {
         return key.clone();
     }
     
+    /**
+     * Copies the {@link KUID}'s bytes into the given byte array.
+     */
     public byte[] getBytes(byte[] dst, int destPos) {
         System.arraycopy(key, 0, dst, destPos, key.length);
         return dst;
     }
     
+    /**
+     * Returns the length of the {@link KUID} in bytes.
+     */
     public int length() {
         return key.length;
     }
 
+    /**
+     * Returns the length of the {@link KUID} in bits.
+     */
     public int lengthInBits() {
         return length() * 8;
     }
@@ -83,17 +100,26 @@ public class KUID implements Xor<KUID>, Negation<KUID>, Writable, Serializable, 
         return new KUID(data);
     }
     
+    /**
+     * Returns the minimum {@link KUID}.
+     */
     public KUID min() {
         byte[] minKey = new byte[length()];
         return new KUID(minKey);
     }
     
+    /**
+     * Returns the maximum {@link KUID}.
+     */
     public KUID max() {
         byte[] maxKey = new byte[length()];
         Arrays.fill(maxKey, (byte)0xFF);
         return new KUID(maxKey);
     }
     
+    /**
+     * Returns true if the bit at the given bitIndex position is true (one, 1).
+     */
     public boolean isSet(int bitIndex) {
         if (bitIndex < 0 || bitIndex >= lengthInBits()) {
             throw new IllegalArgumentException("bitIndex=" + bitIndex);
@@ -108,14 +134,26 @@ public class KUID implements Xor<KUID>, Negation<KUID>, Writable, Serializable, 
         return (key[index] & (0x80 >>> bit)) != 0x00;
     }
     
+    /**
+     * Sets the bit at the given bitIndex position to true (one, 1) 
+     * and returns the {@link KUID}.
+     */
     public KUID set(int bitIndex) {
         return set(bitIndex, true);
     }
     
+    /**
+     * Sets the bit at the given bitIndex position to false (zero, 0) 
+     * and returns the {@link KUID}.
+     */
     public KUID unset(int bitIndex) {
         return set(bitIndex, false);
     }
     
+    /**
+     * Flips the bit at the given bitIndex position and returns the 
+     * {@link KUID}.
+     */
     public KUID flip(int bitIndex) {
         return set(bitIndex, !isSet(bitIndex));
     }
@@ -254,10 +292,16 @@ public class KUID implements Xor<KUID>, Negation<KUID>, Writable, Serializable, 
         return length();
     }
 
+    /**
+     * Returns the {@link KUID}'s value as an {@link BigInteger}
+     */
     public BigInteger toBigInteger() {
         return new BigInteger(1 /* unsigned */, key);
     }
     
+    /**
+     * Returns the {@link KUID}'s value as a Base 16 (hex) encoded String.
+     */
     public String toHexString() {
         return CodingUtils.encodeBase16(key);
     }
