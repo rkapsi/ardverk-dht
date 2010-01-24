@@ -4,13 +4,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.ardverk.dht.ContactPinger;
 import com.ardverk.dht.KUID;
-import com.ardverk.dht.KeyFactory;
 import com.ardverk.dht.routing.DefaultRouteTable.Bucket;
 import com.ardverk.utils.EventUtils;
 
 public abstract class AbstractRouteTable implements RouteTable {
-    
-    protected final ContactFactory contactFactory;
     
     protected final int k;
     
@@ -19,15 +16,10 @@ public abstract class AbstractRouteTable implements RouteTable {
     private final CopyOnWriteArrayList<RouteTableListener> listeners 
         = new CopyOnWriteArrayList<RouteTableListener>();
     
-    public AbstractRouteTable(ContactPinger pinger, 
-            ContactFactory contactFactory, int k) {
+    public AbstractRouteTable(ContactPinger pinger, int k) {
         
         if (pinger == null) {
             throw new NullPointerException("pinger");
-        }
-        
-        if (contactFactory == null) {
-            throw new NullPointerException("contactFactory");
         }
         
         if (k <= 0) {
@@ -35,18 +27,7 @@ public abstract class AbstractRouteTable implements RouteTable {
         }
         
         this.pinger = pinger;
-        this.contactFactory = contactFactory;
         this.k = k;
-    }
-    
-    @Override
-    public ContactFactory getContactFactory() {
-        return contactFactory;
-    }
-    
-    @Override
-    public KeyFactory getKeyFactory() {
-        return getContactFactory().getKeyFactory();
     }
     
     @Override

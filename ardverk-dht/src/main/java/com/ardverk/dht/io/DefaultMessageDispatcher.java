@@ -2,6 +2,7 @@ package com.ardverk.dht.io;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -34,10 +35,10 @@ import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.message.StoreRequest;
 import com.ardverk.dht.message.ValueRequest;
 import com.ardverk.dht.routing.Contact;
-import com.ardverk.dht.routing.ContactFactory;
-import com.ardverk.dht.routing.DefaultContactFactory;
+import com.ardverk.dht.routing.DefaultContact;
 import com.ardverk.dht.routing.DefaultRouteTable;
 import com.ardverk.dht.routing.RouteTable;
+import com.ardverk.dht.routing.Contact.Type;
 import com.ardverk.dht.storage.Database;
 import com.ardverk.dht.storage.DefaultDatabase;
 import com.ardverk.logging.LoggerUtils;
@@ -190,9 +191,6 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
         private static final KeyFactory KEY_FACTORY 
             = new DefaultKeyFactory(KEY_SIZE);
         
-        private static final ContactFactory CONTACT_FACTORY 
-            = new DefaultContactFactory(KEY_FACTORY);
-        
         private static final MessageCodec CODEC 
             = new BencodeMessageCodec();
         
@@ -218,9 +216,11 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
                 }
             };
             
-            routeTable = new DefaultRouteTable(pinger, 
-                    CONTACT_FACTORY, K, contactId, 
-                    0, new InetSocketAddress("localhost", port));
+            SocketAddress address = new InetSocketAddress("localhost", port);
+            Contact localhost = new DefaultContact(Type.SOLICITED, 
+                    contactId, 0, address, address);
+            
+            routeTable = new DefaultRouteTable(pinger, K, localhost);
             
             database = new DefaultDatabase();
             

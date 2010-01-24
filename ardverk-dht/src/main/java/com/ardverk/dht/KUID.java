@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Arrays;
 
+import org.apache.commons.lang.NullArgumentException;
 import org.ardverk.collection.ByteArrayKeyAnalyzer;
 import org.ardverk.collection.KeyAnalyzer;
 
@@ -79,6 +80,16 @@ public class KUID implements Xor<KUID>, Negation<KUID>, Writable, Serializable, 
             data[i] = (byte)(~key[i]);
         }
         
+        return new KUID(data);
+    }
+    
+    public KUID min() {
+        return new KUID(new byte[length()]);
+    }
+    
+    public KUID max() {
+        byte[] data = new byte[length()];
+        Arrays.fill(data, (byte)0xFF);
         return new KUID(data);
     }
     
@@ -253,6 +264,14 @@ public class KUID implements Xor<KUID>, Negation<KUID>, Writable, Serializable, 
     @Override
     public String toString() {
         return toHexString();
+    }
+    
+    public static KeyAnalyzer<KUID> createKeyAnalyzer(KUID key) {
+        if (key == null) {
+            throw new NullArgumentException("key");
+        }
+        
+        return createKeyAnalyzer(key.lengthInBits());
     }
     
     public static KeyAnalyzer<KUID> createKeyAnalyzer(int maxLengthInBits) {

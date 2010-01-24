@@ -18,7 +18,6 @@ import org.slf4j.Logger;
 import com.ardverk.collection.FixedSizeHashMap;
 import com.ardverk.dht.ContactPinger;
 import com.ardverk.dht.KUID;
-import com.ardverk.dht.KeyFactory;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.routing.Contact.Type;
 import com.ardverk.logging.LoggerUtils;
@@ -41,30 +40,17 @@ public class DefaultRouteTable extends AbstractRouteTable {
     
     private int consecutiveErrors = 0;
     
-    public DefaultRouteTable(ContactPinger pinger, ContactFactory contactFactory, 
-            int k, KUID contactId, int instanceId, SocketAddress address) {
-        super(pinger, contactFactory, k);
+    public DefaultRouteTable(ContactPinger pinger, int k, Contact localhost) {
+        super(pinger, k);
         
-        if (contactId == null) {
-            throw new NullPointerException("contactId");
+        if (localhost == null) {
+            throw new NullPointerException("localhost");
         }
         
-        if (address == null) {
-            throw new NullPointerException("address");
-        }
+        KUID contactId = localhost.getContactId();
+        this.keyAnalyzer = KUID.createKeyAnalyzer(contactId);
         
-        KeyFactory keyFactory = getKeyFactory();
-        int lengthInBits = keyFactory.lengthInBits();
-        if (contactId.lengthInBits() != lengthInBits) {
-            throw new IllegalArgumentException(
-                    "Bits: " + lengthInBits + " vs. " 
-                        + contactId.lengthInBits());
-        }
-        
-        this.keyAnalyzer = KUID.createKeyAnalyzer(lengthInBits);
-        
-        this.localhost = contactFactory.createSolicited(
-                contactId, instanceId, address, address);
+        this.localhost = localhost;
         this.buckets = new PatriciaTrie<KUID, Bucket>(keyAnalyzer);
         
         init();
@@ -78,7 +64,9 @@ public class DefaultRouteTable extends AbstractRouteTable {
     private synchronized void init() {
         consecutiveErrors = 0;
         
-        KUID bucketId = getKeyFactory().min();
+        KUID contactId = localhost.getContactId();
+        KUID bucketId = contactId.min();
+        
         Bucket bucket = new Bucket(bucketId, 0, getK(), getMaxCacheSize());
         buckets.put(bucketId, bucket);
         
@@ -93,19 +81,26 @@ public class DefaultRouteTable extends AbstractRouteTable {
         return localhost.getContactId().equals(contact.getContactId());
     }
     
+    private void checkKeyLength(Contact other) throws IllegalArgumentException {
+        KUID contactId = localhost.getContactId();
+        KUID otherId = other.getContactId();
+        if (contactId.lengthInBits() 
+                != otherId.lengthInBits()) {
+            throw new IllegalArgumentException(
+                    "Bits: " + contactId.lengthInBits() 
+                    + " vs. " + contactId.lengthInBits());
+        }
+    }
+    
     @Override
     public synchronized void add(Contact contact) {
         if (contact == null) {
             throw new NullPointerException("contact");
         }
         
-        KeyFactory keyFactory = getKeyFactory();
-        KUID contactId = contact.getContactId();
-        if (keyFactory.lengthInBits() != contactId.lengthInBits()) {
-            throw new IllegalArgumentException(
-                    "Bits: " + keyFactory.lengthInBits() 
-                    + " vs. " + contactId.lengthInBits());
-        }
+        // Make sure the KUIDs of all Contacts have the
+        // same length in bits as the localhost Contact!
+        checkKeyLength(contact);
         
         // Nobody and nothing can add a Contact that has 
         // the exact same KUID as the localhost Contact!

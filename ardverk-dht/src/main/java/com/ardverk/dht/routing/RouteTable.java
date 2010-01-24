@@ -4,7 +4,6 @@ import java.net.SocketAddress;
 
 import com.ardverk.dht.ContactPinger;
 import com.ardverk.dht.KUID;
-import com.ardverk.dht.KeyFactory;
 
 public interface RouteTable {
     
@@ -13,10 +12,6 @@ public interface RouteTable {
     public ContactPinger getContactPinger();
     
     public void add(Contact contact);
-    
-    public ContactFactory getContactFactory();
-    
-    public KeyFactory getKeyFactory() ;
     
     public int getK();
     
