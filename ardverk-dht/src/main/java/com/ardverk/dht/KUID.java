@@ -84,13 +84,14 @@ public class KUID implements Xor<KUID>, Negation<KUID>, Writable, Serializable, 
     }
     
     public KUID min() {
-        return new KUID(new byte[length()]);
+        byte[] minKey = new byte[length()];
+        return new KUID(minKey);
     }
     
     public KUID max() {
-        byte[] data = new byte[length()];
-        Arrays.fill(data, (byte)0xFF);
-        return new KUID(data);
+        byte[] maxKey = new byte[length()];
+        Arrays.fill(maxKey, (byte)0xFF);
+        return new KUID(maxKey);
     }
     
     public boolean isSet(int bitIndex) {
