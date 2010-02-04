@@ -23,8 +23,6 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
 
     private static final long serialVersionUID = -4611363711131603626L;
     
-    private static final int MSB_MASK = 0x80;
-    
     private final byte[] key;
     
     private final int hashCode;
@@ -69,7 +67,7 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
      * Returns the length of the {@link KUID} in bits.
      */
     public int lengthInBits() {
-        return length() * 8;
+        return length() * Byte.SIZE;
     }
     
     @Override
@@ -127,12 +125,12 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
             throw new IllegalArgumentException("bitIndex=" + bitIndex);
         }
         
-        int index = (int)(bitIndex / 8);
+        int index = (int)(bitIndex / Byte.SIZE);
         if (index >= length()) {
             throw new IllegalArgumentException("bitIndex=" + bitIndex);
         }
         
-        int bit = (int)(bitIndex % 8);
+        int bit = (int)(bitIndex % Byte.SIZE);
         return (key[index] & (0x80 >>> bit)) != 0x00;
     }
     
@@ -167,12 +165,12 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
             throw new IllegalArgumentException("bitIndex=" + bitIndex);
         }
         
-        int index = (int)(bitIndex / 8);
+        int index = (int)(bitIndex / Byte.SIZE);
         if (index >= length()) {
             throw new IllegalArgumentException("bitIndex=" + bitIndex);
         }
         
-        int bit = (int)(bitIndex % 8);
+        int bit = (int)(bitIndex % Byte.SIZE);
         int mask = (int)(0x80 >>> bit);
         int value = (int)(key[index] & 0xFF);
         
@@ -204,8 +202,8 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
         for (int i = 0; i < key.length; i++) {
             int value = (int)(key[i] ^ otherId.key[i]);
             
-            for (int j = 0; j < 8 && bitIndex < lengthInBits; j++) {
-                if ((value & (MSB_MASK >>> j)) != 0) {
+            for (int j = 0; j < Byte.SIZE && bitIndex < lengthInBits; j++) {
+                if ((value & (0x80 >>> j)) != 0) {
                     return bitIndex;
                 }
                 
@@ -217,27 +215,37 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
     }
     
     /**
-     * Returns the common prefix length of the two {@link KUID}s.
-     */   
-    public int getPrefixLength(KUID otherId) {
-        if (otherId == null) {
-            throw new NullPointerException("otherId");
-        }
-        
-        int lengthInBits = lengthInBits();
-        if (lengthInBits != otherId.lengthInBits()) {
-            throw new IllegalArgumentException(
-                    "lengthInBits=" + lengthInBits 
-                    + ", otherId.lengthInBits=" + otherId.lengthInBits());
-        }
-        
-        for (int i = 0; i < lengthInBits; i++) {
-            if (isSet(i) != otherId.isSet(i)) {
-                return i;
+     * Returns true if all bits of the {@link KUID} are zero
+     */
+    public boolean isMin() {
+        return checkBits(0x00) == -1;
+    }
+    
+    /**
+     * Returns true if all bits of the {@link KUID} are one
+     */
+    public boolean isMax() {
+        return checkBits(0xFF) == -1;
+    }
+    
+    private int checkBits(int expected) {
+        for (int i = 0; i < key.length; i++) {
+            int value = (key[i] & 0xFF) ^ expected;
+            if (value != 0) {
+                int bits = lengthInBits() % Byte.SIZE;
+                if (bits == 0) {
+                    bits = Byte.SIZE;
+                }
+                
+                for (int j = 0; j < bits; j++) {
+                    if ((value & (0x80 >>> i)) != 0) {
+                        return (i * Byte.SIZE) + j;
+                    }
+                }
             }
         }
         
-        return lengthInBits;
+        return -1;
     }
     
     /**
@@ -270,8 +278,8 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
         
         int length = Math.min(length(), otherId.length());
         
-        int index = (int)(lengthInBits / 8);
-        int bits = (int)(lengthInBits % 8);
+        int index = (int)(lengthInBits / Byte.SIZE);
+        int bits = (int)(lengthInBits % Byte.SIZE);
         int diff = 0;
         
         for (int i = 0; i < length; i++) {
@@ -401,12 +409,5 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
             return keyAnalyzer.compare(o1 != null ? o1.key : null, 
                     o2 != null ? o2.key : null);
         }
-    }
-    
-    public static void main(String[] args) {
-        int bit = 0x100;
-        
-        bit >>>= 0;
-        System.out.println(Integer.toBinaryString(bit));
     }
 }
