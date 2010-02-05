@@ -189,20 +189,30 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
     }
     
     public int diff(KUID otherId) {
+        return diff(otherId, 0);
+    }
+    
+    public int diff(KUID otherId, int bitIndex) {
         if (otherId == null) {
             throw new NullPointerException("otherId");
         }
         
         int lengthInBits = lengthInBits();
+        if (bitIndex < 0 || lengthInBits < bitIndex) {
+            throw new IllegalArgumentException();
+        }
+        
         if (lengthInBits != otherId.lengthInBits()) {
             throw new IllegalArgumentException("otherId=" + otherId);
         }
         
-        int bitIndex = 0;
-        for (int i = 0; i < key.length; i++) {
+        int index = (int)(bitIndex / Byte.SIZE);
+        int bit = bitIndex % Byte.SIZE;
+        
+        for (int i = index; i < key.length; i++) {
             int value = (int)(key[i] ^ otherId.key[i]);
             
-            for (int j = 0; j < Byte.SIZE && bitIndex < lengthInBits; j++) {
+            for (int j = bit; j < Byte.SIZE && bitIndex < lengthInBits; j++) {
                 if ((value & (0x80 >>> j)) != 0) {
                     return bitIndex;
                 }

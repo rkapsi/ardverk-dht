@@ -319,7 +319,11 @@ public class DefaultRouteTable extends AbstractRouteTable {
     private synchronized boolean isSmallestSubtree(Bucket bucket) {
         KUID contactId = localhost.getContactId();
         KUID bucketId = bucket.getBucketId();
-        int prefixLength = contactId.getPrefixLength(bucketId);
+        
+        int prefixLength = contactId.diff(bucketId);
+        if (prefixLength == -1) {
+            prefixLength = contactId.lengthInBits();
+        }
         
         // The sibling Bucket contains the localhost Contact. 
         // We're looking if the other Bucket is its sibling 

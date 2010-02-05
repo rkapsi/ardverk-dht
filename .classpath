@@ -20,7 +20,7 @@
 	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/mina/mina-core-2.0.0-RC1.jar"/>
 	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/mina/slf4j-api-1.5.2.jar"/>
 	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/mina/ognl-2.7.2.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/PatriciaTrie"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Bee-Encode"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/PatriciaTrie"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
