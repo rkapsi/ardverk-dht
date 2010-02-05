@@ -212,7 +212,7 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
         for (int i = index; i < key.length; i++) {
             int value = (int)(key[i] ^ otherId.key[i]);
             
-            for (int j = bit; j < Byte.SIZE && bitIndex < lengthInBits; j++) {
+            for (int j = (i == index ? bit : 0); j < Byte.SIZE && bitIndex < lengthInBits; j++) {
                 if ((value & (0x80 >>> j)) != 0) {
                     return bitIndex;
                 }
