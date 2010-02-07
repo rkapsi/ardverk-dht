@@ -25,9 +25,15 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
     
     private final byte[] key;
     
+    private final int lengthInBits;
+    
     private final int hashCode;
 
     public KUID(byte[] key) {
+        this(key, key.length * Byte.SIZE);
+    }
+    
+    public KUID(byte[] key, int lengthInBits) {
         if (key == null) {
             throw new NullPointerException("key");
         }
@@ -37,7 +43,13 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
                     "key.length=" + key.length);
         }
         
+        if (lengthInBits < key.length * Byte.SIZE) {
+            throw new IllegalArgumentException(
+                    "lengthInBits=" + lengthInBits);
+        }
+        
         this.key = key;
+        this.lengthInBits = lengthInBits;
         this.hashCode = Arrays.hashCode(key);
     }
 
@@ -67,7 +79,7 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
      * Returns the length of the {@link KUID} in bits.
      */
     public int lengthInBits() {
-        return length() * Byte.SIZE;
+        return lengthInBits;
     }
     
     @Override
@@ -87,7 +99,7 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
             data[i] = (byte) (key[i] ^ otherId.key[i]);
         }
 
-        return new KUID(data);
+        return new KUID(data, lengthInBits);
     }
 
     @Override
@@ -97,7 +109,7 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
             data[i] = (byte)(~key[i]);
         }
         
-        return new KUID(data);
+        return new KUID(data, lengthInBits);
     }
     
     /**
@@ -105,7 +117,7 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
      */
     public KUID min() {
         byte[] minKey = new byte[length()];
-        return new KUID(minKey);
+        return new KUID(minKey, lengthInBits);
     }
     
     /**
@@ -114,7 +126,7 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
     public KUID max() {
         byte[] maxKey = new byte[length()];
         Arrays.fill(maxKey, (byte)0xFF);
-        return new KUID(maxKey);
+        return new KUID(maxKey, lengthInBits);
     }
     
     /**
@@ -182,7 +194,7 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
             } else {
                 copy[index] = (byte)(value & ~mask);
             }
-            return new KUID(copy);
+            return new KUID(copy, lengthInBits);
         }
         
         return this;
@@ -199,7 +211,7 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
         
         int lengthInBits = lengthInBits();
         if (bitIndex < 0 || lengthInBits < bitIndex) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("bitIndex=" + bitIndex);
         }
         
         if (lengthInBits != otherId.lengthInBits()) {
@@ -211,6 +223,12 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
         
         for (int i = index; i < key.length; i++) {
             int value = (int)(key[i] ^ otherId.key[i]);
+            
+            // Short cut for all values that are not the first or last
+            if (value == 0 && i != index && i < (key.length-1)) {
+                bitIndex += Byte.SIZE;
+                continue;
+            }
             
             for (int j = (i == index ? bit : 0); j < Byte.SIZE 
                     && bitIndex < lengthInBits; j++) {
@@ -229,34 +247,36 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
      * Returns true if all bits of the {@link KUID} are zero
      */
     public boolean isMin() {
-        return checkBits(0x00) == -1;
+        return compareBits(0x00) == lengthInBits();
     }
     
     /**
      * Returns true if all bits of the {@link KUID} are one
      */
     public boolean isMax() {
-        return checkBits(0xFF) == -1;
+        return compareBits(0xFF) == lengthInBits();
     }
     
-    private int checkBits(int expected) {
+    private int compareBits(int expected) {
+        int lengthInBits = lengthInBits();
+        int bitIndex = 0;
         for (int i = 0; i < key.length; i++) {
             int value = (key[i] & 0xFF) ^ expected;
-            if (value != 0) {
-                int bits = lengthInBits() % Byte.SIZE;
-                if (bits == 0) {
-                    bits = Byte.SIZE;
+            if (value == 0) {
+                bitIndex += Byte.SIZE;
+                continue;
+            }
+            
+            for (int j = 0; j < Byte.SIZE && bitIndex < lengthInBits; j++) {
+                if ((value & (0x80 >>> j)) != 0) {
+                    return bitIndex;
                 }
                 
-                for (int j = 0; j < bits; j++) {
-                    if ((value & (0x80 >>> i)) != 0) {
-                        return (i * Byte.SIZE) + j;
-                    }
-                }
+                ++bitIndex;
             }
         }
         
-        return -1;
+        return lengthInBits;
     }
     
     /**
@@ -277,9 +297,8 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
             throw new NullPointerException("otherId");
         }
         
-        if (lengthInBits < 0 
-                || lengthInBits > lengthInBits() 
-                || lengthInBits > otherId.lengthInBits()) {
+        if (lengthInBits < 0 || lengthInBits() < lengthInBits 
+                || otherId.lengthInBits() < lengthInBits) {
             throw new IllegalArgumentException("lengthInBits=" + lengthInBits);
         }
         
@@ -289,23 +308,30 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
         
         int length = Math.min(length(), otherId.length());
         
-        int index = (int)(lengthInBits / Byte.SIZE);
-        int bits = (int)(lengthInBits % Byte.SIZE);
-        int diff = 0;
+        int bitIndex = 0;
+        
+        int mask, diff;
+        byte value1, value2;
         
         for (int i = 0; i < length; i++) {
-            if (i == index && bits != 0) {
-                for (int j = 0; j < bits; j++) {
-                    diff = (key[i] & (0x80 >>> j)) - (otherId.key[i] & (0x80 >>> j));
-                    if (diff != 0) {
-                        return diff;
-                    }
-                }
-            } else {
-                diff = (key[i] & 0xFF) - (otherId.key[i] & 0xFF);
+            
+            value1 = key[i];
+            value2 = otherId.key[i];
+            
+            if (value1 == value2) {
+                bitIndex += Byte.SIZE;
+                continue;
+            }
+            
+            for (int j = 0; j < Byte.SIZE && bitIndex < lengthInBits; j++) {
+                mask = 0x80 >>> j;
+                diff = (value1 & mask) - (value2 & mask);
+                
                 if (diff != 0) {
                     return diff;
                 }
+                
+                ++bitIndex;
             }
         }
         

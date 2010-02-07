@@ -10,7 +10,7 @@ public class KUIDKeyAnalyzer implements KeyAnalyzer<KUID> {
     public int bitIndex(KUID key, int offsetInBits, int lengthInBits,
             KUID otherId, int otherOffsetInBits, int otherLengthInBits) {
         int index = key.commonPrefix(otherId);
-        if (index == lengthInBits) {
+        if (index == key.lengthInBits()) {
             if (key.isMin()) {
                 return NULL_BIT_KEY;
             }
