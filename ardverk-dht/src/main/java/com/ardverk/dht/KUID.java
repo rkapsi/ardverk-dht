@@ -188,11 +188,11 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
         return this;
     }
     
-    public int diff(KUID otherId) {
-        return diff(otherId, 0);
+    public int commonPrefix(KUID otherId) {
+        return commonPrefix(otherId, 0);
     }
     
-    public int diff(KUID otherId, int bitIndex) {
+    public int commonPrefix(KUID otherId, int bitIndex) {
         if (otherId == null) {
             throw new NullPointerException("otherId");
         }
@@ -212,7 +212,8 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
         for (int i = index; i < key.length; i++) {
             int value = (int)(key[i] ^ otherId.key[i]);
             
-            for (int j = (i == index ? bit : 0); j < Byte.SIZE && bitIndex < lengthInBits; j++) {
+            for (int j = (i == index ? bit : 0); j < Byte.SIZE 
+                    && bitIndex < lengthInBits; j++) {
                 if ((value & (0x80 >>> j)) != 0) {
                     return bitIndex;
                 }
@@ -221,7 +222,7 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
             }
         }
         
-        return -1;
+        return lengthInBits;
     }
     
     /**
