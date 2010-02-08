@@ -133,15 +133,11 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
      * Returns true if the bit at the given bitIndex position is true (one, 1).
      */
     public boolean isSet(int bitIndex) {
-        if (bitIndex < 0 || bitIndex >= lengthInBits()) {
+        if (bitIndex < 0 || lengthInBits() < bitIndex) {
             throw new IllegalArgumentException("bitIndex=" + bitIndex);
         }
         
         int index = (int)(bitIndex / Byte.SIZE);
-        if (index >= length()) {
-            throw new IllegalArgumentException("bitIndex=" + bitIndex);
-        }
-        
         int bit = (int)(bitIndex % Byte.SIZE);
         return (key[index] & (0x80 >>> bit)) != 0x00;
     }
@@ -173,16 +169,13 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
     private KUID set(int bitIndex, boolean on) {
         int lengthInBits = lengthInBits();
         
-        if (bitIndex < 0 || bitIndex >= lengthInBits) {
+        if (bitIndex < 0 || lengthInBits < bitIndex) {
             throw new IllegalArgumentException("bitIndex=" + bitIndex);
         }
         
         int index = (int)(bitIndex / Byte.SIZE);
-        if (index >= length()) {
-            throw new IllegalArgumentException("bitIndex=" + bitIndex);
-        }
-        
         int bit = (int)(bitIndex % Byte.SIZE);
+        
         int mask = (int)(0x80 >>> bit);
         int value = (int)(key[index] & 0xFF);
         
@@ -210,7 +203,8 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
         }
         
         int lengthInBits = lengthInBits();
-        if (offsetInBits < 0 || length < 0 || lengthInBits < (offsetInBits+length)) {
+        if (offsetInBits < 0 || length < 0 
+                || lengthInBits < (offsetInBits+length)) {
             throw new IllegalArgumentException(
                     "offsetInBits=" + offsetInBits + ", length=" + length);
         }
@@ -251,36 +245,50 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
      * Returns true if all bits of the {@link KUID} are zero
      */
     public boolean isMin() {
-        return compareBits(0x00) == lengthInBits();
+        int lengthInBits = lengthInBits();
+        return compare(0x00, 0, lengthInBits) == lengthInBits;
     }
     
     /**
      * Returns true if all bits of the {@link KUID} are one
      */
     public boolean isMax() {
-        return compareBits(0xFF) == lengthInBits();
+        int lengthInBits = lengthInBits();
+        return compare(0xFF, 0, lengthInBits) == lengthInBits;
     }
     
-    private int compareBits(int expected) {
+    private int compare(int expected, int offsetInBits, int length) {
+        
         int lengthInBits = lengthInBits();
+        if (offsetInBits < 0 || length < 0 
+                || lengthInBits < (offsetInBits + length)) {
+            throw new IllegalArgumentException(
+                    "offsetInBits=" + offsetInBits + ", length=" + length);
+        }
+        
+        int index = (int)(offsetInBits / Byte.SIZE);
+        int bit = offsetInBits % Byte.SIZE;
+        
         int bitIndex = 0;
-        for (int i = 0; i < key.length; i++) {
+        for (int i = 0; i < key.length && bitIndex < length; i++) {
             int value = (key[i] & 0xFF) ^ expected;
-            if (value == 0) {
+            if (value == 0 && i != index) {
                 bitIndex += Byte.SIZE;
                 continue;
             }
             
-            for (int j = 0; j < Byte.SIZE && bitIndex < lengthInBits; j++) {
+            for (int j = (i == index ? bit : 0); 
+                    j < Byte.SIZE && bitIndex < length; j++) {
+                
                 if ((value & (0x80 >>> j)) != 0) {
-                    return bitIndex;
+                    return offsetInBits + bitIndex;
                 }
                 
                 ++bitIndex;
             }
         }
         
-        return lengthInBits;
+        return offsetInBits + length;
     }
     
     /**
@@ -302,7 +310,8 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
         }
         
         int lengthInBits = lengthInBits();
-        if (offsetInBits < 0 || length < 0 || lengthInBits < (offsetInBits + length)) {
+        if (offsetInBits < 0 || length < 0 
+                || lengthInBits < (offsetInBits + length)) {
             throw new IllegalArgumentException(
                     "offsetInBits=" + offsetInBits + ", length=" + length);
         }
