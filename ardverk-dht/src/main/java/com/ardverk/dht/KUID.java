@@ -221,8 +221,8 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
             for (int i = index; i < key.length && bitIndex < length; i++) {
                 int value = (int)(key[i] ^ otherId.key[i]);
                 
-                // Short cut for all values that are not the first or last
-                if (value == 0 && i != index && i < (key.length-1)) {
+                // A short cut we can take...
+                if (value == 0 && (bit == 0 || i != index) && i < (key.length-1)) {
                     bitIndex += Byte.SIZE;
                     continue;
                 }
@@ -272,7 +272,9 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
         int bitIndex = 0;
         for (int i = 0; i < key.length && bitIndex < length; i++) {
             int value = (key[i] & 0xFF) ^ expected;
-            if (value == 0 && i != index) {
+            
+            // A shortcut we can take...
+            if (value == 0 && (bit == 0 || i != index)) {
                 bitIndex += Byte.SIZE;
                 continue;
             }
@@ -333,7 +335,8 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
                 value1 = key[i];
                 value2 = otherId.key[i];
                 
-                if (value1 == value2 && i != index) {
+                // A shot cut we can take...
+                if (value1 == value2 && (bit == 0 || i != index)) {
                     bitIndex += Byte.SIZE;
                     continue;
                 }
