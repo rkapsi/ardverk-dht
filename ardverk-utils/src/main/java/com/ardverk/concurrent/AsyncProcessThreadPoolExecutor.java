@@ -23,7 +23,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncThreadPoolExecutor;
-import org.ardverk.lang.Time;
+import org.ardverk.lang.Duration;
 
 /**
  * An implementation of {@link ThreadPoolExecutor} for {@link AsyncProcessFuture}s.
@@ -31,7 +31,7 @@ import org.ardverk.lang.Time;
 public class AsyncProcessThreadPoolExecutor extends AsyncThreadPoolExecutor 
         implements AsyncProcessExecutorService {
 
-    private volatile Time timeout = Time.NONE;
+    private volatile Duration timeout = Duration.NONE;
     
     public AsyncProcessThreadPoolExecutor(int corePoolSize, int maximumPoolSize,
             long keepAliveTime, TimeUnit unit,
@@ -69,7 +69,7 @@ public class AsyncProcessThreadPoolExecutor extends AsyncThreadPoolExecutor
 
     @Override
     public void setTimeout(long timeout, TimeUnit unit) {
-        this.timeout = new Time(timeout, unit);
+        this.timeout = new Duration(timeout, unit);
     }
     
     @Override
@@ -78,13 +78,13 @@ public class AsyncProcessThreadPoolExecutor extends AsyncThreadPoolExecutor
             throw new NullPointerException("unit");
         }
         
-        Time timeout = this.timeout;
-        long value = timeout.getTime();
+        Duration timeout = this.timeout;
+        long value = timeout.getDuration();
         if (value == -1L) {
             return -1L;
         }
         
-        return timeout.getTime(unit);
+        return timeout.getDuration(unit);
     }
     
     @Override
@@ -99,8 +99,8 @@ public class AsyncProcessThreadPoolExecutor extends AsyncThreadPoolExecutor
     
     @Override
     public <T> AsyncProcessFuture<T> submit(AsyncProcess<T> process) {
-        Time timeout = this.timeout;
-        return submit(process, timeout.getTime(), timeout.getUnit());
+        Duration timeout = this.timeout;
+        return submit(process, timeout.getDuration(), timeout.getUnit());
     }
     
     @Override
