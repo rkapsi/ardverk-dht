@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
 
+import com.ardverk.concurrent.AsyncProcessFuture;
 import com.ardverk.dht.entity.Entity;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
@@ -14,7 +15,7 @@ import com.ardverk.dht.message.ResponseMessage;
 public abstract class AbstractResponseHandler<V extends Entity> 
         extends AbstractMessageHandler implements ResponseHandler<V> {
     
-    protected volatile AsyncFuture<V> future = null;
+    protected volatile AsyncProcessFuture<V> future = null;
     
     private final AtomicBoolean done = new AtomicBoolean(false);
     
@@ -116,7 +117,7 @@ public abstract class AbstractResponseHandler<V extends Entity>
     }
     
     @Override
-    public final void start(AsyncFuture<V> future) throws Exception {
+    public final void start(AsyncProcessFuture<V> future) throws Exception {
         if (future == null) {
             throw new NullPointerException("future");
         }

@@ -6,20 +6,21 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.ardverk.concurrent.AsyncExecutorService;
-import org.ardverk.concurrent.AsyncExecutors;
 import org.ardverk.concurrent.AsyncFuture;
-import org.ardverk.concurrent.AsyncFutureTask;
-import org.ardverk.concurrent.AsyncProcess;
+import org.ardverk.concurrent.ExecutorUtils;
+
+import com.ardverk.concurrent.AsyncProcess;
+import com.ardverk.concurrent.AsyncProcessExecutorService;
+import com.ardverk.concurrent.AsyncProcessExecutors;
+import com.ardverk.concurrent.AsyncProcessFutureTask;
 
 class RequestManager implements Closeable {
 
     private static final AtomicInteger COUNTER = new AtomicInteger();
     
-    private static final AsyncExecutorService EXECUTOR 
-        = AsyncExecutors.newCachedThreadPool(
-                AsyncExecutors.defaultThreadFactory(
-                        "RequestManagerThread"));
+    private static final AsyncProcessExecutorService EXECUTOR 
+        = AsyncProcessExecutors.newCachedThreadPool(
+                ExecutorUtils.defaultThreadFactory("RequestManagerThread"));
     
     private boolean open = true;
     
@@ -71,7 +72,7 @@ class RequestManager implements Closeable {
         return future;
     }
     
-    private class AsyncRequestFuture<T> extends AsyncFutureTask<T> {
+    private class AsyncRequestFuture<T> extends AsyncProcessFutureTask<T> {
         
         private final Integer key = Integer.valueOf(COUNTER.incrementAndGet());
         
@@ -89,6 +90,8 @@ class RequestManager implements Closeable {
             synchronized (RequestManager.this) {
                 futures.remove(key);
             }
+            
+            super.done();
         }
     }
 }

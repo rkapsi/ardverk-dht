@@ -12,6 +12,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.ardverk.concurrent.ExecutorUtils;
 import org.slf4j.Logger;
 
 import com.ardverk.collection.FixedSizeHashSet;
@@ -33,7 +34,6 @@ import com.ardverk.dht.message.ValueRequest;
 import com.ardverk.dht.message.ValueResponse;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.logging.LoggerUtils;
-import com.ardverk.utils.ExecutorUtils;
 
 /**
  * 

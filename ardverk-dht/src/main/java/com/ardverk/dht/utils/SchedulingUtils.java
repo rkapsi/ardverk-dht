@@ -4,12 +4,12 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import com.ardverk.utils.ExecutorUtils;
+import org.ardverk.concurrent.ExecutorUtils;
 
 public class SchedulingUtils {
 
     private static final ScheduledThreadPoolExecutor EXECUTOR 
-        = ExecutorUtils.newSingleThreadScheduledExecutor("");
+        = ExecutorUtils.newSingleThreadScheduledExecutor("DefaultSchedulingThread");
     
     private SchedulingUtils() {}
     

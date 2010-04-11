@@ -2,10 +2,9 @@ package com.ardverk.dht.entity;
 
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.concurrent.AsyncExecutorService;
-import org.ardverk.concurrent.AsyncFuture;
-import org.ardverk.concurrent.AsyncProcess;
-
+import com.ardverk.concurrent.AsyncProcess;
+import com.ardverk.concurrent.AsyncProcessExecutorService;
+import com.ardverk.concurrent.AsyncProcessFuture;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.io.StoreResponseHandler;
@@ -14,7 +13,7 @@ import com.ardverk.dht.routing.Contact;
 
 public class DefaultNodeEntity extends AbstractEntity implements NodeEntity {
 
-    private final AsyncExecutorService executor = null;
+    private final AsyncProcessExecutorService executor = null;
     
     private final MessageDispatcher messageDispatcher = null;
     
@@ -41,7 +40,7 @@ public class DefaultNodeEntity extends AbstractEntity implements NodeEntity {
     }
     
     @Override
-    public AsyncFuture<StoreEntity> store(KUID key, byte[] value) {
+    public AsyncProcessFuture<StoreEntity> store(KUID key, byte[] value) {
         AsyncProcess<StoreEntity> process = new StoreResponseHandler(
                 messageDispatcher, this, key, value);
         return executor.submit(process);

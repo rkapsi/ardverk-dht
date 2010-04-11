@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="ardverk-utils/src/main/java"/>
+	<classpathentry kind="src" path="ardverk-utils/src/test/java"/>
 	<classpathentry kind="src" path="ardverk-encoding/src/main/java"/>
 	<classpathentry kind="src" path="ardverk-encoding/src/test/java"/>
 	<classpathentry kind="src" path="ardverk-encoding/resources/main/java"/>
@@ -9,7 +10,6 @@
 	<classpathentry kind="lib" path="ardverk-utils/lib/main/java/slf4j/slf4j-api-1.5.6.jar"/>
 	<classpathentry kind="lib" path="ardverk-utils/lib/main/java/slf4j/slf4j-simple-1.5.6.jar"/>
 	<classpathentry kind="lib" path="ardverk-utils/lib/test/java/junit/junit-4.6.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/AsyncFuture"/>
 	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/mina/commons-lang-2.4.jar"/>
 	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/mina/commons-logging-1.0.3.jar"/>
 	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/mina/javassist-3.7.ga.jar"/>
@@ -18,5 +18,6 @@
 	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/mina/ognl-2.7.2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Bee-Encode"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/PatriciaTrie"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ardverk-concurrent"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

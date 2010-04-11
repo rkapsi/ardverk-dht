@@ -8,12 +8,13 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.concurrent.AsyncExecutorService;
-import org.ardverk.concurrent.AsyncExecutors;
 import org.ardverk.concurrent.AsyncFuture;
-import org.ardverk.concurrent.AsyncProcess;
 import org.slf4j.Logger;
 
+import com.ardverk.concurrent.AsyncProcess;
+import com.ardverk.concurrent.AsyncProcessExecutorService;
+import com.ardverk.concurrent.AsyncProcessExecutors;
+import com.ardverk.concurrent.AsyncProcessFuture;
 import com.ardverk.dht.ContactPinger;
 import com.ardverk.dht.DefaultKeyFactory;
 import com.ardverk.dht.KUID;
@@ -185,8 +186,8 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
         
         private static final int K = 20;
         
-        private static final AsyncExecutorService EXECUTOR 
-            = AsyncExecutors.newCachedThreadPool();
+        private static final AsyncProcessExecutorService EXECUTOR 
+            = AsyncProcessExecutors.newCachedThreadPool();
         
         private static final KeyFactory KEY_FACTORY 
             = new DefaultKeyFactory(KEY_SIZE);
@@ -243,31 +244,31 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
             return routeTable;
         }
         
-        public AsyncFuture<PingEntity> ping(String host, int port) {
+        public AsyncProcessFuture<PingEntity> ping(String host, int port) {
             AsyncProcess<PingEntity> process 
                 = new PingResponseHandler(messageDispatcher, host, port);
             return EXECUTOR.submit(process, 30L, TimeUnit.SECONDS);
         }
         
-        public AsyncFuture<PingEntity> ping(Contact dst) {
+        public AsyncProcessFuture<PingEntity> ping(Contact dst) {
             AsyncProcess<PingEntity> process 
                 = new PingResponseHandler(messageDispatcher, dst);
             return EXECUTOR.submit(process, 30L, TimeUnit.SECONDS);
         }
         
-        public AsyncFuture<NodeEntity> lookup(KUID key) {
+        public AsyncProcessFuture<NodeEntity> lookup(KUID key) {
             AsyncProcess<NodeEntity> process 
                 = new NodeResponseHandler(messageDispatcher, routeTable, key);
             return EXECUTOR.submit(process, 30L, TimeUnit.SECONDS);
         }
         
-        public AsyncFuture<ValueEntity> get(KUID key) {
+        public AsyncProcessFuture<ValueEntity> get(KUID key) {
             AsyncProcess<ValueEntity> process 
                 = new ValueResponseHandler(messageDispatcher, routeTable, key);
             return EXECUTOR.submit(process, 30L, TimeUnit.SECONDS);
         }
         
-        public AsyncFuture<StoreEntity> put(NodeEntity entity, KUID key, byte[] value) {
+        public AsyncProcessFuture<StoreEntity> put(NodeEntity entity, KUID key, byte[] value) {
             AsyncProcess<StoreEntity> process 
                 = new StoreResponseHandler(messageDispatcher, entity, key, value);
             return EXECUTOR.submit(process, 30L, TimeUnit.SECONDS);
