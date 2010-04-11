@@ -1,5 +1,6 @@
 package com.ardverk.coding;
 
+import org.ardverk.coding.Base16;
 import org.ardverk.utils.StringUtils;
 
 public class CodingUtils {
