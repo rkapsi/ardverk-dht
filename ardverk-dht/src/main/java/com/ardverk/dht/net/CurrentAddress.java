@@ -3,7 +3,8 @@ package com.ardverk.dht.net;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
 
-import com.ardverk.collection.FixedSizeHashSet;
+import org.ardverk.collection.FixedSizeHashSet;
+
 import com.ardverk.net.NetworkMask;
 
 /**

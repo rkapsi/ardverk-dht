@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.ardverk.collection.Cursor;
+import org.ardverk.collection.FixedSizeHashMap;
 import org.ardverk.collection.KeyAnalyzer;
 import org.ardverk.collection.PatriciaTrie;
 import org.ardverk.collection.Trie;
@@ -15,7 +16,6 @@ import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
 import org.slf4j.Logger;
 
-import com.ardverk.collection.FixedSizeHashMap;
 import com.ardverk.dht.ContactPinger;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.entity.PingEntity;
