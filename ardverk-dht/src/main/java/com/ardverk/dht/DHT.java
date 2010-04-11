@@ -3,8 +3,7 @@ package com.ardverk.dht;
 import java.net.InetAddress;
 import java.net.SocketAddress;
 
-import org.ardverk.concurrent.AsyncFuture;
-
+import com.ardverk.concurrent.AsyncProcessFuture;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.StoreEntity;
@@ -42,35 +41,35 @@ interface DHT {
     /**
      * Sends a ping to the given host.
      */
-    public AsyncFuture<PingEntity> ping(String address, int port);
+    public AsyncProcessFuture<PingEntity> ping(String address, int port);
     
     /**
      * Sends a ping to the given host.
      */
-    public AsyncFuture<PingEntity> ping(InetAddress address, int port);
+    public AsyncProcessFuture<PingEntity> ping(InetAddress address, int port);
 
     /**
      * Sends a ping to the given host.
      */
-    public AsyncFuture<PingEntity> ping(SocketAddress dst);
+    public AsyncProcessFuture<PingEntity> ping(SocketAddress dst);
     
     /**
      * Sends a ping to the given host.
      */
-    public AsyncFuture<PingEntity> ping(Contact contact);
+    public AsyncProcessFuture<PingEntity> ping(Contact contact);
     
     /**
      * 
      */
-    public AsyncFuture<StoreEntity> put(KUID key, byte[] value);
+    public AsyncProcessFuture<StoreEntity> put(KUID key, byte[] value);
     
     /**
      * 
      */
-    public AsyncFuture<ValueEntity> get(KUID key);
+    public AsyncProcessFuture<ValueEntity> get(KUID key);
     
     /**
      * 
      */
-    public AsyncFuture<NodeEntity> lookup(KUID key);
+    public AsyncProcessFuture<NodeEntity> lookup(KUID key);
 }

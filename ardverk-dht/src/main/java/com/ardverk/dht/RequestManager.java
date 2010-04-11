@@ -12,6 +12,7 @@ import org.ardverk.concurrent.ExecutorUtils;
 import com.ardverk.concurrent.AsyncProcess;
 import com.ardverk.concurrent.AsyncProcessExecutorService;
 import com.ardverk.concurrent.AsyncProcessExecutors;
+import com.ardverk.concurrent.AsyncProcessFuture;
 import com.ardverk.concurrent.AsyncProcessFutureTask;
 
 class RequestManager implements Closeable {
@@ -42,7 +43,7 @@ class RequestManager implements Closeable {
         futures.clear();
     }
     
-    public synchronized <T> AsyncFuture<T> submit(AsyncProcess<T> process) {
+    public synchronized <T> AsyncProcessFuture<T> submit(AsyncProcess<T> process) {
         if (!open) {
             throw new IllegalStateException();
         }
@@ -56,7 +57,7 @@ class RequestManager implements Closeable {
         return future;
     }
     
-    public synchronized <T> AsyncFuture<T> submit(AsyncProcess<T> process, 
+    public synchronized <T> AsyncProcessFuture<T> submit(AsyncProcess<T> process, 
             long timeout, TimeUnit unit) {
         
         if (!open) {

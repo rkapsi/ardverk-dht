@@ -9,6 +9,7 @@ import java.net.SocketAddress;
 import org.ardverk.concurrent.AsyncFuture;
 
 import com.ardverk.concurrent.AsyncProcess;
+import com.ardverk.concurrent.AsyncProcessFuture;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.StoreEntity;
@@ -115,48 +116,48 @@ public class ArdverkDHT extends AbstractDHT implements Closeable {
     }
     
     @Override
-    public AsyncFuture<PingEntity> ping(Contact contact) {
+    public AsyncProcessFuture<PingEntity> ping(Contact contact) {
         AsyncProcess<PingEntity> process 
             = new PingResponseHandler(messageDispatcher, contact);
         return requestManager.submit(process);
     }
 
     @Override
-    public AsyncFuture<PingEntity> ping(InetAddress address, int port) {
+    public AsyncProcessFuture<PingEntity> ping(InetAddress address, int port) {
         AsyncProcess<PingEntity> process 
             = new PingResponseHandler(messageDispatcher, address, port);
         return requestManager.submit(process);
     }
 
     @Override
-    public AsyncFuture<PingEntity> ping(SocketAddress dst) {
+    public AsyncProcessFuture<PingEntity> ping(SocketAddress dst) {
         AsyncProcess<PingEntity> process 
             = new PingResponseHandler(messageDispatcher, dst);
         return requestManager.submit(process);
     }
 
     @Override
-    public AsyncFuture<PingEntity> ping(String address, int port) {
+    public AsyncProcessFuture<PingEntity> ping(String address, int port) {
         AsyncProcess<PingEntity> process 
             = new PingResponseHandler(messageDispatcher, address, port);
         return requestManager.submit(process);
     }
 
     @Override
-    public AsyncFuture<StoreEntity> put(KUID key, byte[] value) {
+    public AsyncProcessFuture<StoreEntity> put(KUID key, byte[] value) {
         AsyncProcess<StoreEntity> process 
             = new StoreResponseHandler(messageDispatcher, null, key, value);
         return requestManager.submit(process);
     }
     
     @Override
-    public AsyncFuture<ValueEntity> get(KUID key) {
+    public AsyncProcessFuture<ValueEntity> get(KUID key) {
         AsyncProcess<ValueEntity> process = null;
         return requestManager.submit(process);
     }
 
     @Override
-    public AsyncFuture<NodeEntity> lookup(KUID key) {
+    public AsyncProcessFuture<NodeEntity> lookup(KUID key) {
         AsyncProcess<NodeEntity> process 
             = new NodeResponseHandler(messageDispatcher, routeTable, key);
         return requestManager.submit(process);
