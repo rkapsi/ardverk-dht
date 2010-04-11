@@ -34,31 +34,31 @@ import org.ardverk.concurrent.AsyncFuture;
 public interface AsyncProcessExecutorService extends AsyncProcessExecutor, AsyncExecutorService {
 
     /**
-     * Sets default timeout for {@link AsyncFuture}s. Use -1 to disable 
+     * Sets default timeout for {@link AsyncProcessFuture}s. Use -1 to disable 
      * the default timeout.
      */
     public void setTimeout(long timeout, TimeUnit unit);
     
     /**
-     * Returns the default timeout of {@link AsyncFuture}s or -1 if no
+     * Returns the default timeout of {@link AsyncProcessFuture}s or -1 if no
      * timeout is specified (default).
      */
     public long getTimeout(TimeUnit unit);
     
     /**
-     * 
+     * Returns the default timeout in milliseconds.
      */
     public long getTimeoutInMillis();
     
     /**
      * Submits the given {@link AsyncProcess} for execution and returns 
-     * an {@link AsyncFuture} for it.
+     * an {@link AsyncProcessFuture} for it.
      */
     public <T> AsyncProcessFuture<T> submit(AsyncProcess<T> process);
     
     /**
      * Submits the given {@link AsyncProcess} for execution and returns 
-     * an {@link AsyncFuture} for it.
+     * an {@link AsyncProcessFuture} for it.
      */
     public <T> AsyncProcessFuture<T> submit(AsyncProcess<T> process, 
             long timeout, TimeUnit unit);

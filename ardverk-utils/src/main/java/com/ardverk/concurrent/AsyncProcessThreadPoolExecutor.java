@@ -22,12 +22,11 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncThreadPoolExecutor;
 import org.ardverk.lang.Time;
 
 /**
- * An implementation of {@link ThreadPoolExecutor} for {@link AsyncFuture}s.
+ * An implementation of {@link ThreadPoolExecutor} for {@link AsyncProcessFuture}s.
  */
 public class AsyncProcessThreadPoolExecutor extends AsyncThreadPoolExecutor 
         implements AsyncProcessExecutorService {
@@ -100,6 +99,7 @@ public class AsyncProcessThreadPoolExecutor extends AsyncThreadPoolExecutor
     
     @Override
     public <T> AsyncProcessFuture<T> submit(AsyncProcess<T> process) {
+        Time timeout = this.timeout;
         return submit(process, timeout.getTime(), timeout.getUnit());
     }
     
