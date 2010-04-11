@@ -2,8 +2,9 @@ package com.ardverk.dht.entity;
 
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.utils.StringUtils;
+
 import com.ardverk.dht.io.LookupResponseHandler.State;
-import com.ardverk.utils.StringUtils;
 
 public class DefaultValueEntity extends AbstractEntity implements ValueEntity {
 
