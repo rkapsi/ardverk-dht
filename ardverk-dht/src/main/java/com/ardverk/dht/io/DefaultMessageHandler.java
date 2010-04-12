@@ -55,4 +55,9 @@ public class DefaultMessageHandler implements MessageCallback {
         routeTable.failure(dst.getContactId(), 
                 dst.getRemoteAddress());
     }
+
+    @Override
+    public void handleException(RequestMessage request, Throwable exception) {
+        // Do nothing!
+    }
 }

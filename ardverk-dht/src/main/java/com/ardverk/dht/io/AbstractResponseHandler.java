@@ -179,4 +179,21 @@ public abstract class AbstractResponseHandler<V extends Entity>
     
     protected abstract void processTimeout(RequestMessage request, 
             long time, TimeUnit unit) throws IOException;
+
+    @Override
+    public void handleException(RequestMessage request, Throwable exception) {
+        synchronized (future) {
+            if (!isOpen()) {
+                return;
+            }
+            
+            synchronized (this) {
+                processException(request, exception);                
+            }
+        }
+    }
+    
+    protected void processException(RequestMessage request, Throwable exception) {
+        
+    }
 }

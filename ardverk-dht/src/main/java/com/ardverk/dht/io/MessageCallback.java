@@ -22,4 +22,9 @@ public interface MessageCallback {
      */
     public void handleTimeout(RequestMessage request, 
             long time, TimeUnit unit) throws IOException;
+    
+    /**
+     * 
+     */
+    public void handleException(RequestMessage request, Throwable exception);
 }
