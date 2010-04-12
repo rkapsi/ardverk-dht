@@ -146,9 +146,15 @@ public abstract class AbstractResponseHandler<V extends Entity>
             ResponseMessage response, long time, TimeUnit unit)
             throws IOException {
         
-        if (isOpen()) {
-            lastResponseTime = System.currentTimeMillis();
-            processResponse(request, response, time, unit);
+        synchronized (future) {
+            if (!isOpen()) {
+                return;
+            }
+            
+            synchronized (this) {
+                lastResponseTime = System.currentTimeMillis();
+                processResponse(request, response, time, unit);
+            }
         }
     }
     
@@ -160,8 +166,14 @@ public abstract class AbstractResponseHandler<V extends Entity>
     public void handleTimeout(RequestMessage request, 
             long time, TimeUnit unit) throws IOException {
         
-        if (isOpen()) {
-            processTimeout(request, time, unit);
+        synchronized (future) {
+            if (!isOpen()) {
+                return;
+            }
+            
+            synchronized (this) {
+                processTimeout(request, time, unit);                
+            }
         }
     }
     
