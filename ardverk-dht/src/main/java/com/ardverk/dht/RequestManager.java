@@ -87,7 +87,7 @@ class RequestManager implements Closeable {
         }
 
         @Override
-        protected void done() {
+        protected void done0() {
             synchronized (RequestManager.this) {
                 futures.remove(key);
             }

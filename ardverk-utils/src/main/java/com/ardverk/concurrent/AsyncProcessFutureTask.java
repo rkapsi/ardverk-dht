@@ -5,17 +5,14 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.ardverk.concurrent.AsyncFutureListener;
-import org.ardverk.concurrent.AsyncValueFuture;
-import org.ardverk.concurrent.CurrentThread;
+import org.ardverk.concurrent.AsyncFutureTask;
 import org.ardverk.concurrent.ExecutorUtils;
-import org.ardverk.concurrent.Interruptible;
 
 import com.ardverk.utils.EventUtils;
 
-public class AsyncProcessFutureTask<V> extends AsyncValueFuture<V> 
+public class AsyncProcessFutureTask<V> extends AsyncFutureTask<V> 
         implements AsyncProcessRunnableFuture<V> {
 
     private static final ScheduledThreadPoolExecutor EXECUTOR 
@@ -28,9 +25,6 @@ public class AsyncProcessFutureTask<V> extends AsyncValueFuture<V>
             throw new IllegalStateException();
         }
     };
-    
-    private final AtomicReference<Interruptible> thread 
-        = new AtomicReference<Interruptible>(Interruptible.INIT);
     
     private final AsyncProcess<V> process;
     
@@ -57,36 +51,13 @@ public class AsyncProcessFutureTask<V> extends AsyncValueFuture<V>
         this.timeout = timeout;
         this.unit = unit;
     }
-
-    @Override
-    public void run() {
-        if (thread.compareAndSet(Interruptible.INIT, new CurrentThread())) {
-            try {
-                synchronized (this) {
-                    if (!isDone()) {
-                        try {
-                            start();
-                            watchdog();
-                        } catch (Exception err) {
-                            setException(err);
-                        }
-                    }
-                }
-            } finally {
-                thread.set(Interruptible.DONE);
-            }
-        }
-    }
     
     @Override
-    public boolean cancel(boolean mayInterruptIfRunning) {
-        boolean success = super.cancel(mayInterruptIfRunning);
-        
-        if (success && mayInterruptIfRunning) {
-            thread.getAndSet(Interruptible.DONE).interrupt();
+    protected synchronized void doRun() throws Exception {
+        if (!isDone()) {
+            start();
+            watchdog();
         }
-        
-        return success;
     }
     
     protected synchronized void start() throws Exception {
@@ -146,7 +117,7 @@ public class AsyncProcessFutureTask<V> extends AsyncValueFuture<V>
     }
 
     @Override
-    protected void done() {
+    protected final void done() {
         synchronized (this) {
             if (future != null) {
                 future.cancel(true);
@@ -154,6 +125,11 @@ public class AsyncProcessFutureTask<V> extends AsyncValueFuture<V>
         }
         
         super.done();
+        done0();
+    }
+    
+    protected void done0() {
+        
     }
 
     @Override
