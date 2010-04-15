@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.ardverk.collection.CollectionsUtils;
 import org.ardverk.lang.NullArgumentException;
 
 import com.ardverk.dht.KUID;
@@ -83,14 +84,10 @@ public class Contact2 implements Cloneable {
         this.socketAddress = socketAddress;
         this.contactAddress = contactAddress;
         
-        if (attributes != null && !attributes.isEmpty()) {
-            this.attributes = new HashMap<Object, Object>(attributes);
-        } else {
-            this.attributes = Collections.emptyMap();
-        }
+        this.attributes = CollectionsUtils.copy(attributes);
     }
     
-    private Contact2(Contact2 existing, Map<Object, Object> attributes) {
+    protected Contact2(Contact2 existing, Map<?, ?> attributes) {
         if (existing == null) {
             throw new NullArgumentException("existing");
         }
@@ -111,7 +108,7 @@ public class Contact2 implements Cloneable {
         this.attributes = attributes;
     }
     
-    private Contact2(Contact2 existing, Type type) {
+    protected Contact2(Contact2 existing, Type type) {
         if (existing == null) {
             throw new NullArgumentException("existing");
         }
@@ -132,7 +129,7 @@ public class Contact2 implements Cloneable {
         this.attributes = existing.attributes;
     }
     
-    private Contact2(Contact2 existing, int instanceId) {
+    protected Contact2(Contact2 existing, int instanceId) {
         if (existing == null) {
             throw new NullArgumentException("existing");
         }
@@ -149,7 +146,7 @@ public class Contact2 implements Cloneable {
         this.attributes = existing.attributes;
     }
     
-    private Contact2(Contact2 existing, Contact2 contact) {
+    protected Contact2(Contact2 existing, Contact2 contact) {
         
         if (existing == null) {
             throw new NullArgumentException("existing");
@@ -172,6 +169,7 @@ public class Contact2 implements Cloneable {
         this.timeStamp = contact.timeStamp;
         
         this.contactId = existing.contactId;
+        
         this.instanceId = contact.instanceId;
         this.socketAddress = contact.socketAddress;
         this.contactAddress = contact.contactAddress;
@@ -233,17 +231,32 @@ public class Contact2 implements Cloneable {
             throw new NullArgumentException("value");
         }
         
-        Map<Object, Object> attributes 
-            = new HashMap<Object, Object>(this.attributes);
-        attributes.put(key, value);
-        return new Contact2(this, attributes);
+        Map<Object, Object> copy 
+            = new HashMap<Object, Object>(attributes);
+        copy.put(key, value);
+        return new Contact2(this, copy);
     }
     
     public Contact2 removeAttribute(Object key) {
-        Map<Object, Object> attributes 
-            = new HashMap<Object, Object>(this.attributes);
-        attributes.remove(key);
-        return new Contact2(this, attributes);
+        if (key == null) {
+            throw new NullArgumentException("key");
+        }
+        
+        // Do it only if the key exists.
+        if (attributes.containsKey(key)) {
+            Map<Object, Object> copy 
+                = new HashMap<Object, Object>(attributes);
+            copy.remove(key);
+            
+            // Replace it with an empty Map
+            if (copy.isEmpty()) {
+                copy = Collections.emptyMap();
+            }
+            
+            return new Contact2(this, copy);
+        }
+        
+        return this;
     }
     
     public boolean hasAttribute(Object key) {
@@ -272,32 +285,25 @@ public class Contact2 implements Cloneable {
     public boolean equals(Object o) {
         if (o == this) {
             return true;
-        } else if (!(o instanceof Contact)) {
+        } else if (!(o instanceof Contact2)) {
             return false;
         }
         
-        Contact other = (Contact)o;
-        return contactId.equals(other.getContactId());
+        Contact2 other = (Contact2)o;
+        return contactId.equals(other.contactId);
     }
     
     private static Map<?, ?> merge(Map<?, ?> m1, Map<?, ?> m2) {
-        Map<Object, Object> copy = null;
-        
-        copy = copy(m1, copy);
-        copy = copy(m2, copy);
-        
-        return copy != null ? copy : Collections.emptyMap();
-    }
-    
-    private static Map<Object, Object> copy(Map<?, ?> src, Map<Object, Object> dst) {
-        if (src != null && !src.isEmpty()) {
-            if (dst == null) {
-                dst = new HashMap<Object, Object>(src);
-            } else {
-                dst.putAll(src);
-            }
+        if (m1.isEmpty()) {
+            return m2;
+        } else if (m2.isEmpty()) {
+            return m1;
         }
         
-        return dst;
+        Map<Object, Object> copy 
+            = new HashMap<Object, Object>(m1);
+        copy.putAll(m2);
+        
+        return copy;
     }
 }
