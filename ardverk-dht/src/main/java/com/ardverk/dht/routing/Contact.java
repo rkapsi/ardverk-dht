@@ -35,12 +35,24 @@ public interface Contact {
         }
     }
     
+    /**
+     * 
+     */
     public long getCreationTime();
 
+    /**
+     * 
+     */
     public long getTimeStamp();
     
+    /**
+     * 
+     */
     public KUID getContactId();
     
+    /**
+     * 
+     */
     public int getInstanceId();
     
     /**
@@ -59,23 +71,53 @@ public interface Contact {
      */
     public SocketAddress getRemoteAddress();
     
+    /**
+     * 
+     */
     public Type getType();
     
+    /**
+     * 
+     */
     public Object getAttribute(Object key);
     
+    /**
+     * 
+     */
     public Object setAttribute(Object key, Object value);
     
+    /**
+     * 
+     */
     public Object removeAttribute(Object key);
     
+    /**
+     * 
+     */
     public boolean hasAttribute(Object key);
     
+    /**
+     * 
+     */
     public Map<Object, Object> getAttributes();
     
+    /**
+     * 
+     */
     public boolean isSolicited();
     
+    /**
+     * 
+     */
     public boolean isUnsolicited();
     
+    /**
+     * 
+     */
     public boolean isUnknown();
     
+    /**
+     * 
+     */
     public boolean isActive();
 }

@@ -7,6 +7,9 @@ import java.util.Map;
 
 import com.ardverk.dht.KUID;
 
+/**
+ * 
+ */
 public class DefaultContact implements Contact {
 
     private final long creationTime;
