@@ -206,6 +206,22 @@ public class Contact2 implements Cloneable {
         return type;
     }
     
+    public boolean isType(Type type) {
+        return type == this.type;
+    }
+    
+    public boolean isSolicited() {
+        return isType(Type.SOLICITED);
+    }
+    
+    public boolean isUnsolicited() {
+        return isType(Type.UNSOLICITED);
+    }
+    
+    public boolean isUnknown() {
+        return isType(Type.UNKNOWN);
+    }
+    
     public boolean isActive() {
         return type.isActive();
     }
