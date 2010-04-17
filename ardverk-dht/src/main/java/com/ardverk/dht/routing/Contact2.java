@@ -4,12 +4,16 @@ import java.net.SocketAddress;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.ardverk.collection.CollectionsUtils;
 import org.ardverk.lang.NullArgumentException;
 
 import com.ardverk.dht.KUID;
 
+/**
+ * 
+ */
 public class Contact2 implements Cloneable {
 
     public static enum Type {
@@ -55,9 +59,13 @@ public class Contact2 implements Cloneable {
     
     private final Map<?, ?> attributes;
     
+    /**
+     * 
+     */
     public Contact2(Type type, KUID contactId, int instanceId, 
             SocketAddress socketAddress, SocketAddress contactAddress,
             Map<?, ?> attributes) {
+        
         
         if (type == null) {
             throw new NullArgumentException("type");
@@ -87,6 +95,9 @@ public class Contact2 implements Cloneable {
         this.attributes = CollectionsUtils.copy(attributes);
     }
     
+    /**
+     * 
+     */
     protected Contact2(Contact2 existing, Map<?, ?> attributes) {
         if (existing == null) {
             throw new NullArgumentException("existing");
@@ -108,6 +119,9 @@ public class Contact2 implements Cloneable {
         this.attributes = attributes;
     }
     
+    /**
+     * 
+     */
     protected Contact2(Contact2 existing, Type type) {
         if (existing == null) {
             throw new NullArgumentException("existing");
@@ -129,6 +143,9 @@ public class Contact2 implements Cloneable {
         this.attributes = existing.attributes;
     }
     
+    /**
+     * 
+     */
     protected Contact2(Contact2 existing, int instanceId) {
         if (existing == null) {
             throw new NullArgumentException("existing");
@@ -146,6 +163,9 @@ public class Contact2 implements Cloneable {
         this.attributes = existing.attributes;
     }
     
+    /**
+     * 
+     */
     protected Contact2(Contact2 existing, Contact2 contact) {
         
         if (existing == null) {
@@ -178,60 +198,145 @@ public class Contact2 implements Cloneable {
         this.attributes = merge(existing.attributes, contact.attributes);
     }
     
+    /**
+     * 
+     */
     public long getCreationTime() {
         return creationTime;
     }
     
+    /**
+     * 
+     */
     public long getTimeStamp() {
         return timeStamp;
     }
     
+    /**
+     * 
+     */
+    public long getTime(TimeUnit unit) {
+        long time = System.currentTimeMillis() - timeStamp;
+        return unit.convert(time, TimeUnit.MILLISECONDS);
+    }
+    
+    /**
+     * 
+     */
+    public long getTimeInMillis() {
+        return getTime(TimeUnit.MILLISECONDS);
+    }
+    
+    /**
+     * 
+     */
     public KUID getContactId() {
         return contactId;
     }
     
+    /**
+     * 
+     */
     public int getInstanceId() {
         return instanceId;
     }
     
+    /**
+     * 
+     */
     public SocketAddress getSocketAddress() {
         return socketAddress;
     }
     
+    /**
+     * 
+     */
     public SocketAddress getContactAddress() {
         return contactAddress;
     }
     
+    /**
+     * 
+     */
     public Type getType() {
         return type;
     }
     
+    /**
+     * 
+     */
     public boolean isType(Type type) {
         return type == this.type;
     }
     
+    /**
+     * 
+     */
     public boolean isSolicited() {
         return isType(Type.SOLICITED);
     }
     
+    /**
+     * 
+     */
     public boolean isUnsolicited() {
         return isType(Type.UNSOLICITED);
     }
     
+    /**
+     * 
+     */
     public boolean isUnknown() {
         return isType(Type.UNKNOWN);
     }
     
+    /**
+     * 
+     */
     public boolean isActive() {
         return type.isActive();
     }
     
+    /**
+     * 
+     */
     public Contact2 setType(Type type) {
         return type != this.type ? new Contact2(this, type) : this;
     }
     
+    /**
+     * 
+     */
     public Contact2 setInstanceId(int instanceId) {
         return instanceId != this.instanceId ? new Contact2(this, instanceId) : this;
+    }
+    
+    /**
+     * 
+     */
+    public long getAdaptiveTimeout(long defaultValue, TimeUnit unit) {
+        return defaultValue;
+    }
+    
+    /**
+     * 
+     */
+    public Contact2 setRoundTripTime(long time, TimeUnit unit) {
+        return this;
+    }
+    
+    /**
+     * 
+     */
+    public long getRoundTripTime(TimeUnit unit) {
+        return 0;
+    }
+    
+    /**
+     * 
+     */
+    public long getRoundTripTimeInMillis() {
+        return getRoundTripTime(TimeUnit.MILLISECONDS);
     }
     
     public Contact2 merge(Contact2 other) {
