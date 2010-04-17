@@ -1,5 +1,6 @@
 package com.ardverk.dht.routing;
 
+import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.Collections;
 import java.util.HashMap;
@@ -47,6 +48,8 @@ public class Contact2 implements Cloneable {
     
     private final long timeStamp;
     
+    private final long rtt;
+    
     private final Type type;
     
     private final KUID contactId;
@@ -86,6 +89,7 @@ public class Contact2 implements Cloneable {
         this.type = type;
         this.creationTime = System.currentTimeMillis();
         this.timeStamp = creationTime;
+        this.rtt = -1L;
         
         this.contactId = contactId;
         this.instanceId = instanceId;
@@ -109,6 +113,7 @@ public class Contact2 implements Cloneable {
         
         this.creationTime = existing.creationTime;
         this.timeStamp = existing.timeStamp;
+        this.rtt = existing.rtt;
         
         this.contactId = existing.contactId;
         this.instanceId = existing.instanceId;
@@ -133,6 +138,7 @@ public class Contact2 implements Cloneable {
         
         this.creationTime = existing.creationTime;
         this.timeStamp = existing.timeStamp;
+        this.rtt = existing.rtt;
         
         this.contactId = existing.contactId;
         this.instanceId = existing.instanceId;
@@ -153,9 +159,31 @@ public class Contact2 implements Cloneable {
         
         this.creationTime = existing.creationTime;
         this.timeStamp = existing.timeStamp;
+        this.rtt = existing.rtt;
         
         this.contactId = existing.contactId;
         this.instanceId = instanceId;
+        this.socketAddress = existing.socketAddress;
+        this.contactAddress = existing.contactAddress;
+        this.type = existing.type;
+        
+        this.attributes = existing.attributes;
+    }
+    
+    /**
+     * 
+     */
+    protected Contact2(Contact2 existing, long rtt, TimeUnit unit) {
+        if (existing == null) {
+            throw new NullArgumentException("existing");
+        }
+        
+        this.creationTime = existing.creationTime;
+        this.timeStamp = existing.timeStamp;
+        this.rtt = unit.toMillis(rtt);
+        
+        this.contactId = existing.contactId;
+        this.instanceId = existing.instanceId;
         this.socketAddress = existing.socketAddress;
         this.contactAddress = existing.contactAddress;
         this.type = existing.type;
@@ -187,6 +215,7 @@ public class Contact2 implements Cloneable {
         
         this.creationTime = existing.creationTime;
         this.timeStamp = contact.timeStamp;
+        this.rtt = contact.rtt >= 0L ? contact.rtt : existing.rtt;
         
         this.contactId = existing.contactId;
         
@@ -199,10 +228,25 @@ public class Contact2 implements Cloneable {
     }
     
     /**
-     * 
+     * Returns the {@link Contact}'s creation time
      */
     public long getCreationTime() {
         return creationTime;
+    }
+    
+    /**
+     * 
+     */
+    public long getTimeSinceCreation(TimeUnit unit) {
+        long time = System.currentTimeMillis() - creationTime;
+        return unit.convert(time, TimeUnit.MILLISECONDS);
+    }
+    
+    /**
+     * 
+     */
+    public long getgetTimeSinceCreationInMillis() {
+        return getTimeSinceCreation(TimeUnit.MILLISECONDS);
     }
     
     /**
@@ -215,7 +259,7 @@ public class Contact2 implements Cloneable {
     /**
      * 
      */
-    public long getTime(TimeUnit unit) {
+    public long getTimeSinceLastContact(TimeUnit unit) {
         long time = System.currentTimeMillis() - timeStamp;
         return unit.convert(time, TimeUnit.MILLISECONDS);
     }
@@ -223,126 +267,110 @@ public class Contact2 implements Cloneable {
     /**
      * 
      */
-    public long getTimeInMillis() {
-        return getTime(TimeUnit.MILLISECONDS);
+    public long getTimeSinceLastContactInMillis() {
+        return getTimeSinceLastContact(TimeUnit.MILLISECONDS);
     }
     
     /**
-     * 
+     * Returns the {@link Contact2}'s unique {@link KUID}
      */
     public KUID getContactId() {
         return contactId;
     }
     
     /**
-     * 
+     * Returns the {@link Contact2}'s instance ID
      */
     public int getInstanceId() {
         return instanceId;
     }
     
     /**
-     * 
+     * Returns the {@link Contact2}'s address as reported by 
+     * the {@link Socket}.
      */
     public SocketAddress getSocketAddress() {
         return socketAddress;
     }
     
     /**
-     * 
+     * Returns the {@link Contact2}'s address as reported by 
+     * the {@link Contact2}.
      */
     public SocketAddress getContactAddress() {
         return contactAddress;
     }
     
     /**
-     * 
+     * Returns the {@link Type} of the {@link Contact2}
      */
     public Type getType() {
         return type;
     }
     
     /**
-     * 
+     * Returns true if the {@link Contact2} is of the given {@link Type}
      */
     public boolean isType(Type type) {
         return type == this.type;
     }
     
     /**
+     * Returns true if the {@link Contact2} is considered active.
      * 
-     */
-    public boolean isSolicited() {
-        return isType(Type.SOLICITED);
-    }
-    
-    /**
-     * 
-     */
-    public boolean isUnsolicited() {
-        return isType(Type.UNSOLICITED);
-    }
-    
-    /**
-     * 
-     */
-    public boolean isUnknown() {
-        return isType(Type.UNKNOWN);
-    }
-    
-    /**
-     * 
+     * @see Type
      */
     public boolean isActive() {
         return type.isActive();
     }
     
     /**
-     * 
+     * Changes the {@link Contact2}'s {@link Type}
      */
     public Contact2 setType(Type type) {
         return type != this.type ? new Contact2(this, type) : this;
     }
     
     /**
-     * 
+     * Changes the {@link Contact2}'s instance ID
      */
     public Contact2 setInstanceId(int instanceId) {
         return instanceId != this.instanceId ? new Contact2(this, instanceId) : this;
     }
     
     /**
-     * 
-     */
-    public long getAdaptiveTimeout(long defaultValue, TimeUnit unit) {
-        return defaultValue;
-    }
-    
-    /**
-     * 
+     * Changes the {@link Contact2}'s Round-Trip-Time (RTT)
      */
     public Contact2 setRoundTripTime(long time, TimeUnit unit) {
-        return this;
+        return new Contact2(this, time, unit);
     }
     
     /**
-     * 
+     * Returns the {@link Contact2}'s Round-Trip-Time (RTT) or a negative 
+     * value if the RTT is unknown.
      */
     public long getRoundTripTime(TimeUnit unit) {
-        return 0;
+        return unit.convert(rtt, TimeUnit.MILLISECONDS);
     }
     
     /**
-     * 
+     * Returns the {@link Contact2}'s Round-Trip-Time (RTT) in milliseconds
+     * or a negative value if the RTT is unknown.
      */
     public long getRoundTripTimeInMillis() {
         return getRoundTripTime(TimeUnit.MILLISECONDS);
     }
     
+    /**
+     * 
+     */
     public Contact2 merge(Contact2 other) {
         return new Contact2(this, other);
     }
     
+    /**
+     * 
+     */
     public Contact2 setAttribute(Object key, Object value) {
         if (key == null) {
             throw new NullArgumentException("key");
@@ -358,6 +386,9 @@ public class Contact2 implements Cloneable {
         return new Contact2(this, copy);
     }
     
+    /**
+     * 
+     */
     public Contact2 removeAttribute(Object key) {
         if (key == null) {
             throw new NullArgumentException("key");
@@ -380,14 +411,23 @@ public class Contact2 implements Cloneable {
         return this;
     }
     
+    /**
+     * 
+     */
     public boolean hasAttribute(Object key) {
         return attributes.containsKey(key);
     }
     
+    /**
+     * 
+     */
     public Object getAttribute(Object key) {
         return attributes.get(key);
     }
     
+    /**
+     * 
+     */
     public Map<Object, Object> getAttributes() {
         return Collections.unmodifiableMap(attributes);
     }
@@ -414,6 +454,9 @@ public class Contact2 implements Cloneable {
         return contactId.equals(other.contactId);
     }
     
+    /**
+     * 
+     */ 
     private static Map<?, ?> merge(Map<?, ?> m1, Map<?, ?> m2) {
         if (m1.isEmpty()) {
             return m2;
