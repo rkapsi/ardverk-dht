@@ -1,5 +1,6 @@
 package com.ardverk.dht.routing;
 
+import java.io.Serializable;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.Collections;
@@ -15,32 +16,45 @@ import com.ardverk.dht.KUID;
 /**
  * 
  */
-public class Contact2 implements Cloneable {
+public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
+    
+    private static final long serialVersionUID = 298059770472298142L;
 
     public static enum Type {
         /**
          * {@link Contact}s that were returned in FIND_NODE responses
          */
-        UNKNOWN(false),
+        UNKNOWN(0, false),
         
         /**
          * {@link Contact}s that sent us a request
          */
-        UNSOLICITED(true),
+        UNSOLICITED(1, true),
         
         /**
          * {@link Contact}s that sent us a response
          */
-        SOLICITED(true);
+        SOLICITED(2, true);
+        
+        private final int priority;
         
         private final boolean active;
         
-        private Type(boolean active) {
+        private Type(int priority, boolean active) {
+            this.priority = priority;
             this.active = active;
         }
         
         public boolean isActive() {
             return active;
+        }
+        
+        public int getPriority() {
+            return priority;
+        }
+        
+        public boolean isBetterOrEqual(Type other) {
+            return priority >= other.priority;
         }
     }
     
@@ -63,11 +77,53 @@ public class Contact2 implements Cloneable {
     private final Map<?, ?> attributes;
     
     /**
-     * 
+     * Creates a {@link Contact2}
      */
-    public Contact2(Type type, KUID contactId, int instanceId, 
-            SocketAddress socketAddress, SocketAddress contactAddress,
+    public Contact2(Type type, 
+            KUID contactId, 
+            int instanceId, 
+            SocketAddress address, 
             Map<?, ?> attributes) {
+        this(type, contactId, instanceId, address, address, 
+                attributes, -1L, TimeUnit.MILLISECONDS);
+    }
+    
+    /**
+     * Creates a {@link Contact2}
+     */
+    public Contact2(Type type, 
+            KUID contactId, 
+            int instanceId, 
+            SocketAddress address, 
+            Map<?, ?> attributes, 
+            long rtt, TimeUnit unit) {
+        this(type, contactId, instanceId, address, 
+                address, attributes, rtt, unit);
+    }
+    
+    /**
+     * Creates a {@link Contact2}
+     */
+    public Contact2(Type type, 
+            KUID contactId, 
+            int instanceId, 
+            SocketAddress socketAddress, 
+            SocketAddress contactAddress,
+            Map<?, ?> attributes) {
+        this(type, contactId, instanceId, socketAddress, 
+                contactAddress, attributes, -1L, TimeUnit.MILLISECONDS);
+    }
+    
+    /**
+     * Creates a {@link Contact2}
+     */
+    public Contact2(Type type, 
+            KUID contactId, 
+            int instanceId, 
+            SocketAddress socketAddress, 
+            SocketAddress contactAddress,
+            Map<?, ?> attributes,
+            long rtt, TimeUnit unit) {
         
         
         if (type == null) {
@@ -89,7 +145,7 @@ public class Contact2 implements Cloneable {
         this.type = type;
         this.creationTime = System.currentTimeMillis();
         this.timeStamp = creationTime;
-        this.rtt = -1L;
+        this.rtt = unit.toMillis(rtt);
         
         this.contactId = contactId;
         this.instanceId = instanceId;
@@ -127,7 +183,7 @@ public class Contact2 implements Cloneable {
     /**
      * 
      */
-    protected Contact2(Contact2 existing, Type type) {
+    /*protected Contact2(Contact2 existing, Type type) {
         if (existing == null) {
             throw new NullArgumentException("existing");
         }
@@ -147,12 +203,12 @@ public class Contact2 implements Cloneable {
         this.type = type;
         
         this.attributes = existing.attributes;
-    }
+    }*/
     
     /**
      * 
      */
-    protected Contact2(Contact2 existing, int instanceId) {
+    /*protected Contact2(Contact2 existing, int instanceId) {
         if (existing == null) {
             throw new NullArgumentException("existing");
         }
@@ -168,12 +224,12 @@ public class Contact2 implements Cloneable {
         this.type = existing.type;
         
         this.attributes = existing.attributes;
-    }
+    }*/
     
     /**
      * 
      */
-    protected Contact2(Contact2 existing, long rtt, TimeUnit unit) {
+    /*protected Contact2(Contact2 existing, long rtt, TimeUnit unit) {
         if (existing == null) {
             throw new NullArgumentException("existing");
         }
@@ -189,42 +245,62 @@ public class Contact2 implements Cloneable {
         this.type = existing.type;
         
         this.attributes = existing.attributes;
-    }
+    }*/
     
     /**
      * 
      */
-    protected Contact2(Contact2 existing, Contact2 contact) {
+    protected Contact2(Contact2 existing, Contact2 other) {
         
         if (existing == null) {
             throw new NullArgumentException("existing");
         }
         
-        if (contact == null) {
-            throw new NullArgumentException("contact");
+        if (other == null) {
+            throw new NullArgumentException("other");
         }
         
-        if (!existing.contactId.equals(contact.contactId)) {
+        if (!existing.contactId.equals(other.contactId)) {
             throw new IllegalArgumentException();
         }
         
-        // 2nd argument must be older
-        if (contact.creationTime < existing.creationTime) {
+        // 2nd argument must be newer
+        if (other.creationTime < existing.creationTime) {
             throw new IllegalArgumentException();
         }
         
         this.creationTime = existing.creationTime;
-        this.timeStamp = contact.timeStamp;
-        this.rtt = contact.rtt >= 0L ? contact.rtt : existing.rtt;
+        
+        if (other.isActive()) {
+            this.timeStamp = other.timeStamp;
+        } else {
+            this.timeStamp = existing.timeStamp;
+        }
+        
+        this.rtt = other.rtt >= 0L ? other.rtt : existing.rtt;
         
         this.contactId = existing.contactId;
         
-        this.instanceId = contact.instanceId;
-        this.socketAddress = contact.socketAddress;
-        this.contactAddress = contact.contactAddress;
-        this.type = contact.type;
+        if (existing.isBetterOrEqual(other)) {
+            this.instanceId = existing.instanceId;
+            this.socketAddress = existing.socketAddress;
+            this.contactAddress = existing.contactAddress;
+            this.type = existing.type;
+        } else {
+            this.instanceId = other.instanceId;
+            this.socketAddress = other.socketAddress;
+            this.contactAddress = other.contactAddress;
+            this.type = other.type;
+        }
         
-        this.attributes = merge(existing.attributes, contact.attributes);
+        this.attributes = merge(existing.attributes, other.attributes);
+    }
+    
+    /**
+     * 
+     */
+    private boolean isBetterOrEqual(Contact2 other) {
+        return type.isBetterOrEqual(other.type);
     }
     
     /**
@@ -327,23 +403,23 @@ public class Contact2 implements Cloneable {
     /**
      * Changes the {@link Contact2}'s {@link Type}
      */
-    public Contact2 setType(Type type) {
+    /*public Contact2 setType(Type type) {
         return type != this.type ? new Contact2(this, type) : this;
-    }
+    }*/
     
     /**
      * Changes the {@link Contact2}'s instance ID
      */
-    public Contact2 setInstanceId(int instanceId) {
+    /*public Contact2 setInstanceId(int instanceId) {
         return instanceId != this.instanceId ? new Contact2(this, instanceId) : this;
-    }
+    }*/
     
     /**
      * Changes the {@link Contact2}'s Round-Trip-Time (RTT)
      */
-    public Contact2 setRoundTripTime(long time, TimeUnit unit) {
+    /*public Contact2 setRoundTripTime(long time, TimeUnit unit) {
         return new Contact2(this, time, unit);
-    }
+    }*/
     
     /**
      * Returns the {@link Contact2}'s Round-Trip-Time (RTT) or a negative 
@@ -365,7 +441,7 @@ public class Contact2 implements Cloneable {
      * 
      */
     public Contact2 merge(Contact2 other) {
-        return new Contact2(this, other);
+        return other != this ? new Contact2(this, other) : this;
     }
     
     /**
@@ -454,6 +530,11 @@ public class Contact2 implements Cloneable {
         return contactId.equals(other.contactId);
     }
     
+    @Override
+    public int compareTo(Contact2 o) {
+        return contactId.compareTo(o.contactId);
+    }
+
     /**
      * 
      */ 

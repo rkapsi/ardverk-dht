@@ -2,6 +2,7 @@ package com.ardverk.dht.routing;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.concurrent.TimeUnit;
 
 import com.ardverk.dht.KUID;
 
@@ -25,6 +26,16 @@ public class ContactUtils {
             }
         };
         
+    public static long getAdaptiveTimeout(Contact2 contact, 
+            long defaultValue, TimeUnit unit) {
+        long rtt = contact.getRoundTripTime(unit);
+        if (rtt < 0) {
+            return defaultValue;
+        }
+        
+        return Math.min((long)(rtt * 1.5f), defaultValue);
+    }
+    
     public static Contact[] sort(Contact[] contacts, KUID key) {
         return sort(contacts, key, true);
     }
