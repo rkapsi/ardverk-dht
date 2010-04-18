@@ -447,7 +447,7 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
     /**
      * 
      */
-    public Contact2 setAttribute(Object key, Object value) {
+    public Contact2 put(Object key, Object value) {
         if (key == null) {
             throw new NullArgumentException("key");
         }
@@ -465,13 +465,42 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
     /**
      * 
      */
-    public Contact2 removeAttribute(Object key) {
+    public Contact2 putAll(Map<?, ?> m) {
+        if (m == null) {
+            throw new NullArgumentException("m");
+        }
+        
+        Map<Object, Object> copy 
+            = new HashMap<Object, Object>(attributes);
+        
+        for (Map.Entry<?, ?> entry : m.entrySet()) {
+            Object key = entry.getKey();
+            Object value = entry.getValue();
+            
+            if (key == null) {
+                throw new NullArgumentException("key");
+            }
+            
+            if (value == null) {
+                throw new NullArgumentException("value");
+            }
+            
+            copy.put(key, value);
+        }
+        
+        return new Contact2(this, copy);
+    }
+    
+    /**
+     * 
+     */
+    public Contact2 remove(Object key) {
         if (key == null) {
             throw new NullArgumentException("key");
         }
         
         // Do it only if the key exists.
-        if (attributes.containsKey(key)) {
+        if (containsKey(key)) {
             Map<Object, Object> copy 
                 = new HashMap<Object, Object>(attributes);
             copy.remove(key);
@@ -490,21 +519,21 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
     /**
      * 
      */
-    public boolean hasAttribute(Object key) {
+    public boolean containsKey(Object key) {
         return attributes.containsKey(key);
     }
     
     /**
      * 
      */
-    public Object getAttribute(Object key) {
+    public Object get(Object key) {
         return attributes.get(key);
     }
     
     /**
      * 
      */
-    public Map<Object, Object> getAttributes() {
+    public Map<Object, Object> getAll() {
         return Collections.unmodifiableMap(attributes);
     }
     
@@ -533,6 +562,19 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
     @Override
     public int compareTo(Contact2 o) {
         return contactId.compareTo(o.contactId);
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder buffer = new StringBuilder();
+        
+        buffer.append("Type=").append(type)
+            .append(", contactId=").append(contactId)
+            .append(", instanceId=").append(instanceId)
+            .append(", socketAddress=").append(socketAddress)
+            .append(", contactAddress=").append(contactAddress);
+        
+        return buffer.toString();
     }
 
     /**
