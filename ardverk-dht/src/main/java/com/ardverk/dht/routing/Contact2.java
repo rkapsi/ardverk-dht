@@ -379,6 +379,13 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
     }
     
     /**
+     * 
+     */
+    public SocketAddress getRemoteAddress() {
+        return getContactAddress();
+    }
+    
+    /**
      * Returns the {@link Type} of the {@link Contact2}
      */
     public Type getType() {
@@ -390,6 +397,20 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
      */
     public boolean isType(Type type) {
         return type == this.type;
+    }
+    
+    /**
+     * 
+     */
+    public boolean isSolicited() {
+        return isType(Type.SOLICITED);
+    }
+    
+    /**
+     * 
+     */
+    public boolean isUnsolicited() {
+        return isType(Type.UNSOLICITED);
     }
     
     /**

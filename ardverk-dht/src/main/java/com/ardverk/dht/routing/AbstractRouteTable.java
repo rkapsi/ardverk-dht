@@ -41,7 +41,7 @@ public abstract class AbstractRouteTable implements RouteTable {
     }
     
     @Override
-    public Contact[] select(KUID contactId) {
+    public Contact2[] select(KUID contactId) {
         return select(contactId, getK());
     }
 
@@ -81,7 +81,7 @@ public abstract class AbstractRouteTable implements RouteTable {
         EventUtils.fireEvent(event);
     }
     
-    protected void fireContactAdded(Bucket bucket, Contact contact) {
+    protected void fireContactAdded(Bucket bucket, Contact2 contact) {
         Runnable event = new Runnable() {
             @Override
             public void run() {
@@ -94,7 +94,8 @@ public abstract class AbstractRouteTable implements RouteTable {
         EventUtils.fireEvent(event);
     }
     
-    protected void fireContactReplaced(Bucket bucket, Contact existing, Contact contact) {
+    protected void fireContactReplaced(Bucket bucket, 
+            Contact2 existing, Contact2 contact) {
         Runnable event = new Runnable() {
             @Override
             public void run() {
@@ -107,7 +108,8 @@ public abstract class AbstractRouteTable implements RouteTable {
         EventUtils.fireEvent(event);
     }
     
-    protected void fireContactChanged(Bucket bucket, Contact existing, Contact contact) {
+    protected void fireContactChanged(Bucket bucket, 
+            Contact2 existing, Contact2 contact) {
         Runnable event = new Runnable() {
             @Override
             public void run() {
@@ -120,7 +122,7 @@ public abstract class AbstractRouteTable implements RouteTable {
         EventUtils.fireEvent(event);
     }
     
-    protected void fireCollision(Contact contact) {
+    protected void fireCollision(Contact2 contact) {
         Runnable event = new Runnable() {
             @Override
             public void run() {
@@ -133,7 +135,8 @@ public abstract class AbstractRouteTable implements RouteTable {
         EventUtils.fireEvent(event);
     }
     
-    protected void fireReplaceContact(Bucket bucket, Contact existing, Contact contact) {
+    protected void fireReplaceContact(Bucket bucket, 
+            Contact2 existing, Contact2 contact) {
         Runnable event = new Runnable() {
             @Override
             public void run() {
