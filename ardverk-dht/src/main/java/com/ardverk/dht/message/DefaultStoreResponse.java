@@ -2,7 +2,7 @@ package com.ardverk.dht.message;
 
 import java.net.SocketAddress;
 
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.Contact2;
 import com.ardverk.dht.storage.Database.Condition;
 
 public class DefaultStoreResponse extends AbstractResponseMessage 
@@ -11,8 +11,8 @@ public class DefaultStoreResponse extends AbstractResponseMessage
     private final Condition status;
     
     public DefaultStoreResponse(
-            MessageId messageId, Contact contact, 
-            Contact destination, Condition status) {
+            MessageId messageId, Contact2 contact, 
+            Contact2 destination, Condition status) {
         super(messageId, contact, destination);
         
         if (status == null) {
@@ -23,7 +23,7 @@ public class DefaultStoreResponse extends AbstractResponseMessage
     }
     
     public DefaultStoreResponse(
-            MessageId messageId, Contact contact, 
+            MessageId messageId, Contact2 contact, 
             SocketAddress address, Condition status) {
         super(messageId, contact, address);
         

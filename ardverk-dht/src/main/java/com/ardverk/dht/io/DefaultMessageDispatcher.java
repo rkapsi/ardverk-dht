@@ -35,11 +35,10 @@ import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.message.StoreRequest;
 import com.ardverk.dht.message.ValueRequest;
-import com.ardverk.dht.routing.Contact;
-import com.ardverk.dht.routing.DefaultContact;
+import com.ardverk.dht.routing.Contact2;
 import com.ardverk.dht.routing.DefaultRouteTable;
 import com.ardverk.dht.routing.RouteTable;
-import com.ardverk.dht.routing.Contact.Type;
+import com.ardverk.dht.routing.Contact2.Type;
 import com.ardverk.dht.storage.Database;
 import com.ardverk.dht.storage.DefaultDatabase;
 import com.ardverk.logging.LoggerUtils;
@@ -212,20 +211,20 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
             
             ContactPinger pinger = new ContactPinger() {
                 @Override
-                public AsyncFuture<PingEntity> ping(Contact contact) {
+                public AsyncFuture<PingEntity> ping(Contact2 contact) {
                     return SimpleDHT.this.ping(contact);
                 }
             };
             
             SocketAddress address = new InetSocketAddress("localhost", port);
-            Contact localhost = new DefaultContact(Type.SOLICITED, 
-                    contactId, 0, address, address);
+            Contact2 localhost = new Contact2(Type.SOLICITED, 
+                    contactId, 0, address);
             
             routeTable = new DefaultRouteTable(pinger, K, localhost);
             
             database = new DefaultDatabase();
             
-            Contact contact = routeTable.getLocalhost();
+            Contact2 contact = routeTable.getLocalhost();
             
             transport = new MinaTransport(new InetSocketAddress(port));
             messageFactory = new DefaultMessageFactory(
@@ -250,7 +249,7 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
             return EXECUTOR.submit(process, 30L, TimeUnit.SECONDS);
         }
         
-        public AsyncProcessFuture<PingEntity> ping(Contact dst) {
+        public AsyncProcessFuture<PingEntity> ping(Contact2 dst) {
             AsyncProcess<PingEntity> process 
                 = new PingResponseHandler(messageDispatcher, dst);
             return EXECUTOR.submit(process, 30L, TimeUnit.SECONDS);

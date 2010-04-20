@@ -4,19 +4,19 @@ import java.util.concurrent.TimeUnit;
 
 import com.ardverk.coding.CodingUtils;
 import com.ardverk.dht.KUID;
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.Contact2;
 
 public class DefaultValue implements Value {
     
     private final long creationTime = System.currentTimeMillis();
     
-    private final Contact src;
+    private final Contact2 src;
     
     private final KUID key;
     
     private final byte[] value;
     
-    public DefaultValue(Contact src, KUID key, byte[] value) {
+    public DefaultValue(Contact2 src, KUID key, byte[] value) {
         this.src = src;
         this.key = key;
         this.value = value;
@@ -33,7 +33,7 @@ public class DefaultValue implements Value {
     }
 
     @Override
-    public Contact getSource() {
+    public Contact2 getSource() {
         return src;
     }
 

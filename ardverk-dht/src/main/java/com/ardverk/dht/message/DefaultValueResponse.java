@@ -2,7 +2,7 @@ package com.ardverk.dht.message;
 
 import java.net.SocketAddress;
 
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.Contact2;
 
 public class DefaultValueResponse extends AbstractLookupResponse 
         implements ValueResponse {
@@ -10,8 +10,8 @@ public class DefaultValueResponse extends AbstractLookupResponse
     private final byte[] value;
     
     public DefaultValueResponse(
-            MessageId messageId, Contact contact, 
-            Contact destination, byte[] value) {
+            MessageId messageId, Contact2 contact, 
+            Contact2 destination, byte[] value) {
         super(messageId, contact, destination);
         
         if (value == null) {
@@ -22,7 +22,7 @@ public class DefaultValueResponse extends AbstractLookupResponse
     }
     
     public DefaultValueResponse(
-            MessageId messageId, Contact contact, 
+            MessageId messageId, Contact2 contact, 
             SocketAddress address, byte[] value) {
         super(messageId, contact, address);
         

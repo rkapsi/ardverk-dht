@@ -3,7 +3,7 @@ package com.ardverk.dht.message;
 import java.net.SocketAddress;
 
 import com.ardverk.dht.KUID;
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.Contact2;
 
 public class DefaultStoreRequest extends AbstractRequestMessage 
         implements StoreRequest {
@@ -13,7 +13,7 @@ public class DefaultStoreRequest extends AbstractRequestMessage
     private final byte[] value;
     
     public DefaultStoreRequest(MessageId messageId, 
-            Contact contact, Contact destination, 
+            Contact2 contact, Contact2 destination, 
             KUID key, byte[] value) {
         super(messageId, contact, destination);
         
@@ -30,7 +30,7 @@ public class DefaultStoreRequest extends AbstractRequestMessage
     }
 
     public DefaultStoreRequest(MessageId messageId, 
-            Contact contact, SocketAddress address, 
+            Contact2 contact, SocketAddress address, 
             KUID key, byte[] value) {
         super(messageId, contact, address);
         

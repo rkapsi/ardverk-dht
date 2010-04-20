@@ -32,7 +32,7 @@ import com.ardverk.dht.message.StoreRequest;
 import com.ardverk.dht.message.StoreResponse;
 import com.ardverk.dht.message.ValueRequest;
 import com.ardverk.dht.message.ValueResponse;
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.Contact2;
 import com.ardverk.logging.LoggerUtils;
 
 /**
@@ -412,7 +412,7 @@ public abstract class MessageDispatcher implements Closeable {
                 return false;
             }
             
-            Contact contact = response.getContact();
+            Contact2 contact = response.getContact();
             if (!factory.isFor(messageId, contact.getRemoteAddress())) {
                 if (LOG.isErrorEnabled()) {
                     LOG.error("Wrong MessageId signature: " + response);

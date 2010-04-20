@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.Contact2;
 import com.ardverk.dht.routing.RouteTable;
 
 public class DefaultMessageHandler implements MessageCallback {
@@ -30,7 +30,7 @@ public class DefaultMessageHandler implements MessageCallback {
     }
     
     public void handleRequest(RequestMessage request) throws IOException {
-        Contact src = request.getContact();
+        Contact2 src = request.getContact();
         routeTable.add(src);
     }
     
@@ -38,12 +38,12 @@ public class DefaultMessageHandler implements MessageCallback {
     public void handleResponse(RequestMessage request, 
             ResponseMessage response, long time, TimeUnit unit) throws IOException {
         
-        Contact src = response.getContact();
+        Contact2 src = response.getContact();
         routeTable.add(src);
     }
     
     public void handleLateResponse(ResponseMessage response) throws IOException {
-        Contact src = response.getContact();
+        Contact2 src = response.getContact();
         routeTable.add(src);
     }
     
@@ -51,7 +51,7 @@ public class DefaultMessageHandler implements MessageCallback {
     public void handleTimeout(RequestMessage request, 
             long time, TimeUnit unit) throws IOException {
         
-        Contact dst = request.getContact();
+        Contact2 dst = request.getContact();
         routeTable.failure(dst.getContactId(), 
                 dst.getRemoteAddress());
     }

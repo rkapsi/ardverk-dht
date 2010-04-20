@@ -3,7 +3,7 @@ package com.ardverk.dht.entity;
 import java.util.concurrent.TimeUnit;
 
 import com.ardverk.dht.message.PingResponse;
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.Contact2;
 
 public class DefaultPingEntity extends AbstractEntity implements PingEntity {
     
@@ -20,7 +20,7 @@ public class DefaultPingEntity extends AbstractEntity implements PingEntity {
     }
     
     @Override
-    public Contact getContact() {
+    public Contact2 getContact() {
         return response.getContact();
     }
     

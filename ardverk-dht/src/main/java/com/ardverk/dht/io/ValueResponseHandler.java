@@ -14,7 +14,7 @@ import com.ardverk.dht.message.NodeResponse;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.message.ValueResponse;
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.Contact2;
 import com.ardverk.dht.routing.RouteTable;
 
 public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
@@ -48,8 +48,8 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     private synchronized void processNodeResponse(NodeResponse response, 
             long time, TimeUnit unit) throws IOException {
         
-        Contact src = response.getContact();
-        Contact[] contacts = response.getContacts();
+        Contact2 src = response.getContact();
+        Contact2[] contacts = response.getContacts();
         processContacts(src, contacts, time, unit);
     }
     
@@ -65,7 +65,7 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     }
     
     @Override
-    protected void lookup(Contact dst, KUID key, 
+    protected void lookup(Contact2 dst, KUID key, 
             long timeout, TimeUnit unit) throws IOException {
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
@@ -93,7 +93,7 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
             this.state = state;
         }
 
-        public Contact[] getContacts() {
+        public Contact2[] getContacts() {
             return state.getContacts();
         }
 

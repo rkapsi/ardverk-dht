@@ -3,18 +3,18 @@ package com.ardverk.dht.message;
 import java.net.SocketAddress;
 
 import com.ardverk.dht.KUID;
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.Contact2;
 
 public class DefaultValueRequest extends AbstractLookupRequest 
         implements ValueRequest {
     
     public DefaultValueRequest(MessageId messageId, 
-            Contact contact, Contact destination, KUID key) {
+            Contact2 contact, Contact2 destination, KUID key) {
         super(messageId, contact, destination, key);
     }
 
     public DefaultValueRequest(MessageId messageId, 
-            Contact contact, SocketAddress address, KUID key) {
+            Contact2 contact, SocketAddress address, KUID key) {
         super(messageId, contact, address, key);
     }
 }

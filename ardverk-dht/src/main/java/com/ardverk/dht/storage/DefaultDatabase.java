@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.ardverk.dht.KUID;
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.Contact2;
 
 public class DefaultDatabase extends AbstractDatabase {
 
@@ -29,7 +29,7 @@ public class DefaultDatabase extends AbstractDatabase {
     }
 
     @Override
-    public Condition store(Contact src, KUID key, byte[] value) {
+    public Condition store(Contact2 src, KUID key, byte[] value) {
         if (value != null) {
             database.put(key, new DefaultValue(src, key, value));
         } else {

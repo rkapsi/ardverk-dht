@@ -2,16 +2,16 @@ package com.ardverk.dht.message;
 
 import java.net.SocketAddress;
 
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.Contact2;
 
 public class DefaultNodeResponse extends AbstractLookupResponse 
         implements NodeResponse {
 
-    private final Contact[] contacts;
+    private final Contact2[] contacts;
     
     public DefaultNodeResponse(
-            MessageId messageId, Contact contact, 
-            Contact destination, Contact[] contacts) {
+            MessageId messageId, Contact2 contact, 
+            Contact2 destination, Contact2[] contacts) {
         super(messageId, contact, destination);
         
         if (contacts == null) {
@@ -22,8 +22,8 @@ public class DefaultNodeResponse extends AbstractLookupResponse
     }
     
     public DefaultNodeResponse(
-            MessageId messageId, Contact contact, 
-            SocketAddress address, Contact[] contacts) {
+            MessageId messageId, Contact2 contact, 
+            SocketAddress address, Contact2[] contacts) {
         super(messageId, contact, address);
         
         if (contacts == null) {
@@ -34,7 +34,7 @@ public class DefaultNodeResponse extends AbstractLookupResponse
     }
 
     @Override
-    public Contact[] getContacts() {
+    public Contact2[] getContacts() {
         return contacts;
     }
 }

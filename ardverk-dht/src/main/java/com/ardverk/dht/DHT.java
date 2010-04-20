@@ -9,7 +9,7 @@ import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.io.transport.Transport;
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.Contact2;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
 
@@ -36,7 +36,7 @@ interface DHT {
     /**
      * 
      */
-    public Contact getContact(KUID contactId);
+    public Contact2 getContact(KUID contactId);
     
     /**
      * Sends a ping to the given host.
@@ -56,7 +56,7 @@ interface DHT {
     /**
      * Sends a ping to the given host.
      */
-    public AsyncProcessFuture<PingEntity> ping(Contact contact);
+    public AsyncProcessFuture<PingEntity> ping(Contact2 contact);
     
     /**
      * 

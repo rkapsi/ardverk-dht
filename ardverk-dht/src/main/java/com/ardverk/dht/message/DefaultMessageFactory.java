@@ -3,14 +3,14 @@ package com.ardverk.dht.message;
 import java.net.SocketAddress;
 
 import com.ardverk.dht.KUID;
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.Contact2;
 import com.ardverk.dht.storage.Database.Condition;
 
 public class DefaultMessageFactory extends AbstractMessageFactory {
 
-    private final Contact contact;
+    private final Contact2 contact;
     
-    public DefaultMessageFactory(int length, Contact contact) {
+    public DefaultMessageFactory(int length, Contact2 contact) {
         super(length);
         
         if (contact == null) {
@@ -21,7 +21,7 @@ public class DefaultMessageFactory extends AbstractMessageFactory {
     }
     
     @Override
-    public PingRequest createPingRequest(Contact dst) {
+    public PingRequest createPingRequest(Contact2 dst) {
         return createPingRequest(dst.getRemoteAddress());
     }
 
@@ -34,27 +34,27 @@ public class DefaultMessageFactory extends AbstractMessageFactory {
     @Override
     public PingResponse createPingResponse(PingRequest request) {
         MessageId messageId = request.getMessageId();
-        Contact destination = request.getContact();
+        Contact2 destination = request.getContact();
         return new DefaultPingResponse(messageId, contact, destination);
     }
 
     @Override
-    public NodeRequest createNodeRequest(Contact dst, KUID key) {
+    public NodeRequest createNodeRequest(Contact2 dst, KUID key) {
         MessageId messageId = createMessageId(dst.getRemoteAddress());
         return new DefaultNodeRequest(messageId, contact, dst, key);
     }
 
     @Override
     public NodeResponse createNodeResponse(LookupRequest request,
-            Contact[] contacts) {
+            Contact2[] contacts) {
         MessageId messageId = request.getMessageId();
-        Contact destination = request.getContact();
+        Contact2 destination = request.getContact();
         return new DefaultNodeResponse(messageId, contact, 
                 destination, contacts);
     }
 
     @Override
-    public ValueRequest createValueRequest(Contact dst, KUID key) {
+    public ValueRequest createValueRequest(Contact2 dst, KUID key) {
         MessageId messageId = createMessageId(dst.getRemoteAddress());
         return new DefaultValueRequest(messageId, contact, dst, key);
     }
@@ -62,12 +62,12 @@ public class DefaultMessageFactory extends AbstractMessageFactory {
     @Override
     public ValueResponse createValueResponse(LookupRequest request, byte[] value) {
         MessageId messageId = request.getMessageId();
-        Contact destination = request.getContact();
+        Contact2 destination = request.getContact();
         return new DefaultValueResponse(messageId, contact, destination, value);
     }
 
     @Override
-    public StoreRequest createStoreRequest(Contact dst, KUID key, byte[] value) {
+    public StoreRequest createStoreRequest(Contact2 dst, KUID key, byte[] value) {
         MessageId messageId = createMessageId(dst.getRemoteAddress());
         return new DefaultStoreRequest(messageId, contact, dst, key, value);
     }
@@ -75,7 +75,7 @@ public class DefaultMessageFactory extends AbstractMessageFactory {
     @Override
     public StoreResponse createStoreResponse(StoreRequest request, Condition status) {
         MessageId messageId = request.getMessageId();
-        Contact destination = request.getContact();
+        Contact2 destination = request.getContact();
         return new DefaultStoreResponse(messageId, contact, destination, status);
     }
 }

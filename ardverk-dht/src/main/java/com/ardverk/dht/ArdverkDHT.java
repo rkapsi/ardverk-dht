@@ -25,11 +25,10 @@ import com.ardverk.dht.message.BencodeMessageCodec;
 import com.ardverk.dht.message.DefaultMessageFactory;
 import com.ardverk.dht.message.MessageCodec;
 import com.ardverk.dht.message.MessageFactory;
-import com.ardverk.dht.routing.Contact;
-import com.ardverk.dht.routing.DefaultContact;
+import com.ardverk.dht.routing.Contact2;
 import com.ardverk.dht.routing.DefaultRouteTable;
 import com.ardverk.dht.routing.RouteTable;
-import com.ardverk.dht.routing.Contact.Type;
+import com.ardverk.dht.routing.Contact2.Type;
 import com.ardverk.dht.storage.Database;
 import com.ardverk.dht.storage.DefaultDatabase;
 
@@ -64,7 +63,7 @@ public class ArdverkDHT extends AbstractDHT implements Closeable {
     public ArdverkDHT(int port) throws IOException {
         ContactPinger pinger = new ContactPinger() {
             @Override
-            public AsyncFuture<PingEntity> ping(Contact contact) {
+            public AsyncFuture<PingEntity> ping(Contact2 contact) {
                 return ArdverkDHT.this.ping(contact);
             }
         };
@@ -72,14 +71,14 @@ public class ArdverkDHT extends AbstractDHT implements Closeable {
         transport = new MinaTransport(new InetSocketAddress(port));
         
         SocketAddress address = new InetSocketAddress("localhost", port);
-        Contact localhost = new DefaultContact(Type.SOLICITED, 
-                contactId, 0, address, address);
+        Contact2 localhost = new Contact2(Type.SOLICITED, 
+                contactId, 0, address);
         
         routeTable = new DefaultRouteTable(pinger, K, localhost);
         
         database = new DefaultDatabase();
         
-        Contact contact = routeTable.getLocalhost();
+        Contact2 contact = routeTable.getLocalhost();
         messageFactory = new DefaultMessageFactory(
                 MESSAGE_ID_SIZE, contact);
         
@@ -111,12 +110,12 @@ public class ArdverkDHT extends AbstractDHT implements Closeable {
     }
 
     @Override
-    public Contact getContact(KUID contactId) {
+    public Contact2 getContact(KUID contactId) {
         return routeTable.get(contactId);
     }
     
     @Override
-    public AsyncProcessFuture<PingEntity> ping(Contact contact) {
+    public AsyncProcessFuture<PingEntity> ping(Contact2 contact) {
         AsyncProcess<PingEntity> process 
             = new PingResponseHandler(messageDispatcher, contact);
         return requestManager.submit(process);

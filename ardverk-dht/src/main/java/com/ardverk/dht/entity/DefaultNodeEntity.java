@@ -10,6 +10,7 @@ import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.io.StoreResponseHandler;
 import com.ardverk.dht.io.LookupResponseHandler.State;
 import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.Contact2;
 
 public class DefaultNodeEntity extends AbstractEntity implements NodeEntity {
 
@@ -17,11 +18,11 @@ public class DefaultNodeEntity extends AbstractEntity implements NodeEntity {
     
     private final MessageDispatcher messageDispatcher = null;
     
-    private final Contact[] contacts;
+    private final Contact2[] contacts;
     
     private final int hop;
     
-    public DefaultNodeEntity(Contact[] contacts, int hops, long time, TimeUnit unit) {
+    public DefaultNodeEntity(Contact2[] contacts, int hops, long time, TimeUnit unit) {
         super(time, unit);
         
         if (contacts == null) {
@@ -47,7 +48,7 @@ public class DefaultNodeEntity extends AbstractEntity implements NodeEntity {
     }
     
     @Override
-    public Contact getContact(int index) {
+    public Contact2 getContact(int index) {
         return contacts[index];
     }
 
@@ -57,7 +58,7 @@ public class DefaultNodeEntity extends AbstractEntity implements NodeEntity {
     }
 
     @Override
-    public Contact[] getContacts() {
+    public Contact2[] getContacts() {
         return contacts;
     }
 

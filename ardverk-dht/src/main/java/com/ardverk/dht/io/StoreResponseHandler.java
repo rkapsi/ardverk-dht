@@ -16,7 +16,7 @@ import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.message.StoreRequest;
 import com.ardverk.dht.message.StoreResponse;
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.Contact2;
 
 public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
 
@@ -117,7 +117,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
                     break;
                 }
                 
-                Contact contact = storeManager.next();
+                Contact2 contact = storeManager.next();
                 store(contact);
                 
                 counter.increment();
@@ -150,7 +150,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
         }
     }
     
-    private synchronized void store(Contact dst) throws IOException {
+    private synchronized void store(Contact2 dst) throws IOException {
         MessageFactory factory = messageDispatcher.getMessageFactory();
         StoreRequest request = factory.createStoreRequest(dst, key, value);
         send(request, timeout, unit);
@@ -192,7 +192,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
             return index < entity.size();
         }
         
-        public Contact next() {
+        public Contact2 next() {
             return entity.getContact(index++);
         }
     }

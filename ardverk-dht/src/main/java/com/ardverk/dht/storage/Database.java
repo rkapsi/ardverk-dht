@@ -1,7 +1,7 @@
 package com.ardverk.dht.storage;
 
 import com.ardverk.dht.KUID;
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.Contact2;
 
 public interface Database {
     
@@ -12,7 +12,7 @@ public interface Database {
         public String name();
     }
     
-    public Condition store(Contact src, KUID key, byte[] value);
+    public Condition store(Contact2 src, KUID key, byte[] value);
     
     public byte[] lookup(KUID key);
     

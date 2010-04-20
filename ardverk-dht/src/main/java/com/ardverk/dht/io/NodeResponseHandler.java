@@ -11,7 +11,7 @@ import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.NodeResponse;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.Contact2;
 import com.ardverk.dht.routing.RouteTable;
 
 public class NodeResponseHandler extends LookupResponseHandler<NodeEntity> {
@@ -27,7 +27,7 @@ public class NodeResponseHandler extends LookupResponseHandler<NodeEntity> {
     }
     
     @Override
-    protected void lookup(Contact dst, KUID key, 
+    protected void lookup(Contact2 dst, KUID key, 
             long timeout, TimeUnit unit) throws IOException {
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
@@ -38,7 +38,7 @@ public class NodeResponseHandler extends LookupResponseHandler<NodeEntity> {
     @Override
     protected void complete(State state) {
         
-        Contact[] contacts = state.getContacts();
+        Contact2[] contacts = state.getContacts();
         
         if (contacts.length == 0) {
             setException(new IOException());                
@@ -52,8 +52,8 @@ public class NodeResponseHandler extends LookupResponseHandler<NodeEntity> {
             ResponseMessage response, long time, TimeUnit unit)
             throws IOException {
         
-        Contact src = response.getContact();
-        Contact[] contacts = ((NodeResponse)response).getContacts();
+        Contact2 src = response.getContact();
+        Contact2[] contacts = ((NodeResponse)response).getContacts();
         processContacts(src, contacts, time, unit);
     }
 }

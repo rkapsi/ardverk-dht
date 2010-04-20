@@ -2,7 +2,7 @@ package com.ardverk.dht.message;
 
 import java.net.SocketAddress;
 
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.Contact2;
 
 public abstract class AbstractMessage implements Message {
 
@@ -10,16 +10,16 @@ public abstract class AbstractMessage implements Message {
     
     private final MessageId messageId;
     
-    private final Contact contact;
+    private final Contact2 contact;
     
     private final SocketAddress address;
     
     public AbstractMessage(MessageId messageId, 
-            Contact contact, Contact destination) {
+            Contact2 contact, Contact2 destination) {
         this(messageId, contact, destination.getRemoteAddress());
     }
     
-    public AbstractMessage(MessageId messageId, Contact contact, 
+    public AbstractMessage(MessageId messageId, Contact2 contact, 
             SocketAddress address) {
         
         if (messageId == null) {
@@ -52,7 +52,7 @@ public abstract class AbstractMessage implements Message {
     }
 
     @Override
-    public Contact getContact() {
+    public Contact2 getContact() {
         return contact;
     }
     

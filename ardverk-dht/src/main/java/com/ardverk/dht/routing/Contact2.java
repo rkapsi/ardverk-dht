@@ -83,6 +83,17 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
     public Contact2(Type type, 
             KUID contactId, 
             int instanceId, 
+            SocketAddress address) {
+        this(type, contactId, instanceId, address, address, 
+                null, -1L, TimeUnit.MILLISECONDS);
+    }
+    
+    /**
+     * Creates a {@link Contact2}
+     */
+    public Contact2(Type type, 
+            KUID contactId, 
+            int instanceId, 
             SocketAddress address, 
             Map<?, ?> attributes) {
         this(type, contactId, instanceId, address, address, 
@@ -100,6 +111,18 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
             long rtt, TimeUnit unit) {
         this(type, contactId, instanceId, address, 
                 address, attributes, rtt, unit);
+    }
+    
+    /**
+     * Creates a {@link Contact2}
+     */
+    public Contact2(Type type, 
+            KUID contactId, 
+            int instanceId, 
+            SocketAddress socketAddress, 
+            SocketAddress contactAddress) {
+        this(type, contactId, instanceId, socketAddress, 
+                contactAddress, null, -1L, TimeUnit.MILLISECONDS);
     }
     
     /**
