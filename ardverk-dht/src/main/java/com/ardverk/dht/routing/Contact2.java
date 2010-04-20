@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.collection.CollectionsUtils;
 import org.ardverk.lang.NullArgumentException;
+import org.ardverk.lang.NumberUtils;
 
 import com.ardverk.dht.KUID;
 
@@ -537,6 +538,62 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
         return Collections.unmodifiableMap(attributes);
     }
     
+    /**
+     * 
+     */
+    public boolean getBoolean(Object key) {
+        return NumberUtils.getBoolean(attributes.get(key));
+    }
+    
+    /**
+     * 
+     */
+    public boolean getBoolean(Object key, boolean defaultValue) {
+        return NumberUtils.getBoolean(attributes.get(key), defaultValue);
+    }
+    
+    /**
+     * 
+     */
+    public int getInteger(Object key) {
+        return NumberUtils.getInteger(attributes.get(key));
+    }
+    
+    /**
+     * 
+     */
+    public int getInteger(Object key, int defaultValue) {
+        return NumberUtils.getInteger(attributes.get(key), defaultValue);
+    }
+    
+    /**
+     * 
+     */
+    public float getFloat(Object key) {
+        return NumberUtils.getFloat(attributes.get(key));
+    }
+    
+    /**
+     * 
+     */
+    public float getFloat(Object key, float defaultValue) {
+        return NumberUtils.getFloat(attributes.get(key), defaultValue);
+    }
+    
+    /**
+     * 
+     */
+    public double getDouble(Object key) {
+        return NumberUtils.getDouble(attributes.get(key));
+    }
+    
+    /**
+     * 
+     */
+    public double getDouble(Object key, double defaultValue) {
+        return NumberUtils.getDouble(attributes.get(key), defaultValue);
+    }
+
     @Override
     public Contact2 clone() {
         return this;
