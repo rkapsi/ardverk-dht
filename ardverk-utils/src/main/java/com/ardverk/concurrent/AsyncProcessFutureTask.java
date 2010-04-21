@@ -53,14 +53,14 @@ public class AsyncProcessFutureTask<V> extends AsyncFutureTask<V>
     }
     
     @Override
-    protected synchronized void doRun() throws Exception {
+    protected void doRun() throws Exception {
         if (!isDone()) {
-            start();
             watchdog();
+            start();
         }
     }
     
-    protected synchronized void start() throws Exception {
+    protected void start() throws Exception {
         process.start(this);
     }
     
