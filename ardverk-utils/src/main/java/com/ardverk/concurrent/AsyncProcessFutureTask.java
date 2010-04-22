@@ -55,37 +55,72 @@ public class AsyncProcessFutureTask<V> extends AsyncFutureTask<V>
     @Override
     protected void doRun() throws Exception {
         if (!isDone()) {
-            watchdog();
+            watchdog(timeout, unit);
             start();
         }
     }
     
+    /**
+     * Starts the {@link AsyncProcess}. You may override this method for
+     * custom implementations.
+     */
     protected void start() throws Exception {
         process.start(this);
     }
     
-    private synchronized void watchdog() {
-        if (timeout == -1L) {
-            return;
+    /**
+     * Starts the watchdog task and returns true on success.
+     */
+    private synchronized boolean watchdog(long timeout, TimeUnit unit) {
+        if (timeout < 0L) {
+            return false;
         }
         
         if (isDone()) {
-            return;
+            return false;
         }
         
         Runnable task = new Runnable() {
             @Override
             public void run() {
                 synchronized (AsyncProcessFutureTask.this) {
-                    if (!isDone()) {
+                    if (!isDone() && !isDelay()) {
                         wasTimeout = true;
-                        setException(new TimeoutException());
+                        handleTimeout();
                     }
                 }
             }
         };
         
         future = EXECUTOR.schedule(task, timeout, unit);
+        return true;
+    }
+    
+    /**
+     * Returns true if the watchdog should be delayed.
+     */
+    private boolean isDelay() {
+        long delay = getDelay(unit);
+        return watchdog(delay, unit);
+    }
+    
+    /**
+     * You may override this method for custom delay implementations.
+     */
+    protected long getDelay(TimeUnit unit) {
+        if (process instanceof Delay) {
+            return ((Delay)process).getDelay(unit);
+        }
+        return -1L;
+    }
+    
+    /**
+     * Called by the watchdog when a timeout occurred. The default
+     * implementation will simply call {@link #setException(Throwable)}
+     * with a {@link TimeoutException}.
+     */
+    protected synchronized void handleTimeout() {
+        setException(new TimeoutException());
     }
     
     @Override

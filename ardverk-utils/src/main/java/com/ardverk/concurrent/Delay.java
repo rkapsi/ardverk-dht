@@ -33,5 +33,5 @@ public interface Delay {
      * Return values greater than zero will reschedule the 
      * watchdog {@link Thread}.
      */
-    public long delay(TimeUnit unit);
+    public long getDelay(TimeUnit unit);
 }
