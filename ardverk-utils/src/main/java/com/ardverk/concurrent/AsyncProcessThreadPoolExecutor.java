@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncThreadPoolExecutor;
 import org.ardverk.lang.Duration;
+import org.ardverk.lang.NullArgumentException;
 
 /**
  * An implementation of {@link ThreadPoolExecutor} for {@link AsyncProcessFuture}s.
@@ -75,13 +76,7 @@ public class AsyncProcessThreadPoolExecutor extends AsyncThreadPoolExecutor
     @Override
     public long getTimeout(TimeUnit unit) {
         if (unit == null) {
-            throw new NullPointerException("unit");
-        }
-        
-        Duration timeout = this.timeout;
-        long value = timeout.getDuration();
-        if (value == -1L) {
-            return -1L;
+            throw new NullArgumentException("unit");
         }
         
         return timeout.getDuration(unit);
