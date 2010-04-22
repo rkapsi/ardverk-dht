@@ -30,9 +30,6 @@ public interface AsyncProcess<V> {
 
     /**
      * Starts the {@link AsyncProcess}
-     * 
-     * ATTENTION: This method is being called by the given {@link AsyncProcessFuture}
-     * while it is holding a lock on itself.
      */
     public void start(AsyncProcessFuture<V> future) throws Exception;
 }
