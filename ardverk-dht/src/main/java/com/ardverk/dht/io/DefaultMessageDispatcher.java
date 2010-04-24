@@ -9,12 +9,12 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncFuture;
+import org.ardverk.concurrent.AsyncProcess;
+import org.ardverk.concurrent.AsyncProcessExecutorService;
+import org.ardverk.concurrent.AsyncProcessFuture;
+import org.ardverk.concurrent.ExecutorUtils;
 import org.slf4j.Logger;
 
-import com.ardverk.concurrent.AsyncProcess;
-import com.ardverk.concurrent.AsyncProcessExecutorService;
-import com.ardverk.concurrent.AsyncProcessExecutors;
-import com.ardverk.concurrent.AsyncProcessFuture;
 import com.ardverk.dht.ContactPinger;
 import com.ardverk.dht.DefaultKeyFactory;
 import com.ardverk.dht.KUID;
@@ -186,7 +186,7 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
         private static final int K = 20;
         
         private static final AsyncProcessExecutorService EXECUTOR 
-            = AsyncProcessExecutors.newCachedThreadPool();
+            = ExecutorUtils.newCachedThreadPool("SimpleDHT");
         
         private static final KeyFactory KEY_FACTORY 
             = new DefaultKeyFactory(KEY_SIZE);

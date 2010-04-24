@@ -3,7 +3,8 @@ package com.ardverk.dht;
 import java.net.InetAddress;
 import java.net.SocketAddress;
 
-import com.ardverk.concurrent.AsyncProcessFuture;
+import org.ardverk.concurrent.AsyncProcessFuture;
+
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.StoreEntity;

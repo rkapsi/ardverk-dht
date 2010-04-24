@@ -7,21 +7,18 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ardverk.concurrent.AsyncFuture;
+import org.ardverk.concurrent.AsyncProcess;
+import org.ardverk.concurrent.AsyncProcessExecutorService;
+import org.ardverk.concurrent.AsyncProcessFuture;
+import org.ardverk.concurrent.AsyncProcessFutureTask;
 import org.ardverk.concurrent.ExecutorUtils;
-
-import com.ardverk.concurrent.AsyncProcess;
-import com.ardverk.concurrent.AsyncProcessExecutorService;
-import com.ardverk.concurrent.AsyncProcessExecutors;
-import com.ardverk.concurrent.AsyncProcessFuture;
-import com.ardverk.concurrent.AsyncProcessFutureTask;
 
 class RequestManager implements Closeable {
 
     private static final AtomicInteger COUNTER = new AtomicInteger();
     
     private static final AsyncProcessExecutorService EXECUTOR 
-        = AsyncProcessExecutors.newCachedThreadPool(
-                ExecutorUtils.defaultThreadFactory("RequestManagerThread"));
+        = ExecutorUtils.newCachedThreadPool("RequestManagerThread");
     
     private boolean open = true;
     

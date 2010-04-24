@@ -7,9 +7,9 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
 import org.ardverk.concurrent.AsyncFuture;
+import org.ardverk.concurrent.AsyncProcess;
+import org.ardverk.concurrent.AsyncProcessFuture;
 
-import com.ardverk.concurrent.AsyncProcess;
-import com.ardverk.concurrent.AsyncProcessFuture;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.StoreEntity;

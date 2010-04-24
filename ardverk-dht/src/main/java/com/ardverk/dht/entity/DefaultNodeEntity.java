@@ -2,14 +2,14 @@ package com.ardverk.dht.entity;
 
 import java.util.concurrent.TimeUnit;
 
-import com.ardverk.concurrent.AsyncProcess;
-import com.ardverk.concurrent.AsyncProcessExecutorService;
-import com.ardverk.concurrent.AsyncProcessFuture;
+import org.ardverk.concurrent.AsyncProcess;
+import org.ardverk.concurrent.AsyncProcessExecutorService;
+import org.ardverk.concurrent.AsyncProcessFuture;
+
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.io.StoreResponseHandler;
 import com.ardverk.dht.io.LookupResponseHandler.State;
-import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.Contact2;
 
 public class DefaultNodeEntity extends AbstractEntity implements NodeEntity {

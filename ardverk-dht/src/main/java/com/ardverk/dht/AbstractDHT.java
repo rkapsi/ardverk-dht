@@ -3,7 +3,8 @@ package com.ardverk.dht;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
-import com.ardverk.concurrent.AsyncProcessFuture;
+import org.ardverk.concurrent.AsyncProcessFuture;
+
 import com.ardverk.dht.entity.PingEntity;
 
 abstract class AbstractDHT implements DHT {

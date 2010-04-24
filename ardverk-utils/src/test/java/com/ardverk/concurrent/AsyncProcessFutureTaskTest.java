@@ -11,7 +11,12 @@ import junit.framework.TestCase;
 
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
+import org.ardverk.concurrent.AsyncProcess;
+import org.ardverk.concurrent.AsyncProcessExecutorService;
+import org.ardverk.concurrent.AsyncProcessFuture;
+import org.ardverk.concurrent.AsyncProcessFutureTask;
 import org.ardverk.concurrent.AsyncRunnableFuture;
+import org.ardverk.concurrent.ExecutorUtils;
 import org.ardverk.utils.ExceptionUtils;
 import org.junit.Test;
 
@@ -27,9 +32,10 @@ public class AsyncProcessFutureTaskTest {
     @Test
     public void addListener() 
             throws InterruptedException, ExecutionException {
-        AsyncProcessExecutorService executor = AsyncProcessExecutors.newSingleThreadExecutor(
-                10L, TimeUnit.SECONDS);
-
+        AsyncProcessExecutorService executor 
+            = ExecutorUtils.newSingleThreadExecutor("TestThread");
+        executor.setTimeout(10L, TimeUnit.SECONDS);
+        
         final CountDownLatch latch = new CountDownLatch(1);
         AsyncFuture<String> future = executor.submit(NOP);
         future.addAsyncFutureListener(new AsyncFutureListener<String>() {
@@ -49,8 +55,9 @@ public class AsyncProcessFutureTaskTest {
     @Test
     public void addListenerBeforeCompletion() 
             throws InterruptedException, ExecutionException {
-        AsyncProcessExecutorService executor = AsyncProcessExecutors.newSingleThreadExecutor(
-                10L, TimeUnit.SECONDS);
+        AsyncProcessExecutorService executor 
+            = ExecutorUtils.newSingleThreadExecutor("TestThread");
+        executor.setTimeout(10L, TimeUnit.SECONDS);
 
         final CountDownLatch latch = new CountDownLatch(1);
         
@@ -83,8 +90,9 @@ public class AsyncProcessFutureTaskTest {
     @Test
     public void addListenerAfterCompletion() 
             throws InterruptedException, ExecutionException {
-        AsyncProcessExecutorService executor = AsyncProcessExecutors.newSingleThreadExecutor(
-                10L, TimeUnit.SECONDS);
+        AsyncProcessExecutorService executor 
+            = ExecutorUtils.newSingleThreadExecutor("TestThread");
+        executor.setTimeout(10L, TimeUnit.SECONDS);
 
         AsyncFuture<String> future = executor.submit(NOP);
         
@@ -106,8 +114,9 @@ public class AsyncProcessFutureTaskTest {
     @Test
     public void execute() throws InterruptedException, 
             ExecutionException, TimeoutException {
-        AsyncProcessExecutorService executor = AsyncProcessExecutors.newSingleThreadExecutor(
-                10L, TimeUnit.SECONDS);
+        AsyncProcessExecutorService executor 
+            = ExecutorUtils.newSingleThreadExecutor("TestThread");
+        executor.setTimeout(10L, TimeUnit.SECONDS);
         
         AsyncProcess<String> process = new AsyncTask();
         AsyncFuture<String> future = executor.submit(process);
@@ -119,8 +128,9 @@ public class AsyncProcessFutureTaskTest {
     
     @Test
     public void timeout() throws InterruptedException, TimeoutException {
-        AsyncProcessExecutorService executor = AsyncProcessExecutors.newSingleThreadExecutor(
-                250L, TimeUnit.MILLISECONDS);
+        AsyncProcessExecutorService executor 
+            = ExecutorUtils.newSingleThreadExecutor("TestThread");
+        executor.setTimeout(250L, TimeUnit.MILLISECONDS);
         
         AsyncProcess<String> process = new AsyncProcess<String>() {
             @Override

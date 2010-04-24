@@ -6,8 +6,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
+import org.ardverk.concurrent.AsyncProcessFuture;
 
-import com.ardverk.concurrent.AsyncProcessFuture;
 import com.ardverk.dht.entity.Entity;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
