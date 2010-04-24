@@ -17,6 +17,7 @@
 package com.ardverk.concurrent;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The {@link AsyncProcess} interface should be implemented by any
@@ -32,4 +33,22 @@ public interface AsyncProcess<V> {
      * Starts the {@link AsyncProcess}
      */
     public void start(AsyncProcessFuture<V> future) throws Exception;
+    
+    /**
+     * A mix-in interface for {@link AsyncProcess}. Instances of 
+     * {@link AsyncProcess} can implement this interface to gain
+     * control over the scheduling of a {@link AsyncFuture}'s watchdog
+     * and use it to delay timeouts.
+     * 
+     * This is useful for {@link AsyncProcess}es that have no predictable
+     * timeout but can ensure they're active.
+     */
+    public static interface Delay {
+
+        /**
+         * Return values greater than zero will reschedule the 
+         * watchdog {@link Thread}.
+         */
+        public long getDelay(TimeUnit unit);
+    }
 }
