@@ -1,3 +1,19 @@
+/*
+ * Copyright 2010 Roger Kapsi
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
 package com.ardverk.net;
 
 import java.io.Serializable;
@@ -11,6 +27,8 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.apache.commons.lang.NullArgumentException;
 
 import com.ardverk.coding.CodingUtils;
 import com.ardverk.utils.ByteArrayComparator;
@@ -28,9 +46,12 @@ public class NetworkCounter implements Serializable {
         = new TreeMap<byte[], AtomicInteger>(
             ByteArrayComparator.COMPARATOR);
     
+    /**
+     * Creates a {@link NetworkCounter} with the given {@link NetworkMask}.
+     */
     public NetworkCounter(NetworkMask mask) {
         if (mask == null) {
-            throw new NullPointerException("mask");
+            throw new NullArgumentException("mask");
         }
         
         this.mask = mask;
@@ -151,14 +172,16 @@ public class NetworkCounter implements Serializable {
     }
     
     /**
-     * 
+     * Returns a {@link Set} view of the keys contained 
+     * in this {@link NetworkCounter}.
      */
     public synchronized Set<byte[]> keySet() {
         return new TreeSet<byte[]>((SortedSet<byte[]>)map.keySet());
     }
     
     /**
-     * 
+     * Returns a {@link Collection} view of the values contained 
+     * in this {@link NetworkCounter}.
      */
     public synchronized Collection<Integer> values() {
         Integer[] values = new Integer[map.size()];
@@ -172,7 +195,8 @@ public class NetworkCounter implements Serializable {
     }
     
     /**
-     * 
+     * Returns a {@link Set} view of the mappings contained 
+     * in this {@link NetworkCounter}.
      */
     public synchronized Set<Map.Entry<byte[], Integer>> entrySet() {
         Map<byte[], Integer> copy = new TreeMap<byte[], Integer>(
