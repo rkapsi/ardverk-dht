@@ -21,8 +21,8 @@ import com.ardverk.dht.KUID;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.routing.Contact2.Type;
 import com.ardverk.logging.LoggerUtils;
-import com.ardverk.net.NetworkConstants;
 import com.ardverk.net.NetworkCounter;
+import com.ardverk.net.NetworkMask;
 import com.ardverk.utils.NetworkUtils;
 
 public class DefaultRouteTable extends AbstractRouteTable {
@@ -514,7 +514,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         private final FixedSizeHashMap<KUID, ContactEntity> cached;
         
         private final NetworkCounter counter 
-            = new NetworkCounter(NetworkConstants.CLASS_C);
+            = new NetworkCounter(NetworkMask.C);
         
         private Bucket(KUID bucketId, int depth, int k, int maxCacheSize) {
             if (bucketId == null) {
