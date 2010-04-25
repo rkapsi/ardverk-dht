@@ -29,9 +29,9 @@ import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang.NullArgumentException;
+import org.ardverk.utils.ByteArrayComparator;
 
 import com.ardverk.coding.CodingUtils;
-import com.ardverk.utils.ByteArrayComparator;
 
 /**
  * A counter that counts Addresses or rather Networks.

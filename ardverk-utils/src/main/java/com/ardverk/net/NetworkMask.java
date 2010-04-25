@@ -25,8 +25,9 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Arrays;
 
+import org.ardverk.utils.ByteArrayComparator;
+
 import com.ardverk.io.Writable;
-import com.ardverk.utils.ByteArrayComparator;
 
 /**
  * A Network Mask
