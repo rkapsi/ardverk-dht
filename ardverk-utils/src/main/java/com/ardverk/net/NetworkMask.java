@@ -15,7 +15,7 @@ import com.ardverk.utils.ByteArrayComparator;
 /**
  * A Network Mask
  */
-public class NetworkMask implements Comparable<NetworkMask>, Serializable, Writable {
+public class NetworkMask implements Comparable<NetworkMask>, Serializable, Writable, Cloneable {
     
     private static final long serialVersionUID = 7628001660790804026L;
     
@@ -49,14 +49,23 @@ public class NetworkMask implements Comparable<NetworkMask>, Serializable, Writa
         return length();
     }
 
+    /**
+     * Returns the given {@link SocketAddress} as a mashed byte-array
+     */
     public byte[] mask(SocketAddress address) {
         return mask(((InetSocketAddress)address).getAddress());
     }
     
+    /**
+     * Returns the given {@link InetAddress} as a mashed byte-array
+     */
     public byte[] mask(InetAddress address) {
         return mask(address.getAddress(), false);
     }
     
+    /**
+     * Masks and returns the given byte-array
+     */
     public byte[] mask(byte[] address) {
         return mask(address, true);
     }
@@ -82,6 +91,11 @@ public class NetworkMask implements Comparable<NetworkMask>, Serializable, Writa
         return address;
     }
 
+    @Override
+    public NetworkMask clone() {
+        return this;
+    }
+    
     @Override
     public int hashCode() {
         return hashCode;

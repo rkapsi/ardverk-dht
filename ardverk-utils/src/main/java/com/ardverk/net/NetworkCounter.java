@@ -5,10 +5,11 @@ import java.net.InetAddress;
 import java.net.SocketAddress;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.ardverk.coding.CodingUtils;
@@ -153,7 +154,7 @@ public class NetworkCounter implements Serializable {
      * 
      */
     public synchronized Set<byte[]> keySet() {
-        return Collections.unmodifiableSet(map.keySet());
+        return new TreeSet<byte[]>((SortedSet<byte[]>)map.keySet());
     }
     
     /**
