@@ -9,9 +9,9 @@ import java.util.Arrays;
 import org.apache.commons.lang.NullArgumentException;
 import org.ardverk.collection.ByteArrayKeyAnalyzer;
 import org.ardverk.collection.KeyAnalyzer;
+import org.ardverk.io.Writable;
 
 import com.ardverk.coding.CodingUtils;
-import com.ardverk.io.Writable;
 import com.ardverk.lang.Negation;
 import com.ardverk.lang.Xor;
 

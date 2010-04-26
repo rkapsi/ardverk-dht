@@ -5,7 +5,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Arrays;
 
-import com.ardverk.net.NetworkMask;
+import org.ardverk.net.NetworkMask;
 
 public class NetworkUtils {
 

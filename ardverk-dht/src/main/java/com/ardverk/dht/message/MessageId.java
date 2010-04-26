@@ -5,10 +5,10 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
 
+import org.ardverk.io.Writable;
 import org.ardverk.utils.ByteArrayComparator;
 
 import com.ardverk.coding.CodingUtils;
-import com.ardverk.io.Writable;
 
 public final class MessageId implements Writable, Serializable, Comparable<MessageId> {
 

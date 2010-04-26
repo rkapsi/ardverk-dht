@@ -7,8 +7,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import org.ardverk.io.Writable;
+
 import com.ardverk.coding.CodingUtils;
-import com.ardverk.io.Writable;
 
 public final class ByteArray implements Serializable, 
         Comparable<ByteArray>, Writable, Iterable<Byte> {

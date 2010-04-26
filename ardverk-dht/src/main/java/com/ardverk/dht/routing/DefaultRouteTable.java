@@ -14,6 +14,8 @@ import org.ardverk.collection.Trie;
 import org.ardverk.collection.Cursor.Decision;
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
+import org.ardverk.net.NetworkCounter;
+import org.ardverk.net.NetworkMask;
 import org.slf4j.Logger;
 
 import com.ardverk.dht.ContactPinger;
@@ -21,8 +23,6 @@ import com.ardverk.dht.KUID;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.routing.Contact2.Type;
 import com.ardverk.logging.LoggerUtils;
-import com.ardverk.net.NetworkCounter;
-import com.ardverk.net.NetworkMask;
 import com.ardverk.utils.NetworkUtils;
 
 public class DefaultRouteTable extends AbstractRouteTable {

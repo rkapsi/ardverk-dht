@@ -4,8 +4,7 @@ import java.net.InetAddress;
 import java.nio.ByteBuffer;
 
 import org.ardverk.collection.FixedSizeHashSet;
-
-import com.ardverk.net.NetworkMask;
+import org.ardverk.net.NetworkMask;
 
 /**
  * 
