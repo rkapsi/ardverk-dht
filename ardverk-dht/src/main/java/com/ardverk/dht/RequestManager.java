@@ -10,8 +10,9 @@ import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncProcess;
 import org.ardverk.concurrent.AsyncProcessExecutorService;
 import org.ardverk.concurrent.AsyncProcessFuture;
-import org.ardverk.concurrent.AsyncProcessFutureTask;
 import org.ardverk.concurrent.ExecutorUtils;
+
+import com.ardverk.dht.concurrent.ArdverkFutureTask;
 
 class RequestManager implements Closeable {
 
@@ -70,7 +71,7 @@ class RequestManager implements Closeable {
         return future;
     }
     
-    private class AsyncRequestFuture<T> extends AsyncProcessFutureTask<T> {
+    private class AsyncRequestFuture<T> extends ArdverkFutureTask<T> {
         
         private final Integer key = Integer.valueOf(COUNTER.incrementAndGet());
         
