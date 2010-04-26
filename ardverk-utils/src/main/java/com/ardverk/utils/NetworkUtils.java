@@ -3,9 +3,6 @@ package com.ardverk.utils;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.Arrays;
-
-import org.ardverk.net.NetworkMask;
 
 public class NetworkUtils {
 
@@ -25,24 +22,6 @@ public class NetworkUtils {
         
         return ((InetSocketAddress)a1).getAddress().equals(
                 ((InetSocketAddress)a2).getAddress());
-    }
-    
-    public static boolean isSameNetwork(SocketAddress a1, 
-            SocketAddress a2, NetworkMask mask) {
-        
-        if (a1 == null) {
-            throw new NullPointerException("address1");
-        }
-        
-        if (a2 == null) {
-            throw new NullPointerException("address2");
-        }
-        
-        if (mask == null) {
-            throw new NullPointerException("mask");
-        }
-        
-        return Arrays.equals(mask.mask(a1), mask.mask(a2));
     }
     
     public static boolean isValidPort(int port) {
