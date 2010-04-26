@@ -24,10 +24,16 @@ public class NetworkUtils {
                 ((InetSocketAddress)a2).getAddress());
     }
     
+    /**
+     * Returns true if the given port is valid.
+     */
     public static boolean isValidPort(int port) {
         return 0 < port && port < 0xFFFF;
     }
     
+    /**
+     * Returns true if the given port is valid.
+     */
     public static boolean isValidPort(SocketAddress address) {
         return isValidPort(((InetSocketAddress)address).getPort());
     }
