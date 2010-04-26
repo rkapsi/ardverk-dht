@@ -3,7 +3,6 @@ package com.ardverk.utils;
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
-import java.util.Collection;
 
 import org.slf4j.Logger;
 
@@ -38,7 +37,7 @@ public class IoUtils {
         return success;
     }
     
-    public static boolean closeAll(Collection<? extends Closeable> closeables) {
+    public static boolean closeAll(Iterable<? extends Closeable> closeables) {
         boolean success = false;
         if (closeables != null) {
             for (Closeable c : closeables) {
@@ -70,7 +69,7 @@ public class IoUtils {
         return success;
     }
     
-    public static boolean flushAll(Collection<? extends Flushable> flushables) {
+    public static boolean flushAll(Iterable<? extends Flushable> flushables) {
         boolean success = false;
         if (flushables != null) {
             for (Flushable c : flushables) {
