@@ -7,6 +7,7 @@ import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncFuture;
+import org.ardverk.net.NetworkUtils;
 
 import com.ardverk.dht.entity.DefaultPingEntity;
 import com.ardverk.dht.entity.PingEntity;
@@ -16,7 +17,6 @@ import com.ardverk.dht.message.PingResponse;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact2;
-import com.ardverk.utils.NetworkUtils;
 
 public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
     
