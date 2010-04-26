@@ -34,7 +34,7 @@ import org.ardverk.utils.ByteArrayComparator;
 import com.ardverk.coding.CodingUtils;
 
 /**
- * A counter that counts Addresses or rather Networks.
+ * A counter for Networks.
  */
 public class NetworkCounter implements Serializable {
     
