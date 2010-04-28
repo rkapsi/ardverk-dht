@@ -63,11 +63,6 @@ public class DefaultRouteTable extends AbstractRouteTable {
         init();
     }
     
-    @Override
-    public Contact2 getLocalhost() {
-        return localhost;
-    }
-    
     private synchronized void init() {
         consecutiveErrors = 0;
         
@@ -80,12 +75,25 @@ public class DefaultRouteTable extends AbstractRouteTable {
         add0(localhost);
     }
     
+    @Override
+    public Contact2 getLocalhost() {
+        return localhost;
+    }
+    
     private boolean isLocalhost(ContactEntity entity) {
         return isLocalhost(entity.getContact());
     }
     
     private boolean isLocalhost(Contact2 contact) {
         return localhost.getContactId().equals(contact.getContactId());
+    }
+    
+    public long getTimeout(TimeUnit unit) {
+        return unit.convert(timeout, this.unit);
+    }
+    
+    public long getTimeoutInMillis() {
+        return getTimeout(TimeUnit.MILLISECONDS);
     }
     
     private void checkKeyLength(Contact2 other) throws IllegalArgumentException {
