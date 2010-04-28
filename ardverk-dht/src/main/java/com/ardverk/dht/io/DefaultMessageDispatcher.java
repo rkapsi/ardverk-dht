@@ -211,7 +211,8 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
             
             ContactPinger pinger = new ContactPinger() {
                 @Override
-                public AsyncFuture<PingEntity> ping(Contact2 contact) {
+                public AsyncFuture<PingEntity> ping(Contact2 contact, 
+                        long timeout, TimeUnit unit) {
                     return SimpleDHT.this.ping(contact);
                 }
             };

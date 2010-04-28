@@ -345,7 +345,7 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
     /**
      * 
      */
-    public long getgetTimeSinceCreationInMillis() {
+    public long getTimeSinceCreationInMillis() {
         return getTimeSinceCreation(TimeUnit.MILLISECONDS);
     }
     
@@ -369,6 +369,13 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
      */
     public long getTimeSinceLastContactInMillis() {
         return getTimeSinceLastContact(TimeUnit.MILLISECONDS);
+    }
+    
+    /**
+     * Returns the adaptive timeout for this {@link Contact2}.
+     */
+    public long getAdaptiveTimeout(long defaultValue, TimeUnit unit) {
+        return defaultValue;
     }
     
     /**

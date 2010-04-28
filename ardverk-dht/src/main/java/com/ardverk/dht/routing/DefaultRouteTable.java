@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
 import org.ardverk.collection.Cursor;
 import org.ardverk.collection.FixedSizeHashMap;
@@ -31,6 +32,12 @@ public class DefaultRouteTable extends AbstractRouteTable {
     
     private static final Logger LOG 
         = LoggerUtils.getLogger(DefaultRouteTable.class);
+    
+    private static final long DEFAULT_TIMEOUT = 30L * 1000L;
+    
+    private final long timeout = DEFAULT_TIMEOUT;
+    
+    private final TimeUnit unit = TimeUnit.MILLISECONDS;
     
     private final Contact2 localhost;
     
@@ -347,8 +354,9 @@ public class DefaultRouteTable extends AbstractRouteTable {
             }
         };*/
         
-        AsyncFuture<PingEntity> future 
-            = pinger.ping(entity.getContact());
+        Contact2 contact = entity.getContact();
+        long timeout = contact.getAdaptiveTimeout(this.timeout, unit);
+        AsyncFuture<PingEntity> future = pinger.ping(contact, timeout, unit);
         
         if (listener != null) {
             future.addAsyncFutureListener(listener);
