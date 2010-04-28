@@ -6,8 +6,8 @@ import java.util.concurrent.TimeUnit;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.entity.DefaultNodeEntity;
 import com.ardverk.dht.entity.NodeEntity;
-import com.ardverk.dht.message.LookupRequest;
 import com.ardverk.dht.message.MessageFactory;
+import com.ardverk.dht.message.NodeRequest;
 import com.ardverk.dht.message.NodeResponse;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
@@ -31,8 +31,10 @@ public class NodeResponseHandler extends LookupResponseHandler<NodeEntity> {
             long timeout, TimeUnit unit) throws IOException {
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
-        LookupRequest message = factory.createNodeRequest(dst, key);
-        send(message, timeout, unit);
+        NodeRequest message = factory.createNodeRequest(dst, key);
+        
+        long adaptiveTimeout = dst.getAdaptiveTimeout(timeout, unit);
+        send(message, adaptiveTimeout, unit);
     }
 
     @Override

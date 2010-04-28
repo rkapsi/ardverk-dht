@@ -153,7 +153,9 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     private synchronized void store(Contact2 dst) throws IOException {
         MessageFactory factory = messageDispatcher.getMessageFactory();
         StoreRequest request = factory.createStoreRequest(dst, key, value);
-        send(request, timeout, unit);
+        
+        long adaptiveTimeout = dst.getAdaptiveTimeout(timeout, unit);
+        send(request, adaptiveTimeout, unit);
     }
     
     @Override

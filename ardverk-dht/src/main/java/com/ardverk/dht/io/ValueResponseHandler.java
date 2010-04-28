@@ -8,11 +8,11 @@ import java.util.concurrent.TimeUnit;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.entity.DefaultValueEntity;
 import com.ardverk.dht.entity.ValueEntity;
-import com.ardverk.dht.message.LookupRequest;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.NodeResponse;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
+import com.ardverk.dht.message.ValueRequest;
 import com.ardverk.dht.message.ValueResponse;
 import com.ardverk.dht.routing.Contact2;
 import com.ardverk.dht.routing.RouteTable;
@@ -69,8 +69,10 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
             long timeout, TimeUnit unit) throws IOException {
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
-        LookupRequest message = factory.createValueRequest(dst, key);
-        send(message, timeout, unit);
+        ValueRequest message = factory.createValueRequest(dst, key);
+        
+        long adaptiveTimeout = dst.getAdaptiveTimeout(timeout, unit);
+        send(message, adaptiveTimeout, unit);
     }
     
     @Override
