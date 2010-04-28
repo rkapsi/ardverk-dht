@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncProcess;
@@ -63,8 +64,9 @@ public class ArdverkDHT extends AbstractDHT implements Closeable {
     public ArdverkDHT(int port) throws IOException {
         ContactPinger pinger = new ContactPinger() {
             @Override
-            public AsyncFuture<PingEntity> ping(Contact2 contact) {
-                return ArdverkDHT.this.ping(contact);
+            public AsyncFuture<PingEntity> ping(Contact2 contact, 
+                    long timeout, TimeUnit unit) {
+                return ArdverkDHT.this.ping(contact, timeout, unit);
             }
         };
         
@@ -115,50 +117,57 @@ public class ArdverkDHT extends AbstractDHT implements Closeable {
     }
     
     @Override
-    public AsyncProcessFuture<PingEntity> ping(Contact2 contact) {
+    public AsyncProcessFuture<PingEntity> ping(Contact2 contact, 
+            long timeout, TimeUnit unit) {
         AsyncProcess<PingEntity> process 
             = new PingResponseHandler(messageDispatcher, contact);
-        return requestManager.submit(process);
+        return requestManager.submit(process, timeout, unit);
     }
 
     @Override
-    public AsyncProcessFuture<PingEntity> ping(InetAddress address, int port) {
+    public AsyncProcessFuture<PingEntity> ping(InetAddress address, int port, 
+            long timeout, TimeUnit unit) {
         AsyncProcess<PingEntity> process 
             = new PingResponseHandler(messageDispatcher, address, port);
-        return requestManager.submit(process);
+        return requestManager.submit(process, timeout, unit);
     }
 
     @Override
-    public AsyncProcessFuture<PingEntity> ping(SocketAddress dst) {
+    public AsyncProcessFuture<PingEntity> ping(SocketAddress dst, 
+            long timeout, TimeUnit unit) {
         AsyncProcess<PingEntity> process 
             = new PingResponseHandler(messageDispatcher, dst);
-        return requestManager.submit(process);
+        return requestManager.submit(process, timeout, unit);
     }
 
     @Override
-    public AsyncProcessFuture<PingEntity> ping(String address, int port) {
+    public AsyncProcessFuture<PingEntity> ping(String address, int port, 
+            long timeout, TimeUnit unit) {
         AsyncProcess<PingEntity> process 
             = new PingResponseHandler(messageDispatcher, address, port);
-        return requestManager.submit(process);
+        return requestManager.submit(process, timeout, unit);
     }
 
     @Override
-    public AsyncProcessFuture<StoreEntity> put(KUID key, byte[] value) {
+    public AsyncProcessFuture<StoreEntity> put(KUID key, byte[] value, 
+            long timeout, TimeUnit unit) {
         AsyncProcess<StoreEntity> process 
             = new StoreResponseHandler(messageDispatcher, null, key, value);
-        return requestManager.submit(process);
+        return requestManager.submit(process, timeout, unit);
     }
     
     @Override
-    public AsyncProcessFuture<ValueEntity> get(KUID key) {
+    public AsyncProcessFuture<ValueEntity> get(KUID key, 
+            long timeout, TimeUnit unit) {
         AsyncProcess<ValueEntity> process = null;
-        return requestManager.submit(process);
+        return requestManager.submit(process, timeout, unit);
     }
 
     @Override
-    public AsyncProcessFuture<NodeEntity> lookup(KUID key) {
+    public AsyncProcessFuture<NodeEntity> lookup(KUID key, 
+            long timeout, TimeUnit unit) {
         AsyncProcess<NodeEntity> process 
             = new NodeResponseHandler(messageDispatcher, routeTable, key);
-        return requestManager.submit(process);
+        return requestManager.submit(process, timeout, unit);
     }
 }

@@ -2,6 +2,7 @@ package com.ardverk.dht;
 
 import java.net.InetAddress;
 import java.net.SocketAddress;
+import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncProcessFuture;
 
@@ -42,35 +43,42 @@ interface DHT {
     /**
      * Sends a ping to the given host.
      */
-    public AsyncProcessFuture<PingEntity> ping(String address, int port);
+    public AsyncProcessFuture<PingEntity> ping(String address, int port, 
+            long timeout, TimeUnit unit);
     
     /**
      * Sends a ping to the given host.
      */
-    public AsyncProcessFuture<PingEntity> ping(InetAddress address, int port);
+    public AsyncProcessFuture<PingEntity> ping(InetAddress address, int port, 
+            long timeout, TimeUnit unit);
 
     /**
      * Sends a ping to the given host.
      */
-    public AsyncProcessFuture<PingEntity> ping(SocketAddress dst);
+    public AsyncProcessFuture<PingEntity> ping(SocketAddress dst, 
+            long timeout, TimeUnit unit);
     
     /**
      * Sends a ping to the given host.
      */
-    public AsyncProcessFuture<PingEntity> ping(Contact2 contact);
+    public AsyncProcessFuture<PingEntity> ping(Contact2 contact, 
+            long timeout, TimeUnit unit);
     
     /**
      * 
      */
-    public AsyncProcessFuture<StoreEntity> put(KUID key, byte[] value);
+    public AsyncProcessFuture<StoreEntity> put(KUID key, byte[] value, 
+            long timeout, TimeUnit unit);
     
     /**
      * 
      */
-    public AsyncProcessFuture<ValueEntity> get(KUID key);
+    public AsyncProcessFuture<ValueEntity> get(KUID key, 
+            long timeout, TimeUnit unit);
     
     /**
      * 
      */
-    public AsyncProcessFuture<NodeEntity> lookup(KUID key);
+    public AsyncProcessFuture<NodeEntity> lookup(KUID key, 
+            long timeout, TimeUnit unit);
 }
