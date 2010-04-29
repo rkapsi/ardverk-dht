@@ -155,7 +155,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
         StoreRequest request = factory.createStoreRequest(dst, key, value);
         
         long adaptiveTimeout = dst.getAdaptiveTimeout(timeout, unit);
-        send(request, adaptiveTimeout, unit);
+        send(dst, request, adaptiveTimeout, unit);
     }
     
     @Override

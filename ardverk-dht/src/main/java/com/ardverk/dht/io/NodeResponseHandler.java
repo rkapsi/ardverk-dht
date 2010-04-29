@@ -34,7 +34,7 @@ public class NodeResponseHandler extends LookupResponseHandler<NodeEntity> {
         NodeRequest message = factory.createNodeRequest(dst, key);
         
         long adaptiveTimeout = dst.getAdaptiveTimeout(timeout, unit);
-        send(message, adaptiveTimeout, unit);
+        send(dst, message, adaptiveTimeout, unit);
     }
 
     @Override

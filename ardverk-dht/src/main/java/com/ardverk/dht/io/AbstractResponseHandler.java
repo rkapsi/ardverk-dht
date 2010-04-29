@@ -1,6 +1,7 @@
 package com.ardverk.dht.io;
 
 import java.io.IOException;
+import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -8,9 +9,11 @@ import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.AsyncProcessFuture;
 
+import com.ardverk.dht.KUID;
 import com.ardverk.dht.entity.Entity;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
+import com.ardverk.dht.routing.Contact2;
 
 public abstract class AbstractResponseHandler<V extends Entity> 
         extends AbstractMessageHandler implements ResponseHandler<V> {
@@ -107,11 +110,26 @@ public abstract class AbstractResponseHandler<V extends Entity>
     /**
      * 
      */
-    public void send(RequestMessage message, 
+    public void send(Contact2 dst, RequestMessage message, 
             long timeout, TimeUnit unit) throws IOException {
         
+        KUID contactId = dst.getContactId();
+        SocketAddress addr = dst.getContactAddress();
+        
+        send(contactId, addr, message, timeout, unit);
+    }
+    
+    public void send(SocketAddress addr, RequestMessage message, 
+            long timeout, TimeUnit unit) throws IOException {
+        send(null, addr, message, timeout, unit);
+    }
+    
+    public void send(KUID contactId, SocketAddress addr, 
+            RequestMessage message, long timeout, TimeUnit unit) throws IOException {
+        
         if (isOpen()) {
-            messageDispatcher.send(this, message, timeout, unit);
+            messageDispatcher.send(this, contactId, addr, 
+                    message, timeout, unit);
             lastSendTime = System.currentTimeMillis();
         }
     }

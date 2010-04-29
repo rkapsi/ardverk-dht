@@ -72,7 +72,7 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
         ValueRequest message = factory.createValueRequest(dst, key);
         
         long adaptiveTimeout = dst.getAdaptiveTimeout(timeout, unit);
-        send(message, adaptiveTimeout, unit);
+        send(dst, message, adaptiveTimeout, unit);
     }
     
     @Override

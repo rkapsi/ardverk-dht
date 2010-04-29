@@ -49,6 +49,6 @@ public class StoreRequestHandler extends AbstractRequestHandler {
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
         ResponseMessage response = factory.createStoreResponse(request, status);
-        send(response);
+        send(request, response);
     }
 }

@@ -19,6 +19,6 @@ public class PingRequestHandler extends AbstractRequestHandler {
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
         PingResponse response = factory.createPingResponse(request);
-        send(response);
+        send(request, response);
     }
 }

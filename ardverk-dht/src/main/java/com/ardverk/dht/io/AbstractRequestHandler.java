@@ -2,7 +2,9 @@ package com.ardverk.dht.io;
 
 import java.io.IOException;
 
+import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
+import com.ardverk.dht.routing.Contact2;
 
 public abstract class AbstractRequestHandler 
         extends AbstractMessageHandler implements RequestHandler {
@@ -11,7 +13,12 @@ public abstract class AbstractRequestHandler
         super(messageDispatcher);
     }
     
-    public void send(ResponseMessage message) throws IOException {
-        messageDispatcher.send(message);
+    public void send(RequestMessage request, 
+            ResponseMessage message) throws IOException {
+        messageDispatcher.send(request.getContact(), message);
+    }
+    
+    public void send(Contact2 dst, ResponseMessage message) throws IOException {
+        messageDispatcher.send(dst, message);
     }
 }

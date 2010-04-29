@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.net.NetworkUtils;
 
+import com.ardverk.dht.KUID;
 import com.ardverk.dht.entity.DefaultPingEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.message.MessageFactory;
@@ -73,9 +74,16 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
     
     private class SocketAddressPingSender implements PingSender {
         
+        private final KUID contactId;
+        
         private final SocketAddress address;
         
         public SocketAddressPingSender(SocketAddress address) {
+            this(null, address);
+        }
+        
+        public SocketAddressPingSender(KUID contactId, 
+                SocketAddress address) {
             if (address == null) {
                 throw new NullPointerException("address");
             }
@@ -84,6 +92,7 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
                 throw new IllegalArgumentException("address=" + address);
             }
             
+            this.contactId = contactId;
             this.address = address;
         }
     
@@ -92,7 +101,8 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
             MessageFactory factory = messageDispatcher.getMessageFactory();
             PingRequest request = factory.createPingRequest(address);
             
-            send(request, getTimeoutInMillis(), TimeUnit.MILLISECONDS);
+            send(contactId, address, request, 
+                    getTimeoutInMillis(), TimeUnit.MILLISECONDS);
         }
     }
     
@@ -115,7 +125,7 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
             
             long adaptiveTimeout = contact.getAdaptiveTimeout(
                     getTimeoutInMillis(), TimeUnit.MILLISECONDS);
-            send(request, adaptiveTimeout, TimeUnit.MILLISECONDS);
+            send(contact, request, adaptiveTimeout, TimeUnit.MILLISECONDS);
         }
     }
 }

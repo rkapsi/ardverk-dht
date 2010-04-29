@@ -52,6 +52,6 @@ public class ValueRequestHandler extends AbstractRequestHandler {
             response = factory.createNodeResponse(request, contacts);
         }
         
-        send(response);
+        send(request, response);
     }
 }

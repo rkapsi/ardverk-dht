@@ -16,6 +16,7 @@ import org.ardverk.collection.FixedSizeHashSet;
 import org.ardverk.concurrent.ExecutorUtils;
 import org.slf4j.Logger;
 
+import com.ardverk.dht.KUID;
 import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.io.transport.TransportListener;
 import com.ardverk.dht.message.Message;
@@ -123,21 +124,38 @@ public abstract class MessageDispatcher implements Closeable {
     /**
      * 
      */
-    public void send(ResponseMessage message) throws IOException {
+    public void send(Contact2 dst, ResponseMessage message) throws IOException {
         byte[] data = codec.encode(message);
-        transport.send(message.getAddress(), data);
+        
+        SocketAddress addr = dst.getContactAddress();
+        transport.send(addr, data);
     }
     
     /**
      * 
      */
     public void send(MessageCallback callback, 
+            Contact2 dst, RequestMessage message, 
+            long timeout, TimeUnit unit) throws IOException {
+        
+        KUID contactId = dst.getContactId();
+        SocketAddress addr = dst.getContactAddress();
+        
+        send(callback, contactId, addr, message, timeout, unit);
+    }
+    
+    /**
+     * 
+     */
+    public void send(MessageCallback callback, 
+            KUID contactId, SocketAddress addr, 
             RequestMessage message, long timeout, 
             TimeUnit unit) throws IOException {
         
         byte[] data = codec.encode(message);
         
-        entityManager.add(callback, message, timeout, unit);
+        entityManager.add(callback, contactId, addr, 
+                message, timeout, unit);
         transport.send(message.getAddress(), data);
     }
     
@@ -248,7 +266,8 @@ public abstract class MessageDispatcher implements Closeable {
         /**
          * 
          */
-        public void add(MessageCallback callback, RequestMessage message, 
+        public void add(MessageCallback callback, KUID contactId, 
+                SocketAddress addr, RequestMessage message, 
                 long timeout, TimeUnit unit) {
             
             final MessageId messageId = message.getMessageId();
@@ -283,7 +302,7 @@ public abstract class MessageDispatcher implements Closeable {
                     = EXECUTOR.schedule(task, timeout, unit);
                 
                 MessageEntity entity = new MessageEntity(
-                        future, callback, message);
+                        future, callback, contactId, addr, message);
                 callbacks.put(messageId, entity);
             }
         }
@@ -307,12 +326,18 @@ public abstract class MessageDispatcher implements Closeable {
 
         private final MessageCallback callback;
         
+        private final KUID contactId;
+        
+        private final SocketAddress addr;
+        
         private final RequestMessage request;
         
         private final AtomicBoolean open = new AtomicBoolean(true);
         
         private MessageEntity(ScheduledFuture<?> future, 
                 MessageCallback callback, 
+                KUID contactId,
+                SocketAddress addr,
                 RequestMessage request) {
             
             if (future == null) {
@@ -329,6 +354,8 @@ public abstract class MessageDispatcher implements Closeable {
             
             this.future = future;
             this.callback = callback;
+            this.contactId = contactId;
+            this.addr = addr;
             this.request = request;
         }
 
