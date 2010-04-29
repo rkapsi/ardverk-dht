@@ -9,9 +9,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncProcess;
 import org.ardverk.concurrent.AsyncProcessExecutorService;
-import org.ardverk.concurrent.AsyncProcessFuture;
 import org.ardverk.concurrent.ExecutorUtils;
 
+import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.concurrent.ArdverkFutureTask;
 
 class RequestManager implements Closeable {
@@ -41,7 +41,7 @@ class RequestManager implements Closeable {
         futures.clear();
     }
     
-    public synchronized <T> AsyncProcessFuture<T> submit(AsyncProcess<T> process) {
+    public synchronized <T> ArdverkFuture<T> submit(AsyncProcess<T> process) {
         if (!open) {
             throw new IllegalStateException();
         }
@@ -55,7 +55,7 @@ class RequestManager implements Closeable {
         return future;
     }
     
-    public synchronized <T> AsyncProcessFuture<T> submit(AsyncProcess<T> process, 
+    public synchronized <T> ArdverkFuture<T> submit(AsyncProcess<T> process, 
             long timeout, TimeUnit unit) {
         
         if (!open) {
