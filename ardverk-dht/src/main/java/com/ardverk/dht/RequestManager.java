@@ -1,11 +1,10 @@
 package com.ardverk.dht;
 
 import java.io.Closeable;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
+import org.ardverk.collection.IdentityHashSet;
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncProcess;
 import org.ardverk.concurrent.AsyncProcessExecutorService;
@@ -15,16 +14,14 @@ import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.concurrent.ArdverkFutureTask;
 
 class RequestManager implements Closeable {
-
-    private static final AtomicInteger COUNTER = new AtomicInteger();
     
     private static final AsyncProcessExecutorService EXECUTOR 
         = ExecutorUtils.newCachedThreadPool("RequestManagerThread");
     
     private boolean open = true;
     
-    private final Map<Integer, AsyncFuture<?>> futures 
-        = new HashMap<Integer, AsyncFuture<?>>();
+    private final Set<AsyncFuture<?>> futures 
+        = new IdentityHashSet<AsyncFuture<?>>();
     
     @Override
     public synchronized void close() {
@@ -34,7 +31,7 @@ class RequestManager implements Closeable {
         
         open = false;
         
-        for (AsyncFuture<?> future : futures.values()) {
+        for (AsyncFuture<?> future : futures) {
             future.cancel(true);
         }
         
@@ -50,7 +47,7 @@ class RequestManager implements Closeable {
             = new AsyncRequestFuture<T>(process);
         
         EXECUTOR.execute(future);
-        futures.put(future.key, future);
+        futures.add(future);
         
         return future;
     }
@@ -66,14 +63,16 @@ class RequestManager implements Closeable {
             = new AsyncRequestFuture<T>(process, timeout, unit);
         
         EXECUTOR.execute(future);
-        futures.put(future.key, future);
+        futures.add(future);
         
         return future;
     }
     
+    private synchronized void complete(AsyncFuture<?> future) {
+        futures.remove(future);
+    }
+    
     private class AsyncRequestFuture<T> extends ArdverkFutureTask<T> {
-        
-        private final Integer key = Integer.valueOf(COUNTER.incrementAndGet());
         
         public AsyncRequestFuture(AsyncProcess<T> process) {
             super(process);
@@ -86,11 +85,8 @@ class RequestManager implements Closeable {
 
         @Override
         protected void done0() {
-            synchronized (RequestManager.this) {
-                futures.remove(key);
-            }
-            
-            super.done();
+            complete(this);
+            super.done0();
         }
     }
 }
