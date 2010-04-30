@@ -28,54 +28,49 @@ public class DefaultMessageFactory extends AbstractMessageFactory {
     @Override
     public PingRequest createPingRequest(SocketAddress dst) {
         MessageId messageId = createMessageId(dst);
-        return new DefaultPingRequest(messageId, contact, dst);
+        return new DefaultPingRequest(messageId, contact);
     }
 
     @Override
     public PingResponse createPingResponse(PingRequest request) {
         MessageId messageId = request.getMessageId();
-        Contact2 destination = request.getContact();
-        return new DefaultPingResponse(messageId, contact, destination);
+        return new DefaultPingResponse(messageId, contact);
     }
 
     @Override
     public NodeRequest createNodeRequest(Contact2 dst, KUID key) {
         MessageId messageId = createMessageId(dst.getRemoteAddress());
-        return new DefaultNodeRequest(messageId, contact, dst, key);
+        return new DefaultNodeRequest(messageId, contact, key);
     }
 
     @Override
     public NodeResponse createNodeResponse(LookupRequest request,
             Contact2[] contacts) {
         MessageId messageId = request.getMessageId();
-        Contact2 destination = request.getContact();
-        return new DefaultNodeResponse(messageId, contact, 
-                destination, contacts);
+        return new DefaultNodeResponse(messageId, contact, contacts);
     }
 
     @Override
     public ValueRequest createValueRequest(Contact2 dst, KUID key) {
         MessageId messageId = createMessageId(dst.getRemoteAddress());
-        return new DefaultValueRequest(messageId, contact, dst, key);
+        return new DefaultValueRequest(messageId, contact, key);
     }
 
     @Override
     public ValueResponse createValueResponse(LookupRequest request, byte[] value) {
         MessageId messageId = request.getMessageId();
-        Contact2 destination = request.getContact();
-        return new DefaultValueResponse(messageId, contact, destination, value);
+        return new DefaultValueResponse(messageId, contact, value);
     }
 
     @Override
     public StoreRequest createStoreRequest(Contact2 dst, KUID key, byte[] value) {
         MessageId messageId = createMessageId(dst.getRemoteAddress());
-        return new DefaultStoreRequest(messageId, contact, dst, key, value);
+        return new DefaultStoreRequest(messageId, contact, key, value);
     }
 
     @Override
     public StoreResponse createStoreResponse(StoreRequest request, Condition status) {
         MessageId messageId = request.getMessageId();
-        Contact2 destination = request.getContact();
-        return new DefaultStoreResponse(messageId, contact, destination, status);
+        return new DefaultStoreResponse(messageId, contact, status);
     }
 }

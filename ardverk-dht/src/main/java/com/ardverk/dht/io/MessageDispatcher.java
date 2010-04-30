@@ -156,7 +156,7 @@ public abstract class MessageDispatcher implements Closeable {
         
         entityManager.add(callback, contactId, addr, 
                 message, timeout, unit);
-        transport.send(message.getAddress(), data);
+        transport.send(addr, data);
     }
     
     /**
@@ -365,9 +365,30 @@ public abstract class MessageDispatcher implements Closeable {
         }
         
         /**
-         * 
+         * Checks if the {@link ResponseMessage} of the expected type.
          */
         public boolean check(ResponseMessage response) {
+            return checkType(response) && checkContactId(response);
+        }
+        
+        /**
+         * Checks the {@link Contact2}'s {@link KUID}
+         */
+        private boolean checkContactId(ResponseMessage response) {
+            if (contactId == null) {
+                return (response instanceof PingResponse);
+            }
+            
+            Contact2 contact = response.getContact();
+            KUID otherId = contact.getContactId();
+            
+            return contactId.equals(otherId);
+        }
+        
+        /**
+         * Checks the type of the {@link ResponseMessage}.
+         */
+        private boolean checkType(ResponseMessage response) {
             if (request instanceof PingRequest) {
                 return response instanceof PingResponse;
             } else if (request instanceof NodeRequest) {

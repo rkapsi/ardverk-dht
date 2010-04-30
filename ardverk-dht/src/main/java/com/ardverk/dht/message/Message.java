@@ -18,9 +18,4 @@ public interface Message {
      * Returns the origin of the {@link Message}
      */
     public Contact2 getContact();
-    
-    /**
-     * Returns the destination {@link SocketAddress} of the {@link Message}.
-     */
-    public SocketAddress getAddress();
 }

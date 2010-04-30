@@ -1,7 +1,5 @@
 package com.ardverk.dht.message;
 
-import java.net.SocketAddress;
-
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact2;
 
@@ -13,26 +11,8 @@ public class DefaultStoreRequest extends AbstractRequestMessage
     private final byte[] value;
     
     public DefaultStoreRequest(MessageId messageId, 
-            Contact2 contact, Contact2 destination, 
-            KUID key, byte[] value) {
-        super(messageId, contact, destination);
-        
-        if (key == null) {
-            throw new NullPointerException("key");
-        }
-        
-        if (value == null) {
-            throw new NullPointerException("value");
-        }
-        
-        this.key = key;
-        this.value = value;
-    }
-
-    public DefaultStoreRequest(MessageId messageId, 
-            Contact2 contact, SocketAddress address, 
-            KUID key, byte[] value) {
-        super(messageId, contact, address);
+            Contact2 contact, KUID key, byte[] value) {
+        super(messageId, contact);
         
         if (key == null) {
             throw new NullPointerException("key");
