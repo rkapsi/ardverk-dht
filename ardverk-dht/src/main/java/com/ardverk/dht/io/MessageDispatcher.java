@@ -211,29 +211,29 @@ public abstract class MessageDispatcher implements Closeable {
      * 
      */
     protected void handleResponse(MessageCallback callback, 
-            RequestMessage request, ResponseMessage response, 
+            RequestEntity entity, ResponseMessage response, 
             long time, TimeUnit unit) throws IOException {
-        callback.handleResponse(request, response, time, unit);
+        callback.handleResponse(entity, response, time, unit);
     }
     
     /**
      * 
      */
     protected void handleTimeout(MessageCallback callback, 
-            RequestMessage request, long time, TimeUnit unit) 
+            RequestEntity entity, long time, TimeUnit unit) 
                 throws IOException {
-        callback.handleTimeout(request, time, unit);
+        callback.handleTimeout(entity, time, unit);
     }
     
     /**
      * 
      */
     protected void handleIllegalResponse(MessageCallback callback, 
-            RequestMessage request, ResponseMessage response, 
+            RequestEntity entity, ResponseMessage response, 
             long time, TimeUnit unit) throws IOException {
         
         if (LOG.isErrorEnabled()) {
-            LOG.error("Illegal Response: " + request + " -> " + response);
+            LOG.error("Illegal Response: " + entity + " -> " + response);
         }
     }
     
@@ -410,12 +410,15 @@ public abstract class MessageDispatcher implements Closeable {
             if (cancel()) {
                 long time = System.currentTimeMillis() - creationTime;
                 
+                RequestEntity entity = new RequestEntity(
+                        contactId, addr, request);
+                
                 if (check(response)) {
-                    MessageDispatcher.this.handleResponse(callback, request, 
+                    MessageDispatcher.this.handleResponse(callback, entity, 
                             response, time, TimeUnit.MILLISECONDS);
                 } else {
-                    MessageDispatcher.this.handleIllegalResponse(callback, request, 
-                            response, time, TimeUnit.MILLISECONDS);
+                    MessageDispatcher.this.handleIllegalResponse(callback, 
+                            entity, response, time, TimeUnit.MILLISECONDS);
                 }
             }
         }
@@ -425,8 +428,12 @@ public abstract class MessageDispatcher implements Closeable {
          */
         public void handleTimeout() throws IOException {
             if (cancel()) {
+                
+                RequestEntity entity = new RequestEntity(
+                        contactId, addr, request);
+                
                 long time = System.currentTimeMillis() - creationTime;
-                MessageDispatcher.this.handleTimeout(callback, request, 
+                MessageDispatcher.this.handleTimeout(callback, entity, 
                         time, TimeUnit.MILLISECONDS);
             }
         }

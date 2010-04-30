@@ -166,12 +166,12 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     
     
     @Override
-    protected final synchronized void processResponse(RequestMessage request,
+    protected final synchronized void processResponse(RequestEntity entity,
             ResponseMessage response, long time, TimeUnit unit)
             throws IOException {
         
         try {
-            processResponse0(request, response, time, unit);
+            processResponse0(entity, response, time, unit);
         } finally {
             process(1);
         }
@@ -180,7 +180,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     /**
      * 
      */
-    protected abstract void processResponse0(RequestMessage request,
+    protected abstract void processResponse0(RequestEntity entity,
             ResponseMessage response, long time, TimeUnit unit) throws IOException;
 
     /**
@@ -192,17 +192,17 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     }
 
     @Override
-    protected final synchronized void processTimeout(RequestMessage request, 
+    protected final synchronized void processTimeout(RequestEntity entity, 
             long time, TimeUnit unit) throws IOException {
         
         try {
-            processTimeout0(request, time, unit);
+            processTimeout0(entity, time, unit);
         } finally {
             process(1);
         }
     }
     
-    protected synchronized void processTimeout0(RequestMessage request, 
+    protected synchronized void processTimeout0(RequestEntity entity, 
             long time, TimeUnit unit) throws IOException {
         lookupManager.handleTimeout(time, unit);
     }

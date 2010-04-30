@@ -3,7 +3,7 @@ package com.ardverk.dht.io;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import com.ardverk.dht.message.RequestMessage;
+import org.ardverk.lang.NullArgumentException;
 
 /**
  * 
@@ -12,18 +12,18 @@ public class TimeoutIoException extends IOException {
     
     private static final long serialVersionUID = -7330783412590437071L;
 
-    private final RequestMessage request;
+    private final RequestEntity entity;
     
     private final long time;
     
     private final TimeUnit unit;
     
-    public TimeoutIoException(RequestMessage request, 
+    public TimeoutIoException(RequestEntity entity, 
             long time, TimeUnit unit) {
-        super (createMessage(request, time, unit));
+        super (createMessage(entity, time, unit));
         
-        if (request == null) {
-            throw new NullPointerException("request");
+        if (entity == null) {
+            throw new NullArgumentException("entity");
         }
         
         if (time < 0L) {
@@ -31,10 +31,10 @@ public class TimeoutIoException extends IOException {
         }
         
         if (unit == null) {
-            throw new NullPointerException("unit");
+            throw new NullArgumentException("unit");
         }
         
-        this.request = request;
+        this.entity = entity;
         this.time = time;
         this.unit = unit;
     }
@@ -42,8 +42,8 @@ public class TimeoutIoException extends IOException {
     /**
      * 
      */
-    public RequestMessage getRequestMessage() {
-        return request;
+    public RequestEntity getRequestEntity() {
+        return entity;
     }
     
     /**
@@ -56,9 +56,9 @@ public class TimeoutIoException extends IOException {
     /**
      * 
      */
-    private static String createMessage(RequestMessage request, 
+    private static String createMessage(RequestEntity entity, 
             long time, TimeUnit unit) {
-        return request.getClass().getSimpleName() + " (" 
-            + request.getAddress() + ", " + time + ", " + unit + ")";
+        return entity.getClass().getSimpleName() + " (" 
+            + entity.getAddress() + ", " + time + ", " + unit + ")";
     }
 }

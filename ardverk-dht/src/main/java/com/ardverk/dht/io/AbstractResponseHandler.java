@@ -160,7 +160,7 @@ public abstract class AbstractResponseHandler<V extends Entity>
     
     
     @Override
-    public void handleResponse(RequestMessage request,
+    public void handleResponse(RequestEntity entity,
             ResponseMessage response, long time, TimeUnit unit)
             throws IOException {
         
@@ -171,17 +171,17 @@ public abstract class AbstractResponseHandler<V extends Entity>
             
             synchronized (this) {
                 lastResponseTime = System.currentTimeMillis();
-                processResponse(request, response, time, unit);
+                processResponse(entity, response, time, unit);
             }
         }
     }
     
-    protected abstract void processResponse(RequestMessage request,
+    protected abstract void processResponse(RequestEntity entity,
             ResponseMessage response, long time, TimeUnit unit)
             throws IOException;
 
     @Override
-    public void handleTimeout(RequestMessage request, 
+    public void handleTimeout(RequestEntity entity, 
             long time, TimeUnit unit) throws IOException {
         
         synchronized (future) {
@@ -190,28 +190,28 @@ public abstract class AbstractResponseHandler<V extends Entity>
             }
             
             synchronized (this) {
-                processTimeout(request, time, unit);                
+                processTimeout(entity, time, unit);                
             }
         }
     }
     
-    protected abstract void processTimeout(RequestMessage request, 
+    protected abstract void processTimeout(RequestEntity entity, 
             long time, TimeUnit unit) throws IOException;
 
     @Override
-    public void handleException(RequestMessage request, Throwable exception) {
+    public void handleException(RequestEntity entity, Throwable exception) {
         synchronized (future) {
             if (!isOpen()) {
                 return;
             }
             
             synchronized (this) {
-                processException(request, exception);                
+                processException(entity, exception);                
             }
         }
     }
     
-    protected void processException(RequestMessage request, Throwable exception) {
+    protected void processException(RequestEntity entity, Throwable exception) {
         
     }
 }

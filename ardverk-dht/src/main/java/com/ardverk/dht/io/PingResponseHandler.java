@@ -15,7 +15,6 @@ import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.PingRequest;
 import com.ardverk.dht.message.PingResponse;
-import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact2;
 
@@ -53,15 +52,15 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
     }
     
     @Override
-    protected void processResponse(RequestMessage request, 
+    protected void processResponse(RequestEntity entity, 
             ResponseMessage response, long time, TimeUnit unit) {
         setValue(new DefaultPingEntity((PingResponse)response, time, unit));
     }
     
     @Override
-    protected void processTimeout(RequestMessage request, 
+    protected void processTimeout(RequestEntity entity, 
             long time, TimeUnit unit) throws IOException {
-        setException(new TimeoutIoException(request, time, unit));
+        setException(new TimeoutIoException(entity, time, unit));
     }
     
     private long getTimeoutInMillis() {

@@ -9,7 +9,6 @@ import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.NodeRequest;
 import com.ardverk.dht.message.NodeResponse;
-import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact2;
 import com.ardverk.dht.routing.RouteTable;
@@ -50,7 +49,7 @@ public class NodeResponseHandler extends LookupResponseHandler<NodeEntity> {
     }
     
     @Override
-    protected synchronized void processResponse0(RequestMessage request,
+    protected synchronized void processResponse0(RequestEntity entity,
             ResponseMessage response, long time, TimeUnit unit)
             throws IOException {
         

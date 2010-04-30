@@ -90,20 +90,20 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
     
     @Override
     protected void handleResponse(MessageCallback callback,
-            RequestMessage request, ResponseMessage response, long time,
+            RequestEntity entity, ResponseMessage response, long time,
             TimeUnit unit) throws IOException {
         
-        super.handleResponse(callback, request, response, time, unit);
-        defaultHandler.handleResponse(request, response, time, unit);
+        super.handleResponse(callback, entity, response, time, unit);
+        defaultHandler.handleResponse(entity, response, time, unit);
     }
 
     @Override
     protected void handleTimeout(MessageCallback callback,
-            RequestMessage request, long time, TimeUnit unit)
+            RequestEntity entity, long time, TimeUnit unit)
             throws IOException {
         
-        super.handleTimeout(callback, request, time, unit);
-        defaultHandler.handleTimeout(request, time, unit);
+        super.handleTimeout(callback, entity, time, unit);
+        defaultHandler.handleTimeout(entity, time, unit);
     }
 
     @Override

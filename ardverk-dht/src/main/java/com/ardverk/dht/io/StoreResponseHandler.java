@@ -12,7 +12,6 @@ import com.ardverk.dht.entity.DefaultStoreEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.message.MessageFactory;
-import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.message.StoreRequest;
 import com.ardverk.dht.message.StoreResponse;
@@ -159,7 +158,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     }
     
     @Override
-    protected synchronized void processResponse(RequestMessage request, 
+    protected synchronized void processResponse(RequestEntity entity, 
             ResponseMessage response, long time, TimeUnit unit) throws IOException {
         StoreResponse message = (StoreResponse)response;
         
@@ -171,7 +170,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     }
 
     @Override
-    protected synchronized void processTimeout(RequestMessage request, 
+    protected synchronized void processTimeout(RequestEntity entity, 
             long time, TimeUnit unit) throws IOException {
         process(1);
     }

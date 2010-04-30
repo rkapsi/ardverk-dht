@@ -10,7 +10,6 @@ import com.ardverk.dht.entity.DefaultValueEntity;
 import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.NodeResponse;
-import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.message.ValueRequest;
 import com.ardverk.dht.message.ValueResponse;
@@ -34,7 +33,7 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     }
 
     @Override
-    protected synchronized void processResponse0(RequestMessage request,
+    protected synchronized void processResponse0(RequestEntity request,
             ResponseMessage response, long time, TimeUnit unit)
             throws IOException {
         

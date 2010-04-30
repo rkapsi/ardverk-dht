@@ -1,8 +1,10 @@
 package com.ardverk.dht.io;
 
 import java.io.IOException;
+import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 
+import com.ardverk.dht.KUID;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact2;
@@ -35,7 +37,7 @@ public class DefaultMessageHandler implements MessageCallback {
     }
     
     @Override
-    public void handleResponse(RequestMessage request, 
+    public void handleResponse(RequestEntity entity, 
             ResponseMessage response, long time, TimeUnit unit) throws IOException {
         
         Contact2 src = response.getContact();
@@ -48,16 +50,17 @@ public class DefaultMessageHandler implements MessageCallback {
     }
     
     @Override
-    public void handleTimeout(RequestMessage request, 
+    public void handleTimeout(RequestEntity entity, 
             long time, TimeUnit unit) throws IOException {
         
-        Contact2 dst = request.getContact();
-        routeTable.failure(dst.getContactId(), 
-                dst.getRemoteAddress());
+        KUID contactId = entity.getContactId();
+        SocketAddress address = entity.getAddress();
+        
+        routeTable.failure(contactId, address);
     }
 
     @Override
-    public void handleException(RequestMessage request, Throwable exception) {
+    public void handleException(RequestEntity entity, Throwable exception) {
         // Do nothing!
     }
 }
