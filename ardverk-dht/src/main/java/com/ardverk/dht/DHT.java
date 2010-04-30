@@ -4,6 +4,8 @@ import java.net.InetAddress;
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.concurrent.AsyncProcess;
+
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
@@ -85,5 +87,11 @@ interface DHT {
      * 
      */
     public ArdverkFuture<NodeEntity> lookup(KUID key, 
+            long timeout, TimeUnit unit);
+    
+    /**
+     * 
+     */
+    public <T> ArdverkFuture<T> submit(AsyncProcess<T> process, 
             long timeout, TimeUnit unit);
 }

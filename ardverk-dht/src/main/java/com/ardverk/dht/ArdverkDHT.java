@@ -170,4 +170,10 @@ public class ArdverkDHT extends AbstractDHT implements Closeable {
             = new NodeResponseHandler(messageDispatcher, routeTable, key);
         return requestManager.submit(process, timeout, unit);
     }
+
+    @Override
+    public <T> ArdverkFuture<T> submit(AsyncProcess<T> process, long timeout,
+            TimeUnit unit) {
+        return requestManager.submit(process, timeout, unit);
+    }
 }
