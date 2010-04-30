@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.ardverk.collection.FixedSizeHashSet;
 import org.ardverk.concurrent.ExecutorUtils;
+import org.ardverk.lang.NullArgumentException;
 import org.slf4j.Logger;
 
 import com.ardverk.dht.KUID;
@@ -23,16 +24,8 @@ import com.ardverk.dht.message.Message;
 import com.ardverk.dht.message.MessageCodec;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.MessageId;
-import com.ardverk.dht.message.NodeRequest;
-import com.ardverk.dht.message.NodeResponse;
-import com.ardverk.dht.message.PingRequest;
-import com.ardverk.dht.message.PingResponse;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
-import com.ardverk.dht.message.StoreRequest;
-import com.ardverk.dht.message.StoreResponse;
-import com.ardverk.dht.message.ValueRequest;
-import com.ardverk.dht.message.ValueResponse;
 import com.ardverk.dht.routing.Contact2;
 import com.ardverk.logging.LoggerUtils;
 
@@ -148,15 +141,17 @@ public abstract class MessageDispatcher implements Closeable {
      * 
      */
     public void send(MessageCallback callback, 
-            KUID contactId, SocketAddress addr, 
-            RequestMessage message, long timeout, 
+            KUID contactId, SocketAddress address, 
+            RequestMessage request, long timeout, 
             TimeUnit unit) throws IOException {
         
-        byte[] data = codec.encode(message);
+        byte[] data = codec.encode(request);
         
-        entityManager.add(callback, contactId, addr, 
-                message, timeout, unit);
-        transport.send(addr, data);
+        RequestEntity entity = new RequestEntity(
+                contactId, address, request);
+        
+        entityManager.add(callback, entity, timeout, unit);
+        transport.send(address, data);
     }
     
     /**
@@ -266,11 +261,10 @@ public abstract class MessageDispatcher implements Closeable {
         /**
          * 
          */
-        public void add(MessageCallback callback, KUID contactId, 
-                SocketAddress addr, RequestMessage message, 
+        public void add(MessageCallback callback, RequestEntity entity, 
                 long timeout, TimeUnit unit) {
             
-            final MessageId messageId = message.getMessageId();
+            final MessageId messageId = entity.getMessageId();
             
             synchronized (callbacks) {
                 
@@ -301,9 +295,9 @@ public abstract class MessageDispatcher implements Closeable {
                 ScheduledFuture<?> future 
                     = EXECUTOR.schedule(task, timeout, unit);
                 
-                MessageEntity entity = new MessageEntity(
-                        future, callback, contactId, addr, message);
-                callbacks.put(messageId, entity);
+                MessageEntity entity2 = new MessageEntity(
+                        future, callback, entity);
+                callbacks.put(messageId, entity2);
             }
         }
         
@@ -326,37 +320,29 @@ public abstract class MessageDispatcher implements Closeable {
 
         private final MessageCallback callback;
         
-        private final KUID contactId;
-        
-        private final SocketAddress addr;
-        
-        private final RequestMessage request;
+        private final RequestEntity entity;
         
         private final AtomicBoolean open = new AtomicBoolean(true);
         
         private MessageEntity(ScheduledFuture<?> future, 
                 MessageCallback callback, 
-                KUID contactId,
-                SocketAddress addr,
-                RequestMessage request) {
+                RequestEntity entity) {
             
             if (future == null) {
-                throw new NullPointerException("future");
+                throw new NullArgumentException("future");
             }
             
             if (callback == null) {
-                throw new NullPointerException("callback");
+                throw new NullArgumentException("callback");
             }
             
-            if (request == null) {
-                throw new NullPointerException("request");
+            if (entity == null) {
+                throw new NullArgumentException("entity");
             }
             
             this.future = future;
             this.callback = callback;
-            this.contactId = contactId;
-            this.addr = addr;
-            this.request = request;
+            this.entity = entity;
         }
 
         public boolean cancel() {
@@ -364,44 +350,6 @@ public abstract class MessageDispatcher implements Closeable {
             return open.getAndSet(false);
         }
         
-        /**
-         * Checks if the {@link ResponseMessage} of the expected type.
-         */
-        public boolean check(ResponseMessage response) {
-            return checkType(response) && checkContactId(response);
-        }
-        
-        /**
-         * Checks the {@link Contact2}'s {@link KUID}
-         */
-        private boolean checkContactId(ResponseMessage response) {
-            if (contactId == null) {
-                return (response instanceof PingResponse);
-            }
-            
-            Contact2 contact = response.getContact();
-            KUID otherId = contact.getContactId();
-            
-            return contactId.equals(otherId);
-        }
-        
-        /**
-         * Checks the type of the {@link ResponseMessage}.
-         */
-        private boolean checkType(ResponseMessage response) {
-            if (request instanceof PingRequest) {
-                return response instanceof PingResponse;
-            } else if (request instanceof NodeRequest) {
-                return response instanceof NodeResponse;
-            } else if (request instanceof ValueRequest) {
-                return response instanceof ValueResponse 
-                    || response instanceof NodeResponse;
-            } else if (request instanceof StoreRequest) {
-                return response instanceof StoreResponse;
-            }
-            
-            return false;
-        }
         
         /**
          * 
@@ -410,10 +358,7 @@ public abstract class MessageDispatcher implements Closeable {
             if (cancel()) {
                 long time = System.currentTimeMillis() - creationTime;
                 
-                RequestEntity entity = new RequestEntity(
-                        contactId, addr, request);
-                
-                if (check(response)) {
+                if (entity.check(response)) {
                     MessageDispatcher.this.handleResponse(callback, entity, 
                             response, time, TimeUnit.MILLISECONDS);
                 } else {
@@ -428,9 +373,6 @@ public abstract class MessageDispatcher implements Closeable {
          */
         public void handleTimeout() throws IOException {
             if (cancel()) {
-                
-                RequestEntity entity = new RequestEntity(
-                        contactId, addr, request);
                 
                 long time = System.currentTimeMillis() - creationTime;
                 MessageDispatcher.this.handleTimeout(callback, entity, 
