@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncFuture;
+import org.ardverk.lang.NullArgumentException;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.entity.DefaultStoreEntity;
@@ -80,11 +81,11 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
         super(messageDispatcher);
         
         if (key == null) {
-            throw new NullPointerException("key");
+            throw new NullArgumentException("key");
         }
         
         if (value == null) {
-            throw new NullPointerException("value");
+            throw new NullArgumentException("value");
         }
         
         if (timeout < 0L) {
@@ -92,7 +93,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
         }
         
         if (unit == null) {
-            throw new NullPointerException("unit");
+            throw new NullArgumentException("unit");
         }
         
         this.storeManager = new StoreManager(entity);
@@ -183,7 +184,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
         
         public StoreManager(NodeEntity entity) {
             if (entity == null) {
-                throw new NullPointerException("entity");
+                throw new NullArgumentException("entity");
             }
             
             this.entity = entity;

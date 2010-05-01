@@ -2,6 +2,8 @@ package com.ardverk.dht.message;
 
 import java.util.ServiceLoader;
 
+import org.ardverk.lang.NullArgumentException;
+
 public abstract class MessageCodec extends MessageCodecSpi {
 
     private static final ServiceLoader<MessageCodec> codecs 
@@ -9,7 +11,7 @@ public abstract class MessageCodec extends MessageCodecSpi {
     
     public static MessageCodec getCodec(String name) {
         if (name == null) {
-            throw new NullPointerException("name");
+            throw new NullArgumentException("name");
         }
         
         for (MessageCodec codec : codecs) {

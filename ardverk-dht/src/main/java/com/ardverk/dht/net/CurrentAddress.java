@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.nio.ByteBuffer;
 
 import org.ardverk.collection.FixedSizeHashSet;
+import org.ardverk.lang.NullArgumentException;
 import org.ardverk.net.NetworkMask;
 
 /**
@@ -21,7 +22,7 @@ public class CurrentAddress {
     
     public CurrentAddress(NetworkMask mask, int count) {        
         if (mask == null) {
-            throw new NullPointerException("mask");
+            throw new NullArgumentException("mask");
         }
         
         if (count < 0) {
@@ -37,11 +38,11 @@ public class CurrentAddress {
      */
     public synchronized boolean set(InetAddress src, InetAddress address) {
         if (src == null) {
-            throw new NullPointerException("src");
+            throw new NullArgumentException("src");
         }
         
         if (address == null) {
-            throw new NullPointerException("address");
+            throw new NullArgumentException("address");
         }
         
         // Do nothing if both addresses are equal

@@ -1,5 +1,7 @@
 package com.ardverk.dht.message;
 
+import org.ardverk.lang.NullArgumentException;
+
 import com.ardverk.dht.routing.Contact2;
 import com.ardverk.dht.storage.Database.Condition;
 
@@ -13,7 +15,7 @@ public class DefaultStoreResponse extends AbstractResponseMessage
         super(messageId, contact);
         
         if (status == null) {
-            throw new NullPointerException("status");
+            throw new NullArgumentException("status");
         }
         
         this.status = status;

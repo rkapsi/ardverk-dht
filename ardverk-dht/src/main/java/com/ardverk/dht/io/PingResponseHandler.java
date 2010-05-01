@@ -7,6 +7,7 @@ import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncFuture;
+import org.ardverk.lang.NullArgumentException;
 import org.ardverk.net.NetworkUtils;
 
 import com.ardverk.dht.KUID;
@@ -84,7 +85,7 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
         public SocketAddressPingSender(KUID contactId, 
                 SocketAddress address) {
             if (address == null) {
-                throw new NullPointerException("address");
+                throw new NullArgumentException("address");
             }
             
             if (!NetworkUtils.isValidPort(address)) {
@@ -111,7 +112,7 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
         
         public ContactPingSender(Contact2 contact) {
             if (contact == null) {
-                throw new NullPointerException("contact");
+                throw new NullArgumentException("contact");
             }
             
             this.contact = contact;

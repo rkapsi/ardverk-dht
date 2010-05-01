@@ -68,15 +68,15 @@ public abstract class MessageDispatcher implements Closeable {
             MessageFactory factory, MessageCodec codec) {
         
         if (transport == null) {
-            throw new NullPointerException("transport");
+            throw new NullArgumentException("transport");
         }
         
         if (factory == null) {
-            throw new NullPointerException("factory");
+            throw new NullArgumentException("factory");
         }
         
         if (codec == null) {
-            throw new NullPointerException("codec");
+            throw new NullArgumentException("codec");
         }
         
         this.transport = transport;
@@ -392,7 +392,7 @@ public abstract class MessageDispatcher implements Closeable {
         
         public ResponseChecker(MessageFactory factory, int historySize) {
             if (factory == null) {
-                throw new NullPointerException("factory");
+                throw new NullArgumentException("factory");
             }
             
             this.factory = factory;

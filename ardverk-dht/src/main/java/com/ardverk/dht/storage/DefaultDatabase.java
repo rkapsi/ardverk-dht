@@ -5,6 +5,8 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.ardverk.lang.NullArgumentException;
+
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact2;
 
@@ -53,7 +55,7 @@ public class DefaultDatabase extends AbstractDatabase {
     @Override
     public Value[] select(final KUID key) {
         if (key == null) {
-            throw new NullPointerException("key");
+            throw new NullArgumentException("key");
         }
         
         Value[] values = values();

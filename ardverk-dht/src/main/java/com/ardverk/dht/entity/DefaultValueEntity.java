@@ -2,6 +2,7 @@ package com.ardverk.dht.entity;
 
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.lang.NullArgumentException;
 import org.ardverk.utils.StringUtils;
 
 import com.ardverk.dht.io.LookupResponseHandler.State;
@@ -14,7 +15,7 @@ public class DefaultValueEntity extends AbstractEntity implements ValueEntity {
         super(time, unit);
         
         if (value == null) {
-            throw new NullPointerException("value");
+            throw new NullArgumentException("value");
         }
         
         this.value = value;
@@ -24,7 +25,7 @@ public class DefaultValueEntity extends AbstractEntity implements ValueEntity {
         super(state.getTimeInMillis(), TimeUnit.MILLISECONDS);
         
         if (value == null) {
-            throw new NullPointerException("value");
+            throw new NullArgumentException("value");
         }
         
         this.value = value;

@@ -54,11 +54,11 @@ public class SizeEstimator {
     
     public SizeEstimator(RouteTable routeTable, KUID maximum) {
         if (routeTable == null) {
-            throw new NullPointerException("routeTable");
+            throw new NullArgumentException("routeTable");
         }
         
         if (maximum == null) {
-            throw new NullPointerException("maximum");
+            throw new NullArgumentException("maximum");
         }
         
         this.routeTable = routeTable;

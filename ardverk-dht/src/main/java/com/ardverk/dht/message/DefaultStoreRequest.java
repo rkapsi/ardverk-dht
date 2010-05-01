@@ -1,5 +1,7 @@
 package com.ardverk.dht.message;
 
+import org.ardverk.lang.NullArgumentException;
+
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact2;
 
@@ -15,11 +17,11 @@ public class DefaultStoreRequest extends AbstractRequestMessage
         super(messageId, contact);
         
         if (key == null) {
-            throw new NullPointerException("key");
+            throw new NullArgumentException("key");
         }
         
         if (value == null) {
-            throw new NullPointerException("value");
+            throw new NullArgumentException("value");
         }
         
         this.key = key;

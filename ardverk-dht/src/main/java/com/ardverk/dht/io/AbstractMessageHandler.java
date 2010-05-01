@@ -1,5 +1,7 @@
 package com.ardverk.dht.io;
 
+import org.ardverk.lang.NullArgumentException;
+
 import com.ardverk.dht.message.MessageFactory;
 
 public abstract class AbstractMessageHandler {
@@ -8,7 +10,7 @@ public abstract class AbstractMessageHandler {
     
     public AbstractMessageHandler(MessageDispatcher messageDispatcher) {
         if (messageDispatcher == null) {
-            throw new NullPointerException("messageDispatcher");
+            throw new NullArgumentException("messageDispatcher");
         }
         
         this.messageDispatcher = messageDispatcher;

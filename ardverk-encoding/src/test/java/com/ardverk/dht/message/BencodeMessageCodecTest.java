@@ -2,7 +2,6 @@ package com.ardverk.dht.message;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 
 import org.junit.Test;
 
@@ -23,8 +22,7 @@ public class BencodeMessageCodecTest {
                 contactId, 0, 
                 new InetSocketAddress("localhost", 6666));
         
-        SocketAddress address = new InetSocketAddress("localhost", 6666);
-        PingRequest request = new DefaultPingRequest(messageId, contact, address);
+        PingRequest request = new DefaultPingRequest(messageId, contact);
         
         byte[] data = codec.encode(request);
         Message message = codec.decode(null, data);

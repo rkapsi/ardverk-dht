@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.AsyncProcessFuture;
+import org.ardverk.lang.NullArgumentException;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.entity.Entity;
@@ -49,7 +50,7 @@ public abstract class AbstractResponseHandler<V extends Entity>
      */
     private long convertTime(long timeInMillis, TimeUnit unit) {
         if (unit == null) {
-            throw new NullPointerException("unit");
+            throw new NullArgumentException("unit");
         }
         
         if (timeInMillis == -1L) {
@@ -137,7 +138,7 @@ public abstract class AbstractResponseHandler<V extends Entity>
     @Override
     public final void start(AsyncProcessFuture<V> future) throws Exception {
         if (future == null) {
-            throw new NullPointerException("future");
+            throw new NullArgumentException("future");
         }
         
         this.future = future;

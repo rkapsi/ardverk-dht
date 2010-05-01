@@ -15,6 +15,7 @@ import org.ardverk.collection.Trie;
 import org.ardverk.collection.Cursor.Decision;
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
+import org.ardverk.lang.NullArgumentException;
 import org.ardverk.net.NetworkCounter;
 import org.ardverk.net.NetworkMask;
 import org.ardverk.net.NetworkUtils;
@@ -51,7 +52,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         super(pinger, k);
         
         if (localhost == null) {
-            throw new NullPointerException("localhost");
+            throw new NullArgumentException("localhost");
         }
         
         KUID contactId = localhost.getContactId();
@@ -110,7 +111,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
     @Override
     public synchronized void add(Contact2 contact) {
         if (contact == null) {
-            throw new NullPointerException("contact");
+            throw new NullArgumentException("contact");
         }
         
         // Make sure the KUIDs of all Contacts have the
@@ -275,7 +276,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
     @Override
     public synchronized Contact2 get(KUID contactId) {
         if (contactId == null) {
-            throw new NullPointerException("contactId");
+            throw new NullArgumentException("contactId");
         }
         
         Bucket bucket = buckets.selectValue(contactId);
@@ -294,7 +295,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
             final Collection<Contact2> dst, final int count) {
         
         if (contactId == null) {
-            throw new NullPointerException("contactId");
+            throw new NullArgumentException("contactId");
         }
         
         if (dst.size() >= count) {
@@ -419,7 +420,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         public ContactEntity(Contact2 contact) {
             if (contact == null) {
-                throw new NullPointerException("contact");
+                throw new NullArgumentException("contact");
             }
             
             this.contactId = contact.getContactId();
@@ -444,7 +445,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         public Contact2[] update(Contact2 contact) {
             if (contact == null) {
-                throw new NullPointerException("contact");
+                throw new NullArgumentException("contact");
             }
             
             if (!contactId.equals(contact.getContactId())) {
@@ -512,7 +513,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         public boolean same(Contact2 other) {
             if (other == null) {
-                throw new NullPointerException("other");
+                throw new NullArgumentException("other");
             }
             
             return contact != null && contact.equals(other);
@@ -534,7 +535,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         private Bucket(KUID bucketId, int depth, int k, int maxCacheSize) {
             if (bucketId == null) {
-                throw new NullPointerException("bucketId");
+                throw new NullArgumentException("bucketId");
             }
             
             if (depth < 0) {

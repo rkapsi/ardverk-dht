@@ -2,6 +2,8 @@ package com.ardverk.dht.entity;
 
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.lang.NullArgumentException;
+
 import com.ardverk.dht.message.PingResponse;
 import com.ardverk.dht.routing.Contact2;
 
@@ -13,7 +15,7 @@ public class DefaultPingEntity extends AbstractEntity implements PingEntity {
         super(time, unit);
         
         if (response == null) {
-            throw new NullPointerException("response");
+            throw new NullArgumentException("response");
         }
         
         this.response = response;

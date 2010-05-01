@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.lang.NullArgumentException;
+
 import com.ardverk.dht.KUID;
 
 public class ContactUtils {
@@ -42,11 +44,11 @@ public class ContactUtils {
     
     public static Contact[] sort(Contact[] contacts, KUID key, boolean ascending) {
         if (contacts == null) {
-            throw new NullPointerException("contacts");
+            throw new NullArgumentException("contacts");
         }
         
         if (key == null) {
-            throw new NullPointerException("key");
+            throw new NullArgumentException("key");
         }
         
         ContactHandle[] handles = new ContactHandle[contacts.length];
@@ -71,7 +73,7 @@ public class ContactUtils {
         
         public ContactHandle(Contact contact, KUID key) {
             if (contact == null) {
-                throw new NullPointerException("contact");
+                throw new NullArgumentException("contact");
             }
             
             this.contact = contact;

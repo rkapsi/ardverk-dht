@@ -9,6 +9,8 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Random;
 
+import org.ardverk.lang.NullArgumentException;
+
 public class DefaultKeyFactory implements KeyFactory {
 
     private static final long serialVersionUID = -3573934494417059105L;
@@ -43,7 +45,7 @@ public class DefaultKeyFactory implements KeyFactory {
     
     protected KUID createKey(byte[] key, boolean copy) {
         if (key == null) {
-            throw new NullPointerException("key");
+            throw new NullArgumentException("key");
         }
         
         if (key.length != length()) {
@@ -60,7 +62,7 @@ public class DefaultKeyFactory implements KeyFactory {
     @Override
     public KUID createKey(InputStream in) throws IOException {
         if (in == null) {
-            throw new NullPointerException("in");
+            throw new NullArgumentException("in");
         }
         
         byte[] key = new byte[length()];
@@ -80,7 +82,7 @@ public class DefaultKeyFactory implements KeyFactory {
     @Override
     public KUID createKey(ByteBuffer in) {
         if (in == null) {
-            throw new NullPointerException("in");
+            throw new NullArgumentException("in");
         }
         
         byte[] key = new byte[length()];
@@ -92,7 +94,7 @@ public class DefaultKeyFactory implements KeyFactory {
     @Override
     public KUID createKey(String value, int radix) {
         if (value == null) {
-            throw new NullPointerException("value");
+            throw new NullArgumentException("value");
         }
         
         if (radix <= 0) {
@@ -105,7 +107,7 @@ public class DefaultKeyFactory implements KeyFactory {
     @Override
     public KUID createKey(BigInteger value) {
         if (value == null) {
-            throw new NullPointerException("value");
+            throw new NullArgumentException("value");
         }
         
         int lengthInBits = lengthInBits();

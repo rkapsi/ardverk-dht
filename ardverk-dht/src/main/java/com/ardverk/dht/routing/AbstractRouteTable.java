@@ -2,6 +2,8 @@ package com.ardverk.dht.routing;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.ardverk.lang.NullArgumentException;
+
 import com.ardverk.dht.ContactPinger;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.DefaultRouteTable.Bucket;
@@ -19,7 +21,7 @@ public abstract class AbstractRouteTable implements RouteTable {
     public AbstractRouteTable(ContactPinger pinger, int k) {
         
         if (pinger == null) {
-            throw new NullPointerException("pinger");
+            throw new NullArgumentException("pinger");
         }
         
         if (k <= 0) {
@@ -48,7 +50,7 @@ public abstract class AbstractRouteTable implements RouteTable {
     @Override
     public void addRouteTableListener(RouteTableListener l) {
         if (l == null) {
-            throw new NullPointerException("l");
+            throw new NullArgumentException("l");
         }
         
         listeners.add(l);
@@ -57,7 +59,7 @@ public abstract class AbstractRouteTable implements RouteTable {
     @Override
     public void removeRouteTableListener(RouteTableListener l) {
         if (l == null) {
-            throw new NullPointerException("l");
+            throw new NullArgumentException("l");
         }
         
         listeners.remove(l);

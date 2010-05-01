@@ -15,11 +15,11 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncFuture;
+import org.ardverk.lang.NullArgumentException;
 import org.slf4j.Logger;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.entity.LookupEntity;
-import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.Contact2;
@@ -260,11 +260,11 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         
         public LookupManager(RouteTable routeTable, KUID key) {
             if (routeTable == null) {
-                throw new NullPointerException("routeTable");
+                throw new NullArgumentException("routeTable");
             }
             
             if (key == null) {
-                throw new NullPointerException("key");
+                throw new NullArgumentException("key");
             }
             
             this.routeTable = routeTable;
@@ -417,7 +417,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         
         public XorComparator(KUID key) {
             if (key == null) {
-                throw new NullPointerException("key");
+                throw new NullArgumentException("key");
             }
             
             this.key = key;
@@ -441,11 +441,11 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         
         private State(Contact2[] contacts, int hop, long time, TimeUnit unit) {
             if (contacts == null) {
-                throw new NullPointerException("contacts");
+                throw new NullArgumentException("contacts");
             }
             
             if (unit == null) {
-                throw new NullPointerException("unit");
+                throw new NullArgumentException("unit");
             }
             
             this.contacts = contacts;

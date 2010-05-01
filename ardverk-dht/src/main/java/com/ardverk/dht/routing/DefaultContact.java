@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.ardverk.lang.NullArgumentException;
+
 import com.ardverk.dht.KUID;
 
 /**
@@ -40,15 +42,15 @@ public class DefaultContact implements Contact {
             Map<?, ?> attributes) {
         
         if (type == null) {
-            throw new NullPointerException("type");
+            throw new NullArgumentException("type");
         }
         
         if (contactId == null) {
-            throw new NullPointerException("contactId");
+            throw new NullArgumentException("contactId");
         }
         
         if (socketAddress == null) {
-            throw new NullPointerException("socketAddress");
+            throw new NullArgumentException("socketAddress");
         }
         
         if (contactAddress == null) {
@@ -72,11 +74,11 @@ public class DefaultContact implements Contact {
     public DefaultContact(Contact existing, Contact contact) {
         
         if (existing == null) {
-            throw new NullPointerException("existing");
+            throw new NullArgumentException("existing");
         }
         
         if (contact == null) {
-            throw new NullPointerException("contact");
+            throw new NullArgumentException("contact");
         }
         
         if (!existing.getContactId().equals(contact.getContactId())) {
@@ -102,11 +104,11 @@ public class DefaultContact implements Contact {
     
     private DefaultContact(Contact contact, Type type) {
         if (contact == null) {
-            throw new NullPointerException("contact");
+            throw new NullArgumentException("contact");
         }
         
         if (type == null) {
-            throw new NullPointerException("type");
+            throw new NullArgumentException("type");
         }
         
         this.creationTime = contact.getCreationTime();

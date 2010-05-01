@@ -2,6 +2,8 @@ package com.ardverk.dht.entity;
 
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.lang.NullArgumentException;
+
 public abstract class AbstractEntity implements Entity {
 
     protected final long time;
@@ -14,7 +16,7 @@ public abstract class AbstractEntity implements Entity {
         }
         
         if (unit == null) {
-            throw new NullPointerException("unit");
+            throw new NullArgumentException("unit");
         }
         
         this.time = time;

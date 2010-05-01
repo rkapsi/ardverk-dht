@@ -5,6 +5,8 @@ import java.net.SocketAddress;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.ardverk.lang.NullArgumentException;
+
 public abstract class AbstractTransport implements Transport {
 
     private final List<TransportListener> listeners 
@@ -18,7 +20,7 @@ public abstract class AbstractTransport implements Transport {
     @Override
     public void addTransportListener(TransportListener l) {
         if (l == null) {
-            throw new NullPointerException("l");
+            throw new NullArgumentException("l");
         }
         
         listeners.add(l);
@@ -27,7 +29,7 @@ public abstract class AbstractTransport implements Transport {
     @Override
     public void removeTransportListener(TransportListener l) {
         if (l == null) {
-            throw new NullPointerException("l");
+            throw new NullArgumentException("l");
         }
         
         listeners.remove(l);

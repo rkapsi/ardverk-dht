@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.lang.NullArgumentException;
+
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
@@ -20,11 +22,11 @@ public class DefaultMessageHandler implements MessageCallback {
             RouteTable routeTable) {
         
         if (messageDispatcher == null) {
-            throw new NullPointerException("messageDispatcher");
+            throw new NullArgumentException("messageDispatcher");
         }
         
         if (routeTable == null) {
-            throw new NullPointerException("routeTable");
+            throw new NullArgumentException("routeTable");
         }
         
         this.messageDispatcher = messageDispatcher;

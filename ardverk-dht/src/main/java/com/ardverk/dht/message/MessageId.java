@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 import org.ardverk.io.Writable;
+import org.ardverk.lang.NullArgumentException;
 import org.ardverk.utils.ByteArrayComparator;
 
 import com.ardverk.coding.CodingUtils;
@@ -20,7 +21,7 @@ public final class MessageId implements Writable, Serializable, Comparable<Messa
     
     public MessageId(byte[] messageId) {
         if (messageId == null) {
-            throw new NullPointerException("messageId");
+            throw new NullArgumentException("messageId");
         }
         
         this.messageId = messageId;

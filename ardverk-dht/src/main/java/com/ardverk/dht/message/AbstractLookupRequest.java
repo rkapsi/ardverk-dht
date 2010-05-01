@@ -1,5 +1,7 @@
 package com.ardverk.dht.message;
 
+import org.ardverk.lang.NullArgumentException;
+
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact2;
 
@@ -13,7 +15,7 @@ abstract class AbstractLookupRequest extends AbstractRequestMessage
         super(messageId, contact);
         
         if (key == null) {
-            throw new NullPointerException("key");
+            throw new NullArgumentException("key");
         }
         
         this.key = key;

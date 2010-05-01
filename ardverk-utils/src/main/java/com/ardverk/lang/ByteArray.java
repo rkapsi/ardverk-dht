@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import org.ardverk.io.Writable;
+import org.ardverk.lang.NullArgumentException;
 
 import com.ardverk.coding.CodingUtils;
 
@@ -34,7 +35,7 @@ public final class ByteArray implements Serializable,
     
     public ByteArray(byte[] data, int offset, int length) {
         if (data == null) {
-            throw new NullPointerException("data");
+            throw new NullArgumentException("data");
         }
         
         if (offset < 0 || length < 0 || (offset+length) > data.length) {

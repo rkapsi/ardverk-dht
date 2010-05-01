@@ -2,6 +2,8 @@ package com.ardverk.dht.message;
 
 import java.net.SocketAddress;
 
+import org.ardverk.lang.NullArgumentException;
+
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact2;
 import com.ardverk.dht.storage.Database.Condition;
@@ -14,7 +16,7 @@ public class DefaultMessageFactory extends AbstractMessageFactory {
         super(length);
         
         if (contact == null) {
-            throw new NullPointerException("contact");
+            throw new NullArgumentException("contact");
         }
         
         this.contact = contact;

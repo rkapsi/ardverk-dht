@@ -35,7 +35,7 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
     
     public KUID(byte[] key, int lengthInBits) {
         if (key == null) {
-            throw new NullPointerException("key");
+            throw new NullArgumentException("key");
         }
         
         if (key.length == 0) {
@@ -85,7 +85,7 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
     @Override
     public KUID xor(KUID otherId) {
         if (otherId == null) {
-            throw new NullPointerException("otherId");
+            throw new NullArgumentException("otherId");
         }
         
         int lengthInBits = lengthInBits();
@@ -199,7 +199,7 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
     
     public int commonPrefix(KUID otherId, int offsetInBits, int length) {
         if (otherId == null) {
-            throw new NullPointerException("otherId");
+            throw new NullArgumentException("otherId");
         }
         
         int lengthInBits = lengthInBits();
@@ -308,7 +308,7 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
 
     public int compareTo(KUID otherId, int offsetInBits, int length) {
         if (otherId == null) {
-            throw new NullPointerException("otherId");
+            throw new NullArgumentException("otherId");
         }
         
         int lengthInBits = lengthInBits();
@@ -379,7 +379,7 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
     @Override
     public int write(OutputStream out) throws IOException {
         if (out == null) {
-            throw new NullPointerException("out");
+            throw new NullArgumentException("out");
         }
         
         out.write(key);

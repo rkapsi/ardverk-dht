@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 import org.ardverk.concurrent.AsyncProcess;
 import org.ardverk.concurrent.AsyncProcessExecutorService;
 import org.ardverk.concurrent.AsyncProcessFuture;
+import org.ardverk.lang.NullArgumentException;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.io.MessageDispatcher;
@@ -26,7 +27,7 @@ public class DefaultNodeEntity extends AbstractEntity implements NodeEntity {
         super(time, unit);
         
         if (contacts == null) {
-            throw new NullPointerException("contacts");
+            throw new NullArgumentException("contacts");
         }
         
         this.contacts = contacts;

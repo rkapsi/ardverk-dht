@@ -1,5 +1,7 @@
 package com.ardverk.dht.message;
 
+import org.ardverk.lang.NullArgumentException;
+
 import com.ardverk.dht.routing.Contact2;
 
 public class DefaultNodeResponse extends AbstractLookupResponse 
@@ -12,7 +14,7 @@ public class DefaultNodeResponse extends AbstractLookupResponse
         super(messageId, contact);
         
         if (contacts == null) {
-            throw new NullPointerException("contacts");
+            throw new NullArgumentException("contacts");
         }
         
         this.contacts = contacts;

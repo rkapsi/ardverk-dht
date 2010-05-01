@@ -1,5 +1,7 @@
 package com.ardverk.dht.message;
 
+import org.ardverk.lang.NullArgumentException;
+
 import com.ardverk.dht.routing.Contact2;
 
 public abstract class AbstractMessage implements Message {
@@ -13,11 +15,11 @@ public abstract class AbstractMessage implements Message {
     public AbstractMessage(MessageId messageId, Contact2 contact) {
         
         if (messageId == null) {
-            throw new NullPointerException("messageId");
+            throw new NullArgumentException("messageId");
         }
         
         if (contact == null) {
-            throw new NullPointerException("contact");
+            throw new NullArgumentException("contact");
         }
         
         this.messageId = messageId;

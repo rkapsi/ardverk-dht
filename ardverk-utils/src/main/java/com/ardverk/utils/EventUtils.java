@@ -23,6 +23,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.ardverk.concurrent.DefaultThreadFactory;
+import org.ardverk.lang.NullArgumentException;
 
 public class EventUtils {
 
@@ -94,7 +95,7 @@ public class EventUtils {
         @Override
         public void fireEvent(Runnable event) {
             if (event == null) {
-                throw new NullPointerException("event");
+                throw new NullArgumentException("event");
             }
             
             executor.execute(event);

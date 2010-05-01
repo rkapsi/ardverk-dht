@@ -2,6 +2,8 @@ package com.ardverk.dht.utils;
 
 import java.util.Comparator;
 
+import org.ardverk.lang.NullArgumentException;
+
 import com.ardverk.dht.KUID;
 
 public class XorComparator implements Comparator<KUID> {
@@ -10,7 +12,7 @@ public class XorComparator implements Comparator<KUID> {
     
     public XorComparator(KUID key) {
         if (key == null) {
-            throw new NullPointerException("key");
+            throw new NullArgumentException("key");
         }
         
         this.key = key;
