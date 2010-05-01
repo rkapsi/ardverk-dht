@@ -41,4 +41,6 @@ public interface RouteTable {
     public void removeRouteTableListener(RouteTableListener l);
     
     public RouteTableListener[] getRouteTableListeners();
+    
+    public int size();
 }

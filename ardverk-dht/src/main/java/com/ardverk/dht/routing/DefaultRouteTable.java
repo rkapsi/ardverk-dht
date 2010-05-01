@@ -404,6 +404,17 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
     }
     
+    @Override
+    public synchronized int size() {
+        int size = 0;
+        
+        for (Bucket bucket : buckets.values()) {
+            size += bucket.size();
+        }
+        
+        return size;
+    }
+    
     private static class ContactEntity {
         
         private static final int MAX_ERRORS = 5;
@@ -558,6 +569,10 @@ public class DefaultRouteTable extends AbstractRouteTable {
             
             cached = new FixedSizeHashMap<KUID, ContactEntity>(
                     maxCacheSize, 1.0f, true, maxCacheSize);
+        }
+        
+        public int size() {
+            return active.size();
         }
         
         public KUID getBucketId() {
