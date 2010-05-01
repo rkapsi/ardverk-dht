@@ -1,5 +1,7 @@
 package com.ardverk.dht.message;
 
+import java.net.SocketAddress;
+
 import org.ardverk.lang.NullArgumentException;
 
 import com.ardverk.dht.routing.Contact2;
@@ -9,9 +11,9 @@ public class DefaultValueResponse extends AbstractLookupResponse
 
     private final byte[] value;
     
-    public DefaultValueResponse(MessageId messageId, 
-            Contact2 contact, byte[] value) {
-        super(messageId, contact);
+    public DefaultValueResponse(MessageId messageId, Contact2 contact, 
+            SocketAddress address, byte[] value) {
+        super(messageId, contact, address);
         
         if (value == null) {
             throw new NullArgumentException("value");

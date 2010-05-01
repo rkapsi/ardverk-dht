@@ -1,5 +1,7 @@
 package com.ardverk.dht.message;
 
+import java.net.SocketAddress;
+
 import org.ardverk.lang.NullArgumentException;
 
 import com.ardverk.dht.routing.Contact2;
@@ -10,9 +12,9 @@ public class DefaultStoreResponse extends AbstractResponseMessage
 
     private final Condition status;
     
-    public DefaultStoreResponse(MessageId messageId, 
-            Contact2 contact, Condition status) {
-        super(messageId, contact);
+    public DefaultStoreResponse(MessageId messageId, Contact2 contact, 
+            SocketAddress address, Condition status) {
+        super(messageId, contact, address);
         
         if (status == null) {
             throw new NullArgumentException("status");
@@ -21,6 +23,7 @@ public class DefaultStoreResponse extends AbstractResponseMessage
         this.status = status;
     }
     
+    @Override
     public Condition getStatus() {
         return status;
     }

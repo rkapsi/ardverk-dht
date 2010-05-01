@@ -20,24 +20,20 @@ public class RequestEntity {
 
     private final KUID contactId;
     
-    private final SocketAddress address;
-    
     private final RequestMessage request;
     
-    public RequestEntity(KUID contactId, 
-            SocketAddress address, RequestMessage request) {
+    public RequestEntity(KUID contactId, RequestMessage request) {
         
         this.contactId = contactId;
-        this.address = address;
         this.request = request;
     }
 
     public KUID getContactId() {
         return contactId;
     }
-
+    
     public SocketAddress getAddress() {
-        return address;
+        return request.getAddress();
     }
 
     public RequestMessage getRequest() {

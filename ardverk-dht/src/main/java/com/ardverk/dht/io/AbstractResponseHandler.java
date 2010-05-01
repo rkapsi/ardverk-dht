@@ -1,7 +1,6 @@
 package com.ardverk.dht.io;
 
 import java.io.IOException;
-import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -115,21 +114,19 @@ public abstract class AbstractResponseHandler<V extends Entity>
             long timeout, TimeUnit unit) throws IOException {
         
         KUID contactId = dst.getContactId();
-        SocketAddress addr = dst.getContactAddress();
-        
-        send(contactId, addr, message, timeout, unit);
+        send(contactId, message, timeout, unit);
     }
     
-    public void send(SocketAddress addr, RequestMessage message, 
+    public void send(RequestMessage message, 
             long timeout, TimeUnit unit) throws IOException {
-        send(null, addr, message, timeout, unit);
+        send((KUID)null, message, timeout, unit);
     }
     
-    public void send(KUID contactId, SocketAddress addr, 
-            RequestMessage message, long timeout, TimeUnit unit) throws IOException {
+    public void send(KUID contactId, RequestMessage message, 
+            long timeout, TimeUnit unit) throws IOException {
         
         if (isOpen()) {
-            messageDispatcher.send(this, contactId, addr, 
+            messageDispatcher.send(this, contactId, 
                     message, timeout, unit);
             lastSendTime = System.currentTimeMillis();
         }

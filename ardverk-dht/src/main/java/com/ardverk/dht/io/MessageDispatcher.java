@@ -118,10 +118,10 @@ public abstract class MessageDispatcher implements Closeable {
      * 
      */
     public void send(Contact2 dst, ResponseMessage message) throws IOException {
-        byte[] data = codec.encode(message);
+        SocketAddress address = message.getAddress();
         
-        SocketAddress addr = dst.getContactAddress();
-        transport.send(addr, data);
+        byte[] data = codec.encode(message);        
+        transport.send(address, data);
     }
     
     /**
@@ -132,26 +132,25 @@ public abstract class MessageDispatcher implements Closeable {
             long timeout, TimeUnit unit) throws IOException {
         
         KUID contactId = dst.getContactId();
-        SocketAddress addr = dst.getContactAddress();
-        
-        send(callback, contactId, addr, message, timeout, unit);
+        send(callback, contactId, message, timeout, unit);
     }
     
     /**
      * 
      */
     public void send(MessageCallback callback, 
-            KUID contactId, SocketAddress address, 
-            RequestMessage request, long timeout, 
-            TimeUnit unit) throws IOException {
+            KUID contactId, RequestMessage request, 
+            long timeout, TimeUnit unit) throws IOException {
+        
+        SocketAddress dst = request.getAddress();
         
         byte[] data = codec.encode(request);
         
         RequestEntity entity = new RequestEntity(
-                contactId, address, request);
+                contactId, request);
         
         entityManager.add(callback, entity, timeout, unit);
-        transport.send(address, data);
+        transport.send(dst, data);
     }
     
     /**

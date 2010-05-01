@@ -101,8 +101,8 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
             MessageFactory factory = messageDispatcher.getMessageFactory();
             PingRequest request = factory.createPingRequest(address);
             
-            send(contactId, address, request, 
-                    getTimeoutInMillis(), TimeUnit.MILLISECONDS);
+            long timeout = getTimeoutInMillis();
+            send(contactId, request, timeout, TimeUnit.MILLISECONDS);
         }
     }
     

@@ -1,5 +1,7 @@
 package com.ardverk.dht.message;
 
+import java.net.SocketAddress;
+
 import org.ardverk.lang.NullArgumentException;
 
 import com.ardverk.dht.KUID;
@@ -10,9 +12,9 @@ abstract class AbstractLookupRequest extends AbstractRequestMessage
     
     private final KUID key;
     
-    public AbstractLookupRequest(MessageId messageId, 
-            Contact2 contact, KUID key) {
-        super(messageId, contact);
+    public AbstractLookupRequest(MessageId messageId, Contact2 contact, 
+            SocketAddress address, KUID key) {
+        super(messageId, contact, address);
         
         if (key == null) {
             throw new NullArgumentException("key");

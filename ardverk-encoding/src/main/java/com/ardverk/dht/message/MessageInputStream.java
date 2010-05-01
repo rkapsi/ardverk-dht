@@ -136,7 +136,7 @@ class MessageInputStream extends BencodingInputStream {
     
     private PingRequest readPingRequest(MessageId messageId, 
             Contact2 contact, SocketAddress address) throws IOException {
-        return new DefaultPingRequest(messageId, contact);
+        return new DefaultPingRequest(messageId, contact, address);
     }
     
     private PingResponse readPingResponse(MessageId messageId, 
