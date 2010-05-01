@@ -143,13 +143,14 @@ public abstract class MessageDispatcher implements Closeable {
             long timeout, TimeUnit unit) throws IOException {
         
         SocketAddress dst = request.getAddress();
-        
         byte[] data = codec.encode(request);
         
-        RequestEntity entity = new RequestEntity(
-                contactId, request);
+        if (callback != null) {
+            RequestEntity entity = new RequestEntity(
+                    contactId, request);
+            entityManager.add(callback, entity, timeout, unit);
+        }
         
-        entityManager.add(callback, entity, timeout, unit);
         transport.send(dst, data);
     }
     
