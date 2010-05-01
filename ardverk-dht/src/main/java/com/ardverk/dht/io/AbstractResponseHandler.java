@@ -139,7 +139,6 @@ public abstract class AbstractResponseHandler<V extends Entity>
         }
         
         this.future = future;
-        go(future);
         
         future.addAsyncFutureListener(new AsyncFutureListener<V>() {
             @Override
@@ -149,6 +148,12 @@ public abstract class AbstractResponseHandler<V extends Entity>
                 }
             }
         });
+        
+        synchronized (future) {
+            if (!future.isDone()) {
+                go(future);
+            }
+        }
     }
     
     protected void done() {

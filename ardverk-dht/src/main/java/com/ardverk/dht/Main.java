@@ -39,5 +39,7 @@ public class Main {
         for (DHT dht : list) {
             System.out.println(dht.getRouteTable().size());
         }
+        
+        System.out.println("DONE!");
     }
 }
