@@ -11,15 +11,18 @@ import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncProcess;
 
 import com.ardverk.dht.concurrent.ArdverkFuture;
+import com.ardverk.dht.entity.BootstrapEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.entity.ValueEntity;
+import com.ardverk.dht.io.BootstrapProcess;
 import com.ardverk.dht.io.DefaultMessageDispatcher;
 import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.io.NodeResponseHandler;
 import com.ardverk.dht.io.PingResponseHandler;
 import com.ardverk.dht.io.StoreResponseHandler;
+import com.ardverk.dht.io.BootstrapProcess.Config;
 import com.ardverk.dht.io.mina.MinaTransport;
 import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.message.BencodeMessageCodec;
@@ -110,6 +113,11 @@ public class ArdverkDHT extends AbstractDHT implements Closeable {
             requestManager.close();
         }
     }
+    
+    @Override
+    public Contact2 getLocalhost() {
+        return routeTable.getLocalhost();
+    }
 
     @Override
     public Contact2 getContact(KUID contactId) {
@@ -117,11 +125,21 @@ public class ArdverkDHT extends AbstractDHT implements Closeable {
     }
     
     @Override
+    public ArdverkFuture<BootstrapEntity> bootstrap(Config config,
+            long timeout, TimeUnit unit) {
+        
+        BootstrapProcess process = new BootstrapProcess(
+                this, config, timeout, unit);
+        
+        return submit(process, timeout, unit);
+    }
+
+    @Override
     public ArdverkFuture<PingEntity> ping(Contact2 contact, 
             long timeout, TimeUnit unit) {
         AsyncProcess<PingEntity> process 
             = new PingResponseHandler(messageDispatcher, contact);
-        return requestManager.submit(process, timeout, unit);
+        return submit(process, timeout, unit);
     }
 
     @Override
@@ -129,7 +147,7 @@ public class ArdverkDHT extends AbstractDHT implements Closeable {
             long timeout, TimeUnit unit) {
         AsyncProcess<PingEntity> process 
             = new PingResponseHandler(messageDispatcher, address, port);
-        return requestManager.submit(process, timeout, unit);
+        return submit(process, timeout, unit);
     }
 
     @Override
@@ -137,7 +155,7 @@ public class ArdverkDHT extends AbstractDHT implements Closeable {
             long timeout, TimeUnit unit) {
         AsyncProcess<PingEntity> process 
             = new PingResponseHandler(messageDispatcher, dst);
-        return requestManager.submit(process, timeout, unit);
+        return submit(process, timeout, unit);
     }
 
     @Override
@@ -145,7 +163,7 @@ public class ArdverkDHT extends AbstractDHT implements Closeable {
             long timeout, TimeUnit unit) {
         AsyncProcess<PingEntity> process 
             = new PingResponseHandler(messageDispatcher, address, port);
-        return requestManager.submit(process, timeout, unit);
+        return submit(process, timeout, unit);
     }
 
     @Override
@@ -153,14 +171,14 @@ public class ArdverkDHT extends AbstractDHT implements Closeable {
             long timeout, TimeUnit unit) {
         AsyncProcess<StoreEntity> process 
             = new StoreResponseHandler(messageDispatcher, null, key, value);
-        return requestManager.submit(process, timeout, unit);
+        return submit(process, timeout, unit);
     }
     
     @Override
     public ArdverkFuture<ValueEntity> get(KUID key, 
             long timeout, TimeUnit unit) {
         AsyncProcess<ValueEntity> process = null;
-        return requestManager.submit(process, timeout, unit);
+        return submit(process, timeout, unit);
     }
 
     @Override
@@ -168,7 +186,7 @@ public class ArdverkDHT extends AbstractDHT implements Closeable {
             long timeout, TimeUnit unit) {
         AsyncProcess<NodeEntity> process 
             = new NodeResponseHandler(messageDispatcher, routeTable, key);
-        return requestManager.submit(process, timeout, unit);
+        return submit(process, timeout, unit);
     }
 
     @Override

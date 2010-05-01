@@ -7,10 +7,12 @@ import java.util.concurrent.TimeUnit;
 import org.ardverk.concurrent.AsyncProcess;
 
 import com.ardverk.dht.concurrent.ArdverkFuture;
+import com.ardverk.dht.entity.BootstrapEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.entity.ValueEntity;
+import com.ardverk.dht.io.BootstrapProcess.Config;
 import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.routing.Contact2;
 import com.ardverk.dht.routing.RouteTable;
@@ -19,7 +21,7 @@ import com.ardverk.dht.storage.Database;
 /**
  * 
  */
-interface DHT {
+public interface DHT {
 
     /**
      * 
@@ -39,13 +41,18 @@ interface DHT {
     /**
      * 
      */
+    public Contact2 getLocalhost();
+    
+    /**
+     * 
+     */
     public Contact2 getContact(KUID contactId);
     
     /**
      * 
      */
-    //public ArdverkFuture<PingEntity> bootstrap(Contact contact, 
-    //        long timeout, TimeUnit unit);
+    public ArdverkFuture<BootstrapEntity> bootstrap(Config config, 
+            long timeout, TimeUnit unit);
     
     /**
      * Sends a ping to the given host.
