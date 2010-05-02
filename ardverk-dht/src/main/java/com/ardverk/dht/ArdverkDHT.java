@@ -54,8 +54,6 @@ public class ArdverkDHT extends AbstractDHT implements Closeable {
     
     private final KUID contactId = KEY_FACTORY.createRandomKey();
     
-    private final Transport transport;
-
     private final RouteTable routeTable;
     
     private final Database database;
@@ -73,7 +71,7 @@ public class ArdverkDHT extends AbstractDHT implements Closeable {
             }
         };
         
-        transport = new MinaTransport(new InetSocketAddress(port));
+        Transport transport = new MinaTransport(new InetSocketAddress(port));
         
         SocketAddress address = new InetSocketAddress("localhost", port);
         Contact2 localhost = new Contact2(Type.SOLICITED, 
@@ -109,6 +107,11 @@ public class ArdverkDHT extends AbstractDHT implements Closeable {
     }
 
     @Override
+    public Transport getTransport() {
+        return messageDispatcher.getTransport();
+    }
+    
+    @Override
     public Database getDatabase() {
         return database;
     }
@@ -119,15 +122,12 @@ public class ArdverkDHT extends AbstractDHT implements Closeable {
     }
     
     @Override
-    public Transport getTransport() {
-        return transport;
-    }
-
-    @Override
     public void close() {
         if (requestManager != null) {
             requestManager.close();
         }
+        
+        messageDispatcher.close();
     }
     
     @Override

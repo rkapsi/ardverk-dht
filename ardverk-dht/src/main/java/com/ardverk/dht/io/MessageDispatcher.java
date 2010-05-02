@@ -130,17 +130,17 @@ public abstract class MessageDispatcher implements Closeable {
         return copy;
     }
     
+    /**
+     * 
+     */
+    public synchronized Transport getTransport() {
+        return transport;
+    }
+    
     @Override
     public void close() {
         unbind(true);
         entityManager.close();
-    }
-    
-    /**
-     * 
-     */
-    public Transport getTransport() {
-        return transport;
     }
     
     /**
