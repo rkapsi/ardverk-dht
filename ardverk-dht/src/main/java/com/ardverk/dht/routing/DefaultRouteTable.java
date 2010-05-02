@@ -13,16 +13,14 @@ import org.ardverk.collection.KeyAnalyzer;
 import org.ardverk.collection.PatriciaTrie;
 import org.ardverk.collection.Trie;
 import org.ardverk.collection.Cursor.Decision;
-import org.ardverk.concurrent.AsyncFuture;
-import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.lang.NullArgumentException;
 import org.ardverk.net.NetworkCounter;
 import org.ardverk.net.NetworkMask;
 import org.ardverk.net.NetworkUtils;
 import org.slf4j.Logger;
 
-import com.ardverk.dht.ContactPinger;
 import com.ardverk.dht.KUID;
+import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.routing.Contact2.Type;
 import com.ardverk.logging.LoggerUtils;
@@ -48,8 +46,8 @@ public class DefaultRouteTable extends AbstractRouteTable {
     
     private int consecutiveErrors = 0;
     
-    public DefaultRouteTable(ContactPinger pinger, int k, Contact2 localhost) {
-        super(pinger, k);
+    public DefaultRouteTable(int k, Contact2 localhost) {
+        super(k);
         
         if (localhost == null) {
             throw new NullArgumentException("localhost");
@@ -226,7 +224,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
     private synchronized void pingLeastRecentlySeenContact(Bucket bucket) {
         ContactEntity lrs = bucket.getLeastRecentlySeenActiveContact();
         if (!isLocalhost(lrs)) {
-            ping(lrs, null);
+            ping(lrs);
         }
     }
     
@@ -344,8 +342,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         return (sibling.getDepth() - 1) == prefixLength;
     }
     
-    private synchronized void ping(ContactEntity entity, 
-            AsyncFutureListener<PingEntity> listener) {
+    private synchronized ArdverkFuture<PingEntity> ping(ContactEntity entity) {
         /*AsyncFutureListener<PingResponse> listener 
                 = new AsyncFutureListener<PingResponse>() {
             @Override
@@ -365,11 +362,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         Contact2 contact = entity.getContact();
         long timeout = contact.getAdaptiveTimeout(this.timeout, unit);
-        AsyncFuture<PingEntity> future = pinger.ping(contact, timeout, unit);
-        
-        if (listener != null) {
-            future.addAsyncFutureListener(listener);
-        }
+        return ping(contact, timeout, unit);
     }
     
     private static final int MAX_CONSECUTIVE_ERRORS = 100;

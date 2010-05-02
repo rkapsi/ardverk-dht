@@ -1,32 +1,10 @@
 package com.ardverk.dht.io;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.concurrent.AsyncFuture;
-import org.ardverk.concurrent.AsyncProcess;
-import org.ardverk.concurrent.AsyncProcessExecutorService;
-import org.ardverk.concurrent.AsyncProcessFuture;
-import org.ardverk.concurrent.ExecutorUtils;
 import org.slf4j.Logger;
 
-import com.ardverk.dht.ContactPinger;
-import com.ardverk.dht.DefaultKeyFactory;
-import com.ardverk.dht.KUID;
-import com.ardverk.dht.KeyFactory;
-import com.ardverk.dht.entity.NodeEntity;
-import com.ardverk.dht.entity.PingEntity;
-import com.ardverk.dht.entity.StoreEntity;
-import com.ardverk.dht.entity.ValueEntity;
-import com.ardverk.dht.io.mina.MinaTransport;
-import com.ardverk.dht.io.transport.Transport;
-import com.ardverk.dht.message.BencodeMessageCodec;
-import com.ardverk.dht.message.DefaultMessageFactory;
 import com.ardverk.dht.message.MessageCodec;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.NodeRequest;
@@ -35,12 +13,8 @@ import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.message.StoreRequest;
 import com.ardverk.dht.message.ValueRequest;
-import com.ardverk.dht.routing.Contact2;
-import com.ardverk.dht.routing.DefaultRouteTable;
 import com.ardverk.dht.routing.RouteTable;
-import com.ardverk.dht.routing.Contact2.Type;
 import com.ardverk.dht.storage.Database;
-import com.ardverk.dht.storage.DefaultDatabase;
 import com.ardverk.logging.LoggerUtils;
 
 public class DefaultMessageDispatcher extends MessageDispatcher {
@@ -117,6 +91,7 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
         }
     }
     
+    /*
     public static void main(String[] args) throws IOException, InterruptedException, ExecutionException {
         List<SimpleDHT> list = new ArrayList<SimpleDHT>();
         for (int i = 0; i < 100; i++) {
@@ -221,7 +196,7 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
             Contact2 localhost = new Contact2(Type.SOLICITED, 
                     contactId, 0, address);
             
-            routeTable = new DefaultRouteTable(pinger, K, localhost);
+            routeTable = new DefaultRouteTable(K, localhost);
             
             database = new DefaultDatabase();
             
@@ -274,5 +249,5 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
                 = new StoreResponseHandler(messageDispatcher, entity, key, value);
             return EXECUTOR.submit(process, 30L, TimeUnit.SECONDS);
         }
-    }
+    }*/
 }

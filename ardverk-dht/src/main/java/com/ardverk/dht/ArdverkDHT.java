@@ -7,7 +7,6 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncProcess;
 
 import com.ardverk.dht.concurrent.ArdverkFuture;
@@ -63,21 +62,13 @@ public class ArdverkDHT extends AbstractDHT implements Closeable {
     private final MessageDispatcher messageDispatcher;
     
     public ArdverkDHT(int port) throws IOException {
-        ContactPinger pinger = new ContactPinger() {
-            @Override
-            public AsyncFuture<PingEntity> ping(Contact2 contact, 
-                    long timeout, TimeUnit unit) {
-                return ArdverkDHT.this.ping(contact, timeout, unit);
-            }
-        };
-        
         Transport transport = new MinaTransport(new InetSocketAddress(port));
         
         SocketAddress address = new InetSocketAddress("localhost", port);
         Contact2 localhost = new Contact2(Type.SOLICITED, 
                 contactId, 0, address);
         
-        routeTable = new DefaultRouteTable(pinger, K, localhost);
+        routeTable = new DefaultRouteTable(K, localhost);
         
         database = new DefaultDatabase();
         
@@ -98,11 +89,13 @@ public class ArdverkDHT extends AbstractDHT implements Closeable {
     
     @Override
     public void bind(Transport transport) throws IOException {
+        routeTable.bind(this);
         messageDispatcher.bind(transport);
     }
 
     @Override
     public Transport unbind() {
+        routeTable.unbind();
         return messageDispatcher.unbind();
     }
 

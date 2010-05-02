@@ -2,14 +2,18 @@ package com.ardverk.dht.routing;
 
 import java.net.SocketAddress;
 
-import com.ardverk.dht.ContactPinger;
+import com.ardverk.dht.DHT;
 import com.ardverk.dht.KUID;
 
 public interface RouteTable {
     
-    public Contact2 getLocalhost();
+    public void bind(DHT dht);
     
-    public ContactPinger getContactPinger();
+    public void unbind();
+    
+    public boolean isBound();
+    
+    public Contact2 getLocalhost();
     
     public void add(Contact2 contact);
     

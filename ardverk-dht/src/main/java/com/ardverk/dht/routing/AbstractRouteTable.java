@@ -1,42 +1,69 @@
 package com.ardverk.dht.routing;
 
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.ardverk.lang.NullArgumentException;
 
-import com.ardverk.dht.ContactPinger;
+import com.ardverk.dht.DHT;
 import com.ardverk.dht.KUID;
+import com.ardverk.dht.concurrent.ArdverkFuture;
+import com.ardverk.dht.concurrent.ArdverkValueFuture;
+import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.routing.DefaultRouteTable.Bucket;
 import com.ardverk.utils.EventUtils;
 
 public abstract class AbstractRouteTable implements RouteTable {
     
+    private final AtomicReference<DHT> dhtRef = new AtomicReference<DHT>();
+    
     protected final int k;
     
-    protected final ContactPinger pinger;
-    
-    private final CopyOnWriteArrayList<RouteTableListener> listeners 
+    private final List<RouteTableListener> listeners 
         = new CopyOnWriteArrayList<RouteTableListener>();
     
-    public AbstractRouteTable(ContactPinger pinger, int k) {
-        
-        if (pinger == null) {
-            throw new NullArgumentException("pinger");
-        }
-        
+    public AbstractRouteTable(int k) {
         if (k <= 0) {
             throw new IllegalArgumentException("k=" + k);
         }
         
-        this.pinger = pinger;
         this.k = k;
     }
     
     @Override
-    public ContactPinger getContactPinger() {
-        return pinger;
+    public void bind(DHT dht) {
+        if (!dhtRef.compareAndSet(null, dht)) {
+            throw new IllegalStateException();
+        }
     }
 
+
+    @Override
+    public void unbind() {
+        dhtRef.set(null);
+    }
+    
+    @Override
+    public boolean isBound() {
+        return dhtRef.get() != null;
+    }
+
+    protected ArdverkFuture<PingEntity> ping(Contact2 contact, 
+            long timeout, TimeUnit unit) {
+        DHT dht = dhtRef.get();
+        
+        if (dht != null) {
+            return dht.ping(contact, timeout, unit);
+        }
+        
+        IllegalStateException exception 
+            = new IllegalStateException();
+        
+        return new ArdverkValueFuture<PingEntity>(exception);
+    }
+    
     @Override
     public int getK() {
         return k;
