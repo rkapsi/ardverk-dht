@@ -7,12 +7,16 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.utils.DeadlockScanner;
+
 import com.ardverk.dht.io.BootstrapProcess.Config;
 
 public class Main {
     
     public static void main(String[] args) throws IOException, 
             InterruptedException, ExecutionException {
+        
+        DeadlockScanner.start();
         
         List<DHT> list = new ArrayList<DHT>();
         
