@@ -3,7 +3,6 @@ package com.ardverk.dht;
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 
@@ -22,64 +21,34 @@ import com.ardverk.dht.io.NodeResponseHandler;
 import com.ardverk.dht.io.PingResponseHandler;
 import com.ardverk.dht.io.StoreResponseHandler;
 import com.ardverk.dht.io.BootstrapProcess.Config;
-import com.ardverk.dht.io.mina.MinaTransport;
 import com.ardverk.dht.io.transport.Transport;
-import com.ardverk.dht.message.BencodeMessageCodec;
-import com.ardverk.dht.message.DefaultMessageFactory;
 import com.ardverk.dht.message.MessageCodec;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.routing.Contact2;
-import com.ardverk.dht.routing.DefaultRouteTable;
 import com.ardverk.dht.routing.RouteTable;
-import com.ardverk.dht.routing.Contact2.Type;
 import com.ardverk.dht.storage.Database;
-import com.ardverk.dht.storage.DefaultDatabase;
 
 public class ArdverkDHT extends AbstractDHT implements Closeable {
-
-    private static final int K = 20;
-    
-    private static final int KEY_SIZE = 20;
-    
-    private static final int MESSAGE_ID_SIZE = 20;
-    
-    private static final KeyFactory KEY_FACTORY 
-        = new DefaultKeyFactory(KEY_SIZE);
-    
-    private static final MessageCodec CODEC 
-        = new BencodeMessageCodec();
     
     private final RequestManager requestManager = new RequestManager();
-    
-    private final KUID contactId = KEY_FACTORY.createRandomKey();
     
     private final RouteTable routeTable;
     
     private final Database database;
     
-    private final MessageFactory messageFactory;
+    //private final MessageFactory messageFactory;
     
     private final MessageDispatcher messageDispatcher;
     
-    public ArdverkDHT(int port) throws IOException {
-        Transport transport = new MinaTransport(new InetSocketAddress(port));
+    public ArdverkDHT(MessageCodec codec, MessageFactory messageFactory, 
+            RouteTable routeTable, Database database) {
         
-        SocketAddress address = new InetSocketAddress("localhost", port);
-        Contact2 localhost = new Contact2(Type.SOLICITED, 
-                contactId, 0, address);
-        
-        routeTable = new DefaultRouteTable(K, localhost);
-        
-        database = new DefaultDatabase();
-        
-        Contact2 contact = routeTable.getLocalhost();
-        messageFactory = new DefaultMessageFactory(
-                MESSAGE_ID_SIZE, contact);
+        //this.messageFactory = messageFactory;
+        this.routeTable = routeTable;
+        this.database = database;
         
         messageDispatcher = new DefaultMessageDispatcher(
-                messageFactory, CODEC, routeTable, database);
-        
-        bind(transport);
+                messageFactory, codec, routeTable, database);
     }
     
     @Override

@@ -23,7 +23,9 @@ public class Main {
         for (int i = 0; i < 100; i++) {
             int port = 2000 + i;
             
-            DHT dht = new ArdverkDHT(port);
+            DHT dht = SimpleFactory.createDHT(port);
+            SimpleFactory.bind(dht);
+            
             list.add(dht);
         }
         
