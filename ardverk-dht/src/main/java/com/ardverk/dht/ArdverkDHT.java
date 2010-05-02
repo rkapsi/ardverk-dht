@@ -104,8 +104,8 @@ public class ArdverkDHT extends AbstractDHT implements Closeable {
     }
 
     @Override
-    public void unbind() {
-        messageDispatcher.unbind();
+    public Transport unbind() {
+        return messageDispatcher.unbind();
     }
 
     @Override

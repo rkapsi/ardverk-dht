@@ -107,14 +107,16 @@ public abstract class MessageDispatcher implements Closeable {
     /**
      * 
      */
-    public synchronized void unbind() {
-        unbind(false);
+    public synchronized Transport unbind() {
+        return unbind(false);
     }
     
     /**
      * 
      */
-    private synchronized void unbind(boolean close) {
+    private synchronized Transport unbind(boolean close) {
+        Transport copy = this.transport;
+        
         if (transport != null) {
             transport.unbind();
             
@@ -124,6 +126,8 @@ public abstract class MessageDispatcher implements Closeable {
             
             transport = null;
         }
+        
+        return copy;
     }
     
     @Override

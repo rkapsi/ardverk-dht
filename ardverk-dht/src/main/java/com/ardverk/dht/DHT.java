@@ -33,7 +33,7 @@ public interface DHT extends Closeable {
     /**
      * 
      */
-    public void unbind();
+    public Transport unbind();
     
     /**
      * 
