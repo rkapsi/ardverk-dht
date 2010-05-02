@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.io.transport.Transport;
-import com.ardverk.dht.io.transport.TransportListener;
+import com.ardverk.dht.io.transport.TransportCallback;
 import com.ardverk.dht.message.Message;
 import com.ardverk.dht.message.MessageCodec;
 import com.ardverk.dht.message.MessageFactory;
@@ -28,6 +28,7 @@ import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact2;
 import com.ardverk.logging.LoggerUtils;
+import com.ardverk.utils.IoUtils;
 
 /**
  * 
@@ -41,35 +42,31 @@ public abstract class MessageDispatcher implements Closeable {
         = ExecutorUtils.newSingleThreadScheduledExecutor(
             "MessageDispatcherThread");
     
-    private final TransportListener listener 
-            = new TransportListener() {
+    private final TransportCallback callback 
+            = new TransportCallback() {
         @Override
         public void received(SocketAddress src, 
-                byte[] message) throws IOException {
-            MessageDispatcher.this.handleMessage(src, message);
+                byte[] message, int offset, int length) throws IOException {
+            MessageDispatcher.this.handleMessage(
+                    src, message, offset, length);
         }
     };
     
     private final MessageEntityManager entityManager 
         = new MessageEntityManager();
-    
-    private final Transport transport;
-    
+        
     private final MessageFactory factory;
     
     private final MessageCodec codec;
     
     private final ResponseChecker checker;
     
+    private Transport transport = null;
+    
     /**
      * 
      */
-    public MessageDispatcher(Transport transport, 
-            MessageFactory factory, MessageCodec codec) {
-        
-        if (transport == null) {
-            throw new NullArgumentException("transport");
-        }
+    public MessageDispatcher(MessageFactory factory, MessageCodec codec) {
         
         if (factory == null) {
             throw new NullArgumentException("factory");
@@ -79,12 +76,60 @@ public abstract class MessageDispatcher implements Closeable {
             throw new NullArgumentException("codec");
         }
         
-        this.transport = transport;
         this.factory = factory;
         this.codec = codec;
         this.checker = new ResponseChecker(factory, 512);
+    }
+    
+    /**
+     * 
+     */
+    public synchronized boolean isBound() {
+        return transport != null;
+    }
+    
+    /**
+     * 
+     */
+    public synchronized void bind(Transport transport) throws IOException {
+        if (transport == null) {
+            throw new NullArgumentException("transport");
+        }
         
-        transport.addTransportListener(listener);
+        if (isBound()) {
+            throw new IOException();
+        }
+        
+        transport.bind(callback);
+        this.transport = transport;
+    }
+    
+    /**
+     * 
+     */
+    public synchronized void unbind() {
+        unbind(false);
+    }
+    
+    /**
+     * 
+     */
+    private synchronized void unbind(boolean close) {
+        if (transport != null) {
+            transport.unbind();
+            
+            if (close && transport instanceof Closeable) {
+                IoUtils.close((Closeable)transport);
+            }
+            
+            transport = null;
+        }
+    }
+    
+    @Override
+    public void close() {
+        unbind(true);
+        entityManager.close();
     }
     
     /**
@@ -108,20 +153,45 @@ public abstract class MessageDispatcher implements Closeable {
         return codec;
     }
     
-    @Override
-    public void close() {
-        transport.removeTransportListener(listener);
-        entityManager.close();
+    /**
+     * 
+     */
+    protected void send(Message message) throws IOException {
+        SocketAddress address = message.getAddress();
+        byte[] data = codec.encode(message);
+        send(address, data);
+    }
+    
+    /**
+     * 
+     */
+    protected void send(SocketAddress dst, byte[] message) throws IOException {
+        send(dst, message, 0, message.length);
+    }
+    
+    /**
+     * 
+     */
+    protected void send(SocketAddress dst, byte[] message, 
+            int offset, int length) throws IOException {
+        
+        Transport transport = null;
+        synchronized (this) {
+            transport = this.transport;
+        }
+        
+        if (transport == null) {
+            throw new IOException();
+        }
+        
+        transport.send(dst, message, offset, length);
     }
     
     /**
      * 
      */
     public void send(Contact2 dst, ResponseMessage message) throws IOException {
-        SocketAddress address = message.getAddress();
-        
-        byte[] data = codec.encode(message);        
-        transport.send(address, data);
+        send(message);
     }
     
     /**
@@ -142,31 +212,28 @@ public abstract class MessageDispatcher implements Closeable {
             KUID contactId, RequestMessage request, 
             long timeout, TimeUnit unit) throws IOException {
         
-        SocketAddress dst = request.getAddress();
-        byte[] data = codec.encode(request);
-        
         if (callback != null) {
             RequestEntity entity = new RequestEntity(
                     contactId, request);
             entityManager.add(callback, entity, timeout, unit);
         }
         
-        transport.send(dst, data);
+        send(request);
     }
     
     /**
      * 
      */
-    private void handleMessage(SocketAddress src, 
-            byte[] data) throws IOException {
-        Message message = codec.decode(src, data);
+    public void handleMessage(SocketAddress src, 
+            byte[] data, int offset, int length) throws IOException {
+        Message message = codec.decode(src, data, offset, length);
         handleMessage(message);
     }
     
     /**
      * 
      */
-    private void handleMessage(Message message) throws IOException {
+    public void handleMessage(Message message) throws IOException {
         
         if (message instanceof RequestMessage) {
             handleRequest((RequestMessage)message);

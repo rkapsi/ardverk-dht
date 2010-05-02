@@ -19,12 +19,10 @@ import com.ardverk.dht.ContactPinger;
 import com.ardverk.dht.DefaultKeyFactory;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.KeyFactory;
-import com.ardverk.dht.entity.BootstrapEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.entity.ValueEntity;
-import com.ardverk.dht.io.BootstrapProcess.Config;
 import com.ardverk.dht.io.mina.MinaTransport;
 import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.message.BencodeMessageCodec;
@@ -60,10 +58,10 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
     
     private final StoreRequestHandler store;
     
-    public DefaultMessageDispatcher(Transport transport, 
-            MessageFactory factory, MessageCodec codec, 
-            RouteTable routeTable, Database database) {
-        super(transport, factory, codec);
+    public DefaultMessageDispatcher(MessageFactory factory, 
+            MessageCodec codec, RouteTable routeTable, 
+            Database database) {
+        super(factory, codec);
         
         defaultHandler = new DefaultMessageHandler(this, routeTable);
         ping = new PingRequestHandler(this);
@@ -234,8 +232,9 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
                     MESSAGE_ID_SIZE, contact);
             
             messageDispatcher = new DefaultMessageDispatcher(
-                    transport, messageFactory, CODEC, 
+                    messageFactory, CODEC, 
                     routeTable, database);
+            messageDispatcher.bind(transport);
         }
         
         public KUID getContactId() {

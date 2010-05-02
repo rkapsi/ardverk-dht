@@ -1,5 +1,7 @@
 package com.ardverk.dht;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
@@ -21,8 +23,23 @@ import com.ardverk.dht.storage.Database;
 /**
  * 
  */
-public interface DHT {
+public interface DHT extends Closeable {
 
+    /**
+     * 
+     */
+    public void bind(Transport transport) throws IOException;
+    
+    /**
+     * 
+     */
+    public void unbind();
+    
+    /**
+     * 
+     */
+    public boolean isBound();
+    
     /**
      * 
      */

@@ -14,10 +14,10 @@ public class BencodeMessageCodec extends MessageCodec {
     }
 
     @Override
-    public Message decode(SocketAddress src, byte[] data)
+    public Message decode(SocketAddress src, byte[] data, int offset, int length)
             throws IOException {
         MessageInputStream in = new MessageInputStream(
-                new ByteArrayInputStream(data));
+                new ByteArrayInputStream(data, offset, length));
         
         return in.readMessage(src);
     }

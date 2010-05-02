@@ -2,15 +2,14 @@ package com.ardverk.dht.io.transport;
 
 import java.io.IOException;
 import java.net.SocketAddress;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.ardverk.lang.NullArgumentException;
 
 public abstract class AbstractTransport implements Transport {
-
-    private final List<TransportListener> listeners 
-        = new CopyOnWriteArrayList<TransportListener>();
+    
+    private final AtomicReference<TransportCallback> callbackRef 
+        = new AtomicReference<TransportCallback>();
     
     @Override
     public void send(SocketAddress dst, byte[] message) throws IOException {
@@ -18,34 +17,34 @@ public abstract class AbstractTransport implements Transport {
     }
     
     @Override
-    public void addTransportListener(TransportListener l) {
-        if (l == null) {
-            throw new NullArgumentException("l");
+    public void bind(TransportCallback callback) throws IOException {
+        if (callback == null) {
+            throw new NullArgumentException("callback");
         }
         
-        listeners.add(l);
+        if (!callbackRef.compareAndSet(null, callback)) {
+            throw new IOException();
+        }
     }
     
     @Override
-    public void removeTransportListener(TransportListener l) {
-        if (l == null) {
-            throw new NullArgumentException("l");
-        }
-        
-        listeners.remove(l);
+    public void unbind() {
+        callbackRef.set(null);
     }
-    
+
     @Override
-    public TransportListener[] getTransportListeners() {
-        return listeners.toArray(new TransportListener[0]);
+    public boolean isBound() {
+        return callbackRef.get() != null;
     }
     
-    /**
-     * 
-     */
-    protected void received(SocketAddress src, byte[] message) throws IOException {
-        for (TransportListener listener : listeners) {
-            listener.received(src, message);
+    protected boolean received(SocketAddress src, byte[] message, 
+            int offset, int length) throws IOException {
+        
+        TransportCallback callback = callbackRef.get();
+        if (callback != null) {
+            callback.received(src, message, offset, length);
+            return true;
         }
+        return false;
     }
 }

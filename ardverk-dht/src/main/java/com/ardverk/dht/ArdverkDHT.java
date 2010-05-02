@@ -88,10 +88,26 @@ public class ArdverkDHT extends AbstractDHT implements Closeable {
                 MESSAGE_ID_SIZE, contact);
         
         messageDispatcher = new DefaultMessageDispatcher(
-                transport, messageFactory, CODEC, 
-                routeTable, database);
+                messageFactory, CODEC, routeTable, database);
+        
+        bind(transport);
     }
     
+    @Override
+    public boolean isBound() {
+        return messageDispatcher.isBound();
+    }
+    
+    @Override
+    public void bind(Transport transport) throws IOException {
+        messageDispatcher.bind(transport);
+    }
+
+    @Override
+    public void unbind() {
+        messageDispatcher.unbind();
+    }
+
     @Override
     public Database getDatabase() {
         return database;
