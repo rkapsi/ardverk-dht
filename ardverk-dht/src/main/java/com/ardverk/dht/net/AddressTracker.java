@@ -12,7 +12,7 @@ import org.ardverk.net.NetworkMask;
 /**
  * 
  */
-public class CurrentAddress {
+public class AddressTracker {
 
     private final NetworkMask mask;
     
@@ -26,14 +26,14 @@ public class CurrentAddress {
     /**
      * 
      */
-    public CurrentAddress(NetworkMask mask, int count) {
+    public AddressTracker(NetworkMask mask, int count) {
         this (null, mask, count);
     }
     
     /**
      * 
      */
-    public CurrentAddress(InetAddress address, NetworkMask mask, int count) {
+    public AddressTracker(InetAddress address, NetworkMask mask, int count) {
         if (mask == null) {
             throw new NullArgumentException("mask");
         }
