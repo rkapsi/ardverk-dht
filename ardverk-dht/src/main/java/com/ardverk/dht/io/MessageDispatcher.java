@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.ardverk.collection.FixedSizeHashSet;
 import org.ardverk.concurrent.ExecutorUtils;
+import org.ardverk.io.IoUtils;
 import org.ardverk.lang.NullArgumentException;
 import org.slf4j.Logger;
 
@@ -28,7 +29,6 @@ import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact2;
 import com.ardverk.logging.LoggerUtils;
-import com.ardverk.utils.IoUtils;
 
 /**
  * 
