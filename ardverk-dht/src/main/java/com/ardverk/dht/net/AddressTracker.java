@@ -16,7 +16,8 @@ import org.ardverk.net.NetworkMask;
 public class AddressTracker {
 
     /**
-     * 
+     * The {@link NetworkMask} makes sure that consecutive {@code set}
+     * calls from the same clients are being ignored.
      */
     private final NetworkMask mask;
     
