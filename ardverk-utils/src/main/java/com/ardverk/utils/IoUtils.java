@@ -4,14 +4,12 @@ import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
 
-import org.slf4j.Logger;
+import org.ardverk.utils.ExceptionUtils;
 
-import com.ardverk.logging.LoggerUtils;
-
+/**
+ * An utility class for I/O operations.
+ */
 public class IoUtils {
-
-    private static final Logger LOG 
-        = LoggerUtils.getLogger(IoUtils.class);
     
     private IoUtils() {}
     
@@ -21,7 +19,7 @@ public class IoUtils {
                 closeable.close();
                 return true;
             } catch (IOException err) {
-                LOG.error("IOException", err);
+                ExceptionUtils.exceptionCaught(err);
             }
         }
         return false;
@@ -53,7 +51,7 @@ public class IoUtils {
                 flushable.flush();
                 return true;
             } catch (IOException err) {
-                LOG.error("IOException", err);
+                ExceptionUtils.exceptionCaught(err);
             }
         }
         return false;
