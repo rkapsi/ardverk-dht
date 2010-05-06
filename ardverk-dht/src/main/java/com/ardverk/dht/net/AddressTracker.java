@@ -10,28 +10,38 @@ import org.ardverk.lang.NullArgumentException;
 import org.ardverk.net.NetworkMask;
 
 /**
- * 
+ * The {@link AddressTracker} helps us to determinate our external/public 
+ * {@link InetAddress} in a distributed but possibly NAT'ed environment.
  */
 public class AddressTracker {
 
+    /**
+     * 
+     */
     private final NetworkMask mask;
     
     // We use a ByteBuffer because it implements equals() and hashCode()
     private final FixedSizeHashSet<ByteBuffer> history;
     
+    /**
+     * The current {@link InetAddress}
+     */
     private InetAddress current = null;
     
+    /**
+     * The temporary {@link InetAddress}
+     */
     private InetAddress temporary = null;
     
     /**
-     * 
+     * Creates an {@link AddressTracker}
      */
     public AddressTracker(NetworkMask mask, int count) {
         this (null, mask, count);
     }
     
     /**
-     * 
+     * Creates an {@link AddressTracker}
      */
     public AddressTracker(InetAddress address, NetworkMask mask, int count) {
         if (mask == null) {
@@ -48,15 +58,31 @@ public class AddressTracker {
     }
     
     /**
-     * 
+     * Sets the current {@link InetAddress}.
      */
     public synchronized boolean set(SocketAddress src, SocketAddress address) {
-        return set(((InetSocketAddress)src).getAddress(), 
-                ((InetSocketAddress)address).getAddress());
+        return set(extract(src), extract(address));
     }
     
     /**
+     * Sets the current {@link InetAddress}.
+     */
+    public synchronized boolean set(InetAddress src, SocketAddress address) {
+        return set(src, extract(address));
+    }
+    
+    /**
+     * Sets the current {@link InetAddress}.
+     */
+    public synchronized boolean set(SocketAddress src, InetAddress address) {
+        return set(extract(src), address);
+    }
+    
+    /**
+     * Sets the current {@link InetAddress}.
      * 
+     * @param src The source of the {@code address}
+     * @param address Our {@link InetAddress}
      */
     public synchronized boolean set(InetAddress src, InetAddress address) {
         if (src == null) {
@@ -103,9 +129,22 @@ public class AddressTracker {
     }
     
     /**
-     * Returns the current {@link InetAddress}
+     * Returns the current {@link InetAddress} or null if it's 
+     * not known yet.
      */
     public synchronized InetAddress get() {
         return current;
+    }
+    
+    /**
+     * An utility method to get the {@link InetAddress} from the
+     * {@link SocketAddress}.
+     */
+    private static InetAddress extract(SocketAddress address) {
+        if (address == null) {
+            return null;
+        }
+        
+        return ((InetSocketAddress)address).getAddress();
     }
 }
