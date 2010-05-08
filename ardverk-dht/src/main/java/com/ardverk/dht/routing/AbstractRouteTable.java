@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.ardverk.lang.NullArgumentException;
 
+import com.ardverk.dht.ContactPinger;
 import com.ardverk.dht.DHT;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.concurrent.ArdverkFuture;
@@ -17,7 +18,8 @@ import com.ardverk.utils.EventUtils;
 
 public abstract class AbstractRouteTable implements RouteTable {
     
-    private final AtomicReference<DHT> dhtRef = new AtomicReference<DHT>();
+    private final AtomicReference<ContactPinger> pingerRef 
+        = new AtomicReference<ContactPinger>();
     
     protected final int k;
     
@@ -33,8 +35,8 @@ public abstract class AbstractRouteTable implements RouteTable {
     }
     
     @Override
-    public void bind(DHT dht) {
-        if (!dhtRef.compareAndSet(null, dht)) {
+    public void bind(ContactPinger pinger) {
+        if (!pingerRef.compareAndSet(null, pinger)) {
             throw new IllegalStateException();
         }
     }
@@ -42,20 +44,25 @@ public abstract class AbstractRouteTable implements RouteTable {
 
     @Override
     public void unbind() {
-        dhtRef.set(null);
+        pingerRef.set(null);
     }
     
     @Override
     public boolean isBound() {
-        return dhtRef.get() != null;
+        return pingerRef.get() != null;
     }
 
     protected ArdverkFuture<PingEntity> ping(Contact2 contact, 
             long timeout, TimeUnit unit) {
-        DHT dht = dhtRef.get();
+        ContactPinger pinger = pingerRef.get();
         
-        if (dht != null) {
-            return dht.ping(contact, timeout, unit);
+        ArdverkFuture<PingEntity> future = null;
+        if (pinger != null) {
+            future = pinger.ping(contact, timeout, unit);
+        }
+        
+        if (future != null) {
+            return future;
         }
         
         IllegalStateException exception 
