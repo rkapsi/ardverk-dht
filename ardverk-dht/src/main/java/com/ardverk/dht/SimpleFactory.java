@@ -32,9 +32,8 @@ public class SimpleFactory {
     }
     
     public static DHT createDHT(SocketAddress address) {
-        KeyFactory keyFactory = new DefaultKeyFactory(KEY_SIZE);
         
-        KUID contactId = keyFactory.createRandomKey();
+        KUID contactId = KUID.createRandom(KEY_SIZE);
         
         Contact2 localhost = new Contact2(
                 Type.SOLICITED, contactId, 0, address);

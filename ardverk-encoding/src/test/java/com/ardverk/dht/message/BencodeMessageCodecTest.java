@@ -17,8 +17,9 @@ public class BencodeMessageCodecTest {
         BencodeMessageCodec codec 
             = new BencodeMessageCodec();
         
-        MessageId messageId = new MessageId(new byte[20]);
-        KUID contactId = new KUID(new byte[20]);
+        MessageId messageId = MessageId.createRandom(20);
+        KUID contactId = KUID.createRandom(20);
+        
         Contact2 contact = new Contact2(Type.SOLICITED, 
                 contactId, 0, 
                 new InetSocketAddress("localhost", 6666));

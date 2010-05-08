@@ -55,11 +55,11 @@ class MessageInputStream extends BencodingInputStream {
     }
 
     public MessageId readMessageId() throws IOException {
-        return new MessageId(readBytes());
+        return MessageId.create(readBytes());
     }
     
     public KUID readKUID() throws IOException {
-        return new KUID(readBytes());
+        return KUID.create(readBytes());
     }
     
     public InetAddress readInetAddress() throws IOException {

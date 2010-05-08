@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Random;
 
 import org.apache.commons.lang.NullArgumentException;
 import org.ardverk.collection.ByteArrayKeyAnalyzer;
@@ -12,6 +13,7 @@ import org.ardverk.collection.KeyAnalyzer;
 import org.ardverk.io.Writable;
 
 import com.ardverk.coding.CodingUtils;
+import com.ardverk.dht.security.SecurityUtils;
 import com.ardverk.lang.Negation;
 import com.ardverk.lang.Xor;
 
@@ -19,21 +21,38 @@ import com.ardverk.lang.Xor;
  * Kademlia Unique Identifier ({@link KUID}) 
  */
 public class KUID implements Xor<KUID>, Negation<KUID>, 
-        Writable, Serializable, Comparable<KUID> {
+        Writable, Serializable, Comparable<KUID>, Cloneable {
 
     private static final long serialVersionUID = -4611363711131603626L;
     
-    private final byte[] key;
+    private static final Random GENERATOR 
+        = SecurityUtils.createSecureRandom();
     
-    private final int lengthInBits;
-    
-    private final int hashCode;
-
-    public KUID(byte[] key) {
-        this(key, key.length * Byte.SIZE);
+    public static KUID createRandom(int length) {
+        byte[] key = new byte[length];
+        GENERATOR.nextBytes(key);
+        return new KUID(key);
     }
     
-    public KUID(byte[] key, int lengthInBits) {
+    public static KUID createRandom(KUID otherId) {
+        return createRandom(otherId.length());
+    }
+    
+    public static KUID create(byte[] key) {
+        return new KUID(key);
+    }
+    
+    public static KUID create(byte[] key, int offset, int length) {
+        byte[] copy = new byte[length];
+        System.arraycopy(key, 0, copy, 0, copy.length);
+        return new KUID(copy);
+    }
+    
+    private final byte[] key;
+    
+    private final int hashCode;
+    
+    private KUID(byte[] key) {
         if (key == null) {
             throw new NullArgumentException("key");
         }
@@ -43,13 +62,7 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
                     "key.length=" + key.length);
         }
         
-        if (lengthInBits < key.length * Byte.SIZE) {
-            throw new IllegalArgumentException(
-                    "lengthInBits=" + lengthInBits);
-        }
-        
         this.key = key;
-        this.lengthInBits = lengthInBits;
         this.hashCode = Arrays.hashCode(key);
     }
 
@@ -79,7 +92,7 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
      * Returns the length of the {@link KUID} in bits.
      */
     public int lengthInBits() {
-        return lengthInBits;
+        return key.length * Byte.SIZE;
     }
     
     @Override
@@ -99,7 +112,7 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
             data[i] = (byte) (key[i] ^ otherId.key[i]);
         }
 
-        return new KUID(data, lengthInBits);
+        return new KUID(data);
     }
 
     @Override
@@ -109,7 +122,7 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
             data[i] = (byte)(~key[i]);
         }
         
-        return new KUID(data, lengthInBits);
+        return new KUID(data);
     }
     
     /**
@@ -117,7 +130,7 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
      */
     public KUID min() {
         byte[] minKey = new byte[length()];
-        return new KUID(minKey, lengthInBits);
+        return new KUID(minKey);
     }
     
     /**
@@ -126,7 +139,7 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
     public KUID max() {
         byte[] maxKey = new byte[length()];
         Arrays.fill(maxKey, (byte)0xFF);
-        return new KUID(maxKey, lengthInBits);
+        return new KUID(maxKey);
     }
     
     /**
@@ -187,7 +200,7 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
             } else {
                 copy[index] = (byte)(value & ~mask);
             }
-            return new KUID(copy, lengthInBits);
+            return new KUID(copy);
         }
         
         return this;
@@ -376,6 +389,11 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
                     && Arrays.equals(key, other.key);
     }
 
+    @Override
+    public KUID clone() {
+        return this;
+    }
+    
     @Override
     public int write(OutputStream out) throws IOException {
         if (out == null) {

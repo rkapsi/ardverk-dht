@@ -4,22 +4,48 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Random;
 
 import org.ardverk.io.Writable;
 import org.ardverk.lang.NullArgumentException;
 import org.ardverk.utils.ByteArrayComparator;
 
 import com.ardverk.coding.CodingUtils;
+import com.ardverk.dht.security.SecurityUtils;
 
-public final class MessageId implements Writable, Serializable, Comparable<MessageId> {
+public final class MessageId implements Writable, Serializable, 
+        Comparable<MessageId>, Cloneable {
 
     private static final long serialVersionUID = 6653397095695641792L;
+    
+    private static final Random GENERATOR 
+        = SecurityUtils.createSecureRandom();
+    
+    public static MessageId createRandom(int length) {
+        byte[] key = new byte[length];
+        GENERATOR.nextBytes(key);
+        return new MessageId(key);
+    }
+    
+    public static MessageId createRandom(MessageId otherId) {
+        return createRandom(otherId.length());
+    }
+    
+    public static MessageId create(byte[] key) {
+        return new MessageId(key);
+    }
+    
+    public static MessageId create(byte[] key, int offset, int length) {
+        byte[] copy = new byte[length];
+        System.arraycopy(key, 0, copy, 0, copy.length);
+        return new MessageId(copy);
+    }
     
     private final byte[] messageId;
     
     private final int hashCode;
     
-    public MessageId(byte[] messageId) {
+    private MessageId(byte[] messageId) {
         if (messageId == null) {
             throw new NullArgumentException("messageId");
         }
@@ -50,6 +76,11 @@ public final class MessageId implements Writable, Serializable, Comparable<Messa
     
     public int length() {
         return messageId.length;
+    }
+    
+    @Override
+    public MessageId clone() {
+        return this;
     }
     
     @Override

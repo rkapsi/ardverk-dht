@@ -22,7 +22,7 @@ public abstract class AbstractMessageFactory implements MessageFactory {
     public MessageId createMessageId(SocketAddress dst) {
         byte[] messageId = new byte[length];
         GENERATOR.nextBytes(messageId);
-        return new MessageId(messageId);
+        return MessageId.create(messageId);
     }
 
     @Override
