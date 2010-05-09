@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.entity.LookupEntity;
 import com.ardverk.dht.message.ResponseMessage;
-import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.Contact2;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.utils.SchedulingUtils;

@@ -38,11 +38,11 @@ public class ContactUtils {
         return Math.min((long)(rtt * 1.5f), defaultValue);
     }
     
-    public static Contact[] sort(Contact[] contacts, KUID key) {
+    public static Contact2[] sort(Contact2[] contacts, KUID key) {
         return sort(contacts, key, true);
     }
     
-    public static Contact[] sort(Contact[] contacts, KUID key, boolean ascending) {
+    public static Contact2[] sort(Contact2[] contacts, KUID key, boolean ascending) {
         if (contacts == null) {
             throw new NullArgumentException("contacts");
         }
@@ -67,11 +67,11 @@ public class ContactUtils {
     
     private static class ContactHandle {
         
-        private final Contact contact;
+        private final Contact2 contact;
         
         private final KUID xor;
         
-        public ContactHandle(Contact contact, KUID key) {
+        public ContactHandle(Contact2 contact, KUID key) {
             if (contact == null) {
                 throw new NullArgumentException("contact");
             }

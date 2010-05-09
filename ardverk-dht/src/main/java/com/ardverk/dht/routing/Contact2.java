@@ -1,6 +1,8 @@
 package com.ardverk.dht.routing;
 
 import java.io.Serializable;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.Collections;
@@ -57,6 +59,27 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
         public boolean isBetterOrEqual(Type other) {
             return priority >= other.priority;
         }
+    }
+    
+    /**
+     * Creates and returns a localhost {@link Contact2}.
+     */
+    public static Contact2 localhost(KUID contactId, String address, int port) {
+        return localhost(contactId, new InetSocketAddress(address, port));
+    }
+    
+    /**
+     * Creates and returns a localhost {@link Contact2}.
+     */
+    public static Contact2 localhost(KUID contactId, InetAddress address, int port) {
+        return localhost(contactId, new InetSocketAddress(address, port));
+    }
+    
+    /**
+     * Creates and returns a localhost {@link Contact2}.
+     */
+    public static Contact2 localhost(KUID contactId, SocketAddress address) {
+        return new Contact2(Type.SOLICITED, contactId, 0, address);
     }
     
     private final long creationTime;
