@@ -27,7 +27,7 @@ import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.MessageId;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
-import com.ardverk.dht.routing.Contact2;
+import com.ardverk.dht.routing.Contact;
 import com.ardverk.logging.LoggerUtils;
 
 /**
@@ -194,7 +194,7 @@ public abstract class MessageDispatcher implements Closeable {
     /**
      * 
      */
-    public void send(Contact2 dst, ResponseMessage message) throws IOException {
+    public void send(Contact dst, ResponseMessage message) throws IOException {
         send(message);
     }
     
@@ -202,7 +202,7 @@ public abstract class MessageDispatcher implements Closeable {
      * 
      */
     public void send(MessageCallback callback, 
-            Contact2 dst, RequestMessage message, 
+            Contact dst, RequestMessage message, 
             long timeout, TimeUnit unit) throws IOException {
         
         KUID contactId = dst.getContactId();
@@ -480,7 +480,7 @@ public abstract class MessageDispatcher implements Closeable {
                 return false;
             }
             
-            Contact2 contact = response.getContact();
+            Contact contact = response.getContact();
             if (!factory.isFor(messageId, contact.getRemoteAddress())) {
                 if (LOG.isErrorEnabled()) {
                     LOG.error("Wrong MessageId signature: " + response);

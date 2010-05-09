@@ -17,7 +17,7 @@ import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.PingRequest;
 import com.ardverk.dht.message.PingResponse;
 import com.ardverk.dht.message.ResponseMessage;
-import com.ardverk.dht.routing.Contact2;
+import com.ardverk.dht.routing.Contact;
 
 public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
     
@@ -41,7 +41,7 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
     }
     
     public PingResponseHandler(MessageDispatcher messageDispatcher, 
-            Contact2 contact) {
+            Contact contact) {
         super(messageDispatcher);
         
         sender = new ContactPingSender(contact);
@@ -108,9 +108,9 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
     
     private class ContactPingSender implements PingSender {
         
-        private final Contact2 contact;
+        private final Contact contact;
         
-        public ContactPingSender(Contact2 contact) {
+        public ContactPingSender(Contact contact) {
             if (contact == null) {
                 throw new NullArgumentException("contact");
             }

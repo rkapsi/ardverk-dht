@@ -9,7 +9,7 @@ import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.message.ValueRequest;
-import com.ardverk.dht.routing.Contact2;
+import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
 
@@ -50,7 +50,7 @@ public class ValueRequestHandler extends AbstractRequestHandler {
         if (value != null) {
             response = factory.createValueResponse(request, value);
         } else {
-            Contact2[] contacts = routeTable.select(key);
+            Contact[] contacts = routeTable.select(key);
             response = factory.createNodeResponse(request, contacts);
         }
         

@@ -10,10 +10,10 @@ import com.ardverk.dht.message.BencodeMessageCodec;
 import com.ardverk.dht.message.DefaultMessageFactory;
 import com.ardverk.dht.message.AbstractMessageCodec;
 import com.ardverk.dht.message.MessageFactory;
-import com.ardverk.dht.routing.Contact2;
+import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.DefaultRouteTable;
 import com.ardverk.dht.routing.RouteTable;
-import com.ardverk.dht.routing.Contact2.Type;
+import com.ardverk.dht.routing.Contact.Type;
 import com.ardverk.dht.storage.Database;
 import com.ardverk.dht.storage.DefaultDatabase;
 
@@ -35,7 +35,7 @@ public class SimpleFactory {
         
         KUID contactId = KUID.createRandom(KEY_SIZE);
         
-        Contact2 localhost = new Contact2(
+        Contact localhost = new Contact(
                 Type.SOLICITED, contactId, 0, address);
         
         RouteTable routeTable = new DefaultRouteTable(K, localhost);
@@ -51,7 +51,7 @@ public class SimpleFactory {
     }
     
     public static void bind(DHT dht) throws IOException {
-        Contact2 localhost = dht.getLocalhost();
+        Contact localhost = dht.getLocalhost();
         int port = ((InetSocketAddress)localhost.getRemoteAddress()).getPort();
         
         Transport transport = new MinaTransport(

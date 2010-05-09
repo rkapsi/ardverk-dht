@@ -5,7 +5,7 @@ import java.net.SocketAddress;
 import org.ardverk.lang.NullArgumentException;
 
 import com.ardverk.dht.KUID;
-import com.ardverk.dht.routing.Contact2;
+import com.ardverk.dht.routing.Contact;
 
 public class DefaultStoreRequest extends AbstractRequestMessage 
         implements StoreRequest {
@@ -14,7 +14,7 @@ public class DefaultStoreRequest extends AbstractRequestMessage
     
     private final byte[] value;
     
-    public DefaultStoreRequest(MessageId messageId, Contact2 contact, 
+    public DefaultStoreRequest(MessageId messageId, Contact contact, 
             SocketAddress address, KUID key, byte[] value) {
         super(messageId, contact, address);
         

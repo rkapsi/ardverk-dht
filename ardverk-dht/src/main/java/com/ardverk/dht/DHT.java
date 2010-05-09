@@ -16,7 +16,7 @@ import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.io.BootstrapProcess.Config;
 import com.ardverk.dht.io.transport.Transport;
-import com.ardverk.dht.routing.Contact2;
+import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
 
@@ -58,12 +58,12 @@ public interface DHT extends Closeable {
     /**
      * 
      */
-    public Contact2 getLocalhost();
+    public Contact getLocalhost();
     
     /**
      * 
      */
-    public Contact2 getContact(KUID contactId);
+    public Contact getContact(KUID contactId);
     
     /**
      * 
@@ -92,7 +92,7 @@ public interface DHT extends Closeable {
     /**
      * Sends a ping to the given host.
      */
-    public ArdverkFuture<PingEntity> ping(Contact2 contact, 
+    public ArdverkFuture<PingEntity> ping(Contact contact, 
             long timeout, TimeUnit unit);
     
     /**

@@ -4,14 +4,14 @@ import java.net.SocketAddress;
 
 import org.ardverk.lang.NullArgumentException;
 
-import com.ardverk.dht.routing.Contact2;
+import com.ardverk.dht.routing.Contact;
 
 public class DefaultValueResponse extends AbstractLookupResponse 
         implements ValueResponse {
 
     private final byte[] value;
     
-    public DefaultValueResponse(MessageId messageId, Contact2 contact, 
+    public DefaultValueResponse(MessageId messageId, Contact contact, 
             SocketAddress address, byte[] value) {
         super(messageId, contact, address);
         

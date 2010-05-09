@@ -15,7 +15,7 @@ import com.ardverk.dht.entity.BootstrapEntity;
 import com.ardverk.dht.entity.DefaultBootstrapEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
-import com.ardverk.dht.routing.Contact2;
+import com.ardverk.dht.routing.Contact;
 
 public class BootstrapProcess implements AsyncProcess<BootstrapEntity> {
 
@@ -143,13 +143,13 @@ public class BootstrapProcess implements AsyncProcess<BootstrapEntity> {
         doLookup(entity.getContact());
     }
     
-    private void doLookup(Contact2 contact) {
+    private void doLookup(Contact contact) {
         synchronized (future) {
             if (future.isDone()) {
                 return;
             }
             
-            Contact2 localhost = dht.getLocalhost();
+            Contact localhost = dht.getLocalhost();
             KUID contactId = localhost.getContactId();
             
             long timeout = config.getLookupTimeoutInMillis();
@@ -200,7 +200,7 @@ public class BootstrapProcess implements AsyncProcess<BootstrapEntity> {
         
         private final SocketAddress address;
         
-        private final Contact2 contact;
+        private final Contact contact;
         
         private volatile long pingTimeout = PING_TIMEOUT;
         
@@ -214,7 +214,7 @@ public class BootstrapProcess implements AsyncProcess<BootstrapEntity> {
             }
         }
         
-        public Config(Contact2 contact) {
+        public Config(Contact contact) {
             this(null, contact);
             
             if (contact == null) {
@@ -222,7 +222,7 @@ public class BootstrapProcess implements AsyncProcess<BootstrapEntity> {
             }
         }
         
-        private Config(SocketAddress address, Contact2 contact) {
+        private Config(SocketAddress address, Contact contact) {
             this.address = address;
             this.contact = contact;
         }
@@ -231,7 +231,7 @@ public class BootstrapProcess implements AsyncProcess<BootstrapEntity> {
             return address;
         }
         
-        public Contact2 getContact() {
+        public Contact getContact() {
             return contact;
         }
         

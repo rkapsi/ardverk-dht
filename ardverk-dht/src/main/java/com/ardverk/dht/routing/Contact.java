@@ -19,7 +19,7 @@ import com.ardverk.dht.KUID;
 /**
  * 
  */
-public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
+public class Contact implements Comparable<Contact>, Cloneable, Serializable {
     
     private static final long serialVersionUID = 298059770472298142L;
 
@@ -62,24 +62,24 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
     }
     
     /**
-     * Creates and returns a localhost {@link Contact2}.
+     * Creates and returns a localhost {@link Contact}.
      */
-    public static Contact2 localhost(KUID contactId, String address, int port) {
+    public static Contact localhost(KUID contactId, String address, int port) {
         return localhost(contactId, new InetSocketAddress(address, port));
     }
     
     /**
-     * Creates and returns a localhost {@link Contact2}.
+     * Creates and returns a localhost {@link Contact}.
      */
-    public static Contact2 localhost(KUID contactId, InetAddress address, int port) {
+    public static Contact localhost(KUID contactId, InetAddress address, int port) {
         return localhost(contactId, new InetSocketAddress(address, port));
     }
     
     /**
-     * Creates and returns a localhost {@link Contact2}.
+     * Creates and returns a localhost {@link Contact}.
      */
-    public static Contact2 localhost(KUID contactId, SocketAddress address) {
-        return new Contact2(Type.SOLICITED, contactId, 0, address);
+    public static Contact localhost(KUID contactId, SocketAddress address) {
+        return new Contact(Type.SOLICITED, contactId, 0, address);
     }
     
     private final long creationTime;
@@ -101,9 +101,9 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
     private final Map<?, ?> attributes;
     
     /**
-     * Creates a {@link Contact2}
+     * Creates a {@link Contact}
      */
-    public Contact2(Type type, 
+    public Contact(Type type, 
             KUID contactId, 
             int instanceId, 
             SocketAddress address) {
@@ -112,9 +112,9 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
     }
     
     /**
-     * Creates a {@link Contact2}
+     * Creates a {@link Contact}
      */
-    public Contact2(Type type, 
+    public Contact(Type type, 
             KUID contactId, 
             int instanceId, 
             SocketAddress address, 
@@ -124,9 +124,9 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
     }
     
     /**
-     * Creates a {@link Contact2}
+     * Creates a {@link Contact}
      */
-    public Contact2(Type type, 
+    public Contact(Type type, 
             KUID contactId, 
             int instanceId, 
             SocketAddress address, 
@@ -137,9 +137,9 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
     }
     
     /**
-     * Creates a {@link Contact2}
+     * Creates a {@link Contact}
      */
-    public Contact2(Type type, 
+    public Contact(Type type, 
             KUID contactId, 
             int instanceId, 
             SocketAddress socketAddress, 
@@ -149,9 +149,9 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
     }
     
     /**
-     * Creates a {@link Contact2}
+     * Creates a {@link Contact}
      */
-    public Contact2(Type type, 
+    public Contact(Type type, 
             KUID contactId, 
             int instanceId, 
             SocketAddress socketAddress, 
@@ -162,9 +162,9 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
     }
     
     /**
-     * Creates a {@link Contact2}
+     * Creates a {@link Contact}
      */
-    public Contact2(Type type, 
+    public Contact(Type type, 
             KUID contactId, 
             int instanceId, 
             SocketAddress socketAddress, 
@@ -205,7 +205,7 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
     /**
      * 
      */
-    protected Contact2(Contact2 existing, Map<?, ?> attributes) {
+    protected Contact(Contact existing, Map<?, ?> attributes) {
         if (existing == null) {
             throw new NullArgumentException("existing");
         }
@@ -297,7 +297,7 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
     /**
      * 
      */
-    protected Contact2(Contact2 existing, Contact2 other) {
+    protected Contact(Contact existing, Contact other) {
         
         if (existing == null) {
             throw new NullArgumentException("existing");
@@ -346,7 +346,7 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
     /**
      * 
      */
-    private boolean isBetterOrEqual(Contact2 other) {
+    private boolean isBetterOrEqual(Contact other) {
         return type.isBetterOrEqual(other.type);
     }
     
@@ -395,28 +395,28 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
     }
     
     /**
-     * Returns the adaptive timeout for this {@link Contact2}.
+     * Returns the adaptive timeout for this {@link Contact}.
      */
     public long getAdaptiveTimeout(long defaultValue, TimeUnit unit) {
         return defaultValue;
     }
     
     /**
-     * Returns the {@link Contact2}'s unique {@link KUID}
+     * Returns the {@link Contact}'s unique {@link KUID}
      */
     public KUID getContactId() {
         return contactId;
     }
     
     /**
-     * Returns the {@link Contact2}'s instance ID
+     * Returns the {@link Contact}'s instance ID
      */
     public int getInstanceId() {
         return instanceId;
     }
     
     /**
-     * Returns the {@link Contact2}'s address as reported by 
+     * Returns the {@link Contact}'s address as reported by 
      * the {@link Socket}.
      */
     public SocketAddress getSocketAddress() {
@@ -424,8 +424,8 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
     }
     
     /**
-     * Returns the {@link Contact2}'s address as reported by 
-     * the {@link Contact2}.
+     * Returns the {@link Contact}'s address as reported by 
+     * the {@link Contact}.
      */
     public SocketAddress getContactAddress() {
         return contactAddress;
@@ -439,14 +439,14 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
     }
     
     /**
-     * Returns the {@link Type} of the {@link Contact2}
+     * Returns the {@link Type} of the {@link Contact}
      */
     public Type getType() {
         return type;
     }
     
     /**
-     * Returns true if the {@link Contact2} is of the given {@link Type}
+     * Returns true if the {@link Contact} is of the given {@link Type}
      */
     public boolean isType(Type type) {
         return type == this.type;
@@ -467,7 +467,7 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
     }
     
     /**
-     * Returns true if the {@link Contact2} is considered active.
+     * Returns true if the {@link Contact} is considered active.
      * 
      * @see Type
      */
@@ -497,7 +497,7 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
     }*/
     
     /**
-     * Returns the {@link Contact2}'s Round-Trip-Time (RTT) or a negative 
+     * Returns the {@link Contact}'s Round-Trip-Time (RTT) or a negative 
      * value if the RTT is unknown.
      */
     public long getRoundTripTime(TimeUnit unit) {
@@ -505,7 +505,7 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
     }
     
     /**
-     * Returns the {@link Contact2}'s Round-Trip-Time (RTT) in milliseconds
+     * Returns the {@link Contact}'s Round-Trip-Time (RTT) in milliseconds
      * or a negative value if the RTT is unknown.
      */
     public long getRoundTripTimeInMillis() {
@@ -515,14 +515,14 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
     /**
      * 
      */
-    public Contact2 merge(Contact2 other) {
-        return other != this ? new Contact2(this, other) : this;
+    public Contact merge(Contact other) {
+        return other != this ? new Contact(this, other) : this;
     }
     
     /**
      * 
      */
-    public Contact2 put(Object key, Object value) {
+    public Contact put(Object key, Object value) {
         if (key == null) {
             throw new NullArgumentException("key");
         }
@@ -534,13 +534,13 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
         Map<Object, Object> copy 
             = new HashMap<Object, Object>(attributes);
         copy.put(key, value);
-        return new Contact2(this, copy);
+        return new Contact(this, copy);
     }
     
     /**
      * 
      */
-    public Contact2 putAll(Map<?, ?> m) {
+    public Contact putAll(Map<?, ?> m) {
         if (m == null) {
             throw new NullArgumentException("m");
         }
@@ -563,13 +563,13 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
             copy.put(key, value);
         }
         
-        return new Contact2(this, copy);
+        return new Contact(this, copy);
     }
     
     /**
      * 
      */
-    public Contact2 remove(Object key) {
+    public Contact remove(Object key) {
         if (key == null) {
             throw new NullArgumentException("key");
         }
@@ -585,7 +585,7 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
                 copy = Collections.emptyMap();
             }
             
-            return new Contact2(this, copy);
+            return new Contact(this, copy);
         }
         
         return this;
@@ -669,7 +669,7 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
     }
 
     @Override
-    public Contact2 clone() {
+    public Contact clone() {
         return this;
     }
     
@@ -682,16 +682,16 @@ public class Contact2 implements Comparable<Contact2>, Cloneable, Serializable {
     public boolean equals(Object o) {
         if (o == this) {
             return true;
-        } else if (!(o instanceof Contact2)) {
+        } else if (!(o instanceof Contact)) {
             return false;
         }
         
-        Contact2 other = (Contact2)o;
+        Contact other = (Contact)o;
         return contactId.equals(other.contactId);
     }
     
     @Override
-    public int compareTo(Contact2 o) {
+    public int compareTo(Contact o) {
         return contactId.compareTo(o.contactId);
     }
     

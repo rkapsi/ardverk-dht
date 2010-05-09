@@ -4,7 +4,7 @@ import java.net.SocketAddress;
 
 import org.ardverk.lang.NullArgumentException;
 
-import com.ardverk.dht.routing.Contact2;
+import com.ardverk.dht.routing.Contact;
 
 public abstract class AbstractMessage implements Message {
 
@@ -12,12 +12,12 @@ public abstract class AbstractMessage implements Message {
     
     private final MessageId messageId;
     
-    private final Contact2 contact;
+    private final Contact contact;
     
     private final SocketAddress address;
     
     public AbstractMessage(MessageId messageId, 
-            Contact2 contact, SocketAddress address) {
+            Contact contact, SocketAddress address) {
         
         if (messageId == null) {
             throw new NullArgumentException("messageId");
@@ -49,7 +49,7 @@ public abstract class AbstractMessage implements Message {
     }
 
     @Override
-    public Contact2 getContact() {
+    public Contact getContact() {
         return contact;
     }
     

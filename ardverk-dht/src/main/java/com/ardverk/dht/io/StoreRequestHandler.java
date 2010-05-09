@@ -9,7 +9,7 @@ import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.message.StoreRequest;
-import com.ardverk.dht.routing.Contact2;
+import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
 import com.ardverk.dht.storage.Database.Condition;
@@ -43,7 +43,7 @@ public class StoreRequestHandler extends AbstractRequestHandler {
         
         StoreRequest request = (StoreRequest)message;
         
-        Contact2 src = message.getContact();
+        Contact src = message.getContact();
         KUID key = request.getKey();
         byte[] value = request.getValue();
         

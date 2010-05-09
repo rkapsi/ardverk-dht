@@ -13,7 +13,7 @@ import com.ardverk.dht.KUID;
 import com.ardverk.dht.entity.Entity;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
-import com.ardverk.dht.routing.Contact2;
+import com.ardverk.dht.routing.Contact;
 
 public abstract class AbstractResponseHandler<V extends Entity> 
         extends AbstractMessageHandler implements ResponseHandler<V> {
@@ -110,7 +110,7 @@ public abstract class AbstractResponseHandler<V extends Entity>
     /**
      * 
      */
-    public void send(Contact2 dst, RequestMessage message, 
+    public void send(Contact dst, RequestMessage message, 
             long timeout, TimeUnit unit) throws IOException {
         
         KUID contactId = dst.getContactId();

@@ -52,7 +52,7 @@ public abstract class AbstractRouteTable implements RouteTable {
         return pingerRef.get() != null;
     }
 
-    protected ArdverkFuture<PingEntity> ping(Contact2 contact, 
+    protected ArdverkFuture<PingEntity> ping(Contact contact, 
             long timeout, TimeUnit unit) {
         ContactPinger pinger = pingerRef.get();
         
@@ -77,7 +77,7 @@ public abstract class AbstractRouteTable implements RouteTable {
     }
     
     @Override
-    public Contact2[] select(KUID contactId) {
+    public Contact[] select(KUID contactId) {
         return select(contactId, getK());
     }
 
@@ -117,7 +117,7 @@ public abstract class AbstractRouteTable implements RouteTable {
         EventUtils.fireEvent(event);
     }
     
-    protected void fireContactAdded(Bucket bucket, Contact2 contact) {
+    protected void fireContactAdded(Bucket bucket, Contact contact) {
         Runnable event = new Runnable() {
             @Override
             public void run() {
@@ -131,7 +131,7 @@ public abstract class AbstractRouteTable implements RouteTable {
     }
     
     protected void fireContactReplaced(Bucket bucket, 
-            Contact2 existing, Contact2 contact) {
+            Contact existing, Contact contact) {
         Runnable event = new Runnable() {
             @Override
             public void run() {
@@ -145,7 +145,7 @@ public abstract class AbstractRouteTable implements RouteTable {
     }
     
     protected void fireContactChanged(Bucket bucket, 
-            Contact2 existing, Contact2 contact) {
+            Contact existing, Contact contact) {
         Runnable event = new Runnable() {
             @Override
             public void run() {
@@ -158,7 +158,7 @@ public abstract class AbstractRouteTable implements RouteTable {
         EventUtils.fireEvent(event);
     }
     
-    protected void fireCollision(Contact2 contact) {
+    protected void fireCollision(Contact contact) {
         Runnable event = new Runnable() {
             @Override
             public void run() {
@@ -172,7 +172,7 @@ public abstract class AbstractRouteTable implements RouteTable {
     }
     
     protected void fireReplaceContact(Bucket bucket, 
-            Contact2 existing, Contact2 contact) {
+            Contact existing, Contact contact) {
         Runnable event = new Runnable() {
             @Override
             public void run() {

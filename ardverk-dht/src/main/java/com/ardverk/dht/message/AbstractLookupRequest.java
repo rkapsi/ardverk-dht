@@ -5,14 +5,14 @@ import java.net.SocketAddress;
 import org.ardverk.lang.NullArgumentException;
 
 import com.ardverk.dht.KUID;
-import com.ardverk.dht.routing.Contact2;
+import com.ardverk.dht.routing.Contact;
 
 abstract class AbstractLookupRequest extends AbstractRequestMessage 
         implements LookupRequest {
     
     private final KUID key;
     
-    public AbstractLookupRequest(MessageId messageId, Contact2 contact, 
+    public AbstractLookupRequest(MessageId messageId, Contact contact, 
             SocketAddress address, KUID key) {
         super(messageId, contact, address);
         

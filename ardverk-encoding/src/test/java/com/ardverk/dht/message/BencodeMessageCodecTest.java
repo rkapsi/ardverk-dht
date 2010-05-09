@@ -7,8 +7,8 @@ import java.net.SocketAddress;
 import org.junit.Test;
 
 import com.ardverk.dht.KUID;
-import com.ardverk.dht.routing.Contact2;
-import com.ardverk.dht.routing.Contact2.Type;
+import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.Contact.Type;
 
 public class BencodeMessageCodecTest {
 
@@ -20,7 +20,7 @@ public class BencodeMessageCodecTest {
         MessageId messageId = MessageId.createRandom(20);
         KUID contactId = KUID.createRandom(20);
         
-        Contact2 contact = new Contact2(Type.SOLICITED, 
+        Contact contact = new Contact(Type.SOLICITED, 
                 contactId, 0, 
                 new InetSocketAddress("localhost", 6666));
         

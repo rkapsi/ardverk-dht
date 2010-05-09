@@ -24,7 +24,7 @@ import com.ardverk.dht.io.BootstrapProcess.Config;
 import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.message.AbstractMessageCodec;
 import com.ardverk.dht.message.MessageFactory;
-import com.ardverk.dht.routing.Contact2;
+import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
 
@@ -60,7 +60,7 @@ public class ArdverkDHT extends AbstractDHT implements Closeable {
     public void bind(Transport transport) throws IOException {
         ContactPinger pinger = new ContactPinger() {
             @Override
-            public ArdverkFuture<PingEntity> ping(Contact2 contact, 
+            public ArdverkFuture<PingEntity> ping(Contact contact, 
                     long timeout, TimeUnit unit) {
                 return ArdverkDHT.this.ping(contact, timeout, unit);
             }
@@ -101,12 +101,12 @@ public class ArdverkDHT extends AbstractDHT implements Closeable {
     }
     
     @Override
-    public Contact2 getLocalhost() {
+    public Contact getLocalhost() {
         return routeTable.getLocalhost();
     }
 
     @Override
-    public Contact2 getContact(KUID contactId) {
+    public Contact getContact(KUID contactId) {
         return routeTable.get(contactId);
     }
     
@@ -121,7 +121,7 @@ public class ArdverkDHT extends AbstractDHT implements Closeable {
     }
 
     @Override
-    public ArdverkFuture<PingEntity> ping(Contact2 contact, 
+    public ArdverkFuture<PingEntity> ping(Contact contact, 
             long timeout, TimeUnit unit) {
         AsyncProcess<PingEntity> process 
             = new PingResponseHandler(messageDispatcher, contact);

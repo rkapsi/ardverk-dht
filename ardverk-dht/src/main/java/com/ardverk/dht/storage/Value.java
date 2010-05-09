@@ -3,7 +3,7 @@ package com.ardverk.dht.storage;
 import java.util.concurrent.TimeUnit;
 
 import com.ardverk.dht.KUID;
-import com.ardverk.dht.routing.Contact2;
+import com.ardverk.dht.routing.Contact;
 
 public interface Value {
 
@@ -11,7 +11,7 @@ public interface Value {
     
     public long getAge(TimeUnit unit);
     
-    public Contact2 getSource();
+    public Contact getSource();
 
     public KUID getKey();
 

@@ -4,7 +4,7 @@ import java.net.SocketAddress;
 
 import org.ardverk.lang.NullArgumentException;
 
-import com.ardverk.dht.routing.Contact2;
+import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.storage.Database.Condition;
 
 public class DefaultStoreResponse extends AbstractResponseMessage 
@@ -12,7 +12,7 @@ public class DefaultStoreResponse extends AbstractResponseMessage
 
     private final Condition status;
     
-    public DefaultStoreResponse(MessageId messageId, Contact2 contact, 
+    public DefaultStoreResponse(MessageId messageId, Contact contact, 
             SocketAddress address, Condition status) {
         super(messageId, contact, address);
         

@@ -4,15 +4,15 @@ import java.net.SocketAddress;
 
 import org.ardverk.lang.NullArgumentException;
 
-import com.ardverk.dht.routing.Contact2;
+import com.ardverk.dht.routing.Contact;
 
 public class DefaultNodeResponse extends AbstractLookupResponse 
         implements NodeResponse {
 
-    private final Contact2[] contacts;
+    private final Contact[] contacts;
     
-    public DefaultNodeResponse(MessageId messageId, Contact2 contact, 
-            SocketAddress address, Contact2[] contacts) {
+    public DefaultNodeResponse(MessageId messageId, Contact contact, 
+            SocketAddress address, Contact[] contacts) {
         super(messageId, contact, address);
         
         if (contacts == null) {
@@ -23,7 +23,7 @@ public class DefaultNodeResponse extends AbstractLookupResponse
     }
 
     @Override
-    public Contact2[] getContacts() {
+    public Contact[] getContacts() {
         return contacts;
     }
 }

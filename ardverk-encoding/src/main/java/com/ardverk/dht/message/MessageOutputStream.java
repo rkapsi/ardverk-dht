@@ -9,7 +9,7 @@ import java.net.SocketAddress;
 import org.ardverk.coding.BencodingOutputStream;
 
 import com.ardverk.dht.KUID;
-import com.ardverk.dht.routing.Contact2;
+import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.storage.Database.Condition;
 import com.ardverk.enumeration.IntegerValue;
 import com.ardverk.enumeration.StringValue;
@@ -30,8 +30,8 @@ class MessageOutputStream extends BencodingOutputStream {
             writeKUID((KUID)obj);
         } else if (obj instanceof MessageId) {
             writeMessageId((MessageId)obj);
-        } else if (obj instanceof Contact2) {
-            writeContact((Contact2)obj);
+        } else if (obj instanceof Contact) {
+            writeContact((Contact)obj);
         } else if (obj instanceof Message) {
             writeMessage((Message)obj);
         } else {
@@ -67,13 +67,13 @@ class MessageOutputStream extends BencodingOutputStream {
         writeBytes(messageId.getBytes());
     }
     
-    public void writeContact(Contact2 contact) throws IOException {
+    public void writeContact(Contact contact) throws IOException {
         writeKUID(contact.getContactId());
         writeInt(contact.getInstanceId());
         writeSocketAddress(contact.getRemoteAddress());
     }
     
-    public void writeContacts(Contact2[] contacts) throws IOException {
+    public void writeContacts(Contact[] contacts) throws IOException {
         writeArray(contacts);
     }
     
@@ -134,10 +134,10 @@ class MessageOutputStream extends BencodingOutputStream {
     }
     
     private void writeNodeResponse(NodeResponse message) throws IOException {
-        Contact2[] contacts = message.getContacts();
+        Contact[] contacts = message.getContacts();
         
         writeInt(contacts.length);
-        for (Contact2 contact : contacts) {
+        for (Contact contact : contacts) {
             writeContact(contact);
         }
     }
