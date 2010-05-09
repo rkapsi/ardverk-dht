@@ -3,6 +3,7 @@ package com.ardverk.dht.message;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -41,6 +42,14 @@ public final class MessageId implements Writable, Serializable,
         return new MessageId(copy);
     }
     
+    public static MessageId create(BigInteger key) {
+        return create(key.toByteArray());
+    }
+    
+    public static MessageId create(String key, int radix) {
+        return create(new BigInteger(key, radix));
+    }
+    
     private final byte[] messageId;
     
     private final int hashCode;
@@ -52,6 +61,14 @@ public final class MessageId implements Writable, Serializable,
         
         this.messageId = messageId;
         this.hashCode = Arrays.hashCode(messageId);
+    }
+    
+    /**
+     * Returns {@code true} if the given {@link MessageId} is 
+     * compatible with this {@link MessageId}.
+     */
+    public boolean isCompatible(MessageId otherId) {
+        return otherId != null && length() == otherId.length();
     }
 
     @Override
