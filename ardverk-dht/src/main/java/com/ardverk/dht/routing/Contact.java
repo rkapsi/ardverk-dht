@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 import org.ardverk.collection.CollectionsUtils;
 import org.ardverk.lang.NullArgumentException;
 import org.ardverk.lang.NumberUtils;
+import org.ardverk.net.NetworkUtils;
 
 import com.ardverk.dht.KUID;
 
@@ -97,6 +98,8 @@ public class Contact implements Comparable<Contact>, Cloneable, Serializable {
     private final SocketAddress socketAddress;
     
     private final SocketAddress contactAddress;
+    
+    private final SocketAddress remoteAddress;
     
     private final Map<?, ?> attributes;
     
@@ -198,6 +201,8 @@ public class Contact implements Comparable<Contact>, Cloneable, Serializable {
         this.instanceId = instanceId;
         this.socketAddress = socketAddress;
         this.contactAddress = contactAddress;
+        this.remoteAddress = combine(
+                socketAddress, contactAddress);
         
         this.attributes = CollectionsUtils.copy(attributes);
     }
@@ -222,6 +227,8 @@ public class Contact implements Comparable<Contact>, Cloneable, Serializable {
         this.instanceId = existing.instanceId;
         this.socketAddress = existing.socketAddress;
         this.contactAddress = existing.contactAddress;
+        this.remoteAddress = existing.remoteAddress;
+        
         this.type = existing.type;
         
         this.attributes = attributes;
@@ -230,32 +237,7 @@ public class Contact implements Comparable<Contact>, Cloneable, Serializable {
     /**
      * 
      */
-    /*protected Contact2(Contact2 existing, Type type) {
-        if (existing == null) {
-            throw new NullArgumentException("existing");
-        }
-        
-        if (type == null) {
-            throw new NullArgumentException("type");
-        }
-        
-        this.creationTime = existing.creationTime;
-        this.timeStamp = existing.timeStamp;
-        this.rtt = existing.rtt;
-        
-        this.contactId = existing.contactId;
-        this.instanceId = existing.instanceId;
-        this.socketAddress = existing.socketAddress;
-        this.contactAddress = existing.contactAddress;
-        this.type = type;
-        
-        this.attributes = existing.attributes;
-    }*/
-    
-    /**
-     * 
-     */
-    /*protected Contact2(Contact2 existing, int instanceId) {
+    protected Contact(Contact existing, int instanceId) {
         if (existing == null) {
             throw new NullArgumentException("existing");
         }
@@ -268,31 +250,12 @@ public class Contact implements Comparable<Contact>, Cloneable, Serializable {
         this.instanceId = instanceId;
         this.socketAddress = existing.socketAddress;
         this.contactAddress = existing.contactAddress;
+        this.remoteAddress = existing.remoteAddress;
+        
         this.type = existing.type;
         
         this.attributes = existing.attributes;
-    }*/
-    
-    /**
-     * 
-     */
-    /*protected Contact2(Contact2 existing, long rtt, TimeUnit unit) {
-        if (existing == null) {
-            throw new NullArgumentException("existing");
-        }
-        
-        this.creationTime = existing.creationTime;
-        this.timeStamp = existing.timeStamp;
-        this.rtt = unit.toMillis(rtt);
-        
-        this.contactId = existing.contactId;
-        this.instanceId = existing.instanceId;
-        this.socketAddress = existing.socketAddress;
-        this.contactAddress = existing.contactAddress;
-        this.type = existing.type;
-        
-        this.attributes = existing.attributes;
-    }*/
+    }
     
     /**
      * 
@@ -332,11 +295,13 @@ public class Contact implements Comparable<Contact>, Cloneable, Serializable {
             this.instanceId = existing.instanceId;
             this.socketAddress = existing.socketAddress;
             this.contactAddress = existing.contactAddress;
+            this.remoteAddress = existing.remoteAddress;
             this.type = existing.type;
         } else {
             this.instanceId = other.instanceId;
             this.socketAddress = other.socketAddress;
             this.contactAddress = other.contactAddress;
+            this.remoteAddress = other.remoteAddress;
             this.type = other.type;
         }
         
@@ -416,6 +381,13 @@ public class Contact implements Comparable<Contact>, Cloneable, Serializable {
     }
     
     /**
+     * 
+     */
+    public Contact setInstanceId(int instanceId) {
+        return new Contact(this, instanceId);
+    }
+    
+    /**
      * Returns the {@link Contact}'s address as reported by 
      * the {@link Socket}.
      */
@@ -435,7 +407,7 @@ public class Contact implements Comparable<Contact>, Cloneable, Serializable {
      * 
      */
     public SocketAddress getRemoteAddress() {
-        return getContactAddress();
+        return remoteAddress;
     }
     
     /**
@@ -723,5 +695,16 @@ public class Contact implements Comparable<Contact>, Cloneable, Serializable {
         copy.putAll(m2);
         
         return copy;
+    }
+    
+    /**
+     * Combines the socket addresses {@link InetAddress} and the
+     * contact addresses port number.
+     */
+    private static SocketAddress combine(SocketAddress socketAddress, 
+            SocketAddress contactAddress) {
+        InetAddress address = NetworkUtils.getAddress(socketAddress);
+        int port = NetworkUtils.getPort(contactAddress);
+        return new InetSocketAddress(address, port);
     }
 }

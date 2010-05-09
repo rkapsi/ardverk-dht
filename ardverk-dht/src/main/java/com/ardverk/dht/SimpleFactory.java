@@ -6,14 +6,13 @@ import java.net.SocketAddress;
 
 import com.ardverk.dht.io.mina.MinaTransport;
 import com.ardverk.dht.io.transport.Transport;
+import com.ardverk.dht.message.AbstractMessageCodec;
 import com.ardverk.dht.message.BencodeMessageCodec;
 import com.ardverk.dht.message.DefaultMessageFactory;
-import com.ardverk.dht.message.AbstractMessageCodec;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.DefaultRouteTable;
 import com.ardverk.dht.routing.RouteTable;
-import com.ardverk.dht.routing.Contact.Type;
 import com.ardverk.dht.storage.Database;
 import com.ardverk.dht.storage.DefaultDatabase;
 
@@ -34,9 +33,7 @@ public class SimpleFactory {
     public static DHT createDHT(SocketAddress address) {
         
         KUID contactId = KUID.createRandom(KEY_SIZE);
-        
-        Contact localhost = new Contact(
-                Type.SOLICITED, contactId, 0, address);
+        Contact localhost = Contact.localhost(contactId, address);
         
         RouteTable routeTable = new DefaultRouteTable(K, localhost);
         
