@@ -1,29 +1,26 @@
 package com.ardverk.dht.message;
 
-import java.util.ServiceLoader;
+import java.io.IOException;
+import java.net.SocketAddress;
 
-import org.ardverk.lang.NullArgumentException;
-
-public abstract class MessageCodec extends MessageCodecSpi {
-
-    private static final ServiceLoader<MessageCodec> codecs 
-        = ServiceLoader.load(MessageCodec.class);
+/**
+ * 
+ */
+public interface MessageCodec {
     
-    public static MessageCodec getCodec(String name) {
-        if (name == null) {
-            throw new NullArgumentException("name");
-        }
-        
-        for (MessageCodec codec : codecs) {
-            if (name.equals(codec.getName())) {
-                return codec;
-            }
-        }
-        
-        throw new IllegalArgumentException("name=" + name);
-    }
-
-    protected MessageCodec(String name) {
-        super(name);
-    }
+    /**
+     * 
+     */
+    public abstract byte[] encode(Message message) throws IOException;
+    
+    /**
+     * 
+     */
+    public Message decode(SocketAddress src, byte[] data) throws IOException;
+    
+    /**
+     * 
+     */
+    public abstract Message decode(SocketAddress src, 
+            byte[] data, int offset, int length) throws IOException;
 }

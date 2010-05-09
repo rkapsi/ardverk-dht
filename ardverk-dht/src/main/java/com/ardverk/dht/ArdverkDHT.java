@@ -22,7 +22,7 @@ import com.ardverk.dht.io.PingResponseHandler;
 import com.ardverk.dht.io.StoreResponseHandler;
 import com.ardverk.dht.io.BootstrapProcess.Config;
 import com.ardverk.dht.io.transport.Transport;
-import com.ardverk.dht.message.MessageCodec;
+import com.ardverk.dht.message.AbstractMessageCodec;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.routing.Contact2;
 import com.ardverk.dht.routing.RouteTable;
@@ -40,7 +40,7 @@ public class ArdverkDHT extends AbstractDHT implements Closeable {
     
     private final MessageDispatcher messageDispatcher;
     
-    public ArdverkDHT(MessageCodec codec, MessageFactory messageFactory, 
+    public ArdverkDHT(AbstractMessageCodec codec, MessageFactory messageFactory, 
             RouteTable routeTable, Database database) {
         
         //this.messageFactory = messageFactory;

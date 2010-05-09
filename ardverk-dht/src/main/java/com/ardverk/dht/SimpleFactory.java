@@ -8,7 +8,7 @@ import com.ardverk.dht.io.mina.MinaTransport;
 import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.message.BencodeMessageCodec;
 import com.ardverk.dht.message.DefaultMessageFactory;
-import com.ardverk.dht.message.MessageCodec;
+import com.ardverk.dht.message.AbstractMessageCodec;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.routing.Contact2;
 import com.ardverk.dht.routing.DefaultRouteTable;
@@ -45,7 +45,7 @@ public class SimpleFactory {
         MessageFactory messageFactory = new DefaultMessageFactory(
                 MESSAGE_ID_SIZE, localhost);
         
-        MessageCodec codec = new BencodeMessageCodec();
+        AbstractMessageCodec codec = new BencodeMessageCodec();
         
         return new ArdverkDHT(codec, messageFactory, routeTable, database);
     }
