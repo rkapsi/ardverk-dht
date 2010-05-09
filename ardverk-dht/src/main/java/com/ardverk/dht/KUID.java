@@ -48,6 +48,14 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
         return new KUID(copy);
     }
     
+    public static KUID create(BigInteger key) {
+        return create(key.toByteArray());
+    }
+    
+    public static KUID create(String key, int radix) {
+        return create(new BigInteger(key, radix));
+    }
+    
     private final byte[] key;
     
     private final int hashCode;
@@ -66,6 +74,14 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
         this.hashCode = Arrays.hashCode(key);
     }
 
+    /**
+     * Returns {@code true} if the given {@link KUID} is compatible with
+     * this {@link KUID}.
+     */
+    public boolean isCompatible(KUID otherId) {
+        return otherId != null && length() == otherId.length();
+    }
+    
     /**
      * Returns the {@link KUID}'s bytes.
      */
