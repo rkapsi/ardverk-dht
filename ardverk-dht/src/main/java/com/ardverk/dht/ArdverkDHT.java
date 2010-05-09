@@ -30,7 +30,7 @@ import com.ardverk.dht.storage.Database;
 
 public class ArdverkDHT extends AbstractDHT implements Closeable {
     
-    private final RequestManager requestManager = new RequestManager();
+    private final FutureManager requestManager = new FutureManager();
     
     private final RouteTable routeTable;
     

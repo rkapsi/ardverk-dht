@@ -13,10 +13,10 @@ import org.ardverk.concurrent.ExecutorUtils;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.concurrent.ArdverkFutureTask;
 
-class RequestManager implements Closeable {
+class FutureManager implements Closeable {
     
     private static final AsyncProcessExecutorService EXECUTOR 
-        = ExecutorUtils.newCachedThreadPool("RequestManagerThread");
+        = ExecutorUtils.newCachedThreadPool("FutureManagerThread");
     
     private boolean open = true;
     
@@ -43,8 +43,8 @@ class RequestManager implements Closeable {
             throw new IllegalStateException();
         }
         
-        AsyncRequestFuture<T> future 
-            = new AsyncRequestFuture<T>(process);
+        ManagedFuture<T> future 
+            = new ManagedFuture<T>(process);
         
         EXECUTOR.execute(future);
         futures.add(future);
@@ -59,8 +59,8 @@ class RequestManager implements Closeable {
             throw new IllegalStateException();
         }
         
-        AsyncRequestFuture<T> future 
-            = new AsyncRequestFuture<T>(process, timeout, unit);
+        ManagedFuture<T> future 
+            = new ManagedFuture<T>(process, timeout, unit);
         
         EXECUTOR.execute(future);
         futures.add(future);
@@ -72,13 +72,13 @@ class RequestManager implements Closeable {
         futures.remove(future);
     }
     
-    private class AsyncRequestFuture<T> extends ArdverkFutureTask<T> {
+    private class ManagedFuture<T> extends ArdverkFutureTask<T> {
         
-        public AsyncRequestFuture(AsyncProcess<T> process) {
+        public ManagedFuture(AsyncProcess<T> process) {
             super(process);
         }
         
-        public AsyncRequestFuture(AsyncProcess<T> process, 
+        public ManagedFuture(AsyncProcess<T> process, 
                 long timeout, TimeUnit unit) {
             super(process, timeout, unit);
         }
