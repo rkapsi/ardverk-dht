@@ -117,10 +117,8 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
             throw new NullArgumentException("otherId");
         }
         
-        int lengthInBits = lengthInBits();
-        if (lengthInBits != otherId.lengthInBits()) {
-            throw new IllegalArgumentException(
-                    "lengthInBits=" + otherId.lengthInBits());
+        if (!isCompatible(otherId)) {
+            throw new IllegalArgumentException("otherId=" + otherId);
         }
 
         byte[] data = new byte[length()];
@@ -400,9 +398,8 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
             return false;
         }
 
-        KUID other = (KUID) obj;
-        return lengthInBits() == other.lengthInBits() 
-                    && Arrays.equals(key, other.key);
+        KUID otherId = (KUID) obj;
+        return Arrays.equals(key, otherId.key);
     }
 
     @Override
