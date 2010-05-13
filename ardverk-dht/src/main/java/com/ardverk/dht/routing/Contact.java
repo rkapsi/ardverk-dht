@@ -20,7 +20,7 @@ import com.ardverk.dht.KUID;
 /**
  * 
  */
-public class Contact implements Comparable<Contact>, Cloneable, Serializable {
+public class Contact implements Comparable<Contact>, Serializable {
     
     private static final long serialVersionUID = 298059770472298142L;
 
@@ -210,7 +210,7 @@ public class Contact implements Comparable<Contact>, Cloneable, Serializable {
     /**
      * 
      */
-    protected Contact(Contact existing, Map<?, ?> attributes) {
+    private Contact(Contact existing, Map<?, ?> attributes) {
         if (existing == null) {
             throw new NullArgumentException("existing");
         }
@@ -237,7 +237,7 @@ public class Contact implements Comparable<Contact>, Cloneable, Serializable {
     /**
      * 
      */
-    protected Contact(Contact existing, int instanceId) {
+    /*protected Contact(Contact existing, int instanceId) {
         if (existing == null) {
             throw new NullArgumentException("existing");
         }
@@ -255,7 +255,7 @@ public class Contact implements Comparable<Contact>, Cloneable, Serializable {
         this.type = existing.type;
         
         this.attributes = existing.attributes;
-    }
+    }*/
     
     /**
      * 
@@ -384,7 +384,8 @@ public class Contact implements Comparable<Contact>, Cloneable, Serializable {
      * 
      */
     public Contact setInstanceId(int instanceId) {
-        return new Contact(this, instanceId);
+        return new Contact(type, contactId, instanceId, 
+                socketAddress, contactAddress, attributes);
     }
     
     /**
@@ -638,11 +639,6 @@ public class Contact implements Comparable<Contact>, Cloneable, Serializable {
      */
     public double getDouble(Object key, double defaultValue) {
         return NumberUtils.getDouble(attributes.get(key), defaultValue);
-    }
-
-    @Override
-    public Contact clone() {
-        return this;
     }
     
     @Override

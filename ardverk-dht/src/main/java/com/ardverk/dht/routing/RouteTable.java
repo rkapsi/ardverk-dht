@@ -3,7 +3,6 @@ package com.ardverk.dht.routing;
 import java.net.SocketAddress;
 
 import com.ardverk.dht.ContactPinger;
-import com.ardverk.dht.DHT;
 import com.ardverk.dht.KUID;
 
 public interface RouteTable {

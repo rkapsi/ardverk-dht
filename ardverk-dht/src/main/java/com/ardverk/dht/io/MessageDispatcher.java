@@ -21,8 +21,8 @@ import org.slf4j.Logger;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.io.transport.TransportCallback;
-import com.ardverk.dht.message.Message;
 import com.ardverk.dht.message.AbstractMessageCodec;
+import com.ardverk.dht.message.Message;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.MessageId;
 import com.ardverk.dht.message.RequestMessage;
@@ -306,7 +306,7 @@ public abstract class MessageDispatcher implements Closeable {
     /**
      * 
      */
-    private class MessageEntityManager implements Closeable {
+    private class MessageEntityManager implements Closeable, TimeProvider {
         
         private final Map<MessageId, MessageEntity> callbacks 
             = Collections.synchronizedMap(new HashMap<MessageId, MessageEntity>());
@@ -378,6 +378,12 @@ public abstract class MessageDispatcher implements Closeable {
         public MessageEntity get(ResponseMessage message) {
             return callbacks.remove(message.getMessageId());
         }
+        
+        @Override
+        public long getTime(MessageId messageId, TimeUnit unit) {
+            MessageEntity entity = callbacks.get(messageId);
+            return entity != null ? entity.getTime(unit) : -1L;
+        }
     }
 
     /**
@@ -421,13 +427,20 @@ public abstract class MessageDispatcher implements Closeable {
             return open.getAndSet(false);
         }
         
+        /**
+         * 
+         */
+        public long getTime(TimeUnit unit) {
+            long time = System.currentTimeMillis() - creationTime;
+            return unit.convert(time, TimeUnit.MILLISECONDS);
+        }
         
         /**
          * 
          */
         public void handleResponse(ResponseMessage response) throws IOException {
             if (cancel()) {
-                long time = System.currentTimeMillis() - creationTime;
+                long time = getTime(TimeUnit.MILLISECONDS);
                 
                 if (entity.check(response)) {
                     MessageDispatcher.this.handleResponse(callback, entity, 
@@ -445,7 +458,7 @@ public abstract class MessageDispatcher implements Closeable {
         public void handleTimeout() throws IOException {
             if (cancel()) {
                 
-                long time = System.currentTimeMillis() - creationTime;
+                long time = getTime(TimeUnit.MILLISECONDS);
                 MessageDispatcher.this.handleTimeout(callback, entity, 
                         time, TimeUnit.MILLISECONDS);
             }
