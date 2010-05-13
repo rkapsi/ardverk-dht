@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 import org.ardverk.collection.CollectionsUtils;
 import org.ardverk.lang.NullArgumentException;
 import org.ardverk.lang.NumberUtils;
+import org.ardverk.lang.PrimitiveProperties;
 import org.ardverk.net.NetworkUtils;
 
 import com.ardverk.dht.KUID;
@@ -20,7 +21,8 @@ import com.ardverk.dht.KUID;
 /**
  * 
  */
-public class Contact implements Comparable<Contact>, Serializable {
+public class Contact implements PrimitiveProperties<Object>, 
+        Comparable<Contact>, Serializable {
     
     private static final long serialVersionUID = 298059770472298142L;
 
@@ -175,7 +177,6 @@ public class Contact implements Comparable<Contact>, Serializable {
             Map<?, ?> attributes,
             long rtt, TimeUnit unit) {
         
-        
         if (type == null) {
             throw new NullArgumentException("type");
         }
@@ -237,7 +238,7 @@ public class Contact implements Comparable<Contact>, Serializable {
     /**
      * 
      */
-    /*protected Contact(Contact existing, int instanceId) {
+    protected Contact(Contact existing, int instanceId) {
         if (existing == null) {
             throw new NullArgumentException("existing");
         }
@@ -255,7 +256,58 @@ public class Contact implements Comparable<Contact>, Serializable {
         this.type = existing.type;
         
         this.attributes = existing.attributes;
-    }*/
+    }
+    
+    protected Contact(Contact existing, long rtt, TimeUnit unit) {
+        if (existing == null) {
+            throw new NullArgumentException("existing");
+        }
+        
+        this.creationTime = existing.creationTime;
+        this.timeStamp = existing.timeStamp;
+        this.rtt = unit.toMillis(rtt);
+        
+        this.contactId = existing.contactId;
+        this.instanceId = existing.instanceId;
+        this.socketAddress = existing.socketAddress;
+        this.contactAddress = existing.contactAddress;
+        this.remoteAddress = existing.remoteAddress;
+        
+        this.type = existing.type;
+        
+        this.attributes = existing.attributes;
+    }
+    
+    protected Contact(Contact existing, 
+            SocketAddress socketAddress, 
+            SocketAddress contactAddress) {
+        
+        if (existing == null) {
+            throw new NullArgumentException("existing");
+        }
+        
+        if (socketAddress == null) {
+            throw new NullArgumentException("socketAddress");
+        }
+        
+        if (contactAddress == null) {
+            throw new NullArgumentException("contactAddress");
+        }
+        
+        this.creationTime = existing.creationTime;
+        this.timeStamp = existing.timeStamp;
+        this.rtt = existing.rtt;
+        
+        this.contactId = existing.contactId;
+        this.instanceId = existing.instanceId;
+        this.socketAddress = socketAddress;
+        this.contactAddress = contactAddress;
+        this.remoteAddress = combine(socketAddress, contactAddress);
+        
+        this.type = existing.type;
+        
+        this.attributes = existing.attributes;
+    }
     
     /**
      * 
@@ -359,11 +411,22 @@ public class Contact implements Comparable<Contact>, Serializable {
         return getTimeSinceLastContact(TimeUnit.MILLISECONDS);
     }
     
+    private static final double MULTIPLIER = 1.5;
+    
     /**
      * Returns the adaptive timeout for this {@link Contact}.
      */
     public long getAdaptiveTimeout(long defaultValue, TimeUnit unit) {
-        return defaultValue;
+        long value = unit.toMillis(defaultValue);
+        
+        long timeout = 0L;
+        if (0L < rtt) {
+            timeout = Math.min((long)(rtt * MULTIPLIER), value);
+        } else {
+            timeout = value;
+        }
+        
+        return unit.convert(timeout, TimeUnit.MILLISECONDS);
     }
     
     /**
@@ -384,8 +447,7 @@ public class Contact implements Comparable<Contact>, Serializable {
      * 
      */
     public Contact setInstanceId(int instanceId) {
-        return new Contact(type, contactId, instanceId, 
-                socketAddress, contactAddress, attributes);
+        return this.instanceId != instanceId ? new Contact(this, instanceId) : this;
     }
     
     /**
@@ -397,11 +459,26 @@ public class Contact implements Comparable<Contact>, Serializable {
     }
     
     /**
+     * Sets the {@link Contact}'s address as reported by the {@link Socket}.
+     */
+    public Contact setSocketAddress(SocketAddress address) {
+        return new Contact(this, address, contactAddress);
+    }
+    
+    /**
      * Returns the {@link Contact}'s address as reported by 
-     * the {@link Contact}.
+     * the remote {@link Contact}.
      */
     public SocketAddress getContactAddress() {
         return contactAddress;
+    }
+    
+    /**
+     * Sets the {@link Contact}'s address as reported by the 
+     * remote {@link Contact}.
+     */
+    public Contact setContactAddress(SocketAddress address) {
+        return new Contact(this, socketAddress, address);
     }
     
     /**
@@ -419,21 +496,23 @@ public class Contact implements Comparable<Contact>, Serializable {
     }
     
     /**
-     * Returns true if the {@link Contact} is of the given {@link Type}
+     * Returns {@code true} if the {@link Contact} is of the given {@link Type}
      */
     public boolean isType(Type type) {
         return type == this.type;
     }
     
     /**
-     * 
+     * Returns {@code true} if this {@link Contact} was discovered 
+     * through solicited communication.
      */
     public boolean isSolicited() {
         return isType(Type.SOLICITED);
     }
     
     /**
-     * 
+     * Returns {@code true} if this {@link Contact} was discovered 
+     * through unsolicited communication.
      */
     public boolean isUnsolicited() {
         return isType(Type.UNSOLICITED);
@@ -449,25 +528,11 @@ public class Contact implements Comparable<Contact>, Serializable {
     }
     
     /**
-     * Changes the {@link Contact2}'s {@link Type}
+     * Changes the {@link Contact}'s Round-Trip-Time (RTT)
      */
-    /*public Contact2 setType(Type type) {
-        return type != this.type ? new Contact2(this, type) : this;
-    }*/
-    
-    /**
-     * Changes the {@link Contact2}'s instance ID
-     */
-    /*public Contact2 setInstanceId(int instanceId) {
-        return instanceId != this.instanceId ? new Contact2(this, instanceId) : this;
-    }*/
-    
-    /**
-     * Changes the {@link Contact2}'s Round-Trip-Time (RTT)
-     */
-    /*public Contact2 setRoundTripTime(long time, TimeUnit unit) {
-        return new Contact2(this, time, unit);
-    }*/
+    public Contact setRoundTripTime(long rtt, TimeUnit unit) {
+        return new Contact(this, rtt, unit);
+    }
     
     /**
      * Returns the {@link Contact}'s Round-Trip-Time (RTT) or a negative 
@@ -486,7 +551,7 @@ public class Contact implements Comparable<Contact>, Serializable {
     }
     
     /**
-     * 
+     * Merges this with the other {@link Contact}.
      */
     public Contact merge(Contact other) {
         return other != this ? new Contact(this, other) : this;
@@ -585,58 +650,42 @@ public class Contact implements Comparable<Contact>, Serializable {
         return Collections.unmodifiableMap(attributes);
     }
     
-    /**
-     * 
-     */
+    @Override
     public boolean getBoolean(Object key) {
         return NumberUtils.getBoolean(attributes.get(key));
     }
     
-    /**
-     * 
-     */
+    @Override
     public boolean getBoolean(Object key, boolean defaultValue) {
         return NumberUtils.getBoolean(attributes.get(key), defaultValue);
     }
     
-    /**
-     * 
-     */
+    @Override
     public int getInteger(Object key) {
         return NumberUtils.getInteger(attributes.get(key));
     }
     
-    /**
-     * 
-     */
+    @Override
     public int getInteger(Object key, int defaultValue) {
         return NumberUtils.getInteger(attributes.get(key), defaultValue);
     }
     
-    /**
-     * 
-     */
+    @Override
     public float getFloat(Object key) {
         return NumberUtils.getFloat(attributes.get(key));
     }
     
-    /**
-     * 
-     */
+    @Override
     public float getFloat(Object key, float defaultValue) {
         return NumberUtils.getFloat(attributes.get(key), defaultValue);
     }
     
-    /**
-     * 
-     */
+    @Override
     public double getDouble(Object key) {
         return NumberUtils.getDouble(attributes.get(key));
     }
     
-    /**
-     * 
-     */
+    @Override
     public double getDouble(Object key, double defaultValue) {
         return NumberUtils.getDouble(attributes.get(key), defaultValue);
     }
@@ -671,8 +720,8 @@ public class Contact implements Comparable<Contact>, Serializable {
             .append(", contactId=").append(contactId)
             .append(", instanceId=").append(instanceId)
             .append(", socketAddress=").append(socketAddress)
-            .append(", contactAddress=").append(contactAddress);
-        
+            .append(", contactAddress=").append(contactAddress)
+            .append(", rtt=").append(rtt);
         return buffer.toString();
     }
 

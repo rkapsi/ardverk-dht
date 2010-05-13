@@ -306,7 +306,7 @@ public abstract class MessageDispatcher implements Closeable {
     /**
      * 
      */
-    private class MessageEntityManager implements Closeable, TimeProvider {
+    private class MessageEntityManager implements Closeable {
         
         private final Map<MessageId, MessageEntity> callbacks 
             = Collections.synchronizedMap(new HashMap<MessageId, MessageEntity>());
@@ -377,12 +377,6 @@ public abstract class MessageDispatcher implements Closeable {
          */
         public MessageEntity get(ResponseMessage message) {
             return callbacks.remove(message.getMessageId());
-        }
-        
-        @Override
-        public long getTime(MessageId messageId, TimeUnit unit) {
-            MessageEntity entity = callbacks.get(messageId);
-            return entity != null ? entity.getTime(unit) : -1L;
         }
     }
 
