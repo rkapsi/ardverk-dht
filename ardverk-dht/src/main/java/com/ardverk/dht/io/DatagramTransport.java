@@ -27,6 +27,8 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
     private static final ExecutorService EXECUTOR 
         = ExecutorUtils.newCachedThreadPool("DatagramTransportThread");
     
+    private final int MAX_SIZE = 8 * 1024;
+    
     private final ExecutorGroup executor 
         = new ExecutorGroup(EXECUTOR);
     
@@ -35,6 +37,8 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
     private volatile DatagramSocket socket = null;
     
     private Future<?> future = null;
+    
+    private boolean open = true;
     
     public DatagramTransport(int port) {
         this(new InetSocketAddress(port));
@@ -58,6 +62,14 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
     
     @Override
     public synchronized void bind(TransportCallback callback) throws IOException {
+        if (!open) {
+            throw new IOException();
+        }
+        
+        super.bind(callback);
+
+        socket = new DatagramSocket(bindaddr);
+
         Runnable task = new Runnable() {
             @Override
             public void run() {
@@ -65,13 +77,13 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
             }
         };
         
-        socket = new DatagramSocket(bindaddr);
         future = EXECUTOR.submit(task);
-        super.bind(callback);
     }
 
     @Override
     public synchronized void unbind() {
+        super.unbind();
+        
         if (socket != null) {
             socket.close();
         }
@@ -83,24 +95,29 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
         synchronized (executor) {
             executor.getQueue().clear();
         }
-        
-        super.unbind();
     }
 
     @Override
     public synchronized void close() {
+        open = false;
         executor.shutdownNow();
         unbind();
     }
     
     private void doServe() {
+        
+        byte[] buffer = new byte[MAX_SIZE];
+        DatagramPacket packet 
+            = new DatagramPacket(buffer, buffer.length);
+        
         DatagramSocket socket = null;
         while ((socket = this.socket) != null 
                 && !socket.isClosed()) {
             
             try {
-                DatagramPacket packet 
-                    = receive(socket);
+                packet.setData(buffer);
+                socket.receive(packet);
+                
                 process(packet);
             } catch (IOException err) {
                 uncaughtException(err);
@@ -108,25 +125,22 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
         }
     }
     
-    private static DatagramPacket receive(DatagramSocket socket) throws IOException {
-        byte[] message = new byte[8 * 1024];
-        DatagramPacket packet = new DatagramPacket(
-                message, 0, message.length);
-        socket.receive(packet);
-        return packet;
-    }
-    
-    private void process(final DatagramPacket packet) throws IOException {
+    private void process(DatagramPacket packet) {
+        
+        final SocketAddress src = packet.getSocketAddress();
+        
+        byte[] data = packet.getData();
+        int offset = packet.getOffset();
+        int length = packet.getLength();
+        
+        final byte[] message = new byte[length];
+        System.arraycopy(data, offset, message, 0, message.length);
+        
         Runnable task = new Runnable() {
             @Override
             public void run() {
-                SocketAddress src = packet.getSocketAddress();
-                byte[] message = packet.getData();
-                int offset = packet.getOffset();
-                int length = packet.getLength();
-                
                 try {
-                    received(src, message, offset, length);
+                    received(src, message, 0, message.length);
                 } catch (IOException err) {
                     uncaughtException(err);
                 }
