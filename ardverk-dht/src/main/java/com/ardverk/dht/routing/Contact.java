@@ -26,6 +26,9 @@ public class Contact implements PrimitiveProperties<Object>,
     
     private static final long serialVersionUID = 298059770472298142L;
 
+    /**
+     * 
+     */
     public static enum Type {
         /**
          * {@link Contact}s that were returned in FIND_NODE responses
