@@ -21,8 +21,8 @@ import org.slf4j.Logger;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.io.transport.TransportCallback;
-import com.ardverk.dht.message.AbstractMessageCodec;
 import com.ardverk.dht.message.Message;
+import com.ardverk.dht.message.MessageCodec;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.MessageId;
 import com.ardverk.dht.message.RequestMessage;
@@ -57,7 +57,7 @@ public abstract class MessageDispatcher implements Closeable {
         
     private final MessageFactory factory;
     
-    private final AbstractMessageCodec codec;
+    private final MessageCodec codec;
     
     private final ResponseChecker checker;
     
@@ -66,7 +66,7 @@ public abstract class MessageDispatcher implements Closeable {
     /**
      * 
      */
-    public MessageDispatcher(MessageFactory factory, AbstractMessageCodec codec) {
+    public MessageDispatcher(MessageFactory factory, MessageCodec codec) {
         
         if (factory == null) {
             throw new NullArgumentException("factory");
@@ -153,7 +153,7 @@ public abstract class MessageDispatcher implements Closeable {
     /**
      * 
      */
-    public AbstractMessageCodec getMessageCodec() {
+    public MessageCodec getMessageCodec() {
         return codec;
     }
     
