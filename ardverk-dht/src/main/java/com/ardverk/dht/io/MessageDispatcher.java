@@ -416,6 +416,9 @@ public abstract class MessageDispatcher implements Closeable {
             this.entity = entity;
         }
 
+        /**
+         * 
+         */
         public boolean cancel() {
             future.cancel(true);
             return open.getAndSet(false);

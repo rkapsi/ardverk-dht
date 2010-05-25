@@ -43,7 +43,8 @@ public class DefaultMessageHandler implements MessageCallback {
             ResponseMessage response, long time, TimeUnit unit) throws IOException {
         
         Contact src = response.getContact();
-        routeTable.add(src);
+        Contact rtt = src.setRoundTripTime(time, unit);
+        routeTable.add(rtt);
     }
     
     public void handleLateResponse(ResponseMessage response) throws IOException {

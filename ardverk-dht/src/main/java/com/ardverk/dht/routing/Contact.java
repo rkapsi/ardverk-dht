@@ -67,6 +67,8 @@ public class Contact implements PrimitiveProperties<Object>,
         }
     }
     
+    private static final double MULTIPLIER = 1.5;
+    
     /**
      * Creates and returns a localhost {@link Contact}.
      */
@@ -413,8 +415,6 @@ public class Contact implements PrimitiveProperties<Object>,
     public long getTimeSinceLastContactInMillis() {
         return getTimeSinceLastContact(TimeUnit.MILLISECONDS);
     }
-    
-    private static final double MULTIPLIER = 1.5;
     
     /**
      * Returns the adaptive timeout for this {@link Contact}.
