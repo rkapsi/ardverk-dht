@@ -12,7 +12,7 @@ import com.ardverk.dht.routing.Contact;
 public interface ContactPinger {
 
     /**
-     * 
+     * Sends a ping to the given host.
      */
     public ArdverkFuture<PingEntity> ping(Contact contact, 
             long timeout, TimeUnit unit);

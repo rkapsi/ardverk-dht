@@ -13,19 +13,19 @@ import com.ardverk.dht.entity.PingEntity;
 public interface AddressPinger {
 
     /**
-     * 
+     * Sends a ping to the given host.
      */
     public ArdverkFuture<PingEntity> ping(
             String address, int port, long timeout, TimeUnit unit);
     
     /**
-     * 
+     * Sends a ping to the given host.
      */
     public ArdverkFuture<PingEntity> ping(
             InetAddress address, int port, long timeout, TimeUnit unit);
     
     /**
-     * 
+     * Sends a ping to the given host.
      */
     public ArdverkFuture<PingEntity> ping(
             SocketAddress address, long timeout, TimeUnit unit);

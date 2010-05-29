@@ -58,15 +58,7 @@ public class ArdverkDHT extends AbstractDHT implements Closeable {
     
     @Override
     public void bind(Transport transport) throws IOException {
-        ContactPinger pinger = new ContactPinger() {
-            @Override
-            public ArdverkFuture<PingEntity> ping(Contact contact, 
-                    long timeout, TimeUnit unit) {
-                return ArdverkDHT.this.ping(contact, timeout, unit);
-            }
-        };
-        
-        routeTable.bind(pinger);
+        routeTable.bind(this);
         messageDispatcher.bind(transport);
     }
 
