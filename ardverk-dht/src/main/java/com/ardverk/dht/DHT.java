@@ -4,8 +4,6 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.concurrent.AsyncProcess;
-
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.entity.BootstrapEntity;
 import com.ardverk.dht.entity.NodeEntity;
@@ -89,6 +87,6 @@ public interface DHT extends AddressPinger, ContactPinger, Closeable {
     /**
      * 
      */
-    public <T> ArdverkFuture<T> submit(AsyncProcess<T> process, 
-            long timeout, TimeUnit unit);
+    /*public <T> ArdverkFuture<T> submit(AsyncProcess<T> process, 
+            long timeout, TimeUnit unit);*/
 }
