@@ -16,8 +16,8 @@ abstract class AbstractValue implements Value {
     
     @Override
     public long getAge(TimeUnit unit) {
-        long time = System.currentTimeMillis() - creationTime;
-        return unit.convert(time, TimeUnit.MILLISECONDS);
+        long age = System.currentTimeMillis() - creationTime;
+        return unit.convert(age, TimeUnit.MILLISECONDS);
     }
 
     @Override
