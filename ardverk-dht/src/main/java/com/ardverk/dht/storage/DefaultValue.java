@@ -1,14 +1,10 @@
 package com.ardverk.dht.storage;
 
-import java.util.concurrent.TimeUnit;
-
 import com.ardverk.coding.CodingUtils;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
 
-public class DefaultValue implements Value {
-    
-    private final long creationTime = System.currentTimeMillis();
+public class DefaultValue extends AbstractValue {
     
     private final Contact src;
     
@@ -20,16 +16,6 @@ public class DefaultValue implements Value {
         this.src = src;
         this.key = key;
         this.value = value;
-    }
-
-    @Override
-    public long getCreationTime() {
-        return creationTime;
-    }
-    
-    @Override
-    public long getAge(TimeUnit unit) {
-        return unit.convert(System.currentTimeMillis() - creationTime, TimeUnit.MILLISECONDS);
     }
 
     @Override

@@ -11,6 +11,8 @@ public interface Value {
     
     public long getAge(TimeUnit unit);
     
+    public long getAgeInMillis();
+    
     public Contact getSource();
 
     public KUID getKey();
