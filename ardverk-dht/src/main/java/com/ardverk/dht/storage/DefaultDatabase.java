@@ -63,8 +63,8 @@ public class DefaultDatabase extends AbstractDatabase {
                 = new Comparator<Value>() {
             @Override
             public int compare(Value o1, Value o2) {
-                KUID xor1 = o1.getKey().xor(key);
-                KUID xor2 = o2.getKey().xor(key);
+                KUID xor1 = o1.getPrimaryKey().xor(key);
+                KUID xor2 = o2.getPrimaryKey().xor(key);
                 return xor1.compareTo(xor2);
             }
         };

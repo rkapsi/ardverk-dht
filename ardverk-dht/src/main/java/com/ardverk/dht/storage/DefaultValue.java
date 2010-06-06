@@ -12,7 +12,7 @@ public class DefaultValue extends AbstractValue {
     
     private final Contact creator;
     
-    private final KUID key;
+    private final KUID primaryKey;
     
     private final byte[] value;
     
@@ -25,12 +25,12 @@ public class DefaultValue extends AbstractValue {
 
         this.sender = sender;
         this.creator = creator;
-        this.key = key;
+        this.primaryKey = key;
         this.value = value;
     }
     
     @Override
-    public KUID getIdentifier() {
+    public KUID getId() {
         return identifier;
     }
 
@@ -45,8 +45,13 @@ public class DefaultValue extends AbstractValue {
     }
 
     @Override
-    public KUID getKey() {
-        return key;
+    public KUID getPrimaryKey() {
+        return primaryKey;
+    }
+    
+    @Override
+    public KUID getSecondaryKey() {
+        return creator.getContactId();
     }
 
     @Override
@@ -56,6 +61,6 @@ public class DefaultValue extends AbstractValue {
     
     @Override
     public String toString() {
-        return key + "={" + sender + ", " + CodingUtils.encodeBase16(value) + "}";
+        return primaryKey + "={" + sender + ", " + CodingUtils.encodeBase16(value) + "}";
     }
 }
