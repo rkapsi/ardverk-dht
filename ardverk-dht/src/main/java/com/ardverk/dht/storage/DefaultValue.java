@@ -1,8 +1,6 @@
 package com.ardverk.dht.storage;
 
-import java.util.concurrent.atomic.AtomicLong;
-
-import org.apache.commons.lang.NullArgumentException;
+import org.ardverk.lang.NullArgumentException;
 
 import com.ardverk.coding.CodingUtils;
 import com.ardverk.dht.KUID;
@@ -11,9 +9,7 @@ import com.ardverk.dht.routing.ContactUtils;
 
 public class DefaultValue extends AbstractValue {
     
-    private static final AtomicLong IDENTIFIER = new AtomicLong();
-    
-    private final long id = IDENTIFIER.incrementAndGet();
+    private final int id = ValueUtils.createId();
     
     private final Contact sender;
     
@@ -53,7 +49,7 @@ public class DefaultValue extends AbstractValue {
     }
     
     @Override
-    public long getId() {
+    public int getId() {
         return id;
     }
 

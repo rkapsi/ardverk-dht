@@ -13,7 +13,7 @@ public interface Value {
     
     public long getAgeInMillis();
     
-    public long getId();
+    public int getId();
     
     public Contact getSender();
     
