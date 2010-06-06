@@ -1,12 +1,19 @@
 package com.ardverk.dht.storage;
 
+import java.util.concurrent.atomic.AtomicLong;
+
+import org.apache.commons.lang.NullArgumentException;
+
 import com.ardverk.coding.CodingUtils;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.ContactUtils;
 
 public class DefaultValue extends AbstractValue {
     
-    private final KUID identifier;
+    private static final AtomicLong IDENTIFIER = new AtomicLong();
+    
+    private final long id = IDENTIFIER.incrementAndGet();
     
     private final Contact sender;
     
@@ -16,22 +23,38 @@ public class DefaultValue extends AbstractValue {
     
     private final byte[] value;
     
-    public DefaultValue(Contact contact, KUID key, byte[] value) {
-        this (contact, contact, key, value);
+    public DefaultValue(Contact contact, KUID primaryKey, byte[] value) {
+        this (contact, contact, primaryKey, value);
     }
     
-    public DefaultValue(Contact sender, Contact creator, KUID key, byte[] value) {
-        this.identifier = KUID.createRandom(key.length());
-
+    public DefaultValue(Contact sender, Contact creator, 
+            KUID primaryKey, byte[] value) {
+        
+        if (sender == null) {
+            throw new NullArgumentException("sender");
+        }
+        
+        if (creator == null) {
+            throw new NullArgumentException("creator");
+        }
+        
+        if (primaryKey == null) {
+            throw new NullArgumentException("primaryKey");
+        }
+        
+        if (value == null) {
+            throw new NullArgumentException("value");
+        }
+        
         this.sender = sender;
-        this.creator = creator;
-        this.primaryKey = key;
+        this.creator = pickCreator(sender, creator);
+        this.primaryKey = primaryKey;
         this.value = value;
     }
     
     @Override
-    public KUID getId() {
-        return identifier;
+    public long getId() {
+        return id;
     }
 
     @Override
@@ -61,6 +84,19 @@ public class DefaultValue extends AbstractValue {
     
     @Override
     public String toString() {
-        return primaryKey + "={" + sender + ", " + CodingUtils.encodeBase16(value) + "}";
+        return primaryKey + "={" + id + ", " + sender + ", " + creator 
+            + ", " + CodingUtils.encodeBase16(value) + "}";
+    }
+    
+    /**
+     * To save memory we're trying to re-use the {@link Contact}
+     * instance if sender and creator are the same.
+     */
+    private static Contact pickCreator(Contact sender, Contact creator) {
+        if (ContactUtils.hasSameContactId(sender, creator)) {
+            return sender;
+        }
+        
+        return creator;
     }
 }
