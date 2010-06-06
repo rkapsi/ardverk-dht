@@ -13,7 +13,11 @@ public interface Value {
     
     public long getAgeInMillis();
     
-    public Contact getSource();
+    public KUID getIdentifier();
+    
+    public Contact getSender();
+    
+    public Contact getCreator();
 
     public KUID getKey();
 

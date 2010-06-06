@@ -6,21 +6,42 @@ import com.ardverk.dht.routing.Contact;
 
 public class DefaultValue extends AbstractValue {
     
-    private final Contact src;
+    private final KUID identifier;
+    
+    private final Contact sender;
+    
+    private final Contact creator;
     
     private final KUID key;
     
     private final byte[] value;
     
-    public DefaultValue(Contact src, KUID key, byte[] value) {
-        this.src = src;
+    public DefaultValue(Contact contact, KUID key, byte[] value) {
+        this (contact, contact, key, value);
+    }
+    
+    public DefaultValue(Contact sender, Contact creator, KUID key, byte[] value) {
+        this.identifier = KUID.createRandom(key.length());
+
+        this.sender = sender;
+        this.creator = creator;
         this.key = key;
         this.value = value;
     }
+    
+    @Override
+    public KUID getIdentifier() {
+        return identifier;
+    }
 
     @Override
-    public Contact getSource() {
-        return src;
+    public Contact getSender() {
+        return sender;
+    }
+    
+    @Override
+    public Contact getCreator() {
+        return creator;
     }
 
     @Override
@@ -35,6 +56,6 @@ public class DefaultValue extends AbstractValue {
     
     @Override
     public String toString() {
-        return key + "={" + src + ", " + CodingUtils.encodeBase16(value) + "}";
+        return key + "={" + sender + ", " + CodingUtils.encodeBase16(value) + "}";
     }
 }
