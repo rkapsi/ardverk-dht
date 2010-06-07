@@ -11,6 +11,11 @@ public interface StoreRequest extends RequestMessage {
     /**
      * 
      */
+    public int getId();
+    
+    /**
+     * 
+     */
     public Contact getCreator();
     
     /**

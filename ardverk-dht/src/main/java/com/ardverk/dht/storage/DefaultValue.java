@@ -1,15 +1,15 @@
 package com.ardverk.dht.storage;
 
+import static com.ardverk.coding.CodingUtils.encodeBase16;
+
 import org.ardverk.lang.NullArgumentException;
 
-import com.ardverk.coding.CodingUtils;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
-import com.ardverk.dht.routing.ContactUtils;
 
 public class DefaultValue extends AbstractValue {
     
-    private final int id = ValueUtils.createId();
+    private final byte[] id;
     
     private final Contact sender;
     
@@ -25,6 +25,12 @@ public class DefaultValue extends AbstractValue {
     
     public DefaultValue(Contact sender, Contact creator, 
             KUID primaryKey, byte[] value) {
+        this (sender, creator, ValueUtils.createId(primaryKey, value), 
+                primaryKey, value);
+    }
+    
+    public DefaultValue(Contact sender, Contact creator, 
+            byte[] id, KUID primaryKey, byte[] value) {
         
         if (sender == null) {
             throw new NullArgumentException("sender");
@@ -32,6 +38,10 @@ public class DefaultValue extends AbstractValue {
         
         if (creator == null) {
             throw new NullArgumentException("creator");
+        }
+        
+        if (id == null) {
+            throw new NullArgumentException("id");
         }
         
         if (primaryKey == null) {
@@ -44,12 +54,13 @@ public class DefaultValue extends AbstractValue {
         
         this.sender = sender;
         this.creator = pickCreator(sender, creator);
+        this.id = id;
         this.primaryKey = primaryKey;
         this.value = value;
     }
     
     @Override
-    public int getId() {
+    public byte[] getId() {
         return id;
     }
 
@@ -80,8 +91,8 @@ public class DefaultValue extends AbstractValue {
     
     @Override
     public String toString() {
-        return primaryKey + "={" + id + ", " + sender + ", " + creator 
-            + ", " + CodingUtils.encodeBase16(value) + "}";
+        return primaryKey + "={" + encodeBase16(id) + ", " + sender 
+            + ", " + creator + ", " + encodeBase16(value) + "}";
     }
     
     /**
@@ -89,7 +100,7 @@ public class DefaultValue extends AbstractValue {
      * instance if sender and creator are the same.
      */
     private static Contact pickCreator(Contact sender, Contact creator) {
-        if (ContactUtils.hasSameContactId(sender, creator)) {
+        if (sender.equals(creator)) {
             return sender;
         }
         

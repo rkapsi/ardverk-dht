@@ -65,13 +65,6 @@ public class ContactUtils {
         return contacts;
     }
     
-    /**
-     * Returns {@code true} if both {@link Contact}s have the same {@link KUID}.
-     */
-    public static boolean hasSameContactId(Contact a, Contact b) {
-        return a == b || a.getContactId().equals(b.getContactId());
-    }
-    
     private static class ContactHandle {
         
         private final Contact contact;

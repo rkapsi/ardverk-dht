@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -95,6 +96,13 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
     public byte[] getBytes(byte[] dst, int destPos) {
         System.arraycopy(key, 0, dst, destPos, key.length);
         return dst;
+    }
+    
+    /**
+     * 
+     */
+    public void update(MessageDigest md) {
+        md.update(key);
     }
     
     /**
