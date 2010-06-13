@@ -9,11 +9,11 @@ import java.util.Arrays;
 import java.util.Random;
 
 import org.apache.commons.lang.NullArgumentException;
+import org.ardverk.coding.CodingUtils;
 import org.ardverk.collection.ByteArrayKeyAnalyzer;
 import org.ardverk.collection.KeyAnalyzer;
 import org.ardverk.io.Writable;
 
-import com.ardverk.coding.CodingUtils;
 import com.ardverk.dht.security.SecurityUtils;
 import com.ardverk.lang.Negation;
 import com.ardverk.lang.Xor;
@@ -439,9 +439,17 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
         return CodingUtils.encodeBase16(key);
     }
     
+    /**
+     * Returns the {@link KUID}'s value as a Base 2 (bin) encoded String.
+     */
+    public String toBinString() {
+        return CodingUtils.encodeBase2(key);
+    }
+    
     @Override
     public String toString() {
-        return toHexString();
+        //return toHexString();
+        return toBinString();
     }
     
     public static KeyAnalyzer<KUID> createKeyAnalyzer(KUID key) {
