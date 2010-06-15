@@ -23,6 +23,8 @@ import com.ardverk.dht.entity.LookupEntity;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
+import com.ardverk.dht.settings.KademliaSettings;
+import com.ardverk.dht.settings.LookupSettings;
 import com.ardverk.dht.utils.SchedulingUtils;
 import com.ardverk.logging.LoggerUtils;
 
@@ -31,8 +33,8 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     
     private static final Logger LOG 
         = LoggerUtils.getLogger(LookupResponseHandler.class);
-        
-    private static final int ALPHA = 4;
+    
+    protected final LookupSettings settings = new LookupSettings();
     
     private final LookupManager lookupManager;
     
@@ -48,21 +50,17 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     
     public LookupResponseHandler(MessageDispatcher messageDispatcher, 
             RouteTable routeTable, KUID key) {
-        this(messageDispatcher, routeTable, key, ALPHA);
-    }
-    
-    public LookupResponseHandler(MessageDispatcher messageDispatcher, 
-            RouteTable routeTable, KUID key, int alpha) {
         super(messageDispatcher);
         
         lookupManager = new LookupManager(routeTable, key);
-        lookupCounter = new ProcessCounter(alpha);
+        lookupCounter = new ProcessCounter(settings.getAlpha());
     }
 
     @Override
     protected synchronized void go(AsyncFuture<T> future) throws IOException {
         
-        long boostFrequency = 1000L;
+        long boostFrequency = settings.getBoostFrequencyInMillis();
+        
         if (0L < boostFrequency) {
             Runnable task = new Runnable() {
                 @Override
@@ -76,7 +74,8 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
             };
             
             boostFuture = SchedulingUtils.scheduleWithFixedDelay(
-                    task, boostFrequency, boostFrequency, TimeUnit.MILLISECONDS);
+                    task, boostFrequency, boostFrequency, 
+                    TimeUnit.MILLISECONDS);
         }
         
         process(0);
@@ -94,10 +93,11 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
      */
     private synchronized void boost() throws IOException {
         if (lookupManager.hasNext(true)) {
-            long boostTimeout = 1000L;
+            long boostTimeout = settings.getBoostTimeoutInMillis();
             if (getLastResponseTime(TimeUnit.MILLISECONDS) >= boostTimeout) {
                 try {
                     Contact contact = lookupManager.next();
+                    
                     lookup(contact, lookupManager.key, timeout, unit);
                     lookupCounter.increment(true);
                 } finally {
@@ -221,11 +221,11 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     /**
      * 
      */
-    private static class LookupManager {
+    private class LookupManager {
         
-        private static final boolean EXHAUSTIVE = false;
+        private final boolean exhaustive = settings.isExhaustive();
         
-        private static final boolean RANDOMIZE = true;
+        private final boolean randomize = settings.isRandomize();
         
         private final RouteTable routeTable;
         
@@ -364,10 +364,11 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         
         public boolean hasNext(boolean force) {
             if (!query.isEmpty()) {
+                
                 Contact contact = query.first();
-                if (force || closest.size() < routeTable.getK() 
-                        || isCloserThanClosest(contact) 
-                        || EXHAUSTIVE) {
+                if (force || exhaustive
+                        || closest.size() < KademliaSettings.K 
+                        || isCloserThanClosest(contact)) {
                     return true;
                 }
             }
@@ -378,7 +379,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         public Contact next() {
             Contact contact = null;
             
-            if (RANDOMIZE) {
+            if (randomize) {
                 
                 // TODO: There is a much better way to do this!
                 if (!query.isEmpty()) {

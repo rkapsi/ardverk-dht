@@ -1,9 +1,9 @@
 package com.ardverk.dht.io;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import org.ardverk.collection.FixedSizeArrayList;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.entity.DefaultValueEntity;
@@ -18,18 +18,13 @@ import com.ardverk.dht.routing.RouteTable;
 
 public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     
-    private static final boolean EXHAUSTIVE = false;
+    private final FixedSizeArrayList<byte[]> values;
     
-    private final List<byte[]> values = new ArrayList<byte[]>();
-    
-    public ValueResponseHandler(MessageDispatcher messageDispatcher,
-            RouteTable routeTable, KUID key, int alpha) {
-        super(messageDispatcher, routeTable, key, alpha);
-    }
-
     public ValueResponseHandler(MessageDispatcher messageDispatcher,
             RouteTable routeTable, KUID key) {
         super(messageDispatcher, routeTable, key);
+        
+        values = new FixedSizeArrayList<byte[]>(settings.getR());
     }
 
     @Override
@@ -57,7 +52,7 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
         
         values.add(response.getValue());
         
-        if (!EXHAUSTIVE) {
+        if (values.isFull()) {
             State state = getState();
             setValue(new DefaultValueEntity(state, response.getValue()));
         }

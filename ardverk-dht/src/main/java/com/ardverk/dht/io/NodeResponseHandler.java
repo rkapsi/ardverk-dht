@@ -14,12 +14,7 @@ import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 
 public class NodeResponseHandler extends LookupResponseHandler<NodeEntity> {
-
-    public NodeResponseHandler(MessageDispatcher messageDispatcher,
-            RouteTable routeTable, KUID key, int alpha) {
-        super(messageDispatcher, routeTable, key, alpha);
-    }
-
+    
     public NodeResponseHandler(MessageDispatcher messageDispatcher,
             RouteTable routeTable, KUID key) {
         super(messageDispatcher, routeTable, key);

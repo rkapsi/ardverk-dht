@@ -1,6 +1,6 @@
 package com.ardverk.dht.storage;
 
-import static com.ardverk.coding.CodingUtils.encodeBase16;
+import static org.ardverk.coding.CodingUtils.encodeBase16;
 
 import org.ardverk.lang.NullArgumentException;
 
