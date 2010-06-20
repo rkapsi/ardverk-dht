@@ -15,17 +15,17 @@ import com.ardverk.dht.message.ValueRequest;
 import com.ardverk.dht.message.ValueResponse;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
-import com.ardverk.dht.storage.Value;
+import com.ardverk.dht.storage.ValueTuple;
 
 public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     
-    private final FixedSizeArrayList<Value> values;
+    private final FixedSizeArrayList<ValueTuple> tuples;
     
     public ValueResponseHandler(MessageDispatcher messageDispatcher,
             RouteTable routeTable, KUID key) {
         super(messageDispatcher, routeTable, key);
         
-        values = new FixedSizeArrayList<Value>(settings.getR());
+        tuples = new FixedSizeArrayList<ValueTuple>(settings.getR());
     }
 
     @Override
@@ -51,12 +51,12 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     private synchronized void processValueResponse(ValueResponse response, 
             long time, TimeUnit unit) throws IOException {
         
-        Value value = response.getValue();
-        values.add(value);
+        ValueTuple tuple = response.getValueTuple();
+        tuples.add(tuple);
         
-        if (values.isFull()) {
+        if (tuples.isFull()) {
             State state = getState();
-            setValue(new DefaultValueEntity(state, value));
+            setValue(new DefaultValueEntity(state, tuple));
         }
     }
     
@@ -74,10 +74,10 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     @Override
     protected void complete(State state) {
         
-        if (values.isEmpty()) {
+        if (tuples.isEmpty()) {
             setException(new NoSuchValueException(state));
         } else {
-            setValue(new DefaultValueEntity(state, values.get(0)));
+            setValue(new DefaultValueEntity(state, tuples.get(0)));
         }
     }
     

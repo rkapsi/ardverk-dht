@@ -6,7 +6,7 @@ import org.ardverk.lang.Arguments;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
-import com.ardverk.dht.storage.Value;
+import com.ardverk.dht.storage.ValueTuple;
 import com.ardverk.dht.storage.Database.Condition;
 
 public class DefaultMessageFactory extends AbstractMessageFactory {
@@ -61,19 +61,19 @@ public class DefaultMessageFactory extends AbstractMessageFactory {
     }
 
     @Override
-    public ValueResponse createValueResponse(LookupRequest request, Value value) {
+    public ValueResponse createValueResponse(LookupRequest request, ValueTuple tuple) {
         Contact dst = request.getContact();
         SocketAddress address = dst.getRemoteAddress();
         MessageId messageId = request.getMessageId();
         
-        return new DefaultValueResponse(messageId, localhost, address, value);
+        return new DefaultValueResponse(messageId, localhost, address, tuple);
     }
 
     @Override
-    public StoreRequest createStoreRequest(Contact dst, Value value) {
+    public StoreRequest createStoreRequest(Contact dst, ValueTuple tuple) {
         SocketAddress address = dst.getRemoteAddress();
         MessageId messageId = createMessageId(address);
-        return new DefaultStoreRequest(messageId, localhost, address, value);
+        return new DefaultStoreRequest(messageId, localhost, address, tuple);
     }
 
     @Override

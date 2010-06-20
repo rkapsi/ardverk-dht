@@ -11,13 +11,13 @@ public interface Database {
         public String name();
     }
     
-    public Condition store(Value value);
+    public Condition store(ValueTuple value);
     
-    public Value get(KUID key);
+    public ValueTuple get(KUID key);
     
-    public Value[] select(KUID key);
+    public ValueTuple[] select(KUID key);
     
-    public Value[] values();
+    public ValueTuple[] values();
     
     public int size();
     

@@ -13,8 +13,10 @@ import org.ardverk.coding.BencodingInputStream;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.Contact.Type;
-import com.ardverk.dht.storage.DefaultValue;
-import com.ardverk.dht.storage.Value;
+import com.ardverk.dht.storage.DefaultValueTuple;
+import com.ardverk.dht.storage.DefaultValueX;
+import com.ardverk.dht.storage.ValueTuple;
+import com.ardverk.dht.storage.ValueX;
 import com.ardverk.dht.storage.Database.Condition;
 import com.ardverk.dht.storage.DefaultDatabase.DefaultCondition;
 import com.ardverk.enumeration.IntegerValue;
@@ -103,14 +105,20 @@ class MessageInputStream extends BencodingInputStream {
         return DefaultCondition.valueOf(value);
     }
     
-    public Value readValue(Contact contact, SocketAddress address) throws IOException {
+    public ValueTuple readValueTuple(Contact contact, 
+            SocketAddress address) throws IOException {
         Contact creator = readContact(Type.UNKNOWN, address);
-        byte[] id = readBytes();
+        ValueX value = readValue();
         
-        KUID primaryKey = readKUID();
+        return new DefaultValueTuple(contact, creator, value);
+    }
+    
+    public ValueX readValue() throws IOException {
+        byte[] id = readBytes();
+        KUID key = readKUID();
         byte[] value = readBytes();
         
-        return new DefaultValue(contact, creator, id, primaryKey, value);
+        return new DefaultValueX(id, key, value);
     }
     
     public Message readMessage(SocketAddress src) throws IOException {
@@ -179,14 +187,14 @@ class MessageInputStream extends BencodingInputStream {
     private ValueResponse readValueResponse(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
         
-        Value value = readValue(contact, address);
+        ValueTuple value = readValueTuple(contact, address);
         return new DefaultValueResponse(messageId, contact, address, value);
     }
     
     private StoreRequest readStoreRequest(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
         
-        Value value = readValue(contact, address);
+        ValueTuple value = readValueTuple(contact, address);
         return new DefaultStoreRequest(messageId, contact, address, value);
     }
     

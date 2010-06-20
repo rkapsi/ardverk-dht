@@ -3,9 +3,9 @@ package com.ardverk.dht.storage;
 import java.util.concurrent.TimeUnit;
 
 /**
- * An abstract implementation of {@link Value}.
+ * An abstract implementation of {@link ValueTuple}.
  */
-abstract class AbstractValue implements Value {
+abstract class AbstractValueTuple implements ValueTuple {
 
     private final long creationTime = System.currentTimeMillis();
     
@@ -23,10 +23,5 @@ abstract class AbstractValue implements Value {
     @Override
     public long getAgeInMillis() {
         return getAge(TimeUnit.MILLISECONDS);
-    }
-    
-    @Override
-    public boolean isEmpty() {
-        return size() == 0;
     }
 }

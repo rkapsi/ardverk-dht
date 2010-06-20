@@ -5,22 +5,22 @@ import java.net.SocketAddress;
 import org.ardverk.lang.Arguments;
 
 import com.ardverk.dht.routing.Contact;
-import com.ardverk.dht.storage.Value;
+import com.ardverk.dht.storage.ValueTuple;
 
 public class DefaultValueResponse extends AbstractLookupResponse 
         implements ValueResponse {
     
-    private final Value value;
+    private final ValueTuple tuple;
     
     public DefaultValueResponse(MessageId messageId, Contact contact, 
-            SocketAddress address, Value value) {
+            SocketAddress address, ValueTuple tuple) {
         super(messageId, contact, address);
         
-        this.value = Arguments.notNull(value, "value");
+        this.tuple = Arguments.notNull(tuple, "tuple");
     }
     
     @Override
-    public Value getValue() {
-        return value;
+    public ValueTuple getValueTuple() {
+        return tuple;
     }
 }

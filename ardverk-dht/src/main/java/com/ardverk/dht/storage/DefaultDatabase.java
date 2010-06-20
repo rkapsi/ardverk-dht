@@ -19,16 +19,16 @@ public class DefaultDatabase extends AbstractDatabase {
         }
     }
     
-    private final Map<KUID, Value> database 
-        = new ConcurrentHashMap<KUID, Value>();
+    private final Map<KUID, ValueTuple> database 
+        = new ConcurrentHashMap<KUID, ValueTuple>();
     
     @Override
-    public Value get(KUID key) {
+    public ValueTuple get(KUID key) {
         return database.get(key);
     }
 
     @Override
-    public Condition store(Value value) {
+    public Condition store(ValueTuple value) {
         KUID primaryKey = value.getPrimaryKey();
         
         if (!value.isEmpty()) {
@@ -46,12 +46,12 @@ public class DefaultDatabase extends AbstractDatabase {
     }
     
     @Override
-    public Value[] select(final KUID key) {
-        Value[] values = values();
-        Comparator<Value> comparator 
-                = new Comparator<Value>() {
+    public ValueTuple[] select(final KUID key) {
+        ValueTuple[] values = values();
+        Comparator<ValueTuple> comparator 
+                = new Comparator<ValueTuple>() {
             @Override
-            public int compare(Value o1, Value o2) {
+            public int compare(ValueTuple o1, ValueTuple o2) {
                 KUID xor1 = o1.getPrimaryKey().xor(key);
                 KUID xor2 = o2.getPrimaryKey().xor(key);
                 return xor1.compareTo(xor2);
@@ -63,15 +63,15 @@ public class DefaultDatabase extends AbstractDatabase {
     }
     
     @Override
-    public Value[] values() {
-        return database.values().toArray(new Value[0]);
+    public ValueTuple[] values() {
+        return database.values().toArray(new ValueTuple[0]);
     }
 
     @Override
     public String toString() {
         StringBuilder buffer = new StringBuilder();
         
-        for (Value entity : database.values()) {
+        for (ValueTuple entity : database.values()) {
             buffer.append(entity).append("\n");
         }
         

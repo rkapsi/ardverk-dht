@@ -1,6 +1,6 @@
 package com.ardverk.dht.message;
 
-import com.ardverk.dht.storage.Value;
+import com.ardverk.dht.storage.ValueTuple;
 
 /**
  * 
@@ -10,5 +10,5 @@ public interface StoreRequest extends RequestMessage {
     /**
      * 
      */
-    public Value getValue();
+    public ValueTuple getValueTuple();
 }

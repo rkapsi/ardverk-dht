@@ -16,7 +16,7 @@ import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.message.StoreRequest;
 import com.ardverk.dht.message.StoreResponse;
 import com.ardverk.dht.routing.Contact;
-import com.ardverk.dht.storage.Value;
+import com.ardverk.dht.storage.ValueTuple;
 
 public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
 
@@ -28,7 +28,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     
     private final StoreManager storeManager;
     
-    private final Value value;
+    private final ValueTuple tuple;
     
     private final long timeout;
     
@@ -43,19 +43,19 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     
     public StoreResponseHandler(
             MessageDispatcher messageDispatcher, 
-            NodeEntity entity, Value value) {
-        this(messageDispatcher, entity, value, 10L, TimeUnit.SECONDS);
+            NodeEntity entity, ValueTuple tuple) {
+        this(messageDispatcher, entity, tuple, 10L, TimeUnit.SECONDS);
     }
     
     public StoreResponseHandler(
             MessageDispatcher messageDispatcher, 
-            NodeEntity entity, Value value, 
+            NodeEntity entity, ValueTuple tuple, 
             long timeout, TimeUnit unit) {
         super(messageDispatcher);
         
         this.storeManager = new StoreManager(entity);
         
-        this.value = Arguments.notNull(value, "value");
+        this.tuple = Arguments.notNull(tuple, "tuple");
         
         this.timeout = Arguments.notNegative(timeout, "timeout");
         this.unit = Arguments.notNull(unit, "unit");
@@ -110,7 +110,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     
     private synchronized void store(Contact dst) throws IOException {
         MessageFactory factory = messageDispatcher.getMessageFactory();
-        StoreRequest request = factory.createStoreRequest(dst, value);
+        StoreRequest request = factory.createStoreRequest(dst, tuple);
         
         long adaptiveTimeout = dst.getAdaptiveTimeout(timeout, unit);
         send(dst, request, adaptiveTimeout, unit);

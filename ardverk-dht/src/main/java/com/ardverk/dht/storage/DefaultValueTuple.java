@@ -1,49 +1,33 @@
 package com.ardverk.dht.storage;
 
-import static org.ardverk.coding.CodingUtils.encodeBase16;
-
 import org.ardverk.lang.Arguments;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
 
-public class DefaultValue extends AbstractValue {
-    
-    private final byte[] id;
+public class DefaultValueTuple extends AbstractValueTuple {
     
     private final Contact sender;
     
     private final Contact creator;
     
-    private final KUID primaryKey;
+    private final ValueX value;
     
-    private final byte[] value;
-    
-    public DefaultValue(Contact contact, KUID primaryKey, byte[] value) {
-        this (contact, contact, primaryKey, value);
+    public DefaultValueTuple(Contact contact, KUID key, byte[] value) {
+        this (contact, new DefaultValueX(key, value));
     }
     
-    public DefaultValue(Contact sender, Contact creator, 
-            KUID primaryKey, byte[] value) {
-        this (sender, creator, ValueUtils.createId(primaryKey, value), 
-                primaryKey, value);
+    public DefaultValueTuple(Contact contact, ValueX value) {
+        this (contact, contact, value);
     }
     
-    public DefaultValue(Contact sender, Contact creator, 
-            byte[] id, KUID primaryKey, byte[] value) {
+    public DefaultValueTuple(Contact sender, Contact creator, ValueX value) {
         
         this.sender = Arguments.notNull(sender, "sender");
         this.creator = Arguments.notNull(
                 pickCreator(sender, creator), "creator");
         
-        this.id = id;
-        this.primaryKey = Arguments.notNull(primaryKey, "primaryKey");
         this.value = Arguments.notNull(value, "value");
-    }
-    
-    @Override
-    public byte[] getId() {
-        return id;
     }
 
     @Override
@@ -58,28 +42,22 @@ public class DefaultValue extends AbstractValue {
 
     @Override
     public KUID getPrimaryKey() {
-        return primaryKey;
+        return value.getKey();
     }
     
     @Override
     public KUID getSecondaryKey() {
         return creator.getContactId();
     }
-
+    
     @Override
-    public byte[] getValue() {
+    public boolean isEmpty() {
+        return value.isEmpty();
+    }
+    
+    @Override
+    public ValueX getValue() {
         return value;
-    }
-    
-    @Override
-    public int size() {
-        return value != null ? value.length : 0;
-    }
-    
-    @Override
-    public String toString() {
-        return primaryKey + "={" + encodeBase16(id) + ", " + sender 
-            + ", " + creator + ", " + encodeBase16(value) + "}";
     }
     
     /**

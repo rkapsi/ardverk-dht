@@ -10,7 +10,7 @@ import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.message.StoreRequest;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
-import com.ardverk.dht.storage.Value;
+import com.ardverk.dht.storage.ValueTuple;
 import com.ardverk.dht.storage.Database.Condition;
 
 public class StoreRequestHandler extends AbstractRequestHandler {
@@ -42,9 +42,8 @@ public class StoreRequestHandler extends AbstractRequestHandler {
         
         StoreRequest request = (StoreRequest)message;
         
-        Value value = request.getValue();
-        
-        Condition status = database.store(value);
+        ValueTuple tuple = request.getValueTuple();
+        Condition status = database.store(tuple);
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
         ResponseMessage response = factory.createStoreResponse(request, status);
