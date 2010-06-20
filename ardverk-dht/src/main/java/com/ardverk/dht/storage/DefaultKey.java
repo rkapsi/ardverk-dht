@@ -16,4 +16,19 @@ public class DefaultKey implements Key {
     public KUID getPrimaryKey() {
         return primaryKey;
     }
+    
+    public int hashCode() {
+        return primaryKey.hashCode();
+    }
+    
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        } else if (!(o instanceof Key)) {
+            return false;
+        }
+        
+        Key other = (Key)o;
+        return primaryKey.equals(other.getPrimaryKey());
+    }
 }
