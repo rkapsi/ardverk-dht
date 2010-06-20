@@ -2,24 +2,21 @@ package com.ardverk.dht.message;
 
 import java.net.SocketAddress;
 
-import org.ardverk.lang.NullArgumentException;
+import org.ardverk.lang.Arguments;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.storage.Value;
 import com.ardverk.dht.storage.Database.Condition;
 
 public class DefaultMessageFactory extends AbstractMessageFactory {
 
-    private final Contact contact;
+    private final Contact localhost;
     
-    public DefaultMessageFactory(int length, Contact contact) {
+    public DefaultMessageFactory(int length, Contact localhost) {
         super(length);
         
-        if (contact == null) {
-            throw new NullArgumentException("contact");
-        }
-        
-        this.contact = contact;
+        this.localhost = Arguments.notNull(localhost, "localhost");
     }
     
     @Override
@@ -30,7 +27,7 @@ public class DefaultMessageFactory extends AbstractMessageFactory {
     @Override
     public PingRequest createPingRequest(SocketAddress dst) {
         MessageId messageId = createMessageId(dst);
-        return new DefaultPingRequest(messageId, contact, dst);
+        return new DefaultPingRequest(messageId, localhost, dst);
     }
 
     @Override
@@ -38,14 +35,14 @@ public class DefaultMessageFactory extends AbstractMessageFactory {
         Contact dst = request.getContact();
         SocketAddress address = dst.getRemoteAddress();
         MessageId messageId = request.getMessageId();
-        return new DefaultPingResponse(messageId, contact, address);
+        return new DefaultPingResponse(messageId, localhost, address);
     }
 
     @Override
     public NodeRequest createNodeRequest(Contact dst, KUID key) {
         SocketAddress address = dst.getRemoteAddress();
         MessageId messageId = createMessageId(address);
-        return new DefaultNodeRequest(messageId, contact, address, key);
+        return new DefaultNodeRequest(messageId, localhost, address, key);
     }
 
     @Override
@@ -53,29 +50,30 @@ public class DefaultMessageFactory extends AbstractMessageFactory {
         Contact dst = request.getContact();
         SocketAddress address = dst.getRemoteAddress();
         MessageId messageId = request.getMessageId();
-        return new DefaultNodeResponse(messageId, contact, address, contacts);
+        return new DefaultNodeResponse(messageId, localhost, address, contacts);
     }
 
     @Override
     public ValueRequest createValueRequest(Contact dst, KUID key) {
         SocketAddress address = dst.getRemoteAddress();
         MessageId messageId = createMessageId(address);
-        return new DefaultValueRequest(messageId, contact, address, key);
+        return new DefaultValueRequest(messageId, localhost, address, key);
     }
 
     @Override
-    public ValueResponse createValueResponse(LookupRequest request, byte[] value) {
+    public ValueResponse createValueResponse(LookupRequest request, Value value) {
         Contact dst = request.getContact();
         SocketAddress address = dst.getRemoteAddress();
         MessageId messageId = request.getMessageId();
-        return new DefaultValueResponse(messageId, contact, address, value);
+        
+        return new DefaultValueResponse(messageId, localhost, address, value);
     }
 
     @Override
-    public StoreRequest createStoreRequest(Contact dst, KUID key, byte[] value) {
+    public StoreRequest createStoreRequest(Contact dst, Value value) {
         SocketAddress address = dst.getRemoteAddress();
         MessageId messageId = createMessageId(address);
-        return new DefaultStoreRequest(messageId, contact, address, key, value);
+        return new DefaultStoreRequest(messageId, localhost, address, value);
     }
 
     @Override
@@ -83,6 +81,6 @@ public class DefaultMessageFactory extends AbstractMessageFactory {
         Contact dst = request.getContact();
         SocketAddress address = dst.getRemoteAddress();
         MessageId messageId = request.getMessageId();
-        return new DefaultStoreResponse(messageId, contact, address, status);
+        return new DefaultStoreResponse(messageId, localhost, address, status);
     }
 }

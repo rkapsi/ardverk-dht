@@ -15,16 +15,17 @@ import com.ardverk.dht.message.ValueRequest;
 import com.ardverk.dht.message.ValueResponse;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
+import com.ardverk.dht.storage.Value;
 
 public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     
-    private final FixedSizeArrayList<byte[]> values;
+    private final FixedSizeArrayList<Value> values;
     
     public ValueResponseHandler(MessageDispatcher messageDispatcher,
             RouteTable routeTable, KUID key) {
         super(messageDispatcher, routeTable, key);
         
-        values = new FixedSizeArrayList<byte[]>(settings.getR());
+        values = new FixedSizeArrayList<Value>(settings.getR());
     }
 
     @Override
@@ -50,11 +51,12 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     private synchronized void processValueResponse(ValueResponse response, 
             long time, TimeUnit unit) throws IOException {
         
-        values.add(response.getValue());
+        Value value = response.getValue();
+        values.add(value);
         
         if (values.isFull()) {
             State state = getState();
-            setValue(new DefaultValueEntity(state, response.getValue()));
+            setValue(new DefaultValueEntity(state, value));
         }
     }
     

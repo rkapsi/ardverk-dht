@@ -448,8 +448,8 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
     
     @Override
     public String toString() {
-        //return toHexString();
-        return toBinString();
+        return toHexString();
+        //return toBinString();
     }
     
     public static KeyAnalyzer<KUID> createKeyAnalyzer(KUID key) {

@@ -27,6 +27,8 @@ import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
+import com.ardverk.dht.storage.DefaultValue;
+import com.ardverk.dht.storage.Value;
 
 public class ArdverkDHT extends AbstractDHT implements Closeable {
     
@@ -147,8 +149,12 @@ public class ArdverkDHT extends AbstractDHT implements Closeable {
     @Override
     public ArdverkFuture<StoreEntity> put(KUID key, byte[] value, 
             long timeout, TimeUnit unit) {
+        Contact localhost = routeTable.getLocalhost();
+        Value tuple = new DefaultValue(localhost, key, value);
+        
         AsyncProcess<StoreEntity> process 
-            = new StoreResponseHandler(messageDispatcher, null, key, value);
+            = new StoreResponseHandler(messageDispatcher, 
+                    StoreResponseHandler.DEFAULT, tuple);
         return submit(process, timeout, unit);
     }
     

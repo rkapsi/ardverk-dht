@@ -5,10 +5,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.ardverk.lang.NullArgumentException;
-
 import com.ardverk.dht.KUID;
-import com.ardverk.dht.routing.Contact;
 
 public class DefaultDatabase extends AbstractDatabase {
 
@@ -22,8 +19,8 @@ public class DefaultDatabase extends AbstractDatabase {
         }
     }
     
-    private final Map<KUID, DefaultValue> database 
-        = new ConcurrentHashMap<KUID, DefaultValue>();
+    private final Map<KUID, Value> database 
+        = new ConcurrentHashMap<KUID, Value>();
     
     @Override
     public Value get(KUID key) {
@@ -31,22 +28,18 @@ public class DefaultDatabase extends AbstractDatabase {
     }
 
     @Override
-    public Condition store(Contact src, KUID key, byte[] value) {
-        if (value != null) {
-            database.put(key, new DefaultValue(src, key, value));
+    public Condition store(Value value) {
+        KUID primaryKey = value.getPrimaryKey();
+        
+        if (!value.isEmpty()) {
+            database.put(primaryKey, value);
         } else {
-            database.remove(key);
+            database.remove(primaryKey);
         }
         
         return DefaultCondition.SUCCESS;
     }
     
-    @Override
-    public byte[] lookup(KUID key) {
-        Value entity = database.get(key);
-        return entity != null ? entity.getValue() : null;
-    }
-
     @Override
     public int size() {
         return database.size();
@@ -54,10 +47,6 @@ public class DefaultDatabase extends AbstractDatabase {
     
     @Override
     public Value[] select(final KUID key) {
-        if (key == null) {
-            throw new NullArgumentException("key");
-        }
-        
         Value[] values = values();
         Comparator<Value> comparator 
                 = new Comparator<Value>() {

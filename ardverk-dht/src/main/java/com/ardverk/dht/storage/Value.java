@@ -24,4 +24,8 @@ public interface Value {
     public KUID getSecondaryKey();
 
     public byte[] getValue();
+    
+    public int size();
+    
+    public boolean isEmpty();
 }

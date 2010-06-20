@@ -10,6 +10,7 @@ import org.ardverk.coding.BencodingOutputStream;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.storage.Value;
 import com.ardverk.dht.storage.Database.Condition;
 import com.ardverk.enumeration.IntegerValue;
 import com.ardverk.enumeration.StringValue;
@@ -81,6 +82,13 @@ class MessageOutputStream extends BencodingOutputStream {
         writeString(status.name());
     }
     
+    public void writeValue(Value value) throws IOException {
+        writeContact(value.getCreator());
+        writeBytes(value.getId());
+        writeKUID(value.getPrimaryKey());
+        writeBytes(value.getValue());
+    }
+    
     public void writeMessage(Message message) throws IOException {
         
         writeByte(MessageUtils.VERSION);
@@ -147,12 +155,11 @@ class MessageOutputStream extends BencodingOutputStream {
     }
     
     private void writeValueResponse(ValueResponse message) throws IOException {
-        writeBytes(message.getValue());
+        writeValue(message.getValue());
     }
     
     private void writeStoreRequest(StoreRequest message) throws IOException {
-        writeKUID(message.getKey());
-        writeBytes(message.getValue());
+        writeValue(message.getValue());
     }
     
     private void writeStoreResponse(StoreResponse message) throws IOException {

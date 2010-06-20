@@ -2,41 +2,25 @@ package com.ardverk.dht.message;
 
 import java.net.SocketAddress;
 
-import org.ardverk.lang.NullArgumentException;
+import org.ardverk.lang.Arguments;
 
-import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.storage.Value;
 
 public class DefaultStoreRequest extends AbstractRequestMessage 
         implements StoreRequest {
 
-    private final KUID key;
-    
-    private final byte[] value;
+    private final Value value;
     
     public DefaultStoreRequest(MessageId messageId, Contact contact, 
-            SocketAddress address, KUID key, byte[] value) {
+            SocketAddress address, Value value) {
         super(messageId, contact, address);
         
-        if (key == null) {
-            throw new NullArgumentException("key");
-        }
-        
-        if (value == null) {
-            throw new NullArgumentException("value");
-        }
-        
-        this.key = key;
-        this.value = value;
+        this.value = Arguments.notNull(value, "value");
     }
-
+    
     @Override
-    public KUID getKey() {
-        return key;
-    }
-
-    @Override
-    public byte[] getValue() {
+    public Value getValue() {
         return value;
     }
 }

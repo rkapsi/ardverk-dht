@@ -2,7 +2,7 @@ package com.ardverk.dht.storage;
 
 import static org.ardverk.coding.CodingUtils.encodeBase16;
 
-import org.ardverk.lang.NullArgumentException;
+import org.ardverk.lang.Arguments;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
@@ -32,31 +32,13 @@ public class DefaultValue extends AbstractValue {
     public DefaultValue(Contact sender, Contact creator, 
             byte[] id, KUID primaryKey, byte[] value) {
         
-        if (sender == null) {
-            throw new NullArgumentException("sender");
-        }
+        this.sender = Arguments.notNull(sender, "sender");
+        this.creator = Arguments.notNull(
+                pickCreator(sender, creator), "creator");
         
-        if (creator == null) {
-            throw new NullArgumentException("creator");
-        }
-        
-        if (id == null) {
-            throw new NullArgumentException("id");
-        }
-        
-        if (primaryKey == null) {
-            throw new NullArgumentException("primaryKey");
-        }
-        
-        if (value == null) {
-            throw new NullArgumentException("value");
-        }
-        
-        this.sender = sender;
-        this.creator = pickCreator(sender, creator);
         this.id = id;
-        this.primaryKey = primaryKey;
-        this.value = value;
+        this.primaryKey = Arguments.notNull(primaryKey, "primaryKey");
+        this.value = Arguments.notNull(value, "value");
     }
     
     @Override
@@ -87,6 +69,11 @@ public class DefaultValue extends AbstractValue {
     @Override
     public byte[] getValue() {
         return value;
+    }
+    
+    @Override
+    public int size() {
+        return value != null ? value.length : 0;
     }
     
     @Override

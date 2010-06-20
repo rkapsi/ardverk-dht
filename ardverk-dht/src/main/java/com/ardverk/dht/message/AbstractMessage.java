@@ -2,7 +2,7 @@ package com.ardverk.dht.message;
 
 import java.net.SocketAddress;
 
-import org.ardverk.lang.NullArgumentException;
+import org.ardverk.lang.Arguments;
 
 import com.ardverk.dht.routing.Contact;
 
@@ -19,25 +19,13 @@ public abstract class AbstractMessage implements Message {
     public AbstractMessage(MessageId messageId, 
             Contact contact, SocketAddress address) {
         
-        if (messageId == null) {
-            throw new NullArgumentException("messageId");
-        }
-        
-        if (contact == null) {
-            throw new NullArgumentException("contact");
-        }
-        
-        if (address == null) {
-            throw new NullArgumentException("address");
-        }
-        
-        this.messageId = messageId;
-        this.contact = contact;
-        this.address = address;
+        this.messageId = Arguments.notNull(messageId, "messageId");
+        this.contact = Arguments.notNull(contact, "contact");
+        this.address = Arguments.notNull(address, "address");
     }
     
     /**
-     * 
+     * Returns the {@link Message}'s creation time.
      */
     public long getCreationTime() {
         return creationTime;

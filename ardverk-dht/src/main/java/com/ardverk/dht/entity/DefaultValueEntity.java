@@ -2,42 +2,30 @@ package com.ardverk.dht.entity;
 
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.lang.NullArgumentException;
-import org.ardverk.utils.StringUtils;
+import org.ardverk.lang.Arguments;
 
 import com.ardverk.dht.io.LookupResponseHandler.State;
+import com.ardverk.dht.storage.Value;
 
 public class DefaultValueEntity extends AbstractEntity implements ValueEntity {
-
-    private final byte[] value;
     
-    public DefaultValueEntity(long time, TimeUnit unit, byte[] value) {
+    private final Value value;
+    
+    public DefaultValueEntity(Value value, 
+            long time, TimeUnit unit) {
         super(time, unit);
         
-        if (value == null) {
-            throw new NullArgumentException("value");
-        }
-        
-        this.value = value;
+        this.value = Arguments.notNull(value, "value");
     }
     
-    public DefaultValueEntity(State state, byte[] value) {
+    public DefaultValueEntity(State state, Value value) {
         super(state.getTimeInMillis(), TimeUnit.MILLISECONDS);
         
-        if (value == null) {
-            throw new NullArgumentException("value");
-        }
-        
-        this.value = value;
+        this.value = Arguments.notNull(value, "value");
     }
 
     @Override
-    public byte[] getValue() {
+    public Value getValue() {
         return value;
-    }
-    
-    @Override
-    public String getValueAsString() {
-        return StringUtils.toString(value);
     }
 }

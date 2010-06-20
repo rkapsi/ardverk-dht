@@ -2,28 +2,25 @@ package com.ardverk.dht.message;
 
 import java.net.SocketAddress;
 
-import org.ardverk.lang.NullArgumentException;
+import org.ardverk.lang.Arguments;
 
 import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.storage.Value;
 
 public class DefaultValueResponse extends AbstractLookupResponse 
         implements ValueResponse {
-
-    private final byte[] value;
+    
+    private final Value value;
     
     public DefaultValueResponse(MessageId messageId, Contact contact, 
-            SocketAddress address, byte[] value) {
+            SocketAddress address, Value value) {
         super(messageId, contact, address);
         
-        if (value == null) {
-            throw new NullArgumentException("value");
-        }
-        
-        this.value = value;
+        this.value = Arguments.notNull(value, "value");
     }
     
     @Override
-    public byte[] getValue() {
+    public Value getValue() {
         return value;
     }
 }

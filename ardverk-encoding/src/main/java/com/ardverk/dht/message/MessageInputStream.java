@@ -12,6 +12,9 @@ import org.ardverk.coding.BencodingInputStream;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.Contact.Type;
+import com.ardverk.dht.storage.DefaultValue;
+import com.ardverk.dht.storage.Value;
 import com.ardverk.dht.storage.Database.Condition;
 import com.ardverk.dht.storage.DefaultDatabase.DefaultCondition;
 import com.ardverk.enumeration.IntegerValue;
@@ -100,6 +103,16 @@ class MessageInputStream extends BencodingInputStream {
         return DefaultCondition.valueOf(value);
     }
     
+    public Value readValue(Contact contact, SocketAddress address) throws IOException {
+        Contact creator = readContact(Type.UNKNOWN, address);
+        byte[] id = readBytes();
+        
+        KUID primaryKey = readKUID();
+        byte[] value = readBytes();
+        
+        return new DefaultValue(contact, creator, id, primaryKey, value);
+    }
+    
     public Message readMessage(SocketAddress src) throws IOException {
         int version = readUnsignedByte();
         if (version != MessageUtils.VERSION) {
@@ -165,15 +178,16 @@ class MessageInputStream extends BencodingInputStream {
     
     private ValueResponse readValueResponse(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
-        byte[] value = readBytes();
+        
+        Value value = readValue(contact, address);
         return new DefaultValueResponse(messageId, contact, address, value);
     }
     
     private StoreRequest readStoreRequest(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
-        KUID key = readKUID();
-        byte[] value = readBytes();
-        return new DefaultStoreRequest(messageId, contact, address, key, value);
+        
+        Value value = readValue(contact, address);
+        return new DefaultStoreRequest(messageId, contact, address, value);
     }
     
     private StoreResponse readStoreResponse(MessageId messageId, 

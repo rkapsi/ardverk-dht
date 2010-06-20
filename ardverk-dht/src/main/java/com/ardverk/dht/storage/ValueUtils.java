@@ -20,7 +20,7 @@ public class ValueUtils {
     }
     
     public static byte[] createId(KUID key, byte[] value) {
-        MessageDigest md = MessageDigestUtils.createSHA1();
+        MessageDigest md = MessageDigestUtils.createCRC32();
         key.update(md);
         md.update(value);
         return md.digest();

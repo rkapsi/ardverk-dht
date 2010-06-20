@@ -2,7 +2,7 @@ package com.ardverk.dht.io;
 
 import java.io.IOException;
 
-import org.ardverk.lang.NullArgumentException;
+import org.ardverk.lang.Arguments;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.message.MessageFactory;
@@ -12,6 +12,7 @@ import com.ardverk.dht.message.ValueRequest;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
+import com.ardverk.dht.storage.Value;
 
 public class ValueRequestHandler extends AbstractRequestHandler {
 
@@ -25,16 +26,8 @@ public class ValueRequestHandler extends AbstractRequestHandler {
             Database database) {
         super(messageDispatcher);
         
-        if (routeTable == null) {
-            throw new NullArgumentException("routeTable");
-        }
-        
-        if (database == null) {
-            throw new NullArgumentException("database");
-        }
-        
-        this.routeTable = routeTable;
-        this.database = database;
+        this.routeTable = Arguments.notNull(routeTable, "routeTable");
+        this.database = Arguments.notNull(database, "database");
     }
 
     @Override
@@ -42,7 +35,7 @@ public class ValueRequestHandler extends AbstractRequestHandler {
         ValueRequest request = (ValueRequest)message;
         
         KUID key = request.getKey();
-        byte[] value = database.lookup(key);
+        Value value = database.get(key);
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
         ResponseMessage response = null;
