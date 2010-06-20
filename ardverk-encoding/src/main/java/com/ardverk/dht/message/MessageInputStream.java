@@ -14,9 +14,9 @@ import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.Contact.Type;
 import com.ardverk.dht.storage.DefaultValueTuple;
-import com.ardverk.dht.storage.DefaultValueX;
+import com.ardverk.dht.storage.DefaultValue;
 import com.ardverk.dht.storage.ValueTuple;
-import com.ardverk.dht.storage.ValueX;
+import com.ardverk.dht.storage.Value;
 import com.ardverk.dht.storage.Database.Condition;
 import com.ardverk.dht.storage.DefaultDatabase.DefaultCondition;
 import com.ardverk.enumeration.IntegerValue;
@@ -108,17 +108,17 @@ class MessageInputStream extends BencodingInputStream {
     public ValueTuple readValueTuple(Contact contact, 
             SocketAddress address) throws IOException {
         Contact creator = readContact(Type.UNKNOWN, address);
-        ValueX value = readValue();
+        Value value = readValue();
         
         return new DefaultValueTuple(contact, creator, value);
     }
     
-    public ValueX readValue() throws IOException {
+    public Value readValue() throws IOException {
         byte[] id = readBytes();
         KUID key = readKUID();
         byte[] value = readBytes();
         
-        return new DefaultValueX(id, key, value);
+        return new DefaultValue(id, key, value);
     }
     
     public Message readMessage(SocketAddress src) throws IOException {

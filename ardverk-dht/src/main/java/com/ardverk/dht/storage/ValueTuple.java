@@ -21,7 +21,7 @@ public interface ValueTuple {
     
     public KUID getSecondaryKey();
 
-    public ValueX getValue();
+    public Value getValue();
     
     public boolean isEmpty();
 }

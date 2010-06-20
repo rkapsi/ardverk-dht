@@ -11,17 +11,17 @@ public class DefaultValueTuple extends AbstractValueTuple {
     
     private final Contact creator;
     
-    private final ValueX value;
+    private final Value value;
     
     public DefaultValueTuple(Contact contact, KUID key, byte[] value) {
-        this (contact, new DefaultValueX(key, value));
+        this (contact, new DefaultValue(key, value));
     }
     
-    public DefaultValueTuple(Contact contact, ValueX value) {
+    public DefaultValueTuple(Contact contact, Value value) {
         this (contact, contact, value);
     }
     
-    public DefaultValueTuple(Contact sender, Contact creator, ValueX value) {
+    public DefaultValueTuple(Contact sender, Contact creator, Value value) {
         
         this.sender = Arguments.notNull(sender, "sender");
         this.creator = Arguments.notNull(
@@ -56,7 +56,7 @@ public class DefaultValueTuple extends AbstractValueTuple {
     }
     
     @Override
-    public ValueX getValue() {
+    public Value getValue() {
         return value;
     }
     
