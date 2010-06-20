@@ -2,7 +2,6 @@ package com.ardverk.dht.storage;
 
 import java.util.concurrent.TimeUnit;
 
-import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
 
 public interface ValueTuple {
@@ -16,11 +15,9 @@ public interface ValueTuple {
     public Contact getSender();
     
     public Contact getCreator();
-
-    public KUID getPrimaryKey();
     
-    public KUID getSecondaryKey();
-
+    public Key getKey();
+    
     public Value getValue();
     
     public boolean isEmpty();

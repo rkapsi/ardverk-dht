@@ -12,6 +12,7 @@ import com.ardverk.dht.message.ValueRequest;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
+import com.ardverk.dht.storage.Key;
 import com.ardverk.dht.storage.ValueTuple;
 
 public class ValueRequestHandler extends AbstractRequestHandler {
@@ -34,7 +35,7 @@ public class ValueRequestHandler extends AbstractRequestHandler {
     public void handleRequest(RequestMessage message) throws IOException {
         ValueRequest request = (ValueRequest)message;
         
-        KUID key = request.getKey();
+        Key key = request.getKey2();
         ValueTuple value = database.get(key);
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
@@ -43,7 +44,8 @@ public class ValueRequestHandler extends AbstractRequestHandler {
         if (value != null) {
             response = factory.createValueResponse(request, value);
         } else {
-            Contact[] contacts = routeTable.select(key);
+            KUID primaryKey = key.getPrimaryKey();
+            Contact[] contacts = routeTable.select(primaryKey);
             response = factory.createNodeResponse(request, contacts);
         }
         

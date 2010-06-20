@@ -1,6 +1,5 @@
 package com.ardverk.dht.storage;
 
-import com.ardverk.dht.KUID;
 
 public interface Database {
     
@@ -11,12 +10,24 @@ public interface Database {
         public String name();
     }
     
-    public Condition store(ValueTuple value);
+    /**
+     * Stores the given {@link ValueTuple} and returns a {@link Condition}.
+     */
+    public Condition store(ValueTuple tuple);
     
-    public ValueTuple get(KUID key);
+    /**
+     * Returns a {@link ValueTuple} for the given {@link Key}.
+     */
+    public ValueTuple get(Key key);
     
-    public ValueTuple[] select(KUID key);
+    /**
+     * Returns all {@link ValueTuple}s for the given {@link Key}.
+     */
+    public ValueTuple[] select(Key key);
     
+    /**
+     * Returns all {@link ValueTuple}s.
+     */
     public ValueTuple[] values();
     
     public int size();

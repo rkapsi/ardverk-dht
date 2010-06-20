@@ -19,22 +19,22 @@ public class DefaultDatabase extends AbstractDatabase {
         }
     }
     
-    private final Map<KUID, ValueTuple> database 
-        = new ConcurrentHashMap<KUID, ValueTuple>();
+    private final Map<Key, ValueTuple> database 
+        = new ConcurrentHashMap<Key, ValueTuple>();
     
     @Override
-    public ValueTuple get(KUID key) {
+    public ValueTuple get(Key key) {
         return database.get(key);
     }
 
     @Override
-    public Condition store(ValueTuple value) {
-        KUID primaryKey = value.getPrimaryKey();
+    public Condition store(ValueTuple tuple) {
+        Key key = tuple.getKey();
         
-        if (!value.isEmpty()) {
-            database.put(primaryKey, value);
+        if (!tuple.isEmpty()) {
+            database.put(key, tuple);
         } else {
-            database.remove(primaryKey);
+            database.remove(key);
         }
         
         return DefaultCondition.SUCCESS;
@@ -46,19 +46,9 @@ public class DefaultDatabase extends AbstractDatabase {
     }
     
     @Override
-    public ValueTuple[] select(final KUID key) {
+    public ValueTuple[] select(Key key) {
         ValueTuple[] values = values();
-        Comparator<ValueTuple> comparator 
-                = new Comparator<ValueTuple>() {
-            @Override
-            public int compare(ValueTuple o1, ValueTuple o2) {
-                KUID xor1 = o1.getPrimaryKey().xor(key);
-                KUID xor2 = o2.getPrimaryKey().xor(key);
-                return xor1.compareTo(xor2);
-            }
-        };
-        
-        Arrays.sort(values, comparator);
+        Arrays.sort(values, new XorComparator(key));
         return values;
     }
     
@@ -76,5 +66,24 @@ public class DefaultDatabase extends AbstractDatabase {
         }
         
         return buffer.toString();
+    }
+    
+    private static class XorComparator implements Comparator<ValueTuple> {
+        
+        private final Key key;
+        
+        public XorComparator(Key key) {
+            this.key = key;
+        }
+
+        @Override
+        public int compare(ValueTuple o1, ValueTuple o2) {
+            KUID primaryKey = key.getPrimaryKey();
+            
+            KUID xor1 = o1.getKey().getPrimaryKey().xor(primaryKey);
+            KUID xor2 = o2.getKey().getPrimaryKey().xor(primaryKey);
+            
+            return xor1.compareTo(xor2);
+        }
     }
 }
