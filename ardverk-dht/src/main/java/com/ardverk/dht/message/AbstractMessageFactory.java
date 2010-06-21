@@ -1,21 +1,20 @@
 package com.ardverk.dht.message;
 
 import java.net.SocketAddress;
-import java.security.SecureRandom;
 import java.util.Random;
+
+import org.ardverk.lang.Arguments;
+
+import com.ardverk.dht.security.SecurityUtils;
 
 public abstract class AbstractMessageFactory implements MessageFactory {
 
-    private static final Random GENERATOR = new SecureRandom();
+    private static final Random GENERATOR = SecurityUtils.createSecureRandom();
     
     private final int length;
     
     public AbstractMessageFactory(int length) {
-        if (length < 0) {
-            throw new IllegalArgumentException("length=" + length);
-        }
-        
-        this.length = length;
+        this.length = Arguments.notNegative(length, "length");
     }
     
     @Override

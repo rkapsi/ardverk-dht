@@ -2,7 +2,7 @@ package com.ardverk.dht.message;
 
 import java.net.SocketAddress;
 
-import org.ardverk.lang.NullArgumentException;
+import org.ardverk.lang.Arguments;
 
 import com.ardverk.dht.routing.Contact;
 
@@ -15,11 +15,7 @@ public class DefaultNodeResponse extends AbstractLookupResponse
             SocketAddress address, Contact[] contacts) {
         super(messageId, contact, address);
         
-        if (contacts == null) {
-            throw new NullArgumentException("contacts");
-        }
-        
-        this.contacts = contacts;
+        this.contacts = Arguments.notNull(contacts, "contacts");
     }
 
     @Override

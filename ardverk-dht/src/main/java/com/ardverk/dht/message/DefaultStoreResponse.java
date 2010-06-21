@@ -2,7 +2,7 @@ package com.ardverk.dht.message;
 
 import java.net.SocketAddress;
 
-import org.ardverk.lang.NullArgumentException;
+import org.ardverk.lang.Arguments;
 
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.storage.Database.Condition;
@@ -16,11 +16,7 @@ public class DefaultStoreResponse extends AbstractResponseMessage
             SocketAddress address, Condition status) {
         super(messageId, contact, address);
         
-        if (status == null) {
-            throw new NullArgumentException("status");
-        }
-        
-        this.status = status;
+        this.status = Arguments.notNull(status, "status");
     }
     
     @Override

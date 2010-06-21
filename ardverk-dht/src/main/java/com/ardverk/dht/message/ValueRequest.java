@@ -10,5 +10,5 @@ public interface ValueRequest extends LookupRequest {
     /**
      * 
      */
-    public Key getKey2();
+    public Key getKey();
 }

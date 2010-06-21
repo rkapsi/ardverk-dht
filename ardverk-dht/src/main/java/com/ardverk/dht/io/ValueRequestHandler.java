@@ -35,7 +35,7 @@ public class ValueRequestHandler extends AbstractRequestHandler {
     public void handleRequest(RequestMessage message) throws IOException {
         ValueRequest request = (ValueRequest)message;
         
-        Key key = request.getKey2();
+        Key key = request.getKey();
         ValueTuple value = database.get(key);
         
         MessageFactory factory = messageDispatcher.getMessageFactory();

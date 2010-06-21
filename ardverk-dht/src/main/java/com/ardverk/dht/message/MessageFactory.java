@@ -4,6 +4,7 @@ import java.net.SocketAddress;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.storage.Key;
 import com.ardverk.dht.storage.ValueTuple;
 import com.ardverk.dht.storage.Database.Condition;
 
@@ -50,7 +51,7 @@ public interface MessageFactory {
     /**
      * 
      */
-    public ValueRequest createValueRequest(Contact dst, KUID key);
+    public ValueRequest createValueRequest(Contact dst, Key key);
     
     /**
      * 
