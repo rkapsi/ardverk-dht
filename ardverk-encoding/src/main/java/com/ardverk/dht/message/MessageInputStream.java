@@ -13,10 +13,12 @@ import org.ardverk.coding.BencodingInputStream;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.Contact.Type;
-import com.ardverk.dht.storage.DefaultValueTuple;
+import com.ardverk.dht.storage.DefaultKey;
 import com.ardverk.dht.storage.DefaultValue;
-import com.ardverk.dht.storage.ValueTuple;
+import com.ardverk.dht.storage.DefaultValueTuple;
+import com.ardverk.dht.storage.Key;
 import com.ardverk.dht.storage.Value;
+import com.ardverk.dht.storage.ValueTuple;
 import com.ardverk.dht.storage.Database.Condition;
 import com.ardverk.dht.storage.DefaultDatabase.DefaultCondition;
 import com.ardverk.enumeration.IntegerValue;
@@ -111,6 +113,11 @@ class MessageInputStream extends BencodingInputStream {
         Value value = readValue();
         
         return new DefaultValueTuple(contact, creator, value);
+    }
+    
+    public Key readKey() throws IOException {
+        KUID primaryKey = readKUID();
+        return new DefaultKey(primaryKey);
     }
     
     public Value readValue() throws IOException {

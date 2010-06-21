@@ -91,7 +91,7 @@ class MessageOutputStream extends BencodingOutputStream {
     
     public void writeValue(Value value) throws IOException {
         writeBytes(value.getId());
-        writeKUID(value.getKey());
+        writeKey(value.getKey());
         writeBytes(value.getValue());
     }
     

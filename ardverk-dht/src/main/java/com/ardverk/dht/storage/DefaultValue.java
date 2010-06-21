@@ -11,7 +11,7 @@ public class DefaultValue extends AbstractValue {
 
     private final byte[] id;
     
-    private final KUID key;
+    private final Key key;
     
     private final byte[] value;
     
@@ -21,6 +21,11 @@ public class DefaultValue extends AbstractValue {
     }
     
     public DefaultValue(byte[] id, KUID key, byte[] value) {
+        this (ValueUtils.createId(key, value), 
+                new DefaultKey(key), value);
+    }
+    
+    public DefaultValue(byte[] id, Key key, byte[] value) {
         this.id = id;
         this.key = Arguments.notNull(key, "key");
         this.value = Arguments.notNull(value, "value");
@@ -32,7 +37,7 @@ public class DefaultValue extends AbstractValue {
     }
 
     @Override
-    public KUID getKey() {
+    public Key getKey() {
         return key;
     }
 
