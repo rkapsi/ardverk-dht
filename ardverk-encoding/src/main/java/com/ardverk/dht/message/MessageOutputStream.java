@@ -86,17 +86,18 @@ class MessageOutputStream extends BencodingOutputStream {
     
     public void writeValueTuple(ValueTuple tuple) throws IOException {
         writeContact(tuple.getCreator());
+        
+        writeKey(tuple.getKey());
         writeValue(tuple.getValue());
-    }
-    
-    public void writeValue(Value value) throws IOException {
-        writeBytes(value.getId());
-        writeKey(value.getKey());
-        writeBytes(value.getValue());
     }
     
     public void writeKey(Key key) throws IOException {
         writeKUID(key.getPrimaryKey());
+    }
+    
+    public void writeValue(Value value) throws IOException {
+        writeBytes(value.getId());
+        writeBytes(value.getValue());
     }
     
     public void writeMessage(Message message) throws IOException {

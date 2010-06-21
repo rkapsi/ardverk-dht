@@ -5,29 +5,18 @@ import java.util.Arrays;
 import org.ardverk.coding.CodingUtils;
 import org.ardverk.lang.Arguments;
 
-import com.ardverk.dht.KUID;
-
 public class DefaultValue extends AbstractValue {
 
     private final byte[] id;
     
-    private final Key key;
-    
     private final byte[] value;
     
-    public DefaultValue(KUID key, byte[] value) {
-        this (ValueUtils.createId(key, value), 
-                key, value);
+    public DefaultValue(byte[] value) {
+        this (ValueUtils.createId(value), value);
     }
     
-    public DefaultValue(byte[] id, KUID key, byte[] value) {
-        this (ValueUtils.createId(key, value), 
-                new DefaultKey(key), value);
-    }
-    
-    public DefaultValue(byte[] id, Key key, byte[] value) {
+    public DefaultValue(byte[] id, byte[] value) {
         this.id = id;
-        this.key = Arguments.notNull(key, "key");
         this.value = Arguments.notNull(value, "value");
     }
     
@@ -35,12 +24,7 @@ public class DefaultValue extends AbstractValue {
     public byte[] getId() {
         return id;
     }
-
-    @Override
-    public Key getKey() {
-        return key;
-    }
-
+    
     @Override
     public byte[] getValue() {
         return value;
@@ -59,7 +43,6 @@ public class DefaultValue extends AbstractValue {
     public int hashCode() {
         int hashCode = 0;
         hashCode += 31 * Arrays.hashCode(id);
-        hashCode += 31 * key.hashCode();
         hashCode += 31 * Arrays.hashCode(value);
         return hashCode;
     }
@@ -74,13 +57,11 @@ public class DefaultValue extends AbstractValue {
         
         Value other = (Value)o;
         return Arrays.equals(id, other.getId())
-           && key.equals(other.getKey())
            && Arrays.equals(value, other.getValue());
     }
     
     @Override
     public String toString() {
-        return CodingUtils.encodeBase16(id) + "/" 
-                + key + "=" + getValueAsString();
+        return CodingUtils.encodeBase16(id) + "/" + getValueAsString();
     }
 }

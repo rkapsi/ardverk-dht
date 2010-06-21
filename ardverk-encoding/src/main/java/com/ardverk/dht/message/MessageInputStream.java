@@ -110,9 +110,11 @@ class MessageInputStream extends BencodingInputStream {
     public ValueTuple readValueTuple(Contact contact, 
             SocketAddress address) throws IOException {
         Contact creator = readContact(Type.UNKNOWN, address);
+        
+        Key key = readKey();
         Value value = readValue();
         
-        return new DefaultValueTuple(contact, creator, value);
+        return new DefaultValueTuple(contact, creator, key, value);
     }
     
     public Key readKey() throws IOException {
@@ -122,10 +124,9 @@ class MessageInputStream extends BencodingInputStream {
     
     public Value readValue() throws IOException {
         byte[] id = readBytes();
-        KUID key = readKUID();
         byte[] value = readBytes();
         
-        return new DefaultValue(id, key, value);
+        return new DefaultValue(id, value);
     }
     
     public Message readMessage(SocketAddress src) throws IOException {
@@ -187,7 +188,7 @@ class MessageInputStream extends BencodingInputStream {
     
     private ValueRequest readValueRequest(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
-        KUID key = readKUID();
+        Key key = readKey();
         return new DefaultValueRequest(messageId, contact, address, key);
     }
     

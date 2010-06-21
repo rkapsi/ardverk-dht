@@ -16,14 +16,15 @@ public class DefaultValueTuple extends AbstractValueTuple {
     private final Value value;
     
     public DefaultValueTuple(Contact contact, KUID key, byte[] value) {
-        this (contact, new DefaultKey(key), new DefaultValue(key, value));
+        this (contact, new DefaultKey(key), new DefaultValue(value));
     }
     
     public DefaultValueTuple(Contact contact, Key key, Value value) {
         this (contact, contact, key, value);
     }
     
-    public DefaultValueTuple(Contact sender, Contact creator, Key key, Value value) {
+    public DefaultValueTuple(Contact sender, Contact creator, 
+            Key key, Value value) {
         
         this.sender = Arguments.notNull(sender, "sender");
         this.creator = Arguments.notNull(
