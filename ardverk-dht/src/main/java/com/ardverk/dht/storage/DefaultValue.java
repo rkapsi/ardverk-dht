@@ -16,7 +16,7 @@ public class DefaultValue extends AbstractValue {
     }
     
     public DefaultValue(byte[] id, byte[] value) {
-        this.id = id;
+        this.id = Arguments.notNull(id, "id");
         this.value = Arguments.notNull(value, "value");
     }
     

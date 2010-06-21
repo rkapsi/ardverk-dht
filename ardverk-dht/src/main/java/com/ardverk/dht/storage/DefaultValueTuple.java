@@ -64,7 +64,7 @@ public class DefaultValueTuple extends AbstractValueTuple {
      * instance if sender and creator are the same.
      */
     private static Contact pickCreator(Contact sender, Contact creator) {
-        if (sender.equals(creator)) {
+        if (creator == null || sender.equals(creator)) {
             return sender;
         }
         

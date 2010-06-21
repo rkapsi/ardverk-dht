@@ -70,20 +70,19 @@ public class DefaultDatabase extends AbstractDatabase {
     
     private static class XorComparator implements Comparator<ValueTuple> {
         
-        private final Key key;
+        private final KUID primaryKey;
         
         public XorComparator(Key key) {
-            this.key = key;
+            this.primaryKey = key.getPrimaryKey();
         }
 
+        private KUID xor(ValueTuple tuple) {
+            return tuple.getKey().getPrimaryKey().xor(primaryKey);
+        }
+        
         @Override
         public int compare(ValueTuple o1, ValueTuple o2) {
-            KUID primaryKey = key.getPrimaryKey();
-            
-            KUID xor1 = o1.getKey().getPrimaryKey().xor(primaryKey);
-            KUID xor2 = o2.getKey().getPrimaryKey().xor(primaryKey);
-            
-            return xor1.compareTo(xor2);
+            return xor(o1).compareTo(xor(o2));
         }
     }
 }

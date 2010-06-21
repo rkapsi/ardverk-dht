@@ -30,7 +30,13 @@ public interface Database {
      */
     public ValueTuple[] values();
     
+    /**
+     * Returns the size of the {@link Database}.
+     */
     public int size();
     
+    /**
+     * Returns {@code true} if the {@link Database} is empty.
+     */
     public boolean isEmpty();
 }
