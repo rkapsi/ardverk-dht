@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.collection.FixedSizeArrayList;
+import org.ardverk.lang.Arguments;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.entity.DefaultValueEntity;
@@ -15,17 +16,21 @@ import com.ardverk.dht.message.ValueRequest;
 import com.ardverk.dht.message.ValueResponse;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
+import com.ardverk.dht.storage.Key;
 import com.ardverk.dht.storage.ValueTuple;
 
 public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     
     private final FixedSizeArrayList<ValueTuple> tuples;
     
+    private final Key key;
+    
     public ValueResponseHandler(MessageDispatcher messageDispatcher,
-            RouteTable routeTable, KUID key) {
-        super(messageDispatcher, routeTable, key);
+            RouteTable routeTable, Key key) {
+        super(messageDispatcher, routeTable, key.getPrimaryKey());
         
         tuples = new FixedSizeArrayList<ValueTuple>(settings.getR());
+        this.key = Arguments.notNull(key, "key");
     }
 
     @Override
@@ -61,8 +66,10 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     }
     
     @Override
-    protected void lookup(Contact dst, KUID key, 
+    protected void lookup(Contact dst, KUID lookupId, 
             long timeout, TimeUnit unit) throws IOException {
+        
+        assert (lookupId.equals(key.getPrimaryKey()));
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
         ValueRequest message = factory.createValueRequest(dst, key);

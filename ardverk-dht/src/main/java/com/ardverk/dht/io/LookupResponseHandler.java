@@ -49,10 +49,10 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     private ScheduledFuture<?> boostFuture;
     
     public LookupResponseHandler(MessageDispatcher messageDispatcher, 
-            RouteTable routeTable, KUID key) {
+            RouteTable routeTable, KUID lookupId) {
         super(messageDispatcher);
         
-        lookupManager = new LookupManager(routeTable, key);
+        lookupManager = new LookupManager(routeTable, lookupId);
         lookupCounter = new ProcessCounter(settings.getAlpha());
     }
 
@@ -155,7 +155,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     /**
      * 
      */
-    protected abstract void lookup(Contact dst, KUID key, 
+    protected abstract void lookup(Contact dst, KUID lookupId, 
             long timeout, TimeUnit unit) throws IOException;
     
     /**

@@ -21,11 +21,11 @@ public class NodeResponseHandler extends LookupResponseHandler<NodeEntity> {
     }
     
     @Override
-    protected void lookup(Contact dst, KUID key, 
+    protected void lookup(Contact dst, KUID lookupId, 
             long timeout, TimeUnit unit) throws IOException {
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
-        NodeRequest message = factory.createNodeRequest(dst, key);
+        NodeRequest message = factory.createNodeRequest(dst, lookupId);
         
         long adaptiveTimeout = dst.getAdaptiveTimeout(timeout, unit);
         send(dst, message, adaptiveTimeout, unit);
