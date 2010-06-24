@@ -2,8 +2,6 @@ package com.ardverk.dht;
 
 import java.util.Properties;
 
-import org.ardverk.lang.NumberUtils;
-
 public class ArdverkConfig {
     
     private static final int DEFAULT_K = 20;
@@ -20,10 +18,8 @@ public class ArdverkConfig {
     
     public ArdverkConfig(Properties props) {
         this.k = getInteger(props, "K", DEFAULT_K);
-        this.r = getInteger(props, "R", k-1);
-        this.w = getInteger(props, "W", k-1);
-        
-        
+        this.r = getInteger(props, "R", Math.max(k-1, 1));
+        this.w = getInteger(props, "W", Math.max(k-1, 1));
     }
     
     public int getK() {
@@ -55,12 +51,48 @@ public class ArdverkConfig {
         return pkg.getName() + "." + suffix;
     }
     
+    
     private static int getInteger(Properties props, String suffix) {
-        return NumberUtils.getInteger(props.getProperty(key(suffix)));
+        return getInteger(props, suffix, 0, false);
     }
     
     private static int getInteger(Properties props, String suffix, int defaultValue) {
-        return NumberUtils.getInteger(props.getProperty(key(suffix), 
-                Integer.toString(defaultValue)));
+        return getInteger(props, suffix, defaultValue, true);
+    }
+    
+    private static int getInteger(Properties props, String suffix, 
+            int defaultValue, boolean hasDefault) {
+        String value = props.getProperty(key(suffix));
+        if (value != null) {
+            return Integer.parseInt(value);
+        }
+        
+        if (hasDefault) {
+            return defaultValue;
+        }
+        
+        throw new IllegalArgumentException("suffix=" + suffix);
+    }
+    
+    private static long getLong(Properties props, String suffix) {
+        return getLong(props, suffix, 0, false);
+    }
+    
+    private static long getLong(Properties props, String suffix, long defaultValue) {
+        return getLong(props, suffix, defaultValue, true);
+    }
+    
+    private static long getLong(Properties props, String suffix, 
+            long defaultValue, boolean hasDefault) {
+        String value = props.getProperty(key(suffix));
+        if (value != null) {
+            return Long.parseLong(value);
+        }
+        
+        if (hasDefault) {
+            return defaultValue;
+        }
+        
+        throw new IllegalArgumentException("suffix=" + suffix);
     }
 }
