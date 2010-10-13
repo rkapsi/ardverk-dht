@@ -420,7 +420,7 @@ public class Contact implements PrimitiveProperties<Object>,
      * Returns the adaptive timeout for this {@link Contact}.
      */
     public long getAdaptiveTimeout(long defaultValue, TimeUnit unit) {
-        long value = unit.toMillis(defaultValue);
+        /*long value = unit.toMillis(defaultValue);
         
         long timeout = 0L;
         if (0L < rtt) {
@@ -429,7 +429,9 @@ public class Contact implements PrimitiveProperties<Object>,
             timeout = value;
         }
         
-        return unit.convert(timeout, TimeUnit.MILLISECONDS);
+        return unit.convert(timeout, TimeUnit.MILLISECONDS);*/
+        
+        return unit.convert(10, TimeUnit.SECONDS);
     }
     
     /**
