@@ -12,7 +12,6 @@ import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.routing.Contact;
-
 import com.ardverk.dht.routing.RouteTable;
 
 public interface DHT2 {
@@ -23,51 +22,42 @@ public interface DHT2 {
     
     public ArdverkFuture<NodeEntity> lookup(KUID key, LookupConfig config);
     
-    public ArdverkFuture<StoreEntity> put(Contact[] dst, ValueTuple tuple, StoreConfig config);
+    public ArdverkFuture<StoreEntity> put(Contact[] dst, KUID key, 
+            Value value, StoreConfig config);
     
     public ArdverkFuture<ValueEntity> get(KUID key, ValueConfig config);
     
-    public static interface ValueTuple {
-        
-        public KUID getKey();
+    public static interface Value {
         
         public long getContentLength();
         
         public InputStream getContent() throws IOException;
     }
     
-    public static class DefaultValueTuple implements ValueTuple {
+    public static class DefaultValue implements Value {
 
-        private final KUID key;
-        
         private final byte[] value;
         
         private final int offset;
         
         private final int length;
         
-        public DefaultValueTuple(KUID key, byte[] value) {
-            this(key, value, 0, value.length);
+        public DefaultValue(byte[] value) {
+            this(value, 0, value.length);
         }
         
-        public DefaultValueTuple(KUID key, byte[] value, int offset, int length) {
+        public DefaultValue(byte[] value, int offset, int length) {
             if (offset < 0 || length < 0 || value.length < (offset+length)) {
                 throw new IllegalArgumentException(
                         "offset=" + offset + ", length=" + length);
             }
             
-            this.key = key;
             this.value = value;
             
             this.offset = offset;
             this.length = length;
         }
         
-        @Override
-        public KUID getKey() {
-            return key;
-        }
-
         @Override
         public long getContentLength() {
             return length;
@@ -143,25 +133,11 @@ public interface DHT2 {
     
     public static interface PingConfig extends ArdverkConfig {
         
-        public void setContactAddress(ContactAddress address);
-        
-        public ContactAddress getContactAddress();
     }
     
     public static class DefaultPingConfig extends DefaultArdverkConfig 
             implements PingConfig {
-
-        private volatile ContactAddress address;
         
-        @Override
-        public void setContactAddress(ContactAddress address) {
-            this.address = address;
-        }
-
-        @Override
-        public ContactAddress getContactAddress() {
-            return address;
-        }
     }
     
     public static interface LookupConfig extends ArdverkConfig {
