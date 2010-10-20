@@ -7,6 +7,10 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+
+import org.ardverk.concurrent.AsyncFuture;
+import org.ardverk.concurrent.AsyncFutureListener;
 
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.entity.NodeEntity;
@@ -14,7 +18,6 @@ import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.routing.Contact;
-import com.ardverk.dht.routing.RouteTable;
 
 public interface DHT2 {
     
@@ -24,9 +27,14 @@ public interface DHT2 {
     
     public ArdverkFuture<PingEntity> ping(SocketAddress address, PingConfig config);
     
+    public ArdverkFuture<PingEntity> ping(Contact dst, PingConfig config);
+    
     public ArdverkFuture<NodeEntity> lookup(KUID key, LookupConfig config);
     
     public ArdverkFuture<ValueEntity> get(KUID key, ValueConfig config);
+    
+    public ArdverkFuture<StoreEntity> put(KUID key, 
+            Value value, StoreConfig config);
     
     public ArdverkFuture<StoreEntity> put(Contact[] dst, KUID key, 
             Value value, StoreConfig config);
@@ -35,15 +43,55 @@ public interface DHT2 {
     public static abstract class AbstractDHT implements DHT2 {
 
         @Override
-        public ArdverkFuture<PingEntity> ping(String host, int port, 
+        public ArdverkFuture<PingEntity> ping(String hostname, int port, 
                 PingConfig config) {
-            return ping(new InetSocketAddress(host, port), config);
+            return ping(new InetSocketAddress(hostname, port), config);
         }
 
         @Override
         public ArdverkFuture<PingEntity> ping(InetAddress address, int port,
                 PingConfig config) {
             return ping(new InetSocketAddress(address, port), config);
+        }
+
+        @Override
+        public ArdverkFuture<StoreEntity> put(KUID key, Value value,
+                StoreConfig config) {
+            
+            final Object lock = new Object();
+            synchronized (lock) {
+                final ArdverkFuture<NodeEntity> lookupFuture 
+                    = lookup(key, config.getLookupConfig());
+                
+                final AtomicReference<ArdverkFuture<StoreEntity>> futureRef 
+                    = new AtomicReference<ArdverkFuture<StoreEntity>>();
+                
+                lookupFuture.addAsyncFutureListener(new AsyncFutureListener<NodeEntity>() {
+                    @Override
+                    public void operationComplete(AsyncFuture<NodeEntity> future) {
+                        synchronized (lock) {
+                            
+                        }
+                    }
+                });
+                
+                long combinedTimeout = config.getCombinedTimeout(TimeUnit.MILLISECONDS);
+                
+                ArdverkFuture<StoreEntity> future = null;
+                future.addAsyncFutureListener(new AsyncFutureListener<StoreEntity>() {
+                    @Override
+                    public void operationComplete(AsyncFuture<StoreEntity> future) {
+                        synchronized (lock) {
+                            if (!lookupFuture.isDone()) {
+                                lookupFuture.cancel(true);
+                            }
+                        }
+                    }
+                });
+                
+                futureRef.set(future);
+                return futureRef.get();
+            }
         }
     }
     
@@ -168,38 +216,10 @@ public interface DHT2 {
     }
     
     public static interface LookupConfig extends Config {
-        
-        public KUID getLookupId();
-        
-        public Contact[] getContacts();
     }
     
     public static class DefaultLookupConfig extends DefaultConfig 
             implements LookupConfig {
-
-        private final KUID lookupId;
-        
-        private final Contact[] contacts;
-        
-        public DefaultLookupConfig(KUID lookupId, Contact[] contacts) {
-            this.lookupId = lookupId;
-            this.contacts = contacts;
-        }
-        
-        public DefaultLookupConfig(KUID lookupId, RouteTable routeTable) {
-            this.lookupId = lookupId;
-            this.contacts = routeTable.select(lookupId);
-        }
-        
-        @Override
-        public KUID getLookupId() {
-            return lookupId;
-        }
-
-        @Override
-        public Contact[] getContacts() {
-            return contacts;
-        }
     }
     
     public static interface ValueConfig extends LookupConfig {
@@ -208,22 +228,36 @@ public interface DHT2 {
     
     public static class DefaultValueConfig extends DefaultLookupConfig 
             implements ValueConfig {
-
-        public DefaultValueConfig(KUID lookupId, Contact[] contacts) {
-            super(lookupId, contacts);
-        }
-
-        public DefaultValueConfig(KUID lookupId, RouteTable routeTable) {
-            super(lookupId, routeTable);
-        }
     }
     
     public static interface StoreConfig extends Config {
         
+        public LookupConfig getLookupConfig();
+        
+        public long getCombinedTimeout(TimeUnit unit);
     }
     
     public static class DefaultStoreConfig extends DefaultConfig 
             implements StoreConfig {
+
+        private final LookupConfig lookupConfig;
         
+        public DefaultStoreConfig() {
+            this(new DefaultLookupConfig());
+        }
+        
+        public DefaultStoreConfig(LookupConfig lookupConfig) {
+            this.lookupConfig = lookupConfig;
+        }
+        
+        @Override
+        public LookupConfig getLookupConfig() {
+            return lookupConfig;
+        }
+        
+        @Override
+        public long getCombinedTimeout(TimeUnit unit) {
+            return getTimeout(unit) + lookupConfig.getTimeout(unit);
+        }
     }
 }
