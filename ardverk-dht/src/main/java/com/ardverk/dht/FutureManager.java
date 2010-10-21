@@ -13,7 +13,7 @@ import org.ardverk.concurrent.ExecutorUtils;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.concurrent.ArdverkFutureTask;
 
-class FutureManager implements Closeable {
+public class FutureManager implements Closeable {
     
     private static final AsyncProcessExecutorService EXECUTOR 
         = ExecutorUtils.newCachedThreadPool("FutureManagerThread");
