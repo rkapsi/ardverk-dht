@@ -1,6 +1,27 @@
 package com.ardverk.dht2;
 
+/**
+ * 
+ */
 public enum QueueKey {
-    PARALLEL,
-    SEQUENTIAL;
+    
+    /**
+     * 
+     */
+    SERIAL,
+    
+    /**
+     * 
+     */
+    PARALLEL;
+    
+    /**
+     * 
+     */
+    public static final QueueKey DEFAULT = QueueKey.PARALLEL;
+    
+    /**
+     * 
+     */
+    public static final QueueKey BACKEND = QueueKey.SERIAL;
 }

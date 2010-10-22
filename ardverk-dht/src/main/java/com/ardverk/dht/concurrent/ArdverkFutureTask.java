@@ -9,7 +9,7 @@ import org.ardverk.concurrent.AsyncProcessFutureTask;
 import com.ardverk.utils.EventUtils;
 
 public class ArdverkFutureTask<V> extends AsyncProcessFutureTask<V> 
-        implements ArdverkFuture<V> {
+        implements ArdverkRunnableFuture<V> {
 
     public ArdverkFutureTask() {
         super();
