@@ -71,24 +71,34 @@ public class ArdverkFutureQueue<V> {
         }
     }
     
+    public ArdverkFuture<V> submit(AsyncProcess<V> process) {
+        ArdverkFutureTask<V> future = newFutureTask(process);
+        enqueue(future);
+        return future;
+    }
+    
     public ArdverkFuture<V> submit(AsyncProcess<V> process, 
             long timeout, TimeUnit unit) {
         
         ArdverkFutureTask<V> future = newFutureTask(process, timeout, unit);
-        
-        synchronized (this) {
-            boolean success = queue.offer(future);
-            if (success) {
-                processNext(false);
-            }
-        }
-        
+        enqueue(future);
         return future;
+    }
+    
+    protected ArdverkFutureTask<V> newFutureTask(AsyncProcess<V> process) {
+        return new ArdverkFutureTask<V>(process);
     }
     
     protected ArdverkFutureTask<V> newFutureTask(AsyncProcess<V> process, 
             long timeout, TimeUnit unit) {
         return new ArdverkFutureTask<V>(process, timeout, unit);
+    }
+    
+    private synchronized void enqueue(ArdverkRunnableFuture<V> future) {
+        boolean success = queue.offer(future);
+        if (success) {
+            processNext(false);
+        }
     }
     
     private synchronized boolean processNext(boolean callback) {
