@@ -26,24 +26,24 @@ public class FutureManager implements Closeable {
     private static final AsyncProcessExecutorService EXECUTOR 
         = ExecutorUtils.newCachedThreadPool("FutureManagerThread");
     
-    private static final int CONCURRENCY_LEVEL = 4;
+    private static final int DEFAULT_CONCURRENCY_LEVEL = 4;
     
     private final Map<QueueKey, ExecutorQueue<? extends Runnable>> executors 
         = new EnumMap<QueueKey, ExecutorQueue<? extends Runnable>>(QueueKey.class);
     
+    private final Set<AsyncFuture<?>> futures 
+        = new IdentityHashSet<AsyncFuture<?>>();
+    
     private boolean open = true;
     
     public FutureManager() {
-        this (CONCURRENCY_LEVEL);
+        this (DEFAULT_CONCURRENCY_LEVEL);
     }
     
     public FutureManager(int concurrencyLevel) {
         executors.put(QueueKey.PARALLEL, new ExecutorGroup(EXECUTOR));
         executors.put(QueueKey.SERIAL, new AsyncFutureGroup(EXECUTOR, concurrencyLevel));
     }
-    
-    private final Set<AsyncFuture<?>> futures 
-        = new IdentityHashSet<AsyncFuture<?>>();
     
     @Override
     public synchronized void close() {
