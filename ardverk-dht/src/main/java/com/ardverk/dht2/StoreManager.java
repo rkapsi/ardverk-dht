@@ -35,7 +35,7 @@ class StoreManager {
     public ArdverkFuture<StoreEntity> put(final QueueKey queueKey, 
             final KUID key, Value value, final StoreConfig config) {
         
-        Contact localhost = dht.getContact();
+        Contact localhost = dht.getLocalhost();
         final ValueTuple valueTuple 
             = new DefaultValueTuple(localhost, key, value);
         

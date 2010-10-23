@@ -13,11 +13,17 @@ import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.RouteTable;
+import com.ardverk.dht.storage.Database;
 import com.ardverk.dht.storage.Value;
 
 public interface DHT {
     
-    public Contact getContact();
+    public Contact getLocalhost();
+    
+    public RouteTable getRouteTable();
+    
+    public Database getDatabase();
     
     public ArdverkFuture<PingEntity> ping(QueueKey queueKey, 
             String host, int port, PingConfig config);
