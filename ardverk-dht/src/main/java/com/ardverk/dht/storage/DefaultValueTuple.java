@@ -16,7 +16,11 @@ public class DefaultValueTuple extends AbstractValueTuple {
     private final Value value;
     
     public DefaultValueTuple(Contact contact, KUID key, byte[] value) {
-        this (contact, new DefaultKey(key), new DefaultValue(value));
+        this (contact, key, new DefaultValue(value));
+    }
+    
+    public DefaultValueTuple(Contact contact, KUID key, Value value) {
+        this (contact, new DefaultKey(key), value);
     }
     
     public DefaultValueTuple(Contact contact, Key key, Value value) {

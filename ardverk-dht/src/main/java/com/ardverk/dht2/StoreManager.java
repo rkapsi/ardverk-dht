@@ -13,48 +13,53 @@ import com.ardverk.dht.KUID;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.entity.DefaultNodeStoreEntity;
 import com.ardverk.dht.entity.NodeEntity;
-import com.ardverk.dht.entity.NodeStoreEntity;
 import com.ardverk.dht.entity.StoreEntity;
+import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.io.StoreResponseHandler;
 import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.storage.DefaultValueTuple;
+import com.ardverk.dht.storage.Value;
+import com.ardverk.dht.storage.ValueTuple;
 
-public class StoreManager {
+class StoreManager {
 
     private final DHT dht;
     
-    public StoreManager(DHT dht) {
+    private final MessageDispatcher messageDispatcher;
+    
+    public StoreManager(DHT dht, MessageDispatcher messageDispatcher) {
         this.dht = dht;
+        this.messageDispatcher = messageDispatcher;
     }
     
-    public ArdverkFuture<StoreEntity> store(Contact[] dst, KUID key, 
-            Value value, StoreConfig config) {
-        return null;
-    }
-    
-    public ArdverkFuture<NodeStoreEntity> store(KUID key, Value value, 
-            StoreConfig config) {
-        return null;
-    }
-    
-    public ArdverkFuture<NodeStoreEntity> put(final KUID key, final Value value,
-            final StoreConfig config) {
+    public ArdverkFuture<StoreEntity> put(final QueueKey queueKey, 
+            final KUID key, Value value, final StoreConfig config) {
+        
+        Contact localhost = dht.getContact();
+        final ValueTuple valueTuple 
+            = new DefaultValueTuple(localhost, key, value);
         
         final Object lock = new Object();
         synchronized (lock) {
             
+            // Start the lookup for the given KUID
             final ArdverkFuture<NodeEntity> lookupFuture 
-                = dht.lookup(key, config.getLookupConfig());
+                = dht.lookup(queueKey, key, config.getLookupConfig());
             
+            // This will get initialized once we've found the k-closest
+            // Contacts to the given KUID
             final AtomicReference<ArdverkFuture<StoreEntity>> storeFutureRef 
                 = new AtomicReference<ArdverkFuture<StoreEntity>>();
             
+            // This is the ArdverkFuture we're going to return to the caller
+            // of this method (in most cases the user).
             long combinedTimeout = config.getCombinedTimeout(TimeUnit.MILLISECONDS);
-            AsyncProcess<NodeStoreEntity> process = NopAsyncProcess.create();
-            final ArdverkFuture<NodeStoreEntity> userFuture 
-                = dht.submit(process, combinedTimeout, TimeUnit.MILLISECONDS);
-            userFuture.addAsyncFutureListener(new AsyncFutureListener<NodeStoreEntity>() {
+            AsyncProcess<StoreEntity> process = NopAsyncProcess.create();
+            final ArdverkFuture<StoreEntity> userFuture 
+                = dht.submit(QueueKey.DEFAULT, process, combinedTimeout, TimeUnit.MILLISECONDS);
+            userFuture.addAsyncFutureListener(new AsyncFutureListener<StoreEntity>() {
                 @Override
-                public void operationComplete(AsyncFuture<NodeStoreEntity> future) {
+                public void operationComplete(AsyncFuture<StoreEntity> future) {
                     synchronized (lock) {
                         FutureUtils.cancel(lookupFuture, true);
                         FutureUtils.cancel(storeFutureRef, true);
@@ -62,6 +67,9 @@ public class StoreManager {
                 }
             });
             
+            // Let's wait for the result of the FIND_NODE operation. On success
+            // we're going to initialize the storeFutureRef and do the actual
+            // STOREing.
             lookupFuture.addAsyncFutureListener(new AsyncFutureListener<NodeEntity>() {
                 @Override
                 public void operationComplete(AsyncFuture<NodeEntity> future) {
@@ -79,10 +87,11 @@ public class StoreManager {
                 }
                 
                 private void handleValue(final NodeEntity nodeEntity) {
-                    // TODO: Fix the nulls
                     AsyncProcess<StoreEntity> process 
-                        = new StoreResponseHandler(null, nodeEntity, null);
-                    ArdverkFuture<StoreEntity> storeFuture = dht.submit(process, config);
+                        = new StoreResponseHandler(messageDispatcher, 
+                                nodeEntity, valueTuple);
+                    ArdverkFuture<StoreEntity> storeFuture 
+                        = dht.submit(queueKey, process, config);
                     storeFuture.addAsyncFutureListener(new AsyncFutureListener<StoreEntity>() {
                         @Override
                         public void operationComplete(AsyncFuture<StoreEntity> future) {
@@ -124,8 +133,8 @@ public class StoreManager {
         }
     }
     
-    public ArdverkFuture<StoreEntity> put(Contact[] dst, KUID key, 
-            Value value, StoreConfig config) {
+    public ArdverkFuture<StoreEntity> put(QueueKey queueKey, 
+            Contact[] dst, KUID key, Value value, StoreConfig config) {
         return null;
     }
 }
