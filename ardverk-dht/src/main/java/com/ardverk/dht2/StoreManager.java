@@ -57,15 +57,6 @@ class StoreManager {
             AsyncProcess<StoreEntity> process = NopAsyncProcess.create();
             final ArdverkFuture<StoreEntity> userFuture 
                 = dht.submit(QueueKey.DEFAULT, process, combinedTimeout, TimeUnit.MILLISECONDS);
-            userFuture.addAsyncFutureListener(new AsyncFutureListener<StoreEntity>() {
-                @Override
-                public void operationComplete(AsyncFuture<StoreEntity> future) {
-                    synchronized (lock) {
-                        FutureUtils.cancel(lookupFuture, true);
-                        FutureUtils.cancel(storeFutureRef, true);
-                    }
-                }
-            });
             
             // Let's wait for the result of the FIND_NODE operation. On success
             // we're going to initialize the storeFutureRef and do the actual
@@ -127,6 +118,16 @@ class StoreManager {
                 
                 private void handleException(Throwable t) {
                     userFuture.setException(t);
+                }
+            });
+            
+            userFuture.addAsyncFutureListener(new AsyncFutureListener<StoreEntity>() {
+                @Override
+                public void operationComplete(AsyncFuture<StoreEntity> future) {
+                    synchronized (lock) {
+                        FutureUtils.cancel(lookupFuture, true);
+                        FutureUtils.cancel(storeFutureRef, true);
+                    }
                 }
             });
             
