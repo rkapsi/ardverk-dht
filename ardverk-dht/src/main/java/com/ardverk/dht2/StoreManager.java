@@ -2,12 +2,12 @@ package com.ardverk.dht2;
 
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.concurrent.AsyncAtomicReference;
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.AsyncProcess;
 import org.ardverk.concurrent.FutureUtils;
 import org.ardverk.concurrent.NopAsyncProcess;
+import org.ardverk.concurrent.ValueReference;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.concurrent.ArdverkFuture;
@@ -48,8 +48,8 @@ class StoreManager {
             
             // This will get initialized once we've found the k-closest
             // Contacts to the given KUID
-            final AsyncAtomicReference<ArdverkFuture<StoreEntity>> storeFutureRef 
-                = new AsyncAtomicReference<ArdverkFuture<StoreEntity>>();
+            final ValueReference<ArdverkFuture<StoreEntity>> storeFutureRef 
+                = new ValueReference<ArdverkFuture<StoreEntity>>();
             
             // This is the ArdverkFuture we're going to return to the caller
             // of this method (in most cases the user).

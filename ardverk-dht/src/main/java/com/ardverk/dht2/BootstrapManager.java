@@ -7,9 +7,9 @@ import java.net.SocketAddress;
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.AsyncProcess;
-import org.ardverk.concurrent.AsyncAtomicReference;
 import org.ardverk.concurrent.FutureUtils;
 import org.ardverk.concurrent.NopAsyncProcess;
+import org.ardverk.concurrent.ValueReference;
 
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.entity.BootstrapEntity;
@@ -48,8 +48,8 @@ class BootstrapManager {
             final AsyncFuture<PingEntity> pingFuture = dht.ping(
                     queueKey, address, config.getPingConfig());
             
-            final AsyncAtomicReference<AsyncFuture<NodeEntity>> lookupFutureRef
-                = new AsyncAtomicReference<AsyncFuture<NodeEntity>>();
+            final ValueReference<AsyncFuture<NodeEntity>> lookupFutureRef
+                = new ValueReference<AsyncFuture<NodeEntity>>();
             
             pingFuture.addAsyncFutureListener(new AsyncFutureListener<PingEntity>() {
                 @Override
