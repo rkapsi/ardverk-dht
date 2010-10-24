@@ -14,6 +14,7 @@ import org.ardverk.concurrent.AsyncProcessExecutorService;
 import org.ardverk.concurrent.ExecutorGroup;
 import org.ardverk.concurrent.ExecutorQueue;
 import org.ardverk.concurrent.ExecutorUtils;
+import org.ardverk.concurrent.Scheduler;
 
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.concurrent.ArdverkFutureTask;
@@ -43,6 +44,18 @@ public class FutureManager implements Closeable {
     public FutureManager(int concurrencyLevel) {
         executors.put(QueueKey.PARALLEL, new ExecutorGroup(EXECUTOR));
         executors.put(QueueKey.SERIAL, new AsyncFutureGroup(EXECUTOR, concurrencyLevel));
+    }
+    
+    public ExecutorGroup createExecutorGroup() {
+        return new ExecutorGroup(EXECUTOR);
+    }
+    
+    public ExecutorGroup createExecutorGroup(Scheduler scheduler) {
+        return new ExecutorGroup(EXECUTOR, scheduler);
+    }
+    
+    public AsyncFutureGroup createAsyncFutureGroup(int concurrencyLevel) {
+        return new AsyncFutureGroup(EXECUTOR, concurrencyLevel);
     }
     
     @Override
