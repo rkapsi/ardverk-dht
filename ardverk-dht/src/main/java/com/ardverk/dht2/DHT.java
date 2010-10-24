@@ -8,6 +8,7 @@ import org.ardverk.concurrent.AsyncProcess;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.concurrent.ArdverkFuture;
+import com.ardverk.dht.entity.BootstrapEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.StoreEntity;
@@ -24,6 +25,15 @@ public interface DHT {
     public RouteTable getRouteTable();
     
     public Database getDatabase();
+    
+    public ArdverkFuture<BootstrapEntity> bootstrap(QueueKey queueKey, 
+            String host, int port, BootstrapConfig config);
+    
+    public ArdverkFuture<BootstrapEntity> bootstrap(QueueKey queueKey, 
+            InetAddress address, int port, BootstrapConfig config);
+    
+    public ArdverkFuture<BootstrapEntity> bootstrap(QueueKey queueKey, 
+            SocketAddress address, BootstrapConfig config);
     
     public ArdverkFuture<PingEntity> ping(QueueKey queueKey, 
             String host, int port, PingConfig config);

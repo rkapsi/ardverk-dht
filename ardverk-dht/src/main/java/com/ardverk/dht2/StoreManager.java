@@ -1,8 +1,8 @@
 package com.ardverk.dht2;
 
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
+import org.ardverk.concurrent.AsyncAtomicReference;
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.AsyncProcess;
@@ -48,8 +48,8 @@ class StoreManager {
             
             // This will get initialized once we've found the k-closest
             // Contacts to the given KUID
-            final AtomicReference<ArdverkFuture<StoreEntity>> storeFutureRef 
-                = new AtomicReference<ArdverkFuture<StoreEntity>>();
+            final AsyncAtomicReference<ArdverkFuture<StoreEntity>> storeFutureRef 
+                = new AsyncAtomicReference<ArdverkFuture<StoreEntity>>();
             
             // This is the ArdverkFuture we're going to return to the caller
             // of this method (in most cases the user).
@@ -76,7 +76,7 @@ class StoreManager {
                     synchronized (lock) {
                         try {
                             if (!future.isCancelled()) {
-                                handleValue(future.get());
+                                handleNodeEntity(future.get());
                             } else {
                                 handleCancelled();
                             }
@@ -86,19 +86,22 @@ class StoreManager {
                     }
                 }
                 
-                private void handleValue(final NodeEntity nodeEntity) {
+                private void handleNodeEntity(final NodeEntity nodeEntity) {
                     AsyncProcess<StoreEntity> process 
                         = new StoreResponseHandler(messageDispatcher, 
                                 nodeEntity, valueTuple);
+                    
                     ArdverkFuture<StoreEntity> storeFuture 
-                        = dht.submit(queueKey, process, config);
+                        = storeFutureRef.make(
+                            dht.submit(queueKey, process, config));
+                    
                     storeFuture.addAsyncFutureListener(new AsyncFutureListener<StoreEntity>() {
                         @Override
                         public void operationComplete(AsyncFuture<StoreEntity> future) {
                             synchronized (lock) {
                                 try {
                                     if (!future.isCancelled()) {
-                                        handleValue(future.get());
+                                        handleStoreEntity(future.get());
                                     } else {
                                         handleCancelled();
                                     }
@@ -108,7 +111,7 @@ class StoreManager {
                             }
                         }
                         
-                        private void handleValue(StoreEntity storeEntity) {
+                        private void handleStoreEntity(StoreEntity storeEntity) {
                             long time = nodeEntity.getTimeInMillis() 
                                     + storeEntity.getTimeInMillis();
                             
@@ -116,8 +119,6 @@ class StoreManager {
                                     nodeEntity, time, TimeUnit.MILLISECONDS));
                         }
                     });
-                    
-                    storeFutureRef.set(storeFuture);
                 }
                 
                 private void handleCancelled() {

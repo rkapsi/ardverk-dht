@@ -7,6 +7,7 @@ import org.ardverk.concurrent.AsyncProcess;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.concurrent.ArdverkFuture;
+import com.ardverk.dht.entity.BootstrapEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.StoreEntity;
@@ -26,6 +27,8 @@ import com.ardverk.dht.storage.Value;
 
 public class ArdverkDHT extends AbstractDHT {
     
+    private final BootstrapManager bootstrapManager;
+    
     private final StoreManager storeManager;
     
     private final RouteTable routeTable;
@@ -43,6 +46,7 @@ public class ArdverkDHT extends AbstractDHT {
         messageDispatcher = new DefaultMessageDispatcher(
                 messageFactory, codec, routeTable, database);
         
+        bootstrapManager = new BootstrapManager(this);
         storeManager = new StoreManager(this, messageDispatcher);
     }
     
@@ -59,6 +63,24 @@ public class ArdverkDHT extends AbstractDHT {
     @Override
     public Database getDatabase() {
         return database;
+    }
+    
+    @Override
+    public ArdverkFuture<BootstrapEntity> bootstrap(QueueKey queueKey,
+            String host, int port, BootstrapConfig config) {
+        return bootstrapManager.bootstrap(queueKey, host, port, config);
+    }
+
+    @Override
+    public ArdverkFuture<BootstrapEntity> bootstrap(QueueKey queueKey,
+            InetAddress address, int port, BootstrapConfig config) {
+        return bootstrapManager.bootstrap(queueKey, address, port, config);
+    }
+
+    @Override
+    public ArdverkFuture<BootstrapEntity> bootstrap(QueueKey queueKey,
+            SocketAddress address, BootstrapConfig config) {
+        return bootstrapManager.bootstrap(queueKey, address, config);
     }
 
     @Override

@@ -366,9 +366,9 @@ public abstract class MessageDispatcher implements Closeable {
                 ScheduledFuture<?> future 
                     = EXECUTOR.schedule(task, timeout, unit);
                 
-                MessageEntity entity2 = new MessageEntity(
+                MessageEntity messageEntity = new MessageEntity(
                         future, callback, entity);
-                callbacks.put(messageId, entity2);
+                callbacks.put(messageId, messageEntity);
             }
         }
         
