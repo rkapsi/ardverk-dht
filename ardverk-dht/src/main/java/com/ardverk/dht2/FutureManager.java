@@ -8,12 +8,12 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.collection.IdentityHashSet;
 import org.ardverk.concurrent.AsyncFuture;
-import org.ardverk.concurrent.AsyncFutureGroup;
 import org.ardverk.concurrent.AsyncProcess;
 import org.ardverk.concurrent.AsyncProcessExecutorService;
 import org.ardverk.concurrent.ExecutorGroup;
 import org.ardverk.concurrent.ExecutorQueue;
 import org.ardverk.concurrent.ExecutorUtils;
+import org.ardverk.concurrent.FutureGroup;
 import org.ardverk.concurrent.Scheduler;
 
 import com.ardverk.dht.concurrent.ArdverkFuture;
@@ -43,7 +43,7 @@ public class FutureManager implements Closeable {
     
     public FutureManager(int concurrencyLevel) {
         executors.put(QueueKey.PARALLEL, createExecutorGroup());
-        executors.put(QueueKey.SERIAL, createAsyncFutureGroup(concurrencyLevel));
+        executors.put(QueueKey.SERIAL, createFutureGroup(concurrencyLevel));
     }
     
     public static ExecutorGroup createExecutorGroup() {
@@ -54,8 +54,8 @@ public class FutureManager implements Closeable {
         return new ExecutorGroup(EXECUTOR, scheduler);
     }
     
-    public static AsyncFutureGroup createAsyncFutureGroup(int concurrencyLevel) {
-        return new AsyncFutureGroup(EXECUTOR, concurrencyLevel);
+    public static FutureGroup createFutureGroup(int concurrencyLevel) {
+        return new FutureGroup(EXECUTOR, concurrencyLevel);
     }
     
     @Override
