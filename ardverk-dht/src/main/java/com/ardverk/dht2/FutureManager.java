@@ -42,19 +42,19 @@ public class FutureManager implements Closeable {
     }
     
     public FutureManager(int concurrencyLevel) {
-        executors.put(QueueKey.PARALLEL, new ExecutorGroup(EXECUTOR));
-        executors.put(QueueKey.SERIAL, new AsyncFutureGroup(EXECUTOR, concurrencyLevel));
+        executors.put(QueueKey.PARALLEL, createExecutorGroup());
+        executors.put(QueueKey.SERIAL, createAsyncFutureGroup(concurrencyLevel));
     }
     
-    public ExecutorGroup createExecutorGroup() {
+    public static ExecutorGroup createExecutorGroup() {
         return new ExecutorGroup(EXECUTOR);
     }
     
-    public ExecutorGroup createExecutorGroup(Scheduler scheduler) {
+    public static ExecutorGroup createExecutorGroup(Scheduler scheduler) {
         return new ExecutorGroup(EXECUTOR, scheduler);
     }
     
-    public AsyncFutureGroup createAsyncFutureGroup(int concurrencyLevel) {
+    public static AsyncFutureGroup createAsyncFutureGroup(int concurrencyLevel) {
         return new AsyncFutureGroup(EXECUTOR, concurrencyLevel);
     }
     
