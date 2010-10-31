@@ -42,21 +42,21 @@ class StoreManager {
         final Object lock = new Object();
         synchronized (lock) {
             
-            // Start the lookup for the given KUID
-            final ArdverkFuture<NodeEntity> lookupFuture 
-                = dht.lookup(queueKey, key, config.getLookupConfig());
+            // This is the ArdverkFuture we're going to return to the caller
+            // of this method (in most cases the user).
+            long combinedTimeout = config.getCombinedTimeout(TimeUnit.MILLISECONDS);
+            AsyncProcess<StoreEntity> process = NopAsyncProcess.create();
+            final ArdverkFuture<StoreEntity> userFuture 
+                = dht.submit(queueKey, process, combinedTimeout, TimeUnit.MILLISECONDS);
             
             // This will get initialized once we've found the k-closest
             // Contacts to the given KUID
             final ValueReference<ArdverkFuture<StoreEntity>> storeFutureRef 
                 = new ValueReference<ArdverkFuture<StoreEntity>>();
             
-            // This is the ArdverkFuture we're going to return to the caller
-            // of this method (in most cases the user).
-            long combinedTimeout = config.getCombinedTimeout(TimeUnit.MILLISECONDS);
-            AsyncProcess<StoreEntity> process = NopAsyncProcess.create();
-            final ArdverkFuture<StoreEntity> userFuture 
-                = dht.submit(QueueKey.DEFAULT, process, combinedTimeout, TimeUnit.MILLISECONDS);
+            // Start the lookup for the given KUID
+            final ArdverkFuture<NodeEntity> lookupFuture 
+                = dht.lookup(queueKey, key, config.getLookupConfig());
             
             // Let's wait for the result of the FIND_NODE operation. On success
             // we're going to initialize the storeFutureRef and do the actual

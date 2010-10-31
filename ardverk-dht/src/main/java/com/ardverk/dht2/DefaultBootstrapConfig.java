@@ -14,10 +14,20 @@ public class DefaultBootstrapConfig extends AbstractConfig
     public PingConfig getPingConfig() {
         return pingConfig;
     }
+    
+    @Override
+    public void setPingConfig(PingConfig pingConfig) {
+        this.pingConfig = pingConfig;
+    }
 
     @Override
     public LookupConfig getLookupConfig() {
         return lookupConfig;
+    }
+    
+    @Override
+    public void setLookupConfig(LookupConfig lookupConfig) {
+        this.lookupConfig = lookupConfig;
     }
 
     @Override

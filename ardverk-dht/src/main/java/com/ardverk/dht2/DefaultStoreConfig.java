@@ -5,15 +5,7 @@ import java.util.concurrent.TimeUnit;
 public class DefaultStoreConfig extends DefaultConfig 
         implements StoreConfig {
 
-    private final LookupConfig lookupConfig;
-    
-    public DefaultStoreConfig() {
-        this(new DefaultLookupConfig());
-    }
-    
-    public DefaultStoreConfig(LookupConfig lookupConfig) {
-        this.lookupConfig = lookupConfig;
-    }
+    private volatile LookupConfig lookupConfig = new DefaultLookupConfig();
     
     @Override
     public LookupConfig getLookupConfig() {
@@ -21,7 +13,12 @@ public class DefaultStoreConfig extends DefaultConfig
     }
     
     @Override
+    public void setLookupConfig(LookupConfig lookupConfig) {
+        this.lookupConfig = lookupConfig;
+    }
+    
+    @Override
     public long getCombinedTimeout(TimeUnit unit) {
-        return getTimeout(unit) + lookupConfig.getTimeout(unit);
+        return ConfigUtils.getTimeout(unit, this, lookupConfig);
     }
 }
