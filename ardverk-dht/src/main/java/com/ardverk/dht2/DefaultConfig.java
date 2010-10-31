@@ -2,7 +2,7 @@ package com.ardverk.dht2;
 
 import java.util.concurrent.TimeUnit;
 
-public class DefaultConfig implements Config {
+public class DefaultConfig extends AbstractConfig {
     
     private volatile long timeoutInMillis;
     
@@ -21,10 +21,5 @@ public class DefaultConfig implements Config {
     @Override
     public long getTimeout(TimeUnit unit) {
         return unit.convert(timeoutInMillis, TimeUnit.MILLISECONDS);
-    }
-    
-    @Override
-    public long getTimeoutInMillis() {
-        return getTimeout(TimeUnit.MILLISECONDS);
     }
 }
