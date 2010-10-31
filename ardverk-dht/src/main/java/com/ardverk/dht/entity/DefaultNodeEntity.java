@@ -1,12 +1,14 @@
 package com.ardverk.dht.entity;
 
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncProcessExecutorService;
 import org.ardverk.lang.NullArgumentException;
 
-import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.io.LookupResponseHandler.State;
+import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.routing.Contact;
 
 public class DefaultNodeEntity extends AbstractEntity implements NodeEntity {
@@ -57,6 +59,11 @@ public class DefaultNodeEntity extends AbstractEntity implements NodeEntity {
     @Override
     public Contact[] getContacts() {
         return contacts;
+    }
+
+    @Override
+    public Iterator<Contact> iterator() {
+        return Arrays.asList(contacts).iterator();
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.ardverk.dht2;
 
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncFuture;
@@ -33,21 +35,16 @@ class StoreManager {
     }
     
     public ArdverkFuture<StoreEntity> put(final QueueKey queueKey, 
-            final KUID key, Value value, final StoreConfig config) {
-        
-        Contact localhost = dht.getLocalhost();
-        final ValueTuple valueTuple 
-            = new DefaultValueTuple(localhost, key, value);
+            final KUID key, final Value value, final PutConfig config) {
         
         final Object lock = new Object();
         synchronized (lock) {
             
             // This is the ArdverkFuture we're going to return to the caller
             // of this method (in most cases the user).
-            long combinedTimeout = config.getCombinedTimeout(TimeUnit.MILLISECONDS);
             AsyncProcess<StoreEntity> process = NopAsyncProcess.create();
             final ArdverkFuture<StoreEntity> userFuture 
-                = dht.submit(queueKey, process, combinedTimeout, TimeUnit.MILLISECONDS);
+                = dht.submit(queueKey, process, config);
             
             // This will get initialized once we've found the k-closest
             // Contacts to the given KUID
@@ -58,9 +55,8 @@ class StoreManager {
             final ArdverkFuture<NodeEntity> lookupFuture 
                 = dht.lookup(queueKey, key, config.getLookupConfig());
             
-            // Let's wait for the result of the FIND_NODE operation. On success
-            // we're going to initialize the storeFutureRef and do the actual
-            // STOREing.
+            // Let's wait for the result of the FIND_NODE operation. On success we're 
+            // going to initialize the storeFutureRef and do the actual STOREing.
             lookupFuture.addAsyncFutureListener(new AsyncFutureListener<NodeEntity>() {
                 @Override
                 public void operationComplete(AsyncFuture<NodeEntity> future) {
@@ -78,13 +74,9 @@ class StoreManager {
                 }
                 
                 private void handleNodeEntity(final NodeEntity nodeEntity) {
-                    AsyncProcess<StoreEntity> process 
-                        = new StoreResponseHandler(messageDispatcher, 
-                                nodeEntity, valueTuple);
-                    
                     ArdverkFuture<StoreEntity> storeFuture 
-                        = storeFutureRef.make(
-                            dht.submit(queueKey, process, config));
+                        = storeFutureRef.make(store(queueKey, nodeEntity, 
+                                key, value, config.getStoreConfig()));
                     
                     storeFuture.addAsyncFutureListener(new AsyncFutureListener<StoreEntity>() {
                         @Override
@@ -136,7 +128,43 @@ class StoreManager {
     }
     
     public ArdverkFuture<StoreEntity> put(QueueKey queueKey, 
-            Contact[] dst, KUID key, Value value, StoreConfig config) {
-        return null;
+            final Contact[] dst, KUID key, Value value, StoreConfig config) {
+        
+        Contacts contacts = new Contacts() {
+            @Override
+            public Iterator<Contact> iterator() {
+                return Arrays.asList(dst).iterator();
+            }
+
+            @Override
+            public int size() {
+                return dst.length;
+            }
+
+            @Override
+            public Contact getContact(int index) {
+                return dst[index];
+            }
+
+            @Override
+            public Contact[] getContacts() {
+                return dst;
+            }
+        };
+        
+        return store(queueKey, contacts, key, value, config);
+    }
+    
+    private ArdverkFuture<StoreEntity> store(QueueKey queueKey, 
+            Contacts contacts, KUID key, Value value, StoreConfig config) {
+        
+        Contact localhost = dht.getLocalhost();
+        ValueTuple valueTuple = new DefaultValueTuple(localhost, key, value);
+        
+        AsyncProcess<StoreEntity> process 
+            = new StoreResponseHandler(messageDispatcher, 
+                contacts, valueTuple);
+        
+        return dht.submit(queueKey, process, config);
     }
 }

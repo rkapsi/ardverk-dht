@@ -56,7 +56,7 @@ public interface DHT {
             KUID key, ValueConfig config);
     
     public ArdverkFuture<StoreEntity> put(QueueKey queueKey,
-            KUID key, Value value, StoreConfig config);
+            KUID key, Value value, PutConfig config);
     
     public ArdverkFuture<StoreEntity> put(QueueKey queueKey, 
             Contact[] dst, KUID key, Value value, StoreConfig config);

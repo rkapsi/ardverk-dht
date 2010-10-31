@@ -17,6 +17,7 @@ import com.ardverk.dht.message.StoreRequest;
 import com.ardverk.dht.message.StoreResponse;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.storage.ValueTuple;
+import com.ardverk.dht2.Contacts;
 
 public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
 
@@ -26,7 +27,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     
     private final ProcessCounter counter = new ProcessCounter(K / 4);
     
-    private final StoreManager storeManager;
+    private final ContactsManager contactsManager;
     
     private final ValueTuple tuple;
     
@@ -43,20 +44,18 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     
     public StoreResponseHandler(
             MessageDispatcher messageDispatcher, 
-            NodeEntity entity, ValueTuple tuple) {
-        this(messageDispatcher, entity, tuple, 10L, TimeUnit.SECONDS);
+            Contacts contacts, ValueTuple tuple) {
+        this(messageDispatcher, contacts, tuple, 10L, TimeUnit.SECONDS);
     }
     
     public StoreResponseHandler(
             MessageDispatcher messageDispatcher, 
-            NodeEntity entity, ValueTuple tuple, 
+            Contacts contacts, ValueTuple tuple, 
             long timeout, TimeUnit unit) {
         super(messageDispatcher);
         
-        this.storeManager = new StoreManager(entity);
-        
+        this.contactsManager = new ContactsManager(contacts);
         this.tuple = Arguments.notNull(tuple, "tuple");
-        
         this.timeout = Arguments.notNegative(timeout, "timeout");
         this.unit = Arguments.notNull(unit, "unit");
     }
@@ -71,11 +70,11 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
             preProcess(pop);
             
             while (counter.hasNext() && counter.getCount() < K) {
-                if (!storeManager.hasNext()) {
+                if (!contactsManager.hasNext()) {
                     break;
                 }
                 
-                Contact contact = storeManager.next();
+                Contact contact = contactsManager.next();
                 store(contact);
                 
                 counter.increment();
@@ -134,22 +133,22 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
         process(1);
     }
     
-    private static class StoreManager {
+    private static class ContactsManager {
         
-        private final NodeEntity entity;
+        private final Contacts contacts;
         
         private int index = 0;
         
-        public StoreManager(NodeEntity entity) {
-            this.entity = Arguments.notNull(entity, "entity");
+        public ContactsManager(Contacts contacts) {
+            this.contacts = Arguments.notNull(contacts, "contacts");
         }
         
         public boolean hasNext() {
-            return index < entity.size();
+            return index < contacts.size();
         }
         
         public Contact next() {
-            return entity.getContact(index++);
+            return contacts.getContact(index++);
         }
     }
 }

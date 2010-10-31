@@ -142,7 +142,7 @@ public class ArdverkDHT extends AbstractDHT {
 
     @Override
     public ArdverkFuture<StoreEntity> put(QueueKey queueKey, 
-            KUID key, Value value, StoreConfig config) {
+            KUID key, Value value, PutConfig config) {
         return storeManager.put(queueKey, key, value, config);
     }
     
