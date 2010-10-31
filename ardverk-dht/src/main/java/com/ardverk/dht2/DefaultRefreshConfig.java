@@ -2,17 +2,21 @@ package com.ardverk.dht2;
 
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.utils.TimeUtils;
+
 public class DefaultRefreshConfig extends AbstractConfig implements RefreshConfig {
 
     private volatile PingConfig pingConfig = new DefaultPingConfig();
 
-    private volatile int pingCount = 20;
+    private volatile int pingCount = Constants.K;
     
-    private volatile long contactTimeoutInMillis;
+    private volatile long contactTimeoutInMillis 
+        = TimeUtils.convert(5L, TimeUnit.MINUTES, TimeUnit.MILLISECONDS);
     
     private volatile LookupConfig lookupConfig = new DefaultLookupConfig();
     
-    private volatile long bucketTimeoutInMillis;
+    private volatile long bucketTimeoutInMillis 
+        = TimeUtils.convert(5L, TimeUnit.MINUTES, TimeUnit.MILLISECONDS);
     
     @Override
     public PingConfig getPingConfig() {
@@ -20,8 +24,18 @@ public class DefaultRefreshConfig extends AbstractConfig implements RefreshConfi
     }
     
     @Override
+    public void setPingConfig(PingConfig pingConfig) {
+        this.pingConfig = pingConfig;
+    }
+    
+    @Override
     public int getPingCount() {
         return pingCount;
+    }
+    
+    @Override
+    public void setPingCount(int pingCount) {
+        this.pingCount = pingCount;
     }
 
     @Override
@@ -42,6 +56,11 @@ public class DefaultRefreshConfig extends AbstractConfig implements RefreshConfi
     @Override
     public LookupConfig getLookupConfig() {
         return lookupConfig;
+    }
+    
+    @Override
+    public void setLookupConfig(LookupConfig lookupConfig) {
+        this.lookupConfig = lookupConfig;
     }
 
     @Override

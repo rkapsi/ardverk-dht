@@ -6,6 +6,8 @@ public interface RefreshConfig extends Config {
 
     public int getPingCount();
     
+    public void setPingCount(int pingCount);
+    
     public long getContactTimeout(TimeUnit unit);
     
     public long getContactTimeoutInMillis();
@@ -14,7 +16,11 @@ public interface RefreshConfig extends Config {
     
     public PingConfig getPingConfig();
     
+    public void setPingConfig(PingConfig pingConfig);
+    
     public LookupConfig getLookupConfig();
+    
+    public void setLookupConfig(LookupConfig lookupConfig);
     
     public long getBucketTimeout(TimeUnit unit);
     
