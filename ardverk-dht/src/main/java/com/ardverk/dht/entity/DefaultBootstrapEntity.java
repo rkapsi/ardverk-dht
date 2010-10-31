@@ -5,7 +5,34 @@ import java.util.concurrent.TimeUnit;
 public class DefaultBootstrapEntity extends AbstractEntity 
         implements BootstrapEntity {
 
-    public DefaultBootstrapEntity(long time, TimeUnit unit) {
-        super(time, unit);
+    private final PingEntity pingEntity;
+    
+    private final NodeEntity nodeEntity;
+    
+    public DefaultBootstrapEntity(PingEntity pingEntity, 
+            NodeEntity nodeEntity) {
+        super(getTimeInMillis(pingEntity, nodeEntity), 
+                TimeUnit.MILLISECONDS);
+        
+        this.pingEntity = pingEntity;
+        this.nodeEntity = nodeEntity;
+    }
+
+    @Override
+    public PingEntity getPingEntity() {
+        return pingEntity;
+    }
+
+    @Override
+    public NodeEntity getNodeEntity() {
+        return nodeEntity;
+    }
+    
+    private static long getTimeInMillis(Entity... entities) {
+        long time = 0;
+        for (Entity entity : entities) {
+            time += entity.getTimeInMillis();
+        }
+        return time;
     }
 }
