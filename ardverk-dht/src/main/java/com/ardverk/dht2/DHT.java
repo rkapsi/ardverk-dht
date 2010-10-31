@@ -35,6 +35,8 @@ public interface DHT {
     public ArdverkFuture<BootstrapEntity> bootstrap(QueueKey queueKey, 
             SocketAddress address, BootstrapConfig config);
     
+    public ArdverkFuture<?>[] refresh(QueueKey queueKey, RefreshConfig config);
+    
     public ArdverkFuture<PingEntity> ping(QueueKey queueKey, 
             String host, int port, PingConfig config);
     

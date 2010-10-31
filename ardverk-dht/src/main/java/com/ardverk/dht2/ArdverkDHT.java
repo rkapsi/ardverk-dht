@@ -31,6 +31,8 @@ public class ArdverkDHT extends AbstractDHT {
     
     private final StoreManager storeManager;
     
+    private final RouteTableManager routeTableManager;
+    
     private final RouteTable routeTable;
     
     private final Database database;
@@ -48,6 +50,7 @@ public class ArdverkDHT extends AbstractDHT {
         
         bootstrapManager = new BootstrapManager(this);
         storeManager = new StoreManager(this, messageDispatcher);
+        routeTableManager = new RouteTableManager(this, routeTable);
     }
     
     @Override
@@ -81,6 +84,11 @@ public class ArdverkDHT extends AbstractDHT {
     public ArdverkFuture<BootstrapEntity> bootstrap(QueueKey queueKey,
             SocketAddress address, BootstrapConfig config) {
         return bootstrapManager.bootstrap(queueKey, address, config);
+    }
+    
+    @Override
+    public ArdverkFuture<?>[] refresh(QueueKey queueKey, RefreshConfig config) {
+        return routeTableManager.refresh(queueKey, config);
     }
 
     @Override

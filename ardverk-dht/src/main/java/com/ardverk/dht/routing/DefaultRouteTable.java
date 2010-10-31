@@ -8,11 +8,11 @@ import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.collection.Cursor;
+import org.ardverk.collection.Cursor.Decision;
 import org.ardverk.collection.FixedSizeHashMap;
 import org.ardverk.collection.KeyAnalyzer;
 import org.ardverk.collection.PatriciaTrie;
 import org.ardverk.collection.Trie;
-import org.ardverk.collection.Cursor.Decision;
 import org.ardverk.lang.NullArgumentException;
 import org.ardverk.net.NetworkCounter;
 import org.ardverk.net.NetworkMask;
@@ -309,6 +309,33 @@ public class DefaultRouteTable extends AbstractRouteTable {
         });
     }
     
+    @Override
+    public synchronized KUID[] select(final long timeout, final TimeUnit unit) {
+        final List<KUID> bucketIds = new ArrayList<KUID>();
+        final KUID localhostId = localhost.getContactId();
+        
+        buckets.select(localhostId, new Cursor<KUID, Bucket>() {
+            @Override
+            public Decision select(Entry<? extends KUID, ? extends Bucket> entry) {
+                Bucket bucket = entry.getValue();
+                
+                if (!bucket.contains(localhostId) 
+                        && bucket.isTimeout(timeout, unit)) {
+                    // Select a random ID with this prefix
+                    KUID randomId = KUID.createWithPrefix(
+                            bucket.getBucketId(), bucket.getDepth());
+                    
+                    bucketIds.add(randomId);
+                    bucket.touch();
+                }
+                
+                return Decision.CONTINUE;
+            }
+        });
+        
+        return bucketIds.toArray(new KUID[0]);
+    }
+
     public int getMaxDepth() {
         return Integer.MAX_VALUE;
     }
@@ -526,6 +553,8 @@ public class DefaultRouteTable extends AbstractRouteTable {
     
     public class Bucket {
         
+        private final long creationTime = System.currentTimeMillis();
+        
         private final KUID bucketId;
         
         private final int depth;
@@ -536,6 +565,8 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         private final NetworkCounter counter 
             = new NetworkCounter(NetworkMask.C);
+        
+        private long timeStamp = creationTime;
         
         private Bucket(KUID bucketId, int depth, int k, int maxCacheSize) {
             if (bucketId == null) {
@@ -562,6 +593,23 @@ public class DefaultRouteTable extends AbstractRouteTable {
             
             cached = new FixedSizeHashMap<KUID, ContactEntity>(
                     maxCacheSize, 1.0f, true, maxCacheSize);
+        }
+        
+        public long getCreationTime() {
+            return creationTime;
+        }
+        
+        public long getTimeStamp() {
+            return timeStamp;
+        }
+        
+        public void touch() {
+            timeStamp = System.currentTimeMillis();
+        }
+        
+        public boolean isTimeout(long timeout, TimeUnit unit) {
+            long timeoutInMillis = unit.toMillis(timeout);
+            return (System.currentTimeMillis()-timeStamp) >= timeoutInMillis;
         }
         
         public int size() {

@@ -57,6 +57,29 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
         return create(new BigInteger(key, radix));
     }
     
+    public static KUID createWithPrefix(KUID prefix, int bits) {
+        // 1) Create a random KUID of the same length
+        byte[] dst = new byte[prefix.length()];
+        GENERATOR.nextBytes(dst);
+        
+        // 2) Overwrite the prefix bytes
+        ++bits;
+        int length = bits/8;
+        System.arraycopy(prefix.key, 0, dst, 0, length);
+        
+        // 3) Overwrite the remaining bits
+        int bitsToCopy = bits % 8;
+        if (bitsToCopy != 0) {
+            // Mask has the low-order (8-bits) bits set
+            int mask = (1 << (8-bitsToCopy)) - 1;
+            int prefixByte = prefix.key[length];
+            int randByte   = dst[length];
+            dst[length] = (byte) ((prefixByte & ~mask) | (randByte & mask));
+        }
+        
+        return create(dst);
+    }
+    
     private final byte[] key;
     
     private final int hashCode;

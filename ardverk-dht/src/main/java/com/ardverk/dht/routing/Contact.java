@@ -417,6 +417,13 @@ public class Contact implements PrimitiveProperties<Object>,
     }
     
     /**
+     * 
+     */
+    public boolean isTimeout(long timeout, TimeUnit unit) {
+        return getTimeSinceLastContact(unit) >= timeout;
+    }
+    
+    /**
      * Returns the adaptive timeout for this {@link Contact}.
      */
     public long getAdaptiveTimeout(long defaultValue, TimeUnit unit) {
