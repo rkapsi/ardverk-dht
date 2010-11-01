@@ -24,7 +24,7 @@ import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.io.NodeResponseHandler;
 import com.ardverk.dht.io.PingResponseHandler;
 import com.ardverk.dht.io.ValueResponseHandler;
-import com.ardverk.dht.message.AbstractMessageCodec;
+import com.ardverk.dht.message.MessageCodec;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
@@ -44,7 +44,7 @@ public class ArdverkDHT extends AbstractDHT {
     
     private final MessageDispatcher messageDispatcher;
     
-    public ArdverkDHT(AbstractMessageCodec codec, MessageFactory messageFactory, 
+    public ArdverkDHT(MessageCodec codec, MessageFactory messageFactory, 
             RouteTable routeTable, Database database) {
         
         this.routeTable = routeTable;
@@ -73,6 +73,11 @@ public class ArdverkDHT extends AbstractDHT {
     }
     
     @Override
+    public MessageDispatcher getMessageDispatcher() {
+        return messageDispatcher;
+    }
+
+    @Override
     public ArdverkFuture<BootstrapEntity> bootstrap(QueueKey queueKey,
             String host, int port, BootstrapConfig config) {
         return bootstrapManager.bootstrap(queueKey, host, port, config);
@@ -88,6 +93,12 @@ public class ArdverkDHT extends AbstractDHT {
     public ArdverkFuture<BootstrapEntity> bootstrap(QueueKey queueKey,
             SocketAddress address, BootstrapConfig config) {
         return bootstrapManager.bootstrap(queueKey, address, config);
+    }
+    
+    @Override
+    public ArdverkFuture<BootstrapEntity> bootstrap(QueueKey queueKey,
+            Contact contact, BootstrapConfig config) {
+        return bootstrapManager.bootstrap(queueKey, contact, config);
     }
     
     @Override

@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 
-import com.ardverk.dht.message.AbstractMessageCodec;
+import com.ardverk.dht.message.MessageCodec;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.NodeRequest;
 import com.ardverk.dht.message.PingRequest;
@@ -33,7 +33,7 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
     private final StoreRequestHandler store;
     
     public DefaultMessageDispatcher(MessageFactory factory, 
-            AbstractMessageCodec codec, RouteTable routeTable, 
+            MessageCodec codec, RouteTable routeTable, 
             Database database) {
         super(factory, codec);
         

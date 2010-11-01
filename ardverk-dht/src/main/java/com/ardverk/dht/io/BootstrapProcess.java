@@ -12,7 +12,6 @@ import org.ardverk.lang.NullArgumentException;
 import com.ardverk.dht.DHT;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.entity.BootstrapEntity;
-import com.ardverk.dht.entity.DefaultBootstrapEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.routing.Contact;
@@ -91,7 +90,8 @@ public class BootstrapProcess implements AsyncProcess<BootstrapEntity> {
     
     private void doComplete() {
         long time = System.currentTimeMillis() - startTime;
-        future.setValue(new DefaultBootstrapEntity(time, TimeUnit.MILLISECONDS));
+        //future.setValue(new DefaultBootstrapEntity(time, TimeUnit.MILLISECONDS));
+        future.setException(new IllegalStateException());
     }
     
     private void start() {

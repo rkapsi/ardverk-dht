@@ -2,6 +2,7 @@ package com.ardverk.dht.io;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -27,7 +28,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     
     private final ProcessCounter counter = new ProcessCounter(K / 4);
     
-    private final ContactsManager contactsManager;
+    private final Iterator<Contact> contacts;
     
     private final ValueTuple tuple;
     
@@ -54,7 +55,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
             long timeout, TimeUnit unit) {
         super(messageDispatcher);
         
-        this.contactsManager = new ContactsManager(contacts);
+        this.contacts = contacts.iterator();
         this.tuple = Arguments.notNull(tuple, "tuple");
         this.timeout = Arguments.notNegative(timeout, "timeout");
         this.unit = Arguments.notNull(unit, "unit");
@@ -70,11 +71,11 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
             preProcess(pop);
             
             while (counter.hasNext() && counter.getCount() < K) {
-                if (!contactsManager.hasNext()) {
+                if (!contacts.hasNext()) {
                     break;
                 }
                 
-                Contact contact = contactsManager.next();
+                Contact contact = contacts.next();
                 store(contact);
                 
                 counter.increment();
@@ -131,24 +132,5 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     protected synchronized void processTimeout(RequestEntity entity, 
             long time, TimeUnit unit) throws IOException {
         process(1);
-    }
-    
-    private static class ContactsManager {
-        
-        private final Contacts contacts;
-        
-        private int index = 0;
-        
-        public ContactsManager(Contacts contacts) {
-            this.contacts = Arguments.notNull(contacts, "contacts");
-        }
-        
-        public boolean hasNext() {
-            return index < contacts.size();
-        }
-        
-        public Contact next() {
-            return contacts.get(index++);
-        }
     }
 }

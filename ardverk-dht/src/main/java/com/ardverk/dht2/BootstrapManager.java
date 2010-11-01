@@ -49,6 +49,11 @@ class BootstrapManager {
     }
     
     public ArdverkFuture<BootstrapEntity> bootstrap(QueueKey queueKey, 
+            Contact contact, BootstrapConfig config) {
+        return bootstrap(queueKey, contact.getContactAddress(), config);
+    }
+    
+    public ArdverkFuture<BootstrapEntity> bootstrap(QueueKey queueKey, 
             SocketAddress address, BootstrapConfig config) {
         
         Object lock = new Object();
@@ -143,7 +148,7 @@ class BootstrapManager {
         return userFuture;
     }
     
-public ArdverkFuture<?>[] refresh(QueueKey queueKey, RefreshConfig config) {
+    public ArdverkFuture<?>[] refresh(QueueKey queueKey, RefreshConfig config) {
         
         List<ArdverkFuture<?>> futures 
             = new ArrayList<ArdverkFuture<?>>();

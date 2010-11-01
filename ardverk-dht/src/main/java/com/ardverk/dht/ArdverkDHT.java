@@ -153,10 +153,11 @@ public class ArdverkDHT extends AbstractDHT implements Closeable {
         
         ValueTuple tuple = new DefaultValueTuple(localhost, key, value);
         
-        AsyncProcess<StoreEntity> process 
+        /*AsyncProcess<StoreEntity> process 
             = new StoreResponseHandler(messageDispatcher, 
                     StoreResponseHandler.DEFAULT, tuple);
-        return submit(process, timeout, unit);
+        return submit(process, timeout, unit);*/
+        throw new IllegalStateException();
     }
     
     @Override
