@@ -1,15 +1,14 @@
 package com.ardverk.dht.entity;
 
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncProcessExecutorService;
-import org.ardverk.lang.NullArgumentException;
 
 import com.ardverk.dht.io.LookupResponseHandler.State;
 import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht2.Contacts;
+import com.ardverk.dht2.DefaultContacts;
 
 public class DefaultNodeEntity extends AbstractEntity implements NodeEntity {
 
@@ -17,25 +16,21 @@ public class DefaultNodeEntity extends AbstractEntity implements NodeEntity {
     
     private final MessageDispatcher messageDispatcher = null;
     
-    private final Contact[] contacts;
+    private final Contacts contacts;
     
     private final int hop;
     
     public DefaultNodeEntity(Contact[] contacts, int hops, long time, TimeUnit unit) {
         super(time, unit);
         
-        if (contacts == null) {
-            throw new NullArgumentException("contacts");
-        }
-        
-        this.contacts = contacts;
+        this.contacts = new DefaultContacts(contacts);
         this.hop = hops;
     }
     
     public DefaultNodeEntity(State state) {
         super(state.getTimeInMillis(), TimeUnit.MILLISECONDS);
         
-        this.contacts = state.getContacts();
+        this.contacts = new DefaultContacts(state.getContacts());
         this.hop = state.getHop();
     }
     
@@ -47,23 +42,8 @@ public class DefaultNodeEntity extends AbstractEntity implements NodeEntity {
     }*/
     
     @Override
-    public Contact getContact(int index) {
-        return contacts[index];
-    }
-
-    @Override
-    public int size() {
-        return contacts.length;
-    }
-
-    @Override
-    public Contact[] getContacts() {
+    public Contacts getContacts() {
         return contacts;
-    }
-
-    @Override
-    public Iterator<Contact> iterator() {
-        return Arrays.asList(contacts).iterator();
     }
 
     @Override

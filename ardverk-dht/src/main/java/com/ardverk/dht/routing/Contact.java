@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.collection.CollectionsUtils;
+import org.ardverk.collection.CollectionUtils;
 import org.ardverk.lang.NullArgumentException;
 import org.ardverk.lang.NumberUtils;
 import org.ardverk.lang.PrimitiveProperties;
@@ -210,7 +210,7 @@ public class Contact implements PrimitiveProperties<Object>,
         this.remoteAddress = combine(
                 socketAddress, contactAddress);
         
-        this.attributes = CollectionsUtils.copy(attributes);
+        this.attributes = CollectionUtils.copy(attributes);
     }
     
     /**

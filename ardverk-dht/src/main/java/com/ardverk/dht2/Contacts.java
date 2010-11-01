@@ -6,7 +6,9 @@ public interface Contacts extends Iterable<Contact> {
 
     public int size();
     
-    public Contact getContact(int index);
+    public boolean isEmpty();
     
-    public Contact[] getContacts();
+    public Contact get(int index);
+    
+    public Contact[] toArray();
 }

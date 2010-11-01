@@ -1,7 +1,5 @@
 package com.ardverk.dht2;
 
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncFuture;
@@ -76,8 +74,9 @@ class StoreManager {
                 }
                 
                 private void handleNodeEntity(final NodeEntity nodeEntity) {
+                    Contacts contacts = nodeEntity.getContacts();
                     ArdverkFuture<StoreEntity> storeFuture 
-                        = storeFutureRef.make(store(queueKey, nodeEntity, 
+                        = storeFutureRef.make(store(queueKey, contacts, 
                                 key, value, config.getStoreConfig()));
                     
                     storeFuture.addAsyncFutureListener(new AsyncFutureListener<StoreEntity>() {
@@ -130,30 +129,9 @@ class StoreManager {
     }
     
     public ArdverkFuture<StoreEntity> put(QueueKey queueKey, 
-            final Contact[] dst, KUID key, Value value, StoreConfig config) {
+            Contact[] dst, KUID key, Value value, StoreConfig config) {
         
-        Contacts contacts = new Contacts() {
-            @Override
-            public Iterator<Contact> iterator() {
-                return Arrays.asList(dst).iterator();
-            }
-
-            @Override
-            public int size() {
-                return dst.length;
-            }
-
-            @Override
-            public Contact getContact(int index) {
-                return dst[index];
-            }
-
-            @Override
-            public Contact[] getContacts() {
-                return dst;
-            }
-        };
-        
+        Contacts contacts = new DefaultContacts(dst);
         return store(queueKey, contacts, key, value, config);
     }
     

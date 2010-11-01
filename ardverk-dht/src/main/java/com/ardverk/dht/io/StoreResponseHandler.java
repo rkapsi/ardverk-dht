@@ -148,7 +148,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
         }
         
         public Contact next() {
-            return contacts.getContact(index++);
+            return contacts.get(index++);
         }
     }
 }
