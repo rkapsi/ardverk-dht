@@ -75,7 +75,7 @@ public class EventUtils {
             = new AtomicReference<Thread>();
         
         private final ThreadFactory factory 
-                = new DefaultThreadFactory("DefaultThreadEvent") {
+                = new DefaultThreadFactory("DefaultEventThread") {
             @Override
             public Thread newThread(Runnable r) {
                 Thread thread = super.newThread(r);

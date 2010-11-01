@@ -66,7 +66,7 @@ public class Main {
         
         DHT first = null;
         List<DHT> dhts = new ArrayList<DHT>();
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1000; i++) {
             DHT dht = createDHT(2000 + i);
             dhts.add(dht);
             
@@ -77,7 +77,7 @@ public class Main {
             if (0 < i) {
                 BootstrapConfig config = new DefaultBootstrapConfig();
                 ArdverkFuture<BootstrapEntity> future = dht.bootstrap(
-                        QueueKey.DEFAULT, first.getLocalhost(), config);
+                        QueueKey.BACKEND, first.getLocalhost(), config);
                 future.get();
             }
         }
@@ -87,7 +87,7 @@ public class Main {
             config.setBucketTimeout(-1L, TimeUnit.MILLISECONDS);
             
             ArdverkFuture<?>[] futures = dht.refresh(
-                    QueueKey.DEFAULT, config);
+                    QueueKey.BACKEND, config);
             for (ArdverkFuture<?> future : futures) {
                 future.get();
             }
