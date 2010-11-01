@@ -1,7 +1,6 @@
-package com.ardverk.dht2;
+package com.ardverk.dht.config;
 
 import java.util.concurrent.TimeUnit;
-
 
 public class DefaultBootstrapConfig extends AbstractConfig 
         implements BootstrapConfig {

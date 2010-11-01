@@ -1,4 +1,6 @@
-package com.ardverk.dht2;
+package com.ardverk.dht.config;
+
+import com.ardverk.dht2.LookupConfig;
 
 public interface BootstrapConfig extends Config {
 

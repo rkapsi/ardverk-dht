@@ -1,8 +1,10 @@
-package com.ardverk.dht2;
+package com.ardverk.dht.config;
 
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.utils.TimeUtils;
+
+import com.ardverk.dht2.Constants;
 
 public class DefaultRefreshConfig extends AbstractConfig implements RefreshConfig {
 

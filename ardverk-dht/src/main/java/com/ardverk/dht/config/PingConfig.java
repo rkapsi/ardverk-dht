@@ -1,4 +1,4 @@
-package com.ardverk.dht2;
+package com.ardverk.dht.config;
 
 public interface PingConfig extends Config {
     
