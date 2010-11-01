@@ -5,6 +5,7 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import org.ardverk.utils.DeadlockScanner;
 
@@ -82,8 +83,11 @@ public class Main {
         }
         
         for (DHT dht : dhts) {
+            DefaultRefreshConfig config = new DefaultRefreshConfig();
+            config.setBucketTimeout(-1L, TimeUnit.MILLISECONDS);
+            
             ArdverkFuture<?>[] futures = dht.refresh(
-                    QueueKey.DEFAULT, new DefaultRefreshConfig());
+                    QueueKey.DEFAULT, config);
             for (ArdverkFuture<?> future : futures) {
                 future.get();
             }
@@ -104,17 +108,22 @@ public class Main {
         ValueTuple tuple = entity.getValue();
         
         System.out.println(tuple.getSender());
+        System.out.println(tuple.getKey().getPrimaryKey() + " vs. " + key);
         System.out.println(new String(tuple.getValue().getValue()));
         
+        int foo = 0;
         int counter = 0;
         for (DHT dht : dhts) {
             Database database = dht.getDatabase();
             if (!database.isEmpty()) {
                 ++counter;
             }
+            
+            foo += dht.getRouteTable().size();
         }
         
         System.out.println("COUNTER: " + counter);
+        System.out.println("AVG: " + foo/dhts.size());
         System.out.println("DONE!");
     }
 }
