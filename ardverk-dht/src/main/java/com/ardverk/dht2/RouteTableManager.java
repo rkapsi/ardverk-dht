@@ -6,6 +6,9 @@ import java.util.concurrent.TimeUnit;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.concurrent.ArdverkFuture;
+import com.ardverk.dht.config.LookupConfig;
+import com.ardverk.dht.config.PingConfig;
+import com.ardverk.dht.config.RefreshConfig;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.routing.Contact;

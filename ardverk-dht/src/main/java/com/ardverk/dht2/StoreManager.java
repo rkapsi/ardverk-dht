@@ -13,6 +13,8 @@ import org.ardverk.concurrent.ValueReference;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.concurrent.ArdverkFuture;
+import com.ardverk.dht.config.PutConfig;
+import com.ardverk.dht.config.StoreConfig;
 import com.ardverk.dht.entity.DefaultNodeStoreEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.StoreEntity;

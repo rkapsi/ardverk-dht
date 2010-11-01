@@ -8,6 +8,14 @@ import org.ardverk.concurrent.AsyncProcess;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.concurrent.ArdverkFuture;
+import com.ardverk.dht.config.Config;
+import com.ardverk.dht.config.BootstrapConfig;
+import com.ardverk.dht.config.LookupConfig;
+import com.ardverk.dht.config.PingConfig;
+import com.ardverk.dht.config.PutConfig;
+import com.ardverk.dht.config.RefreshConfig;
+import com.ardverk.dht.config.StoreConfig;
+import com.ardverk.dht.config.ValueConfig;
 import com.ardverk.dht.entity.BootstrapEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
@@ -58,7 +66,7 @@ public interface DHT {
     public ArdverkFuture<StoreEntity> put(QueueKey queueKey,
             KUID key, Value value, PutConfig config);
     
-    public ArdverkFuture<StoreEntity> put(QueueKey queueKey, 
+    public ArdverkFuture<StoreEntity> store(QueueKey queueKey, 
             Contact[] dst, KUID key, Value value, StoreConfig config);
     
     public <V> ArdverkFuture<V> submit(QueueKey queueKey, 

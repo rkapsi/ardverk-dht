@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 import org.ardverk.concurrent.AsyncProcess;
 
 import com.ardverk.dht.concurrent.ArdverkFuture;
+import com.ardverk.dht.config.Config;
 
 abstract class AbstractDHT implements DHT {
 
