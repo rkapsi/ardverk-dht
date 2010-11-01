@@ -107,6 +107,7 @@ public class Main {
         ValueEntity entity = valueFuture.get();
         ValueTuple tuple = entity.getValue();
         
+        System.out.println(entity.getTimeInMillis());
         System.out.println(tuple.getSender());
         System.out.println(tuple.getKey().getPrimaryKey() + " vs. " + key);
         System.out.println(new String(tuple.getValue().getValue()));
