@@ -738,12 +738,13 @@ public class Contact implements PrimitiveProperties<Object>,
     }
 
     /**
-     * 
+     * Merges the two arguments into on {@link Map} unless one of them
+     * is either empty or null in which case the other one is returned.
      */ 
     private static Map<?, ?> merge(Map<?, ?> m1, Map<?, ?> m2) {
-        if (m1.isEmpty()) {
+        if (m1 == null || m1.isEmpty()) {
             return m2;
-        } else if (m2.isEmpty()) {
+        } else if (m2 == null || m2.isEmpty()) {
             return m1;
         }
         
