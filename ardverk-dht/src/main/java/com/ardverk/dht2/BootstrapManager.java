@@ -16,6 +16,7 @@ import org.ardverk.concurrent.ValueReference;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.concurrent.ArdverkFuture;
+import com.ardverk.dht.concurrent.RefreshFuture;
 import com.ardverk.dht.config.BootstrapConfig;
 import com.ardverk.dht.config.LookupConfig;
 import com.ardverk.dht.config.PingConfig;
@@ -24,6 +25,7 @@ import com.ardverk.dht.entity.BootstrapEntity;
 import com.ardverk.dht.entity.DefaultBootstrapEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
+import com.ardverk.dht.entity.RefreshEntity;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 
@@ -148,10 +150,14 @@ class BootstrapManager {
         return userFuture;
     }
     
-    public ArdverkFuture<?>[] refresh(QueueKey queueKey, RefreshConfig config) {
+    @SuppressWarnings("unchecked")
+    public ArdverkFuture<RefreshEntity> refresh(QueueKey queueKey, RefreshConfig config) {
         
-        List<ArdverkFuture<?>> futures 
-            = new ArrayList<ArdverkFuture<?>>();
+        List<ArdverkFuture<PingEntity>> pingFutures 
+            = new ArrayList<ArdverkFuture<PingEntity>>();
+        
+        List<ArdverkFuture<NodeEntity>> lookupFutures 
+            = new ArrayList<ArdverkFuture<NodeEntity>>();
         
         synchronized (routeTable) {
             int pingCount = config.getPingCount();
@@ -165,7 +171,7 @@ class BootstrapManager {
                     if (contact.isTimeout(contactTimeout, TimeUnit.MILLISECONDS)) {
                         ArdverkFuture<PingEntity> future = dht.ping(
                                 queueKey, contact, pingConfig);
-                        futures.add(future);
+                        pingFutures.add(future);
                     }
                 }
             }
@@ -177,10 +183,11 @@ class BootstrapManager {
             for (KUID bucketId : bucketIds) {
                 ArdverkFuture<NodeEntity> future = dht.lookup(
                         queueKey, bucketId, lookupConfig);
-                futures.add(future);
+                lookupFutures.add(future);
             }
         }
         
-        return futures.toArray(new ArdverkFuture[0]);
+        return new RefreshFuture(pingFutures.toArray(new ArdverkFuture[0]), 
+                lookupFutures.toArray(new ArdverkFuture[0]));
     }
 }

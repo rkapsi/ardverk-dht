@@ -17,6 +17,7 @@ import com.ardverk.dht.config.DefaultPutConfig;
 import com.ardverk.dht.config.DefaultRefreshConfig;
 import com.ardverk.dht.config.DefaultValueConfig;
 import com.ardverk.dht.entity.BootstrapEntity;
+import com.ardverk.dht.entity.RefreshEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.io.DatagramTransport;
@@ -86,11 +87,10 @@ public class Main {
             DefaultRefreshConfig config = new DefaultRefreshConfig();
             config.setBucketTimeout(-1L, TimeUnit.MILLISECONDS);
             
-            ArdverkFuture<?>[] futures = dht.refresh(
+            ArdverkFuture<RefreshEntity> future = dht.refresh(
                     QueueKey.BACKEND, config);
-            for (ArdverkFuture<?> future : futures) {
-                future.get();
-            }
+            RefreshEntity entity = future.get();
+            System.out.println(entity);
         }
         
         System.out.println(dhts.size());

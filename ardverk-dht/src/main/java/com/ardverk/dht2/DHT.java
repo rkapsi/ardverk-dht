@@ -19,6 +19,7 @@ import com.ardverk.dht.config.ValueConfig;
 import com.ardverk.dht.entity.BootstrapEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
+import com.ardverk.dht.entity.RefreshEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.io.MessageDispatcher;
@@ -49,7 +50,7 @@ public interface DHT {
     public ArdverkFuture<BootstrapEntity> bootstrap(QueueKey queueKey, 
             Contact contact, BootstrapConfig config);
     
-    public ArdverkFuture<?>[] refresh(QueueKey queueKey, RefreshConfig config);
+    public ArdverkFuture<RefreshEntity> refresh(QueueKey queueKey, RefreshConfig config);
     
     public ArdverkFuture<PingEntity> ping(QueueKey queueKey, 
             String host, int port, PingConfig config);

@@ -17,6 +17,7 @@ import com.ardverk.dht.config.ValueConfig;
 import com.ardverk.dht.entity.BootstrapEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
+import com.ardverk.dht.entity.RefreshEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.io.DefaultMessageDispatcher;
@@ -102,7 +103,7 @@ public class ArdverkDHT extends AbstractDHT {
     }
     
     @Override
-    public ArdverkFuture<?>[] refresh(QueueKey queueKey, RefreshConfig config) {
+    public ArdverkFuture<RefreshEntity> refresh(QueueKey queueKey, RefreshConfig config) {
         return bootstrapManager.refresh(queueKey, config);
     }
 

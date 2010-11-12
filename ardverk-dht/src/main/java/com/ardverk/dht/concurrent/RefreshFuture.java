@@ -1,21 +1,26 @@
 package com.ardverk.dht.concurrent;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.FutureUtils;
 
+import com.ardverk.dht.entity.DefaultRefreshEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
+import com.ardverk.dht.entity.RefreshEntity;
 
-public class RefreshFuture extends ArdverkValueFuture<Object> {
+public class RefreshFuture extends ArdverkValueFuture<RefreshEntity> {
+    
+    private final long startTime = System.currentTimeMillis();
+    
+    private final AtomicInteger coutdown = new AtomicInteger();
     
     private final ArdverkFuture<PingEntity>[] pingFutures;
     
     private final ArdverkFuture<NodeEntity>[] lookupFutures;
-    
-    private final AtomicInteger coutdown = new AtomicInteger();
     
     @SuppressWarnings("unchecked")
     public RefreshFuture(ArdverkFuture<PingEntity>[] pingFutures, 
@@ -62,7 +67,9 @@ public class RefreshFuture extends ArdverkValueFuture<Object> {
     
     private void coutdown() {
         if (coutdown.decrementAndGet() == 0) {
-            setValue(new Object());
+            long time = System.currentTimeMillis() - startTime;
+            setValue(new DefaultRefreshEntity(pingFutures, lookupFutures, 
+                    time, TimeUnit.MILLISECONDS));
         }
     }
 }
