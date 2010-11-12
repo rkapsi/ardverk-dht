@@ -6,6 +6,7 @@ import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
@@ -16,13 +17,14 @@ import org.ardverk.concurrent.ValueReference;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.concurrent.ArdverkFuture;
-import com.ardverk.dht.concurrent.RefreshFuture;
+import com.ardverk.dht.concurrent.ArdverkValueFuture;
 import com.ardverk.dht.config.BootstrapConfig;
 import com.ardverk.dht.config.LookupConfig;
 import com.ardverk.dht.config.PingConfig;
 import com.ardverk.dht.config.RefreshConfig;
 import com.ardverk.dht.entity.BootstrapEntity;
 import com.ardverk.dht.entity.DefaultBootstrapEntity;
+import com.ardverk.dht.entity.DefaultRefreshEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.RefreshEntity;
@@ -153,6 +155,8 @@ class BootstrapManager {
     @SuppressWarnings("unchecked")
     public ArdverkFuture<RefreshEntity> refresh(QueueKey queueKey, RefreshConfig config) {
         
+        long startTime = System.currentTimeMillis();
+        
         List<ArdverkFuture<PingEntity>> pingFutures 
             = new ArrayList<ArdverkFuture<PingEntity>>();
         
@@ -187,7 +191,65 @@ class BootstrapManager {
             }
         }
         
-        return new RefreshFuture(pingFutures.toArray(new ArdverkFuture[0]), 
-                lookupFutures.toArray(new ArdverkFuture[0]));
+        ArdverkFuture<PingEntity>[] pings = pingFutures.toArray(new ArdverkFuture[0]);
+        ArdverkFuture<NodeEntity>[] lookups = lookupFutures.toArray(new ArdverkFuture[0]);
+        
+        return new RefreshFuture(startTime, pings, lookups);
+    }
+    
+    private static class RefreshFuture extends ArdverkValueFuture<RefreshEntity> {
+        
+        private final AtomicInteger coutdown = new AtomicInteger();
+        
+        private final long startTime;
+        
+        private final ArdverkFuture<PingEntity>[] pingFutures;
+        
+        private final ArdverkFuture<NodeEntity>[] lookupFutures;
+        
+        @SuppressWarnings("unchecked")
+        public RefreshFuture(long startTime, 
+                ArdverkFuture<PingEntity>[] pingFutures, 
+                ArdverkFuture<NodeEntity>[] lookupFutures) {
+            this.startTime = startTime;
+            this.pingFutures = pingFutures;
+            this.lookupFutures = lookupFutures;
+            
+            coutdown.set(pingFutures.length + lookupFutures.length);
+            
+            AsyncFutureListener<?> listener 
+                    = new AsyncFutureListener<Object>() {
+                @Override
+                public void operationComplete(AsyncFuture<Object> future) {
+                    coutdown();
+                }
+            };
+            
+            for (ArdverkFuture<PingEntity> future : pingFutures) {
+                future.addAsyncFutureListener(
+                        (AsyncFutureListener<PingEntity>)listener);
+            }
+            
+            for (ArdverkFuture<NodeEntity> future : lookupFutures) {
+                future.addAsyncFutureListener(
+                        (AsyncFutureListener<NodeEntity>)listener);
+            }
+        }
+        
+        @Override
+        protected void done() {
+            super.done();
+            
+            FutureUtils.cancelAll(pingFutures, true);
+            FutureUtils.cancelAll(lookupFutures, true);
+        }
+        
+        private void coutdown() {
+            if (coutdown.decrementAndGet() == 0) {
+                long time = System.currentTimeMillis() - startTime;
+                setValue(new DefaultRefreshEntity(pingFutures, lookupFutures, 
+                        time, TimeUnit.MILLISECONDS));
+            }
+        }
     }
 }
