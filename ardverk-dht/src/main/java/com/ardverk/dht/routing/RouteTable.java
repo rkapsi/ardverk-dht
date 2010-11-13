@@ -42,6 +42,10 @@ public interface RouteTable {
      */
     public KUID[] select(long timeout, TimeUnit unit);
     
+    public Contact[] getActiveContacts();
+    
+    public Contact[] getCachedContacts();
+    
     public void failure(KUID contactId, SocketAddress address);
     
     public void rebuild();

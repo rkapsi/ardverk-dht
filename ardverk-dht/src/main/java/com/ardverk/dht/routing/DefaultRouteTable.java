@@ -32,6 +32,11 @@ public class DefaultRouteTable extends AbstractRouteTable {
     private static final Logger LOG 
         = LoggerUtils.getLogger(DefaultRouteTable.class);
     
+    private static enum ContactType {
+        ACTIVE,
+        CACHED;
+    }
+    
     private static final long DEFAULT_TIMEOUT = 30L * 1000L;
     
     private final long timeout = DEFAULT_TIMEOUT;
@@ -420,8 +425,62 @@ public class DefaultRouteTable extends AbstractRouteTable {
     }
     
     @Override
-    public synchronized void rebuild() {
+    public synchronized Contact[] getActiveContacts() {
+        return getContacts(ContactType.ACTIVE);
+    }
+
+    @Override
+    public synchronized Contact[] getCachedContacts() {
+        return getContacts(ContactType.CACHED);
+    }
+
+    private Contact[] getContacts(ContactType contactType) {
+        List<Contact> contacts = new ArrayList<Contact>();
+        for (Bucket bucket : buckets.values()) {
+            
+            ContactEntity[] entitis = bucket.getContacts(contactType);
+            
+            for (ContactEntity entity : entitis) {
+                contacts.add(entity.getContact());
+            }
+        }
         
+        return contacts.toArray(new Contact[0]);
+    }
+    
+    private ContactEntity[] getContacts2(ContactType contactType) {
+        List<ContactEntity> entities = new ArrayList<ContactEntity>();
+        for (Bucket bucket : buckets.values()) {
+            
+            ContactEntity[] entitis = bucket.getContacts(contactType);
+            
+            for (ContactEntity entity : entitis) {
+                entities.add(entity);
+            }
+        }
+        
+        return entities.toArray(new ContactEntity[0]);
+    }
+    
+    @Override
+    public synchronized void rebuild() {
+        ContactEntity[] active = getContacts2(ContactType.ACTIVE);
+        ContactEntity[] cached = getContacts2(ContactType.CACHED);
+        
+        clear();
+        
+        for (ContactEntity entity : active) {
+            add(entity.getContact());
+        }
+        
+        for (ContactEntity entity : cached) {
+            add(entity.getContact());
+        }
+    }
+    
+    public synchronized void clear() {
+        buckets.clear();
+        init();
     }
     
     @Override
@@ -682,6 +741,17 @@ public class DefaultRouteTable extends AbstractRouteTable {
                 entity = cached.get(contactId);
             }
             return entity;
+        }
+        
+        public ContactEntity[] getContacts(ContactType contactType) {
+            switch (contactType) {
+                case ACTIVE:
+                    return getActive();
+                case CACHED:
+                    return getCached();
+                default:
+                    throw new IllegalArgumentException("contactType=" + contactType);
+            }
         }
         
         public ContactEntity[] getActive() {
