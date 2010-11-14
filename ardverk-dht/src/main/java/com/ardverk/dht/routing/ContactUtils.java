@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.utils.ReverseComparator;
+
 import com.ardverk.dht.KUID;
 
 public class ContactUtils {
@@ -19,12 +21,7 @@ public class ContactUtils {
         };
     
     private static final Comparator<ContactHandle> XOR_DESCENDING 
-        = new Comparator<ContactHandle>() {
-            @Override
-            public int compare(ContactHandle o1, ContactHandle o2) {
-                return o2.xor.compareTo(o1.xor);
-            }
-        };
+        = new ReverseComparator<ContactHandle>(XOR_ASCENDING);
         
     private static final Comparator<Contact> TIME_ASCENDING 
         = new Comparator<Contact>() {
@@ -42,19 +39,7 @@ public class ContactUtils {
         };
         
     private static final Comparator<Contact> TIME_DESCENDING 
-        = new Comparator<Contact>() {
-            @Override
-            public int compare(Contact o1, Contact o2) {
-                long t1 = o1.getTimeSinceLastContactInMillis();
-                long t2 = o2.getTimeSinceLastContactInMillis();
-                if (t1 < t2) {
-                    return 1;
-                } else if (t2 < t1) {
-                    return -1;
-                }
-                return 0;
-            }
-        };
+        = new ReverseComparator<Contact>(TIME_ASCENDING);
         
     public static long getAdaptiveTimeout(Contact contact, 
             long defaultValue, TimeUnit unit) {
