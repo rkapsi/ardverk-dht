@@ -182,7 +182,7 @@ class BootstrapManager {
             
             LookupConfig lookupConfig = config.getLookupConfig();
             long bucketTimeout = config.getBucketTimeoutInMillis();
-            KUID[] bucketIds = routeTable.select(bucketTimeout, TimeUnit.MILLISECONDS);
+            KUID[] bucketIds = routeTable.refresh(bucketTimeout, TimeUnit.MILLISECONDS);
             
             for (KUID bucketId : bucketIds) {
                 ArdverkFuture<NodeEntity> future = dht.lookup(

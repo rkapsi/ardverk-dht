@@ -166,8 +166,8 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
         
         if (entity.isSameRemoteAddress(contact)) {
-            Contact[] merged = entity.update(contact);
-            fireContactChanged(bucket, merged[0], merged[1]);
+            ContactEntity.Update merged = entity.update(contact);
+            fireContactChanged(bucket, merged.getPrevious(), merged.getMerged());
         } else {
             // Spoof Check
         }
@@ -311,33 +311,6 @@ public class DefaultRouteTable extends AbstractRouteTable {
             }
         });
     }
-    
-    @Override
-    public synchronized KUID[] select(final long timeout, final TimeUnit unit) {
-        final List<KUID> bucketIds = new ArrayList<KUID>();
-        final KUID localhostId = localhost.getContactId();
-        
-        buckets.select(localhostId, new Cursor<KUID, Bucket>() {
-            @Override
-            public Decision select(Entry<? extends KUID, ? extends Bucket> entry) {
-                Bucket bucket = entry.getValue();
-                
-                if (!bucket.contains(localhostId) 
-                        && bucket.isTimeout(timeout, unit)) {
-                    // Select a random ID with this prefix
-                    KUID randomId = KUID.createWithPrefix(
-                            bucket.getBucketId(), bucket.getDepth());
-                    
-                    bucketIds.add(randomId);
-                    bucket.touch();
-                }
-                
-                return Decision.CONTINUE;
-            }
-        });
-        
-        return bucketIds.toArray(new KUID[0]);
-    }
 
     public int getMaxDepth() {
         return Integer.MAX_VALUE;
@@ -399,6 +372,9 @@ public class DefaultRouteTable extends AbstractRouteTable {
     
     @Override
     public synchronized void failure(KUID contactId, SocketAddress address) {
+        // There is nothing we can do if we don't have the KUID.
+        // This is possible for PINGs that failed (that means we
+        // knew only the SocketAddress of the remote host).
         if (contactId == null) {
             return;
         }
@@ -406,6 +382,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         Bucket bucket = buckets.selectValue(contactId);
         ContactEntity entity = bucket.get(contactId);
         
+        // Huh? There is no such contact for the given KUID?
         if (entity == null) {
             return;
         }
@@ -422,10 +399,16 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
     }
     
+    /**
+     * Returns all ACTIVE {@link ContactEntity}s.
+     */
     public synchronized ContactEntity[] getActiveContacts() {
         return getContacts(ContactType.ACTIVE);
     }
 
+    /**
+     * Returns all CACHED {@link ContactEntity}s.
+     */
     public synchronized ContactEntity[] getCachedContacts() {
         return getContacts(ContactType.CACHED);
     }
@@ -444,12 +427,54 @@ public class DefaultRouteTable extends AbstractRouteTable {
         return contacts.toArray(new ContactEntity[0]);
     }
     
+    /**
+     * Returns a set of prefixed random {@link KUID}s that need to be
+     * looked up to keep the {@link RouteTable} fresh.
+     */
+    public synchronized KUID[] refresh(final long timeout, final TimeUnit unit) {
+        final List<KUID> bucketIds = new ArrayList<KUID>();
+        final KUID localhostId = localhost.getContactId();
+        
+        buckets.select(localhostId, new Cursor<KUID, Bucket>() {
+            @Override
+            public Decision select(Entry<? extends KUID, ? extends Bucket> entry) {
+                Bucket bucket = entry.getValue();
+                
+                if (!bucket.contains(localhostId) 
+                        && bucket.isTimeout(timeout, unit)) {
+                    // Select a random ID with this prefix
+                    KUID randomId = KUID.createWithPrefix(
+                            bucket.getBucketId(), bucket.getDepth());
+                    
+                    bucketIds.add(randomId);
+                    bucket.touch();
+                }
+                
+                return Decision.CONTINUE;
+            }
+        });
+        
+        return bucketIds.toArray(new KUID[0]);
+    }
+    
+    /**
+     * Rebuilds the {@link RouteTable} by.
+     * 
+     * <ol>
+     * <li>Making a copy of all ACTIVE and CACHED contacts
+     * <li>Clearing the RouteTable
+     * <li>Sorting all ACTIVE contacts by their health and throwing away everything that is considered dead
+     * <li>Sorting all CACHED contacts by their time (most recently seen to least recently seen) and adding them back
+     * </ol>
+     */
     public synchronized void rebuild() {
         ContactEntity[] active = getActiveContacts();
         ContactEntity[] cached = getCachedContacts();
         
         clear();
         
+        // Sort the ACTIVE contacts by their health (most healthy to least healthy)
+        // and exit the loop as soon as we encounter the first DEAD contact.
         ContactUtils.byHealth(active);
         for (ContactEntity entity : active) {
             if (entity.isDead()) {
@@ -459,12 +484,17 @@ public class DefaultRouteTable extends AbstractRouteTable {
             add(entity.getContact());
         }
         
+        // Sort the CACHED contacts by their time stamp (most recently encountered
+        // to least recently encountered) and try to add them to the RouteTable.
         ContactUtils.byTimeStamp(cached);
         for (ContactEntity entity : cached) {
             add(entity.getContact());
         }
     }
     
+    /**
+     * Clears the {@link RouteTable}.
+     */
     public synchronized void clear() {
         buckets.clear();
         init();
