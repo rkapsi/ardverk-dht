@@ -16,13 +16,11 @@ import org.ardverk.collection.Trie;
 import org.ardverk.lang.NullArgumentException;
 import org.ardverk.net.NetworkCounter;
 import org.ardverk.net.NetworkMask;
-import org.ardverk.net.NetworkUtils;
 import org.slf4j.Logger;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.entity.PingEntity;
-import com.ardverk.dht.routing.Contact.Type;
 import com.ardverk.logging.LoggerUtils;
 
 public class DefaultRouteTable extends AbstractRouteTable {
@@ -211,7 +209,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         if (contact.isActive() && isOkayToAdd(bucket, contact)) {
             
-            if (!isLocalhost(lrs) /* OTHER CONDITION! */) {
+            if (!isLocalhost(lrs) /* TODO OTHER CONDITION! */) {
                 
                 bucket.removeActive(lrs);
                 bucket.addActive(new ContactEntity(contact));
@@ -424,55 +422,44 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
     }
     
-    @Override
-    public synchronized Contact[] getActiveContacts() {
+    public synchronized ContactEntity[] getActiveContacts() {
         return getContacts(ContactType.ACTIVE);
     }
 
-    @Override
-    public synchronized Contact[] getCachedContacts() {
+    public synchronized ContactEntity[] getCachedContacts() {
         return getContacts(ContactType.CACHED);
     }
 
-    private Contact[] getContacts(ContactType contactType) {
-        List<Contact> contacts = new ArrayList<Contact>();
+    private ContactEntity[] getContacts(ContactType contactType) {
+        List<ContactEntity> contacts = new ArrayList<ContactEntity>();
         for (Bucket bucket : buckets.values()) {
             
             ContactEntity[] entitis = bucket.getContacts(contactType);
             
             for (ContactEntity entity : entitis) {
-                contacts.add(entity.getContact());
+                contacts.add(entity);
             }
         }
         
-        return contacts.toArray(new Contact[0]);
+        return contacts.toArray(new ContactEntity[0]);
     }
     
-    private ContactEntity[] getContacts2(ContactType contactType) {
-        List<ContactEntity> entities = new ArrayList<ContactEntity>();
-        for (Bucket bucket : buckets.values()) {
-            
-            ContactEntity[] entitis = bucket.getContacts(contactType);
-            
-            for (ContactEntity entity : entitis) {
-                entities.add(entity);
-            }
-        }
-        
-        return entities.toArray(new ContactEntity[0]);
-    }
-    
-    @Override
     public synchronized void rebuild() {
-        ContactEntity[] active = getContacts2(ContactType.ACTIVE);
-        ContactEntity[] cached = getContacts2(ContactType.CACHED);
+        ContactEntity[] active = getActiveContacts();
+        ContactEntity[] cached = getCachedContacts();
         
         clear();
         
+        ContactUtils.byHealth(active);
         for (ContactEntity entity : active) {
+            if (entity.isDead()) {
+                break;
+            }
+            
             add(entity.getContact());
         }
         
+        ContactUtils.byTimeStamp(cached);
         for (ContactEntity entity : cached) {
             add(entity.getContact());
         }
@@ -492,122 +479,6 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
         
         return size;
-    }
-    
-    private static class ContactEntity {
-        
-        private static final int MAX_ERRORS = 5;
-        
-        private final long creationTime = System.currentTimeMillis();
-        
-        private long timeStamp = creationTime;
-        
-        private final KUID contactId;
-        
-        private Contact contact;
-        
-        private int errorCount = 0;
-        
-        public ContactEntity(Contact contact) {
-            if (contact == null) {
-                throw new NullArgumentException("contact");
-            }
-            
-            this.contactId = contact.getContactId();
-            this.contact = contact;
-        }
-        
-        public long getCreationTime() {
-            return creationTime;
-        }
-        
-        public long getTimeStamp() {
-            return timeStamp;
-        }
-        
-        public KUID getContactId() {
-            return contactId;
-        }
-        
-        public Contact getContact() {
-            return contact;
-        }
-        
-        public Contact[] update(Contact contact) {
-            if (contact == null) {
-                throw new NullArgumentException("contact");
-            }
-            
-            if (!contactId.equals(contact.getContactId())) {
-                throw new IllegalArgumentException();
-            }
-            
-            Contact previous = this.contact;
-            
-            if (previous != null) {
-                if (previous.getType() == Type.SOLICITED
-                        && contact.getType() == Type.UNSOLICITED) {
-                    throw new IllegalArgumentException();
-                }
-                
-                //contact = new DefaultContact(previous, contact);
-                contact = previous.merge(contact);
-            }
-            
-            this.contact = contact;
-            this.timeStamp = System.currentTimeMillis();
-            
-            return new Contact[] { previous, contact };
-        }
-        
-        public Contact replaceContact(Contact contact) {
-            return update(contact)[0];
-        }
-        
-        public boolean error() {
-            ++errorCount;
-            return isDead();
-        }
-        
-        public boolean isSolicited() {
-            return contact.isSolicited();
-        }
-        
-        public boolean isUnsolicited() {
-            return contact.isUnsolicited();
-        }
-        
-        public boolean isDead() {
-            return errorCount >= MAX_ERRORS;
-        }
-        
-        public boolean isAlive() {
-            return !isDead() && contact.isActive();
-        }
-        
-        public boolean isUnknown() {
-            return !isDead() && isUnsolicited();
-        }
-        
-        public boolean isSameRemoteAddress(Contact contact) {
-            return NetworkUtils.isSameAddress(
-                    this.contact.getRemoteAddress(), 
-                    contact.getRemoteAddress());
-        }
-        
-        private static final long X = 5L*60L*1000L;
-        
-        public boolean hasBeenActiveRecently() {
-            return (System.currentTimeMillis() - getTimeStamp()) < X;
-        }
-        
-        public boolean same(Contact other) {
-            if (other == null) {
-                throw new NullArgumentException("other");
-            }
-            
-            return contact != null && contact.equals(other);
-        }
     }
     
     public class Bucket {

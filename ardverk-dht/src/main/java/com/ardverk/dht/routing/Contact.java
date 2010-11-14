@@ -21,7 +21,7 @@ import com.ardverk.dht.KUID;
 /**
  * 
  */
-public class Contact implements PrimitiveProperties<Object>, 
+public class Contact implements ContactBase, PrimitiveProperties<Object>, 
         Comparable<Contact>, Serializable {
     
     private static final long serialVersionUID = 298059770472298142L;
@@ -372,9 +372,7 @@ public class Contact implements PrimitiveProperties<Object>,
         return type.isBetterOrEqual(other.type);
     }
     
-    /**
-     * Returns the {@link Contact}'s creation time
-     */
+    @Override
     public long getCreationTime() {
         return creationTime;
     }
@@ -394,9 +392,7 @@ public class Contact implements PrimitiveProperties<Object>,
         return getTimeSinceCreation(TimeUnit.MILLISECONDS);
     }
     
-    /**
-     * 
-     */
+    @Override
     public long getTimeStamp() {
         return timeStamp;
     }
@@ -441,9 +437,7 @@ public class Contact implements PrimitiveProperties<Object>,
         return unit.convert(10, TimeUnit.SECONDS);
     }
     
-    /**
-     * Returns the {@link Contact}'s unique {@link KUID}
-     */
+    @Override
     public KUID getContactId() {
         return contactId;
     }
