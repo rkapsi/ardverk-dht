@@ -54,7 +54,7 @@ public abstract class AbstractBucket implements Bucket {
         if (entity == null) {
             entity = getCached(contactId);
         }
-        return null;
+        return entity;
     }
 
     @Override
