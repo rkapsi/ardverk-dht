@@ -12,10 +12,6 @@ public interface LookupConfig extends Config {
 
     public void setRandomize(boolean randomize);
 
-    public int getR();
-
-    public void setR(int r);
-
     public int getAlpha();
 
     public void setAlpha(int alpha);

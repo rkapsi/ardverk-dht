@@ -13,15 +13,11 @@ public class DefaultLookupConfig extends DefaultConfig
     
     private static final long BOOST_TIMEOUT = 3000L;
     
-    private static final int R = 1;
-
     private static final int ALPHA = 4;
     
     private volatile boolean exhaustive = EXHAUSTIVE;
     
     private volatile boolean randomize = RANDOMIZE;
-    
-    private volatile int r = R;
     
     private volatile int alpha = ALPHA;
 
@@ -57,16 +53,6 @@ public class DefaultLookupConfig extends DefaultConfig
     @Override
     public void setRandomize(boolean randomize) {
         this.randomize = randomize;
-    }
-
-    @Override
-    public int getR() {
-        return r;
-    }
-
-    @Override
-    public void setR(int r) {
-        this.r = r;
     }
 
     @Override
