@@ -25,8 +25,8 @@ import com.ardverk.dht.entity.LookupEntity;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
-import com.ardverk.dht.settings.KademliaSettings;
 import com.ardverk.dht.utils.SchedulingUtils;
+import com.ardverk.dht2.Constants;
 import com.ardverk.logging.LoggerUtils;
 
 public abstract class LookupResponseHandler<T extends LookupEntity> 
@@ -372,7 +372,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
                 
                 Contact contact = query.first();
                 if (force || exhaustive
-                        || closest.size() < KademliaSettings.K 
+                        || closest.size() < Constants.K 
                         || isCloserThanClosest(contact)) {
                     return true;
                 }
