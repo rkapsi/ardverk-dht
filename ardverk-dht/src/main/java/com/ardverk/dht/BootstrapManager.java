@@ -15,7 +15,6 @@ import org.ardverk.concurrent.FutureUtils;
 import org.ardverk.concurrent.NopAsyncProcess;
 import org.ardverk.concurrent.ValueReference;
 
-import com.ardverk.dht.KUID;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.concurrent.ArdverkValueFuture;
 import com.ardverk.dht.config.BootstrapConfig;
@@ -217,7 +216,7 @@ class BootstrapManager {
     
     private static class RefreshFuture extends ArdverkValueFuture<RefreshEntity> {
         
-        private final AtomicInteger coutdown = new AtomicInteger();
+        private final AtomicInteger countdown = new AtomicInteger();
         
         private final long startTime;
         
@@ -233,24 +232,29 @@ class BootstrapManager {
             this.pingFutures = pingFutures;
             this.lookupFutures = lookupFutures;
             
-            coutdown.set(pingFutures.length + lookupFutures.length);
+            countdown.set(pingFutures.length + lookupFutures.length);
             
-            AsyncFutureListener<?> listener 
-                    = new AsyncFutureListener<Object>() {
-                @Override
-                public void operationComplete(AsyncFuture<Object> future) {
-                    coutdown();
+            // It's possible that countdown is 0!
+            if (0 < countdown.get()) {
+                AsyncFutureListener<?> listener 
+                        = new AsyncFutureListener<Object>() {
+                    @Override
+                    public void operationComplete(AsyncFuture<Object> future) {
+                        coutdown();
+                    }
+                };
+                
+                for (ArdverkFuture<PingEntity> future : pingFutures) {
+                    future.addAsyncFutureListener(
+                            (AsyncFutureListener<PingEntity>)listener);
                 }
-            };
-            
-            for (ArdverkFuture<PingEntity> future : pingFutures) {
-                future.addAsyncFutureListener(
-                        (AsyncFutureListener<PingEntity>)listener);
-            }
-            
-            for (ArdverkFuture<NodeEntity> future : lookupFutures) {
-                future.addAsyncFutureListener(
-                        (AsyncFutureListener<NodeEntity>)listener);
+                
+                for (ArdverkFuture<NodeEntity> future : lookupFutures) {
+                    future.addAsyncFutureListener(
+                            (AsyncFutureListener<NodeEntity>)listener);
+                }
+            } else {
+                complete();
             }
         }
         
@@ -263,11 +267,15 @@ class BootstrapManager {
         }
         
         private void coutdown() {
-            if (coutdown.decrementAndGet() == 0) {
-                long time = System.currentTimeMillis() - startTime;
-                setValue(new DefaultRefreshEntity(pingFutures, lookupFutures, 
-                        time, TimeUnit.MILLISECONDS));
+            if (countdown.decrementAndGet() == 0) {
+                complete();
             }
+        }
+        
+        private void complete() {
+            long time = System.currentTimeMillis() - startTime;
+            setValue(new DefaultRefreshEntity(pingFutures, lookupFutures, 
+                    time, TimeUnit.MILLISECONDS));
         }
     }
 }

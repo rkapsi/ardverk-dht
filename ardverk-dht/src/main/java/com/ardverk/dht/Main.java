@@ -81,6 +81,7 @@ public class Main {
             }
         }
         
+        int index = 0;
         for (DHT dht : dhts) {
             DefaultRefreshConfig config = new DefaultRefreshConfig();
             config.setBucketTimeout(-1L, TimeUnit.MILLISECONDS);
@@ -88,7 +89,7 @@ public class Main {
             ArdverkFuture<RefreshEntity> future = dht.refresh(
                     QueueKey.BACKEND, config);
             RefreshEntity entity = future.get();
-            System.out.println(entity);
+            System.out.println((index++) + ": " + entity);
         }
         
         System.out.println(dhts.size());
@@ -124,5 +125,6 @@ public class Main {
         System.out.println("COUNTER: " + counter);
         System.out.println("AVG: " + foo/dhts.size());
         System.out.println("DONE!");
+        System.exit(0);
     }
 }

@@ -155,7 +155,8 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         // Never update an *ALIVE* contact with information from
         // an another non-active Contact! 
-        if (entity.isAlive() && !contact.isActive()) {
+        // TODO: Need to think about this condition!
+        if (entity.isAlive() && !contact.isSolicited()) {
             return;
         }
         

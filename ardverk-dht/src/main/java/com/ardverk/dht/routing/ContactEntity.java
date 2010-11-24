@@ -56,7 +56,8 @@ class ContactEntity implements Identifier, Longevity {
         }
         
         if (!force && isSolicited() && other.isUnsolicited()) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(
+                    contact.getType() + " vs. " + other.getType());
         }
         
         Contact previous = contact;
