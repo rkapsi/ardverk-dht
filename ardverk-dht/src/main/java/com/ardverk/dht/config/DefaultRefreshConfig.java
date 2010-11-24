@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.utils.TimeUtils;
 
-import com.ardverk.dht2.Constants;
+import com.ardverk.dht.Constants;
 
 public class DefaultRefreshConfig extends AbstractConfig implements RefreshConfig {
 

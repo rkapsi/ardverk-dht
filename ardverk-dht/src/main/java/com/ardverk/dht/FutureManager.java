@@ -1,4 +1,4 @@
-package com.ardverk.dht2;
+package com.ardverk.dht;
 
 import java.io.Closeable;
 import java.util.EnumMap;

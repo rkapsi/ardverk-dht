@@ -2,8 +2,8 @@ package com.ardverk.dht.config;
 
 import java.util.concurrent.TimeUnit;
 
+import com.ardverk.dht.Constants;
 import com.ardverk.dht.routing.Contact;
-import com.ardverk.dht2.Constants;
 
 public abstract class AbstractConfig implements Config {
 

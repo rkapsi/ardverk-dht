@@ -10,8 +10,8 @@ import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.message.StoreRequest;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
-import com.ardverk.dht.storage.ValueTuple;
 import com.ardverk.dht.storage.Database.Condition;
+import com.ardverk.dht.storage.ValueTuple;
 
 public class StoreRequestHandler extends AbstractRequestHandler {
 

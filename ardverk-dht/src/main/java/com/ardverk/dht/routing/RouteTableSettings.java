@@ -4,9 +4,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.net.NetworkMask;
 
+import com.ardverk.dht.Constants;
 import com.ardverk.dht.config.DefaultPingConfig;
 import com.ardverk.dht.config.PingConfig;
-import com.ardverk.dht2.Constants;
 
 public class RouteTableSettings {
     

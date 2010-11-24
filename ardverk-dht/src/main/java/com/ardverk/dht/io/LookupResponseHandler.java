@@ -19,6 +19,7 @@ import org.ardverk.lang.Arguments;
 import org.ardverk.lang.NullArgumentException;
 import org.slf4j.Logger;
 
+import com.ardverk.dht.Constants;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.config.LookupConfig;
 import com.ardverk.dht.entity.LookupEntity;
@@ -26,7 +27,6 @@ import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.utils.SchedulingUtils;
-import com.ardverk.dht2.Constants;
 import com.ardverk.logging.LoggerUtils;
 
 public abstract class LookupResponseHandler<T extends LookupEntity> 
