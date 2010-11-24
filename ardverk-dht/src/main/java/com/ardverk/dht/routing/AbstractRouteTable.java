@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.ardverk.lang.NullArgumentException;
 
 import com.ardverk.dht.ContactPinger;
+import com.ardverk.dht.KUID;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.concurrent.ArdverkValueFuture;
 import com.ardverk.dht.entity.PingEntity;
@@ -56,6 +57,11 @@ public abstract class AbstractRouteTable implements RouteTable {
             = new IllegalStateException();
         
         return new ArdverkValueFuture<PingEntity>(exception);
+    }
+    
+    @Override
+    public Contact[] select(KUID contactId) {
+        return select(contactId, getK());
     }
     
     @Override

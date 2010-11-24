@@ -277,12 +277,12 @@ public class DefaultRouteTable extends AbstractRouteTable {
         ContactEntity entity = bucket.get(contactId);
         return entity != null ? entity.getContact() : null;
     }
-
-    @Override
-    public synchronized Contact[] select(KUID contactId) {
-        return select(contactId, settings.getK());
-    }
     
+    @Override
+    public int getK() {
+        return settings.getK();
+    }
+
     @Override
     public synchronized Contact[] select(KUID contactId, int count) {
         List<Contact> dst = new ArrayList<Contact>(count);

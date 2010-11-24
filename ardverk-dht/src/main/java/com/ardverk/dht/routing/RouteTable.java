@@ -8,6 +8,8 @@ import com.ardverk.dht.KUID;
 
 public interface RouteTable {
     
+    public int getK();
+    
     public void bind(ContactPinger pinger);
     
     public void unbind();
