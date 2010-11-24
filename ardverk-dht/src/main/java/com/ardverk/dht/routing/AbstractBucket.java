@@ -40,7 +40,7 @@ public abstract class AbstractBucket implements Bucket {
     }
     
     @Override
-    public KUID getBucketId() {
+    public KUID getId() {
         return bucketId;
     }
 

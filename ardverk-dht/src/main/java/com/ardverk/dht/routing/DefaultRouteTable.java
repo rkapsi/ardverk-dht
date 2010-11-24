@@ -52,7 +52,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
     public DefaultRouteTable(RouteTableSettings settings, Contact localhost) {
         this.settings = Arguments.notNull(settings, "settings");
         
-        KUID contactId = localhost.getContactId();
+        KUID contactId = localhost.getId();
         this.keyAnalyzer = KUID.createKeyAnalyzer(contactId);
         
         this.localhost = localhost;
@@ -64,7 +64,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
     private synchronized void init() {
         consecutiveErrors = 0;
         
-        KUID contactId = localhost.getContactId();
+        KUID contactId = localhost.getId();
         KUID bucketId = contactId.min();
         
         DefaultBucket bucket = new DefaultBucket(bucketId, 0);
@@ -90,12 +90,12 @@ public class DefaultRouteTable extends AbstractRouteTable {
     }
     
     private boolean isLocalhost(Contact contact) {
-        return localhost.getContactId().equals(contact.getContactId());
+        return localhost.getId().equals(contact.getId());
     }
     
     private void checkKeyLength(Contact other) throws IllegalArgumentException {
-        KUID contactId = localhost.getContactId();
-        KUID otherId = other.getContactId();
+        KUID contactId = localhost.getId();
+        KUID otherId = other.getId();
         if (contactId.lengthInBits() 
                 != otherId.lengthInBits()) {
             throw new IllegalArgumentException(
@@ -130,7 +130,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
     }
     
     private synchronized void add0(Contact contact) {
-        KUID contactId = contact.getContactId();
+        KUID contactId = contact.getId();
         DefaultBucket bucket = buckets.selectValue(contactId);
         ContactEntity entity = bucket.get(contactId);
         
@@ -237,11 +237,11 @@ public class DefaultRouteTable extends AbstractRouteTable {
             DefaultBucket right = split[1];
             
             // The left one replaces the existing Bucket
-            DefaultBucket oldLeft = buckets.put(left.getBucketId(), left);
+            DefaultBucket oldLeft = buckets.put(left.getId(), left);
             assert (oldLeft == bucket);
             
             // The right one is new in the RouteTable
-            DefaultBucket oldRight = buckets.put(right.getBucketId(), right);
+            DefaultBucket oldRight = buckets.put(right.getId(), right);
             assert (oldRight == null);
             
             fireSplitBucket(bucket, left, right);
@@ -257,7 +257,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         // 1. Bucket contains the localhost Contact
         // 2. Bucket is smallest subtree
         // 3. Bucket hasn't reached its max depth
-        KUID contactId = localhost.getContactId();
+        KUID contactId = localhost.getId();
         
         if (bucket.contains(contactId)
                 || isSmallestSubtree(bucket)
@@ -324,8 +324,8 @@ public class DefaultRouteTable extends AbstractRouteTable {
      * the localhost {@link Contact}.
      */
     private synchronized boolean isSmallestSubtree(DefaultBucket bucket) {
-        KUID contactId = localhost.getContactId();
-        KUID bucketId = bucket.getBucketId();
+        KUID contactId = localhost.getId();
+        KUID bucketId = bucket.getId();
         int prefixLength = contactId.commonPrefix(bucketId);
         
         // The sibling Bucket contains the localhost Contact. 
@@ -419,33 +419,6 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
         
         return contacts.toArray(new ContactEntity[0]);
-    }
-    
-    @Override
-    public synchronized KUID[] refresh(final long timeout, final TimeUnit unit) {
-        final List<KUID> bucketIds = new ArrayList<KUID>();
-        final KUID localhostId = localhost.getContactId();
-        
-        buckets.select(localhostId, new Cursor<KUID, DefaultBucket>() {
-            @Override
-            public Decision select(Entry<? extends KUID, ? extends DefaultBucket> entry) {
-                DefaultBucket bucket = entry.getValue();
-                
-                if (!bucket.contains(localhostId) 
-                        && bucket.isTimeout(timeout, unit)) {
-                    // Select a random ID with this prefix
-                    KUID randomId = KUID.createWithPrefix(
-                            bucket.getBucketId(), bucket.getDepth());
-                    
-                    bucketIds.add(randomId);
-                    bucket.touch();
-                }
-                
-                return Decision.CONTINUE;
-            }
-        });
-        
-        return bucketIds.toArray(new KUID[0]);
     }
     
     /**
@@ -628,7 +601,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         private boolean addActive(ContactEntity entity) {
             Contact contact = entity.getContact();
-            KUID contactId = contact.getContactId();
+            KUID contactId = contact.getId();
             
             // Make sure Bucket does not contain the Contact!
             assert (!contains(contactId));
@@ -644,7 +617,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         private ContactEntity addCache(ContactEntity entity) {
             Contact contact = entity.getContact();
-            KUID contactId = contact.getContactId();
+            KUID contactId = contact.getId();
             
             // Make sure Bucket does not contain the Contact!
             assert (!contains(contactId));
@@ -656,7 +629,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
             
             ContactEntity lrs = getLeastRecentlySeenCachedContact();
             if (lrs.isDead() || (!lrs.hasBeenActiveRecently() && !entity.isDead())) {
-                ContactEntity removed = cached.remove(lrs.getContactId());
+                ContactEntity removed = cached.remove(lrs.getId());
                 assert (lrs == removed);
                 
                 cached.put(contactId, entity);
@@ -687,7 +660,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
         
         private ContactEntity removeCache(ContactEntity entity) {
-            KUID contactId = entity.getContactId();
+            KUID contactId = entity.getId();
             return cached.remove(contactId);
         }
         
@@ -705,7 +678,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
         
         private void removeActive(ContactEntity entity) {
-            ContactEntity other = active.remove(entity.getContactId());
+            ContactEntity other = active.remove(entity.getId());
             assert (entity == other);
             
             Contact contact = other.getContact();
@@ -714,14 +687,14 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
         
         public DefaultBucket[] split() {
-            KUID bucketId = getBucketId();
+            KUID bucketId = getId();
             int depth = getDepth();
             
             DefaultBucket left = new DefaultBucket(bucketId, depth+1);
             DefaultBucket right = new DefaultBucket(bucketId.set(depth), depth+1);
             
             for (ContactEntity entity : active.values()) {
-                KUID contactId = entity.getContactId();
+                KUID contactId = entity.getId();
                 if (!contactId.isSet(depth)) {
                     left.add(entity);
                 } else {
@@ -730,7 +703,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
             }
             
             for (ContactEntity entity : cached.values()) {
-                KUID contactId = entity.getContactId();
+                KUID contactId = entity.getId();
                 if (!contactId.isSet(depth)) {
                     left.add(entity);
                 } else {

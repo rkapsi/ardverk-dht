@@ -13,34 +13,23 @@ public class ContactUtils {
 
     private ContactUtils() {}
     
-    private static final Comparator<ContactRef<?>> XOR_ASCENDING 
-        = new Comparator<ContactRef<?>>() {
-            @Override
-            public int compare(ContactRef<?> o1, ContactRef<?> o2) {
-                return o1.xor.compareTo(o2.xor);
-            }
-        };
-    
-    private static final Comparator<ContactRef<?>> XOR_DESCENDING 
-        = new ReverseComparator<ContactRef<?>>(XOR_ASCENDING);
-    
     /**
-     * Sorts the {@link ContactBase} in ascending order.
+     * Sorts the {@link Identity} in ascending order.
      * 
      * IMPORTANT NOTE: Ascending order means from most recently seen
      * to least recently seen.
      */
-    private static final Comparator<ContactBase> TIMESTAMP_ASCENDING 
-        = new Comparator<ContactBase>() {
+    private static final Comparator<Identity> TIMESTAMP_ASCENDING 
+        = new Comparator<Identity>() {
             @Override
-            public int compare(ContactBase o1, ContactBase o2) {
+            public int compare(Identity o1, Identity o2) {
                 // NOTE: See the negative sign!!!
                 return -LongComparator.compare(o1.getTimeStamp(), o2.getTimeStamp());
             }
         };
         
-    private static final Comparator<ContactBase> TIMESTAMP_DESCENDING 
-        = new ReverseComparator<ContactBase>(TIMESTAMP_ASCENDING);
+    private static final Comparator<Identity> TIMESTAMP_DESCENDING 
+        = new ReverseComparator<Identity>(TIMESTAMP_ASCENDING);
         
     private static final Comparator<ContactEntity> HEALTH_ASCENDING 
         = new Comparator<ContactEntity>() {
@@ -79,42 +68,16 @@ public class ContactUtils {
     }
     
     /**
-     * Sorts the given {@link ContactBase}'s by XOR distance.
+     * Sorts the given {@link Identity}'s by their time stamp
      */
-    public static <T extends ContactBase> T[] byXor(T[] contacts, KUID key) {
-        return byXor(contacts, key, true);
-    }
-    
-    /**
-     * Sorts the given {@link ContactBase}'s by XOR distance.
-     */
-    public static <T extends ContactBase> T[] byXor(T[] contacts, KUID key, boolean ascending) {
-        @SuppressWarnings("unchecked")
-        ContactRef<T>[] handles = new ContactRef[contacts.length];
-        for (int i = 0; i < contacts.length; i++) {
-            handles[i] = new ContactRef<T>(contacts[i], key);
-        }
-        
-        Arrays.sort(handles, ascending ? XOR_ASCENDING : XOR_DESCENDING);
-        
-        for (int i = 0; i < handles.length; i++) {
-            contacts[i] = handles[i].contact;
-        }
-        
-        return contacts;
-    }
-    
-    /**
-     * Sorts the given {@link ContactBase}'s by their time stamp
-     */
-    public static <T extends ContactBase> T[] byTimeStamp(T[] contacts) {
+    public static <T extends Identity> T[] byTimeStamp(T[] contacts) {
         return byTimeStamp(contacts, true);
     }
     
     /**
-     * Sorts the given {@link ContactBase}'s by their time stamp
+     * Sorts the given {@link Identity}'s by their time stamp
      */
-    public static <T extends ContactBase> T[] byTimeStamp(T[] contacts, boolean ascending) {
+    public static <T extends Identity> T[] byTimeStamp(T[] contacts, boolean ascending) {
         Arrays.sort(contacts, ascending ? TIMESTAMP_ASCENDING : TIMESTAMP_DESCENDING);
         return contacts;
     }
@@ -146,15 +109,17 @@ public class ContactUtils {
         return contacts;
     }
     
-    private static class ContactRef<T extends ContactBase> {
-        
-        private final T contact;
-        
-        private final KUID xor;
-        
-        public ContactRef(T contact, KUID key) {
-            this.contact = contact;
-            this.xor = key.xor(contact.getContactId());
-        }
+    /**
+     * Sorts the given {@link Identifier}'s by XOR distance.
+     */
+    public static <T extends Identity> T[] byXor(T[] contacts, KUID key) {
+        return byXor(contacts, key, true);
+    }
+    
+    /**
+     * Sorts the given {@link Identifier}'s by XOR distance.
+     */
+    public static <T extends Identity> T[] byXor(T[] contacts, KUID key, boolean ascending) {
+        return IdentifierUtils.byXor(contacts, key, ascending);
     }
 }

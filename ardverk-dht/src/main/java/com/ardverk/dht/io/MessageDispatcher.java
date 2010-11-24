@@ -205,7 +205,7 @@ public abstract class MessageDispatcher implements Closeable {
             Contact dst, RequestMessage message, 
             long timeout, TimeUnit unit) throws IOException {
         
-        KUID contactId = dst.getContactId();
+        KUID contactId = dst.getId();
         send(callback, contactId, message, timeout, unit);
     }
     

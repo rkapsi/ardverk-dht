@@ -5,7 +5,7 @@ import org.ardverk.net.NetworkUtils;
 
 import com.ardverk.dht.KUID;
 
-class ContactEntity implements ContactBase {
+class ContactEntity implements Identity {
     
     private static final int MAX_ERRORS = 5;
     
@@ -30,8 +30,8 @@ class ContactEntity implements ContactBase {
     }
     
     @Override
-    public KUID getContactId() {
-        return contact.getContactId();
+    public KUID getId() {
+        return contact.getId();
     }
     
     /**
@@ -42,7 +42,7 @@ class ContactEntity implements ContactBase {
     }
     
     public Update update(Contact other) {
-        if (!getContactId().equals(other.getContactId())) {
+        if (!getId().equals(other.getId())) {
             throw new IllegalArgumentException();
         }
         

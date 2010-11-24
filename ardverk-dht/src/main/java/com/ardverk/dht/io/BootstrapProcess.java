@@ -150,7 +150,7 @@ public class BootstrapProcess implements AsyncProcess<BootstrapEntity> {
             }
             
             Contact localhost = dht.getLocalhost();
-            KUID contactId = localhost.getContactId();
+            KUID contactId = localhost.getId();
             
             long timeout = config.getLookupTimeoutInMillis();
             nodeFuture = dht.lookup(contactId, timeout, unit);

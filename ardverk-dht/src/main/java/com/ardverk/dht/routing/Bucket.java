@@ -4,15 +4,13 @@ import java.util.concurrent.TimeUnit;
 
 import com.ardverk.dht.KUID;
 
-public interface Bucket {
+public interface Bucket extends Identifier {
 
     public long getCreationTime();
     
     public long getTimeStamp();
     
     public boolean isTimeout(long timeout, TimeUnit unit);
-    
-    public KUID getBucketId();
     
     public int getDepth();
     

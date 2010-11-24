@@ -113,7 +113,7 @@ public abstract class AbstractResponseHandler<V extends Entity>
     public void send(Contact dst, RequestMessage message, 
             long timeout, TimeUnit unit) throws IOException {
         
-        KUID contactId = dst.getContactId();
+        KUID contactId = dst.getId();
         send(contactId, message, timeout, unit);
     }
     

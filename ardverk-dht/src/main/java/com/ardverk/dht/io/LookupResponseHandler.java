@@ -270,7 +270,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
             this.key = key;
             
             Contact localhost = routeTable.getLocalhost();
-            KUID contactId = localhost.getContactId();
+            KUID contactId = localhost.getId();
             
             XorComparator comparator = new XorComparator(key);
             this.responses = new TreeSet<Contact>(comparator);
@@ -328,7 +328,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
                     closest.pollLast();
                 }
                 
-                KUID contactId = contact.getContactId();
+                KUID contactId = contact.getId();
                 currentHop = history.get(contactId);
                 return true;
             }
@@ -337,7 +337,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         }
         
         private boolean addToQuery(Contact contact, int hop) {
-            KUID contactId = contact.getContactId();
+            KUID contactId = contact.getId();
             if (!history.containsKey(contactId)) { 
                 history.put(contactId, hop);
                 query.add(contact);
@@ -350,8 +350,8 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         private boolean isCloserThanClosest(Contact other) {
             if (!closest.isEmpty()) {
                 Contact contact = closest.last();
-                KUID contactId = contact.getContactId();
-                KUID otherId = other.getContactId();
+                KUID contactId = contact.getId();
+                KUID otherId = other.getId();
                 return otherId.isCloserTo(key, contactId);
             }
             
@@ -425,7 +425,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         
         @Override
         public int compare(Contact o1, Contact o2) {
-            return o1.getContactId().xor(key).compareTo(o2.getContactId().xor(key));
+            return o1.getId().xor(key).compareTo(o2.getId().xor(key));
         }
     }
     

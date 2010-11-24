@@ -17,8 +17,6 @@ import com.ardverk.dht.storage.Database;
 import com.ardverk.dht.storage.DefaultDatabase;
 
 public class SimpleFactory {
-
-    public static final int K = 20;
     
     public static final int KEY_SIZE = 20;
     
@@ -35,7 +33,7 @@ public class SimpleFactory {
         KUID contactId = KUID.createRandom(KEY_SIZE);
         Contact localhost = Contact.localhost(contactId, address);
         
-        RouteTable routeTable = new DefaultRouteTable(K, localhost);
+        RouteTable routeTable = new DefaultRouteTable(localhost);
         
         Database database = new DefaultDatabase();
         

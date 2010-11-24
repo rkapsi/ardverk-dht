@@ -1,11 +1,9 @@
 package com.ardverk.dht.routing;
 
-import com.ardverk.dht.KUID;
-
 /**
  * 
  */
-public interface ContactBase {
+public interface Identity extends Identifier {
 
     /**
      * Returns the creation time
@@ -16,9 +14,4 @@ public interface ContactBase {
      * Returns the time stamp
      */
     public long getTimeStamp();
-    
-    /**
-     * Returns the {@link KUID}
-     */
-    public KUID getContactId();
 }

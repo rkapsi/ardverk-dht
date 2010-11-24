@@ -21,7 +21,7 @@ import com.ardverk.dht.KUID;
 /**
  * 
  */
-public class Contact implements ContactBase, PrimitiveProperties<Object>, 
+public class Contact implements Identity, PrimitiveProperties<Object>, 
         Comparable<Contact>, Serializable {
     
     private static final long serialVersionUID = 298059770472298142L;
@@ -438,7 +438,7 @@ public class Contact implements ContactBase, PrimitiveProperties<Object>,
     }
     
     @Override
-    public KUID getContactId() {
+    public KUID getId() {
         return contactId;
     }
     

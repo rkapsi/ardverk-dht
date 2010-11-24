@@ -60,7 +60,7 @@ public class RequestEntity {
         }
         
         Contact contact = response.getContact();
-        KUID otherId = contact.getContactId();
+        KUID otherId = contact.getId();
         
         return contactId.equals(otherId);
     }

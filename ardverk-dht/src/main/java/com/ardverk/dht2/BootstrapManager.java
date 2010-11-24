@@ -28,6 +28,8 @@ import com.ardverk.dht.entity.DefaultRefreshEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.RefreshEntity;
+import com.ardverk.dht.routing.Bucket;
+import com.ardverk.dht.routing.IdentifierUtils;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 
@@ -101,7 +103,7 @@ class BootstrapManager {
             
             private void handlePingEntity(final PingEntity pingEntity) {
                 Contact localhost = dht.getLocalhost();
-                KUID localhostId = localhost.getContactId();
+                KUID localhostId = localhost.getId();
                 AsyncFuture<NodeEntity> lookupFuture 
                     = lookupFutureRef.make(
                         dht.lookup(queueKey, localhostId, 
@@ -165,7 +167,7 @@ class BootstrapManager {
         
         synchronized (routeTable) {
             int pingCount = config.getPingCount();
-            KUID localhostId = dht.getLocalhost().getContactId();
+            KUID localhostId = dht.getLocalhost().getId();
 
             if (0 < pingCount) {
                 PingConfig pingConfig = config.getPingConfig();
@@ -183,15 +185,26 @@ class BootstrapManager {
             
             LookupConfig lookupConfig = config.getLookupConfig();
             long bucketTimeout = config.getBucketTimeoutInMillis();
-            KUID[] bucketIds = routeTable.refresh(
-                    bucketTimeout, TimeUnit.MILLISECONDS);
             
-            if (bucketIds != null) {
-                for (KUID bucketId : bucketIds) {
-                    ArdverkFuture<NodeEntity> future = dht.lookup(
-                            queueKey, bucketId, lookupConfig);
-                    lookupFutures.add(future);
+            Bucket[] buckets = routeTable.getBuckets();
+            IdentifierUtils.byXor(buckets, localhostId);
+            
+            for (Bucket bucket : buckets) {
+                if (bucket.contains(localhostId)) {
+                    continue;
                 }
+                
+                if (!bucket.isTimeout(bucketTimeout, TimeUnit.MILLISECONDS)) {
+                    continue;
+                }
+                
+                // Select a random ID with this prefix
+                KUID randomId = KUID.createWithPrefix(
+                        bucket.getId(), bucket.getDepth());
+                
+                ArdverkFuture<NodeEntity> future = dht.lookup(
+                        queueKey, randomId, lookupConfig);
+                lookupFutures.add(future);
             }
         }
         
