@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.ardverk.collection.FixedSizeHashSet;
 import org.ardverk.concurrent.ExecutorUtils;
 import org.ardverk.io.IoUtils;
+import org.ardverk.lang.Arguments;
 import org.ardverk.lang.NullArgumentException;
 import org.slf4j.Logger;
 
@@ -67,17 +68,9 @@ public abstract class MessageDispatcher implements Closeable {
      * 
      */
     public MessageDispatcher(MessageFactory factory, MessageCodec codec) {
+        this.factory = Arguments.notNull(factory, "factory");
+        this.codec = Arguments.notNull(codec, "codec");
         
-        if (factory == null) {
-            throw new NullArgumentException("factory");
-        }
-        
-        if (codec == null) {
-            throw new NullArgumentException("codec");
-        }
-        
-        this.factory = factory;
-        this.codec = codec;
         this.checker = new ResponseChecker(factory, 512);
     }
     

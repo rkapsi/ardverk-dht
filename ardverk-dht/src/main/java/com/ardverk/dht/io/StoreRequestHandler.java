@@ -2,7 +2,7 @@ package com.ardverk.dht.io;
 
 import java.io.IOException;
 
-import org.ardverk.lang.NullArgumentException;
+import org.ardverk.lang.Arguments;
 
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.RequestMessage;
@@ -25,16 +25,8 @@ public class StoreRequestHandler extends AbstractRequestHandler {
             Database database) {
         super(messageDispatcher);
         
-        if (routeTable == null) {
-            throw new NullArgumentException("routeTable");
-        }
-        
-        if (database == null) {
-            throw new NullArgumentException("database");
-        }
-        
-        this.routeTable = routeTable;
-        this.database = database;
+        this.routeTable = Arguments.notNull(routeTable, "routeTable");
+        this.database = Arguments.notNull(database, "database");
     }
 
     @Override

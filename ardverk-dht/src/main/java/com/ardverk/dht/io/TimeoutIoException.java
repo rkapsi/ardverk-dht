@@ -3,7 +3,7 @@ package com.ardverk.dht.io;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.lang.NullArgumentException;
+import org.ardverk.lang.Arguments;
 
 /**
  * 
@@ -22,21 +22,9 @@ public class TimeoutIoException extends IOException {
             long time, TimeUnit unit) {
         super (createMessage(entity, time, unit));
         
-        if (entity == null) {
-            throw new NullArgumentException("entity");
-        }
-        
-        if (time < 0L) {
-            throw new IllegalArgumentException("time=" + time);
-        }
-        
-        if (unit == null) {
-            throw new NullArgumentException("unit");
-        }
-        
-        this.entity = entity;
-        this.time = time;
-        this.unit = unit;
+        this.entity = Arguments.notNull(entity, "entity");
+        this.time = Arguments.notNegative(time, "time");
+        this.unit = Arguments.notNull(unit, "unit");
     }
     
     /**

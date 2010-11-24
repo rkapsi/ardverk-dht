@@ -5,8 +5,6 @@ import java.net.SocketAddress;
 
 import org.ardverk.concurrent.AsyncProcess;
 
-import com.ardverk.dht.ContactPinger;
-import com.ardverk.dht.KUID;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.config.BootstrapConfig;
 import com.ardverk.dht.config.LookupConfig;
@@ -58,7 +56,7 @@ public class ArdverkDHT extends AbstractDHT {
         bootstrapManager = new BootstrapManager(this, routeTable);
         storeManager = new StoreManager(this, messageDispatcher);
         
-        routeTable.bind(new ContactPinger() {
+        routeTable.bind(new RouteTable.ContactPinger() {
             @Override
             public ArdverkFuture<PingEntity> ping(Contact contact,
                     PingConfig config) {

@@ -2,7 +2,7 @@ package com.ardverk.dht.io;
 
 import java.io.IOException;
 
-import org.ardverk.lang.NullArgumentException;
+import org.ardverk.lang.Arguments;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.message.MessageFactory;
@@ -21,11 +21,7 @@ public class NodeRequestHandler extends AbstractRequestHandler {
             RouteTable routeTable) {
         super(messageDispatcher);
         
-        if (routeTable == null) {
-            throw new NullArgumentException("routeTable");
-        }
-        
-        this.routeTable = routeTable;
+        this.routeTable = Arguments.notNull(routeTable, "routeTable");
     }
 
     @Override
