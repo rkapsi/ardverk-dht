@@ -1,7 +1,6 @@
 package com.ardverk.dht.entity;
 
-import com.ardverk.dht2.Contacts;
-
+import com.ardverk.dht.routing.Contact;
 
 public interface NodeEntity extends LookupEntity {
     
@@ -9,5 +8,5 @@ public interface NodeEntity extends LookupEntity {
     
     public int getHop();
     
-    public Contacts getContacts();
+    public Contact[] getContacts();
 }

@@ -1,6 +1,7 @@
 package com.ardverk.dht.routing;
 
 import java.net.SocketAddress;
+import java.util.concurrent.TimeUnit;
 
 import com.ardverk.dht.ContactPinger;
 import com.ardverk.dht.KUID;
@@ -16,8 +17,6 @@ public interface RouteTable {
     public Contact getLocalhost();
     
     public void add(Contact contact);
-    
-    public int getK();
     
     /**
      * 
@@ -35,6 +34,14 @@ public interface RouteTable {
      * array is ordered by closeness.
      */
     public Contact[] select(KUID contactId, int count);
+    
+    /**
+     * Returns a set of prefixed random {@link KUID}s that need to be
+     * looked up to keep the {@link RouteTable} fresh.
+     */
+    public KUID[] refresh(long timeout, TimeUnit unit);
+    
+    public Bucket[] getBuckets();
     
     public void failure(KUID contactId, SocketAddress address);
     

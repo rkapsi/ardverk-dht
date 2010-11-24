@@ -13,9 +13,9 @@ import org.ardverk.collection.FixedSizeHashMap;
 import org.ardverk.collection.KeyAnalyzer;
 import org.ardverk.collection.PatriciaTrie;
 import org.ardverk.collection.Trie;
+import org.ardverk.lang.Arguments;
 import org.ardverk.lang.NullArgumentException;
 import org.ardverk.net.NetworkCounter;
-import org.ardverk.net.NetworkMask;
 import org.slf4j.Logger;
 
 import com.ardverk.dht.KUID;
@@ -35,32 +35,28 @@ public class DefaultRouteTable extends AbstractRouteTable {
         CACHED;
     }
     
-    private static final long DEFAULT_TIMEOUT = 30L * 1000L;
-    
-    private final long timeout = DEFAULT_TIMEOUT;
-    
-    private final TimeUnit unit = TimeUnit.MILLISECONDS;
+    private final RouteTableSettings settings;
     
     private final Contact localhost;
     
     private final KeyAnalyzer<KUID> keyAnalyzer;
     
-    private final Trie<KUID, Bucket> buckets;
+    private final Trie<KUID, DefaultBucket> buckets;
     
     private int consecutiveErrors = 0;
     
-    public DefaultRouteTable(int k, Contact localhost) {
-        super(k);
-        
-        if (localhost == null) {
-            throw new NullArgumentException("localhost");
-        }
+    public DefaultRouteTable(Contact localhost) {
+        this(new RouteTableSettings(), localhost);
+    }
+    
+    public DefaultRouteTable(RouteTableSettings settings, Contact localhost) {
+        this.settings = Arguments.notNull(settings, "settings");
         
         KUID contactId = localhost.getContactId();
         this.keyAnalyzer = KUID.createKeyAnalyzer(contactId);
         
         this.localhost = localhost;
-        this.buckets = new PatriciaTrie<KUID, Bucket>(keyAnalyzer);
+        this.buckets = new PatriciaTrie<KUID, DefaultBucket>(keyAnalyzer);
         
         init();
     }
@@ -71,10 +67,17 @@ public class DefaultRouteTable extends AbstractRouteTable {
         KUID contactId = localhost.getContactId();
         KUID bucketId = contactId.min();
         
-        Bucket bucket = new Bucket(bucketId, 0, getK(), getMaxCacheSize());
+        DefaultBucket bucket = new DefaultBucket(bucketId, 0);
         buckets.put(bucketId, bucket);
         
         add0(localhost);
+    }
+    
+    /**
+     * Returns the {@link DefaultRouteTable}'s {@link RouteTableSettings}.
+     */
+    public RouteTableSettings getSettings() {
+        return settings;
     }
     
     @Override
@@ -88,14 +91,6 @@ public class DefaultRouteTable extends AbstractRouteTable {
     
     private boolean isLocalhost(Contact contact) {
         return localhost.getContactId().equals(contact.getContactId());
-    }
-    
-    public long getTimeout(TimeUnit unit) {
-        return unit.convert(timeout, this.unit);
-    }
-    
-    public long getTimeoutInMillis() {
-        return getTimeout(TimeUnit.MILLISECONDS);
     }
     
     private void checkKeyLength(Contact other) throws IllegalArgumentException {
@@ -136,7 +131,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
     
     private synchronized void add0(Contact contact) {
         KUID contactId = contact.getContactId();
-        Bucket bucket = buckets.selectValue(contactId);
+        DefaultBucket bucket = buckets.selectValue(contactId);
         ContactEntity entity = bucket.get(contactId);
         
         if (entity != null) {
@@ -154,7 +149,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
     }
     
-    private synchronized void updateContact(Bucket bucket, 
+    private synchronized void updateContact(DefaultBucket bucket, 
             ContactEntity entity, Contact contact) {
         
         assert (!entity.same(localhost) 
@@ -173,14 +168,12 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
     }
     
-    private static final int MAX_PER_BUCKET = Integer.MAX_VALUE;
-    
-    private synchronized boolean isOkayToAdd(Bucket bucket, Contact contact) {
+    private synchronized boolean isOkayToAdd(DefaultBucket bucket, Contact contact) {
         SocketAddress address = contact.getRemoteAddress();
-        return bucket.getActiveCount(address) < MAX_PER_BUCKET;
+        return bucket.getActiveCount(address) < settings.getMaxContactsFromSameNetwork();
     }
     
-    private synchronized void addActive(Bucket bucket, Contact contact) {
+    private synchronized void addActive(DefaultBucket bucket, Contact contact) {
         ContactEntity entity = new ContactEntity(contact);
         boolean success = bucket.addActive(entity);
         
@@ -189,7 +182,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
     }
     
-    private synchronized ContactEntity addCache(Bucket bucket, Contact contact) {
+    private synchronized ContactEntity addCache(DefaultBucket bucket, Contact contact) {
         ContactEntity entity = new ContactEntity(contact);
         ContactEntity other = bucket.addCache(entity);
         
@@ -204,7 +197,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         return other;
     }
     
-    private synchronized void replaceCache(Bucket bucket, Contact contact) {
+    private synchronized void replaceCache(DefaultBucket bucket, Contact contact) {
         ContactEntity lrs = bucket.getLeastRecentlySeenActiveContact();
         
         if (contact.isActive() && isOkayToAdd(bucket, contact)) {
@@ -224,31 +217,31 @@ public class DefaultRouteTable extends AbstractRouteTable {
         pingLeastRecentlySeenContact(bucket);
     }
     
-    private synchronized void pingLeastRecentlySeenContact(Bucket bucket) {
+    private synchronized void pingLeastRecentlySeenContact(DefaultBucket bucket) {
         ContactEntity lrs = bucket.getLeastRecentlySeenActiveContact();
         if (!isLocalhost(lrs)) {
             ping(lrs);
         }
     }
     
-    private synchronized boolean split(Bucket bucket) {
+    private synchronized boolean split(DefaultBucket bucket) {
         if (canSplit(bucket)) {
             if (LOG.isInfoEnabled()) {
                 LOG.info("Splitting Bucket: " + bucket);
             }
             
-            Bucket[] split = bucket.split();
+            DefaultBucket[] split = bucket.split();
             assert (split.length == 2);
             
-            Bucket left = split[0];
-            Bucket right = split[1];
+            DefaultBucket left = split[0];
+            DefaultBucket right = split[1];
             
             // The left one replaces the existing Bucket
-            Bucket oldLeft = buckets.put(left.getBucketId(), left);
+            DefaultBucket oldLeft = buckets.put(left.getBucketId(), left);
             assert (oldLeft == bucket);
             
             // The right one is new in the RouteTable
-            Bucket oldRight = buckets.put(right.getBucketId(), right);
+            DefaultBucket oldRight = buckets.put(right.getBucketId(), right);
             assert (oldRight == null);
             
             fireSplitBucket(bucket, left, right);
@@ -258,7 +251,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         return false;
     }
     
-    private synchronized boolean canSplit(Bucket bucket) {
+    private synchronized boolean canSplit(DefaultBucket bucket) {
         
         // We *split* the Bucket if:
         // 1. Bucket contains the localhost Contact
@@ -280,11 +273,16 @@ public class DefaultRouteTable extends AbstractRouteTable {
             throw new NullArgumentException("contactId");
         }
         
-        Bucket bucket = buckets.selectValue(contactId);
+        DefaultBucket bucket = buckets.selectValue(contactId);
         ContactEntity entity = bucket.get(contactId);
         return entity != null ? entity.getContact() : null;
     }
 
+    @Override
+    public synchronized Contact[] select(KUID contactId) {
+        return select(contactId, settings.getK());
+    }
+    
     @Override
     public synchronized Contact[] select(KUID contactId, int count) {
         List<Contact> dst = new ArrayList<Contact>(count);
@@ -303,37 +301,29 @@ public class DefaultRouteTable extends AbstractRouteTable {
             return;
         }
        
-        buckets.select(contactId, new Cursor<KUID, Bucket>() {
+        buckets.select(contactId, new Cursor<KUID, DefaultBucket>() {
             @Override
-            public Decision select(Entry<? extends KUID, ? extends Bucket> entry) {
-                Bucket bucket = entry.getValue();
+            public Decision select(Entry<? extends KUID, ? extends DefaultBucket> entry) {
+                DefaultBucket bucket = entry.getValue();
                 return bucket.select(contactId, dst, count);
             }
         });
     }
-
-    public int getMaxDepth() {
-        return Integer.MAX_VALUE;
-    }
-    
-    public int getMaxCacheSize() {
-        return 16;
-    }
     
     /**
-     * Returns true if the given {@link Bucket} has reached its maximum
+     * Returns true if the given {@link DefaultBucket} has reached its maximum
      * depth in the RoutingTable Tree.
      */
-    private synchronized boolean isTooDeep(Bucket bucket) {
-        return bucket.getDepth() >= getMaxDepth();
+    private synchronized boolean isTooDeep(DefaultBucket bucket) {
+        return bucket.getDepth() >= settings.getMaxDepth();
     }
     
     /**
-     * Returns true if the given {@link Bucket} is the closest left
-     * or right hand sibling of the {@link Bucket} which contains 
+     * Returns true if the given {@link DefaultBucket} is the closest left
+     * or right hand sibling of the {@link DefaultBucket} which contains 
      * the localhost {@link Contact}.
      */
-    private synchronized boolean isSmallestSubtree(Bucket bucket) {
+    private synchronized boolean isSmallestSubtree(DefaultBucket bucket) {
         KUID contactId = localhost.getContactId();
         KUID bucketId = bucket.getBucketId();
         int prefixLength = contactId.commonPrefix(bucketId);
@@ -341,7 +331,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         // The sibling Bucket contains the localhost Contact. 
         // We're looking if the other Bucket is its sibling 
         // (what we call the smallest subtree).
-        Bucket sibling = buckets.selectValue(contactId);
+        DefaultBucket sibling = buckets.selectValue(contactId);
         return (sibling.getDepth() - 1) == prefixLength;
     }
     
@@ -364,11 +354,12 @@ public class DefaultRouteTable extends AbstractRouteTable {
         };*/
         
         Contact contact = entity.getContact();
-        long timeout = contact.getAdaptiveTimeout(this.timeout, unit);
-        return ping(contact, timeout, unit);
+        
+        long defaultTimeout = settings.getTimeoutInMillis();
+        long timeout = contact.getAdaptiveTimeout(
+                defaultTimeout, TimeUnit.MILLISECONDS);
+        return ping(contact, timeout, TimeUnit.MILLISECONDS);
     }
-    
-    private static final int MAX_CONSECUTIVE_ERRORS = 100;
     
     @Override
     public synchronized void failure(KUID contactId, SocketAddress address) {
@@ -379,7 +370,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
             return;
         }
         
-        Bucket bucket = buckets.selectValue(contactId);
+        DefaultBucket bucket = buckets.selectValue(contactId);
         ContactEntity entity = bucket.get(contactId);
         
         // Huh? There is no such contact for the given KUID?
@@ -389,13 +380,13 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         // Make sure we're not going kill the entire RouteTable 
         // if the Network goes down!
-        if (++consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {
+        if (++consecutiveErrors >= settings.getMaxConsecutiveErrors()) {
             return;
         }
         
         boolean dead = entity.error();
         if (dead) {
-            
+            // TODO: Replace dead Contact with something from the Cache
         }
     }
     
@@ -413,9 +404,12 @@ public class DefaultRouteTable extends AbstractRouteTable {
         return getContacts(ContactType.CACHED);
     }
 
+    /**
+     * Returns {@link ContactEntity}ies of the given {@link ContactType}.
+     */
     private ContactEntity[] getContacts(ContactType contactType) {
         List<ContactEntity> contacts = new ArrayList<ContactEntity>();
-        for (Bucket bucket : buckets.values()) {
+        for (DefaultBucket bucket : buckets.values()) {
             
             ContactEntity[] entitis = bucket.getContacts(contactType);
             
@@ -427,18 +421,15 @@ public class DefaultRouteTable extends AbstractRouteTable {
         return contacts.toArray(new ContactEntity[0]);
     }
     
-    /**
-     * Returns a set of prefixed random {@link KUID}s that need to be
-     * looked up to keep the {@link RouteTable} fresh.
-     */
+    @Override
     public synchronized KUID[] refresh(final long timeout, final TimeUnit unit) {
         final List<KUID> bucketIds = new ArrayList<KUID>();
         final KUID localhostId = localhost.getContactId();
         
-        buckets.select(localhostId, new Cursor<KUID, Bucket>() {
+        buckets.select(localhostId, new Cursor<KUID, DefaultBucket>() {
             @Override
-            public Decision select(Entry<? extends KUID, ? extends Bucket> entry) {
-                Bucket bucket = entry.getValue();
+            public Decision select(Entry<? extends KUID, ? extends DefaultBucket> entry) {
+                DefaultBucket bucket = entry.getValue();
                 
                 if (!bucket.contains(localhostId) 
                         && bucket.isTimeout(timeout, unit)) {
@@ -505,95 +496,50 @@ public class DefaultRouteTable extends AbstractRouteTable {
         int size = 0;
         
         for (Bucket bucket : buckets.values()) {
-            size += bucket.size();
+            size += bucket.getActiveCount();
         }
         
         return size;
     }
     
-    public class Bucket {
-        
-        private final long creationTime = System.currentTimeMillis();
-        
-        private final KUID bucketId;
-        
-        private final int depth;
+    @Override
+    public synchronized Bucket[] getBuckets() {
+        return buckets.values().toArray(new Bucket[0]);
+    }
+    
+    private class DefaultBucket extends AbstractBucket {
         
         private final Trie<KUID, ContactEntity> active;
         
         private final FixedSizeHashMap<KUID, ContactEntity> cached;
         
-        private final NetworkCounter counter 
-            = new NetworkCounter(NetworkMask.C);
+        private final NetworkCounter counter;
         
-        private long timeStamp = creationTime;
-        
-        private Bucket(KUID bucketId, int depth, int k, int maxCacheSize) {
-            if (bucketId == null) {
-                throw new NullArgumentException("bucketId");
-            }
-            
-            if (depth < 0) {
-                throw new IllegalArgumentException("depth=" + depth);
-            }
-            
-            if (k <= 0) {
-                throw new IllegalArgumentException("k=" + k);
-            }
-            
-            if (maxCacheSize < 0) {
-                throw new IllegalArgumentException(
-                        "maxCacheSize=" + maxCacheSize);
-            }
-            
-            this.bucketId = bucketId;
-            this.depth = depth;
+        private DefaultBucket(KUID bucketId, int depth) {
+            super(bucketId, depth);
             
             active = new PatriciaTrie<KUID, ContactEntity>(keyAnalyzer);
             
+            int maxCacheSize = settings.getMaxCacheSize();
             cached = new FixedSizeHashMap<KUID, ContactEntity>(
                     maxCacheSize, 1.0f, true, maxCacheSize);
+            
+            counter = new NetworkCounter(
+                    settings.getNetworkMask());
         }
         
-        public long getCreationTime() {
-            return creationTime;
-        }
-        
-        public long getTimeStamp() {
-            return timeStamp;
-        }
-        
-        public void touch() {
-            timeStamp = System.currentTimeMillis();
-        }
-        
-        public boolean isTimeout(long timeout, TimeUnit unit) {
-            long timeoutInMillis = unit.toMillis(timeout);
-            return (System.currentTimeMillis()-timeStamp) >= timeoutInMillis;
-        }
-        
-        public int size() {
+        @Override
+        public int getActiveCount() {
             return active.size();
         }
         
-        public KUID getBucketId() {
-            return bucketId;
-        }
-        
-        public int getDepth() {
-            return depth;
+        @Override
+        public int getCachedCount() {
+            return cached.size();
         }
         
         public int getMaxCacheSize() {
             return cached.getMaxSize();
-        }
-        
-        public int getCacheSize() {
-            return cached.size();
-        }
-        
-        public boolean isCacheEmpty() {
-            return cached.isEmpty();
         }
         
         public boolean isCacheFull() {
@@ -601,18 +547,13 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
         
         public boolean isActiveFull() {
-            return active.size() >= getK();
+            return active.size() >= settings.getK();
         }
-        
-        public boolean isActiveEmpty() {
-            return active.isEmpty();
-        }
-        
-        private static final double PROBABILITY = 0.75d;
         
         public Decision select(KUID contactId, 
                 final Collection<Contact> dst, final int count) {
             
+            final double probability = settings.getProbability();
             active.select(contactId, new Cursor<KUID, ContactEntity>() {
                 @Override
                 public Decision select(Entry<? extends KUID, 
@@ -620,12 +561,12 @@ public class DefaultRouteTable extends AbstractRouteTable {
                     
                     ContactEntity entity = entry.getValue();
                     
-                    double probability = 1.0d;
+                    double random = 1.0d;
                     if (entity.isDead()) {
-                        probability = Math.random();
+                        random = Math.random();
                     }
                     
-                    if (probability >= PROBABILITY) {
+                    if (random >= probability) {
                         dst.add(entity.getContact());
                     }
                     
@@ -636,14 +577,16 @@ public class DefaultRouteTable extends AbstractRouteTable {
             return (dst.size() < count ? Decision.CONTINUE : Decision.EXIT);
         }
         
-        public ContactEntity get(KUID contactId) {
-            ContactEntity entity = active.get(contactId);
-            if (entity == null) {
-                entity = cached.get(contactId);
-            }
-            return entity;
+        @Override
+        public ContactEntity getActive(KUID contactId) {
+            return active.get(contactId);
         }
-        
+
+        @Override
+        public ContactEntity getCached(KUID contactId) {
+            return cached.get(contactId);
+        }
+
         public ContactEntity[] getContacts(ContactType contactType) {
             switch (contactType) {
                 case ACTIVE:
@@ -655,10 +598,12 @@ public class DefaultRouteTable extends AbstractRouteTable {
             }
         }
         
+        @Override
         public ContactEntity[] getActive() {
             return active.values().toArray(new ContactEntity[0]);
         }
         
+        @Override
         public ContactEntity[] getCached() {
             return cached.values().toArray(new ContactEntity[0]);
         }
@@ -768,17 +713,12 @@ public class DefaultRouteTable extends AbstractRouteTable {
             counter.remove(address);
         }
         
-        public Bucket[] split() {
+        public DefaultBucket[] split() {
             KUID bucketId = getBucketId();
             int depth = getDepth();
-            int k = getK();
-            int maxCacheSize = getMaxCacheSize();
             
-            Bucket left = new Bucket(bucketId, 
-                    depth+1, k, maxCacheSize);
-            
-            Bucket right = new Bucket(bucketId.set(depth), 
-                    depth+1, k, maxCacheSize);
+            DefaultBucket left = new DefaultBucket(bucketId, depth+1);
+            DefaultBucket right = new DefaultBucket(bucketId.set(depth), depth+1);
             
             for (ContactEntity entity : active.values()) {
                 KUID contactId = entity.getContactId();
@@ -798,12 +738,17 @@ public class DefaultRouteTable extends AbstractRouteTable {
                 }
             }
             
-            return new Bucket[] { left, right };
+            return new DefaultBucket[] { left, right };
         }
         
-        public boolean contains(KUID contactId) {
-            return active.containsKey(contactId)
-                || cached.containsKey(contactId);
+        @Override
+        public boolean containsActive(KUID contactId) {
+            return active.containsKey(contactId);
+        }
+
+        @Override
+        public boolean containsCached(KUID contactId) {
+            return cached.containsKey(contactId);
         }
     }
     

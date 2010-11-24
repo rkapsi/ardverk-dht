@@ -167,10 +167,10 @@ class BootstrapManager {
             int pingCount = config.getPingCount();
             if (0 < pingCount) {
                 PingConfig pingConfig = config.getPingConfig();
-                KUID localhost = dht.getLocalhost().getContactId();
+                KUID localhostId = dht.getLocalhost().getContactId();
                 long contactTimeout = config.getContactTimeoutInMillis();
                 
-                Contact[] contacts = routeTable.select(localhost, pingCount);
+                Contact[] contacts = routeTable.select(localhostId, pingCount);
                 for (Contact contact : contacts) {
                     if (contact.isTimeout(contactTimeout, TimeUnit.MILLISECONDS)) {
                         ArdverkFuture<PingEntity> future = dht.ping(
@@ -182,12 +182,15 @@ class BootstrapManager {
             
             LookupConfig lookupConfig = config.getLookupConfig();
             long bucketTimeout = config.getBucketTimeoutInMillis();
-            KUID[] bucketIds = routeTable.refresh(bucketTimeout, TimeUnit.MILLISECONDS);
+            KUID[] bucketIds = routeTable.refresh(
+                    bucketTimeout, TimeUnit.MILLISECONDS);
             
-            for (KUID bucketId : bucketIds) {
-                ArdverkFuture<NodeEntity> future = dht.lookup(
-                        queueKey, bucketId, lookupConfig);
-                lookupFutures.add(future);
+            if (bucketIds != null) {
+                for (KUID bucketId : bucketIds) {
+                    ArdverkFuture<NodeEntity> future = dht.lookup(
+                            queueKey, bucketId, lookupConfig);
+                    lookupFutures.add(future);
+                }
             }
         }
         

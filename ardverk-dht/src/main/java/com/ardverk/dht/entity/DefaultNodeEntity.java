@@ -7,8 +7,6 @@ import org.ardverk.concurrent.AsyncProcessExecutorService;
 import com.ardverk.dht.io.LookupResponseHandler.State;
 import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.routing.Contact;
-import com.ardverk.dht2.Contacts;
-import com.ardverk.dht2.DefaultContacts;
 
 public class DefaultNodeEntity extends AbstractEntity implements NodeEntity {
 
@@ -16,21 +14,21 @@ public class DefaultNodeEntity extends AbstractEntity implements NodeEntity {
     
     private final MessageDispatcher messageDispatcher = null;
     
-    private final Contacts contacts;
+    private final Contact[] contacts;
     
     private final int hop;
     
     public DefaultNodeEntity(Contact[] contacts, int hops, long time, TimeUnit unit) {
         super(time, unit);
         
-        this.contacts = new DefaultContacts(contacts);
+        this.contacts = contacts;
         this.hop = hops;
     }
     
     public DefaultNodeEntity(State state) {
         super(state.getTimeInMillis(), TimeUnit.MILLISECONDS);
         
-        this.contacts = new DefaultContacts(state.getContacts());
+        this.contacts = state.getContacts();
         this.hop = state.getHop();
     }
     
@@ -42,7 +40,7 @@ public class DefaultNodeEntity extends AbstractEntity implements NodeEntity {
     }*/
     
     @Override
-    public Contacts getContacts() {
+    public Contact[] getContacts() {
         return contacts;
     }
 

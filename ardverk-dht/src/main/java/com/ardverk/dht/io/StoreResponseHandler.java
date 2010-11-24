@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.collection.Iterators;
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.lang.Arguments;
 
@@ -18,7 +19,6 @@ import com.ardverk.dht.message.StoreRequest;
 import com.ardverk.dht.message.StoreResponse;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.storage.ValueTuple;
-import com.ardverk.dht2.Contacts;
 
 public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
 
@@ -45,17 +45,17 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     
     public StoreResponseHandler(
             MessageDispatcher messageDispatcher, 
-            Contacts contacts, ValueTuple tuple) {
+            Contact[] contacts, ValueTuple tuple) {
         this(messageDispatcher, contacts, tuple, 10L, TimeUnit.SECONDS);
     }
     
     public StoreResponseHandler(
             MessageDispatcher messageDispatcher, 
-            Contacts contacts, ValueTuple tuple, 
+            Contact[] contacts, ValueTuple tuple, 
             long timeout, TimeUnit unit) {
         super(messageDispatcher);
         
-        this.contacts = contacts.iterator();
+        this.contacts = Iterators.fromArray(contacts);
         this.tuple = Arguments.notNull(tuple, "tuple");
         this.timeout = Arguments.notNegative(timeout, "timeout");
         this.unit = Arguments.notNull(unit, "unit");

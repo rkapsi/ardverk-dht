@@ -8,12 +8,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.ardverk.lang.NullArgumentException;
 
 import com.ardverk.dht.ContactPinger;
-import com.ardverk.dht.DHT;
-import com.ardverk.dht.KUID;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.concurrent.ArdverkValueFuture;
 import com.ardverk.dht.entity.PingEntity;
-import com.ardverk.dht.routing.DefaultRouteTable.Bucket;
 import com.ardverk.utils.EventUtils;
 
 public abstract class AbstractRouteTable implements RouteTable {
@@ -21,18 +18,8 @@ public abstract class AbstractRouteTable implements RouteTable {
     private final AtomicReference<ContactPinger> pingerRef 
         = new AtomicReference<ContactPinger>();
     
-    protected final int k;
-    
     private final List<RouteTableListener> listeners 
         = new CopyOnWriteArrayList<RouteTableListener>();
-    
-    public AbstractRouteTable(int k) {
-        if (k <= 0) {
-            throw new IllegalArgumentException("k=" + k);
-        }
-        
-        this.k = k;
-    }
     
     @Override
     public void bind(ContactPinger pinger) {
@@ -71,16 +58,6 @@ public abstract class AbstractRouteTable implements RouteTable {
         return new ArdverkValueFuture<PingEntity>(exception);
     }
     
-    @Override
-    public int getK() {
-        return k;
-    }
-    
-    @Override
-    public Contact[] select(KUID contactId) {
-        return select(contactId, getK());
-    }
-
     @Override
     public void addRouteTableListener(RouteTableListener l) {
         if (l == null) {

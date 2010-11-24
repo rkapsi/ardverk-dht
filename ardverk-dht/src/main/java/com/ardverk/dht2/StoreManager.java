@@ -74,7 +74,7 @@ class StoreManager {
                 }
                 
                 private void handleNodeEntity(final NodeEntity nodeEntity) {
-                    Contacts contacts = nodeEntity.getContacts();
+                    Contact[] contacts = nodeEntity.getContacts();
                     ArdverkFuture<StoreEntity> storeFuture 
                         = storeFutureRef.make(store(queueKey, contacts, 
                                 key, value, config.getStoreConfig()));
@@ -131,12 +131,11 @@ class StoreManager {
     public ArdverkFuture<StoreEntity> put(QueueKey queueKey, 
             Contact[] dst, KUID key, Value value, StoreConfig config) {
         
-        Contacts contacts = new DefaultContacts(dst);
-        return store(queueKey, contacts, key, value, config);
+        return store(queueKey, dst, key, value, config);
     }
     
     private ArdverkFuture<StoreEntity> store(QueueKey queueKey, 
-            Contacts contacts, KUID key, Value value, StoreConfig config) {
+            Contact[] contacts, KUID key, Value value, StoreConfig config) {
         
         Contact localhost = dht.getLocalhost();
         ValueTuple valueTuple = new DefaultValueTuple(localhost, key, value);

@@ -37,8 +37,6 @@ import com.ardverk.dht.storage.ValueTuple;
 
 public class Main {
     
-    private static final int K = 20;
-    
     private static final int ID_SIZE = 20;
     
     private static DHT createDHT(int port) throws IOException {
@@ -50,7 +48,7 @@ public class Main {
                 ID_SIZE, localhost);
         
         Database database = new DefaultDatabase();
-        RouteTable routeTable = new DefaultRouteTable(K, localhost);
+        RouteTable routeTable = new DefaultRouteTable(localhost);
         
         DHT dht = new ArdverkDHT(codec, messageFactory, routeTable, database);
         
