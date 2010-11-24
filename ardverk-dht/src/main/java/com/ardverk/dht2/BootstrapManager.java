@@ -165,9 +165,10 @@ class BootstrapManager {
         
         synchronized (routeTable) {
             int pingCount = config.getPingCount();
+            KUID localhostId = dht.getLocalhost().getContactId();
+
             if (0 < pingCount) {
                 PingConfig pingConfig = config.getPingConfig();
-                KUID localhostId = dht.getLocalhost().getContactId();
                 long contactTimeout = config.getContactTimeoutInMillis();
                 
                 Contact[] contacts = routeTable.select(localhostId, pingCount);

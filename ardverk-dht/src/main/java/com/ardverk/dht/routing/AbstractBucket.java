@@ -29,15 +29,16 @@ public abstract class AbstractBucket implements Bucket {
         return timeStamp;
     }
     
-    protected void touch() {
-        timeStamp = System.currentTimeMillis();
-    }
-    
-    protected boolean isTimeout(long timeout, TimeUnit unit) {
+    @Override
+    public boolean isTimeout(long timeout, TimeUnit unit) {
         long timeoutInMillis = unit.toMillis(timeout);
         return (System.currentTimeMillis()-timeStamp) >= timeoutInMillis;
     }
 
+    protected void touch() {
+        timeStamp = System.currentTimeMillis();
+    }
+    
     @Override
     public KUID getBucketId() {
         return bucketId;

@@ -1,5 +1,7 @@
 package com.ardverk.dht.routing;
 
+import java.util.concurrent.TimeUnit;
+
 import com.ardverk.dht.KUID;
 
 public interface Bucket {
@@ -7,6 +9,8 @@ public interface Bucket {
     public long getCreationTime();
     
     public long getTimeStamp();
+    
+    public boolean isTimeout(long timeout, TimeUnit unit);
     
     public KUID getBucketId();
     
