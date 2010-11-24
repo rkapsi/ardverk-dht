@@ -1,5 +1,7 @@
 package com.ardverk.dht.routing;
 
+import com.ardverk.dht.Identifier;
+
 /**
  * 
  */

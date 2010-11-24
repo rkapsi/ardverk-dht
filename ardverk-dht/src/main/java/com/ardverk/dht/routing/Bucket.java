@@ -2,6 +2,7 @@ package com.ardverk.dht.routing;
 
 import java.util.concurrent.TimeUnit;
 
+import com.ardverk.dht.Identifier;
 import com.ardverk.dht.KUID;
 
 public interface Bucket extends Identifier {

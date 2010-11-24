@@ -29,9 +29,9 @@ import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.RefreshEntity;
 import com.ardverk.dht.routing.Bucket;
-import com.ardverk.dht.routing.IdentifierUtils;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
+import com.ardverk.dht.utils.IdentifierUtils;
 
 class BootstrapManager {
 

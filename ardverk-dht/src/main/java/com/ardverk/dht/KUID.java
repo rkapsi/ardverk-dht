@@ -21,7 +21,7 @@ import com.ardverk.lang.Xor;
 /**
  * Kademlia Unique Identifier ({@link KUID}) 
  */
-public class KUID implements Xor<KUID>, Negation<KUID>, 
+public class KUID implements Identifier, Xor<KUID>, Negation<KUID>, 
         Writable, Serializable, Comparable<KUID>, Cloneable {
 
     private static final long serialVersionUID = -4611363711131603626L;
@@ -97,6 +97,11 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
         this.key = key;
         this.hashCode = Arrays.hashCode(key);
     }
+    
+    @Override
+    public KUID getId() {
+        return this;
+    }
 
     /**
      * Returns {@code true} if the given {@link KUID} is compatible with
@@ -122,7 +127,7 @@ public class KUID implements Xor<KUID>, Negation<KUID>,
     }
     
     /**
-     * 
+     * Calls {@link MessageDigest#update(byte[])} with the {@link KUID}'s bytes.
      */
     public void update(MessageDigest md) {
         md.update(key);

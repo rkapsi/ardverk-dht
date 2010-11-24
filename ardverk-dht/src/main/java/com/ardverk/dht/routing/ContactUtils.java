@@ -7,8 +7,6 @@ import java.util.concurrent.TimeUnit;
 import org.ardverk.utils.LongComparator;
 import org.ardverk.utils.ReverseComparator;
 
-import com.ardverk.dht.KUID;
-
 public class ContactUtils {
 
     private ContactUtils() {}
@@ -107,19 +105,5 @@ public class ContactUtils {
             contacts[i] = entities[offset + i].getContact();
         }
         return contacts;
-    }
-    
-    /**
-     * Sorts the given {@link Identifier}'s by XOR distance.
-     */
-    public static <T extends Identity> T[] byXor(T[] contacts, KUID key) {
-        return byXor(contacts, key, true);
-    }
-    
-    /**
-     * Sorts the given {@link Identifier}'s by XOR distance.
-     */
-    public static <T extends Identity> T[] byXor(T[] contacts, KUID key, boolean ascending) {
-        return IdentifierUtils.byXor(contacts, key, ascending);
     }
 }
