@@ -2,15 +2,15 @@ package com.ardverk.dht.routing;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.ardverk.lang.NullArgumentException;
+import org.ardverk.lang.Arguments;
 
 import com.ardverk.dht.ContactPinger;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.concurrent.ArdverkValueFuture;
+import com.ardverk.dht.config.PingConfig;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.utils.EventUtils;
 
@@ -41,12 +41,12 @@ public abstract class AbstractRouteTable implements RouteTable {
     }
 
     protected ArdverkFuture<PingEntity> ping(Contact contact, 
-            long timeout, TimeUnit unit) {
+            PingConfig config) {
         ContactPinger pinger = pingerRef.get();
         
         ArdverkFuture<PingEntity> future = null;
         if (pinger != null) {
-            future = pinger.ping(contact, timeout, unit);
+            future = pinger.ping(contact, config);
         }
         
         if (future != null) {
@@ -66,20 +66,12 @@ public abstract class AbstractRouteTable implements RouteTable {
     
     @Override
     public void addRouteTableListener(RouteTableListener l) {
-        if (l == null) {
-            throw new NullArgumentException("l");
-        }
-        
-        listeners.add(l);
+        listeners.add(Arguments.notNull(l, "l"));
     }
 
     @Override
     public void removeRouteTableListener(RouteTableListener l) {
-        if (l == null) {
-            throw new NullArgumentException("l");
-        }
-        
-        listeners.remove(l);
+        listeners.remove(Arguments.notNull(l, "l"));
     }
     
     @Override
@@ -156,6 +148,19 @@ public abstract class AbstractRouteTable implements RouteTable {
     
     protected void fireReplaceContact(Bucket bucket, 
             Contact existing, Contact contact) {
+        Runnable event = new Runnable() {
+            @Override
+            public void run() {
+                for (RouteTableListener l : listeners) {
+                    
+                }
+            }
+        };
+        
+        EventUtils.fireEvent(event);
+    }
+    
+    protected void fireRemoveContact(Bucket bucket, Contact contact) {
         Runnable event = new Runnable() {
             @Override
             public void run() {

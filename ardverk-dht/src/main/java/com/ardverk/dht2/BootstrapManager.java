@@ -194,7 +194,8 @@ class BootstrapManager {
                     continue;
                 }
                 
-                if (!bucket.isTimeout(bucketTimeout, TimeUnit.MILLISECONDS)) {
+                long timeStamp = bucket.getTimeStamp();
+                if ((System.currentTimeMillis() - timeStamp) < bucketTimeout) {
                     continue;
                 }
                 

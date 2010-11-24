@@ -3,9 +3,10 @@ package com.ardverk.dht.routing;
 import org.ardverk.lang.NullArgumentException;
 import org.ardverk.net.NetworkUtils;
 
+import com.ardverk.dht.Identifier;
 import com.ardverk.dht.KUID;
 
-class ContactEntity implements Identity {
+class ContactEntity implements Identifier, Longevity {
     
     private static final int MAX_ERRORS = 5;
     
@@ -42,11 +43,19 @@ class ContactEntity implements Identity {
     }
     
     public Update update(Contact other) {
+        return update(other, false);
+    }
+    
+    public Contact replace(Contact other) {
+        return update(other, true).getPrevious();
+    }
+    
+    private Update update(Contact other, boolean force) {
         if (!getId().equals(other.getId())) {
             throw new IllegalArgumentException();
         }
         
-        if (isSolicited() && other.isUnsolicited()) {
+        if (!force && isSolicited() && other.isUnsolicited()) {
             throw new IllegalArgumentException();
         }
         
@@ -59,10 +68,6 @@ class ContactEntity implements Identity {
         }
         
         return new Update(previous, other, contact);
-    }
-    
-    public Contact replaceContact(Contact contact) {
-        return update(contact).getPrevious();
     }
     
     public int getErrorCount() {

@@ -85,10 +85,6 @@ public class KUID implements Identifier, Xor<KUID>, Negation<KUID>,
     private final int hashCode;
     
     private KUID(byte[] key) {
-        if (key == null) {
-            throw new NullArgumentException("key");
-        }
-        
         if (key.length == 0) {
             throw new IllegalArgumentException(
                     "key.length=" + key.length);
@@ -149,10 +145,6 @@ public class KUID implements Identifier, Xor<KUID>, Negation<KUID>,
     
     @Override
     public KUID xor(KUID otherId) {
-        if (otherId == null) {
-            throw new NullArgumentException("otherId");
-        }
-        
         if (!isCompatible(otherId)) {
             throw new IllegalArgumentException("otherId=" + otherId);
         }

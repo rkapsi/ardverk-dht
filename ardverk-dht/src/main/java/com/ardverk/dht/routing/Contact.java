@@ -16,12 +16,13 @@ import org.ardverk.lang.NumberUtils;
 import org.ardverk.lang.PrimitiveProperties;
 import org.ardverk.net.NetworkUtils;
 
+import com.ardverk.dht.Identifier;
 import com.ardverk.dht.KUID;
 
 /**
  * 
  */
-public class Contact implements Identity, PrimitiveProperties<Object>, 
+public class Contact implements Identifier, Longevity, PrimitiveProperties<Object>, 
         Comparable<Contact>, Serializable {
     
     private static final long serialVersionUID = 298059770472298142L;
@@ -43,7 +44,12 @@ public class Contact implements Identity, PrimitiveProperties<Object>,
         /**
          * {@link Contact}s that sent us a response
          */
-        SOLICITED(2, true);
+        SOLICITED(2, true),
+        
+        /**
+         * {@link Contact}s that have been created by the local user.
+         */
+        AUTHORITATIVE(3, true);
         
         private final int priority;
         
@@ -67,8 +73,6 @@ public class Contact implements Identity, PrimitiveProperties<Object>,
         }
     }
     
-    private static final double MULTIPLIER = 1.5;
-    
     /**
      * Creates and returns a localhost {@link Contact}.
      */
@@ -87,7 +91,7 @@ public class Contact implements Identity, PrimitiveProperties<Object>,
      * Creates and returns a localhost {@link Contact}.
      */
     public static Contact localhost(KUID contactId, SocketAddress address) {
-        return new Contact(Type.SOLICITED, contactId, 0, address);
+        return new Contact(Type.AUTHORITATIVE, contactId, 0, address);
     }
     
     private final long creationTime;
@@ -422,19 +426,18 @@ public class Contact implements Identity, PrimitiveProperties<Object>,
     /**
      * Returns the adaptive timeout for this {@link Contact}.
      */
-    public long getAdaptiveTimeout(long defaultValue, TimeUnit unit) {
-        /*long value = unit.toMillis(defaultValue);
+    public long getAdaptiveTimeout(double multiplier, 
+            long defaultTimeout, TimeUnit unit) {
         
-        long timeout = 0L;
-        if (0L < rtt) {
-            timeout = Math.min((long)(rtt * MULTIPLIER), value);
-        } else {
-            timeout = value;
+        long rttInMillis = getRoundTripTimeInMillis();
+        if (0L < rttInMillis && 0d < multiplier) {
+            long timeout = (long)(rttInMillis * multiplier);
+            long adaptive = Math.min(timeout, 
+                    unit.toMillis(defaultTimeout));
+            return unit.convert(adaptive, TimeUnit.MILLISECONDS);
         }
         
-        return unit.convert(timeout, TimeUnit.MILLISECONDS);*/
-        
-        return unit.convert(10, TimeUnit.SECONDS);
+        return defaultTimeout;
     }
     
     @Override
@@ -506,6 +509,13 @@ public class Contact implements Identity, PrimitiveProperties<Object>,
      */
     public boolean isType(Type type) {
         return type == this.type;
+    }
+    
+    /**
+     * 
+     */
+    public boolean isAuthoritative() {
+        return isType(Type.AUTHORITATIVE);
     }
     
     /**

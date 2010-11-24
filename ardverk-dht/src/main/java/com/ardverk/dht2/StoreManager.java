@@ -142,7 +142,7 @@ class StoreManager {
         
         AsyncProcess<StoreEntity> process 
             = new StoreResponseHandler(messageDispatcher, 
-                contacts, valueTuple);
+                contacts, valueTuple, config);
         
         return dht.submit(queueKey, process, config);
     }

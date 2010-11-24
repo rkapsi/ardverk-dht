@@ -15,16 +15,17 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncFuture;
+import org.ardverk.lang.Arguments;
 import org.ardverk.lang.NullArgumentException;
 import org.slf4j.Logger;
 
 import com.ardverk.dht.KUID;
+import com.ardverk.dht.config.LookupConfig;
 import com.ardverk.dht.entity.LookupEntity;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.settings.KademliaSettings;
-import com.ardverk.dht.settings.LookupSettings;
 import com.ardverk.dht.utils.SchedulingUtils;
 import com.ardverk.logging.LoggerUtils;
 
@@ -34,32 +35,29 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     private static final Logger LOG 
         = LoggerUtils.getLogger(LookupResponseHandler.class);
     
-    protected final LookupSettings settings = new LookupSettings();
+    protected final LookupConfig config;
     
     private final LookupManager lookupManager;
     
     private final ProcessCounter lookupCounter;
-    
-    private final long timeout = 3L;
-    
-    private final TimeUnit unit = TimeUnit.SECONDS;
     
     private long startTime = -1L;
     
     private ScheduledFuture<?> boostFuture;
     
     public LookupResponseHandler(MessageDispatcher messageDispatcher, 
-            RouteTable routeTable, KUID lookupId) {
+            RouteTable routeTable, KUID lookupId, LookupConfig config) {
         super(messageDispatcher);
         
+        this.config = Arguments.notNull(config, "config");
         lookupManager = new LookupManager(routeTable, lookupId);
-        lookupCounter = new ProcessCounter(settings.getAlpha());
+        lookupCounter = new ProcessCounter(config.getAlpha());
     }
 
     @Override
     protected synchronized void go(AsyncFuture<T> future) throws IOException {
         
-        long boostFrequency = settings.getBoostFrequencyInMillis();
+        long boostFrequency = config.getBoostFrequencyInMillis();
         
         if (0L < boostFrequency) {
             Runnable task = new Runnable() {
@@ -93,12 +91,12 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
      */
     private synchronized void boost() throws IOException {
         if (lookupManager.hasNext(true)) {
-            long boostTimeout = settings.getBoostTimeoutInMillis();
+            long boostTimeout = config.getBoostTimeoutInMillis();
             if (getLastResponseTime(TimeUnit.MILLISECONDS) >= boostTimeout) {
                 try {
                     Contact contact = lookupManager.next();
                     
-                    lookup(contact, lookupManager.key, timeout, unit);
+                    lookup(contact);
                     lookupCounter.increment(true);
                 } finally {
                     postProcess();
@@ -119,13 +117,20 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
                 }
                 
                 Contact contact = lookupManager.next();
-                lookup(contact, lookupManager.key, timeout, unit);
                 
+                lookup(contact);
                 lookupCounter.increment();
             }
         } finally {
             postProcess();
         }
+    }
+    
+    private void lookup(Contact dst) throws IOException {
+        long defaultTimeout = config.getFooTimeoutInMillis();
+        long adaptiveTimeout = config.getAdaptiveTimeout(
+                dst, defaultTimeout, TimeUnit.MILLISECONDS);
+        lookup(dst, lookupManager.key, adaptiveTimeout, TimeUnit.MILLISECONDS);
     }
     
     /**
@@ -223,9 +228,9 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
      */
     private class LookupManager {
         
-        private final boolean exhaustive = settings.isExhaustive();
+        private final boolean exhaustive = config.isExhaustive();
         
-        private final boolean randomize = settings.isRandomize();
+        private final boolean randomize = config.isRandomize();
         
         private final RouteTable routeTable;
         

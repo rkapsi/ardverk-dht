@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.concurrent.TimeUnit;
 
 import org.ardverk.collection.Cursor;
 import org.ardverk.collection.Cursor.Decision;
@@ -13,6 +12,8 @@ import org.ardverk.collection.FixedSizeHashMap;
 import org.ardverk.collection.KeyAnalyzer;
 import org.ardverk.collection.PatriciaTrie;
 import org.ardverk.collection.Trie;
+import org.ardverk.concurrent.AsyncFuture;
+import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.lang.Arguments;
 import org.ardverk.lang.NullArgumentException;
 import org.ardverk.net.NetworkCounter;
@@ -20,6 +21,7 @@ import org.slf4j.Logger;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.concurrent.ArdverkFuture;
+import com.ardverk.dht.config.PingConfig;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.logging.LoggerUtils;
 
@@ -29,11 +31,6 @@ public class DefaultRouteTable extends AbstractRouteTable {
     
     private static final Logger LOG 
         = LoggerUtils.getLogger(DefaultRouteTable.class);
-    
-    private static enum ContactType {
-        ACTIVE,
-        CACHED;
-    }
     
     private final RouteTableSettings settings;
     
@@ -152,25 +149,93 @@ public class DefaultRouteTable extends AbstractRouteTable {
     private synchronized void updateContact(DefaultBucket bucket, 
             ContactEntity entity, Contact contact) {
         
+        // Make sure neither is the localhost!
         assert (!entity.same(localhost) 
                 && !contact.equals(localhost));
         
-        // 
-        if (entity.isAlive() && !contact.isSolicited()) {
+        // Never update an *ALIVE* contact with information from
+        // an another non-active Contact! 
+        if (entity.isAlive() && !contact.isActive()) {
             return;
         }
         
+        // Everything is fine if they've got the same address.
         if (entity.isSameRemoteAddress(contact)) {
-            ContactEntity.Update merged = entity.update(contact);
-            fireContactChanged(bucket, merged.getPrevious(), merged.getMerged());
+            ContactEntity.Update update = entity.update(contact);
+            fireContactChanged(bucket, update.getPrevious(), 
+                    update.getMerged());
         } else {
-            // Spoof Check
+            checkContact(bucket, entity, contact);
         }
     }
     
+    private synchronized void checkContact(DefaultBucket bucket, 
+            ContactEntity entity, final Contact contact) {
+        
+        if (settings.isCheckIdentity()) {
+            
+            final Contact previous = entity.getContact();
+            
+            ArdverkFuture<PingEntity> future = ping(entity);
+            future.addAsyncFutureListener(new AsyncFutureListener<PingEntity>() {
+                @Override
+                public void operationComplete(AsyncFuture<PingEntity> future) {
+                    // Do nothing if there was *NO* error (in other words if
+                    // we received a PONG). We're simply dropping the new 
+                    // Contact's information!
+                    if (!future.isCompletedAbnormally()) {
+                        return;
+                    }
+                    
+                    // Cancellations are OK too
+                    if (future.isCancelled()) {
+                        return;
+                    }
+                    
+                    KUID contactId = contact.getId();
+                    
+                    synchronized (DefaultRouteTable.this) {
+                        DefaultBucket bucket = buckets.selectValue(contactId);
+                        ContactEntity current = bucket.get(contactId);
+                        
+                        // Make sure the pre-condition still holds and we're
+                        // not replacing some other Contact.
+                        if (current != null && current.getContact() == previous) {
+                            ContactEntity.Update update = current.update(contact);
+                            fireContactChanged(bucket, 
+                                    update.getPrevious(), update.getMerged());
+                            
+                            if (bucket.containsCached(contactId)) {
+                                pingLeastRecentlySeenContact(bucket);
+                            }
+                            
+                        } else {
+                            add(contact);
+                        }
+                    }
+                }
+            });
+        } else {
+            Contact existing = entity.replace(contact);
+            fireContactChanged(bucket, existing, contact);
+            
+            if (bucket.containsCached(contact.getId())) {
+                pingLeastRecentlySeenContact(bucket);
+            }
+        }
+    }
+    
+    private synchronized boolean isOkayToAdd(DefaultBucket bucket, ContactEntity entity) {
+        return isOkayToAdd(bucket, entity.getContact());
+    }
+    
     private synchronized boolean isOkayToAdd(DefaultBucket bucket, Contact contact) {
-        SocketAddress address = contact.getRemoteAddress();
-        return bucket.getActiveCount(address) < settings.getMaxContactsFromSameNetwork();
+        return isOkayToAdd(bucket, contact.getRemoteAddress());
+    }
+    
+    private synchronized boolean isOkayToAdd(DefaultBucket bucket, SocketAddress remoteAddress) {
+        return bucket.getActiveCount(remoteAddress) 
+                < settings.getMaxContactsFromSameNetwork();
     }
     
     private synchronized void addActive(DefaultBucket bucket, Contact contact) {
@@ -198,17 +263,19 @@ public class DefaultRouteTable extends AbstractRouteTable {
     }
     
     private synchronized void replaceCache(DefaultBucket bucket, Contact contact) {
-        ContactEntity lrs = bucket.getLeastRecentlySeenActiveContact();
-        
         if (contact.isActive() && isOkayToAdd(bucket, contact)) {
+            ContactEntity lrs = bucket.getLeastRecentlySeenActiveContact();
             
-            if (!isLocalhost(lrs) /* TODO OTHER CONDITION! */) {
+            if (!isLocalhost(lrs) && (lrs.isUnknown() || lrs.isDead() 
+                    || contact.isAuthoritative())) {
                 
-                bucket.removeActive(lrs);
+                ContactEntity entity = bucket.removeActive(lrs);
+                assert (entity == lrs);
+                
                 bucket.addActive(new ContactEntity(contact));
+                bucket.touch();
                 
                 fireReplaceContact(bucket, lrs.getContact(), contact);
-                
                 return;
             }
         }
@@ -267,6 +334,31 @@ public class DefaultRouteTable extends AbstractRouteTable {
         return false;
     }
     
+    /**
+     * Returns true if the given {@link DefaultBucket} has reached its maximum
+     * depth in the RoutingTable Tree.
+     */
+    private synchronized boolean isTooDeep(DefaultBucket bucket) {
+        return bucket.getDepth() >= settings.getMaxDepth();
+    }
+    
+    /**
+     * Returns true if the given {@link DefaultBucket} is the closest left
+     * or right hand sibling of the {@link DefaultBucket} which contains 
+     * the localhost {@link Contact}.
+     */
+    private synchronized boolean isSmallestSubtree(DefaultBucket bucket) {
+        KUID contactId = localhost.getId();
+        KUID bucketId = bucket.getId();
+        int prefixLength = contactId.commonPrefix(bucketId);
+        
+        // The sibling Bucket contains the localhost Contact. 
+        // We're looking if the other Bucket is its sibling 
+        // (what we call the smallest subtree).
+        DefaultBucket sibling = buckets.selectValue(contactId);
+        return (sibling.getDepth() - 1) == prefixLength;
+    }
+    
     @Override
     public synchronized Contact get(KUID contactId) {
         if (contactId == null) {
@@ -310,55 +402,11 @@ public class DefaultRouteTable extends AbstractRouteTable {
         });
     }
     
-    /**
-     * Returns true if the given {@link DefaultBucket} has reached its maximum
-     * depth in the RoutingTable Tree.
-     */
-    private synchronized boolean isTooDeep(DefaultBucket bucket) {
-        return bucket.getDepth() >= settings.getMaxDepth();
-    }
-    
-    /**
-     * Returns true if the given {@link DefaultBucket} is the closest left
-     * or right hand sibling of the {@link DefaultBucket} which contains 
-     * the localhost {@link Contact}.
-     */
-    private synchronized boolean isSmallestSubtree(DefaultBucket bucket) {
-        KUID contactId = localhost.getId();
-        KUID bucketId = bucket.getId();
-        int prefixLength = contactId.commonPrefix(bucketId);
-        
-        // The sibling Bucket contains the localhost Contact. 
-        // We're looking if the other Bucket is its sibling 
-        // (what we call the smallest subtree).
-        DefaultBucket sibling = buckets.selectValue(contactId);
-        return (sibling.getDepth() - 1) == prefixLength;
-    }
-    
     private synchronized ArdverkFuture<PingEntity> ping(ContactEntity entity) {
-        /*AsyncFutureListener<PingResponse> listener 
-                = new AsyncFutureListener<PingResponse>() {
-            @Override
-            public void operationComplete(AsyncFuture<PingResponse> future) {
-                if (!future.throwsException()) {
-                    try {
-                        PingResponse response = future.get();
-                        fireCollision(response.getContact());
-                    } catch (InterruptedException err) {
-                        LOG.error("InterruptedException", err);
-                    } catch (ExecutionException err) {
-                        LOG.error("ExecutionException", err);
-                    }
-                }
-            }
-        };*/
-        
         Contact contact = entity.getContact();
         
-        long defaultTimeout = settings.getTimeoutInMillis();
-        long timeout = contact.getAdaptiveTimeout(
-                defaultTimeout, TimeUnit.MILLISECONDS);
-        return ping(contact, timeout, TimeUnit.MILLISECONDS);
+        PingConfig config = settings.getPingConfig();
+        return ping(contact, config);
     }
     
     @Override
@@ -386,7 +434,49 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         boolean dead = entity.error();
         if (dead) {
-            // TODO: Replace dead Contact with something from the Cache
+            
+            if (bucket.containsActive(contactId)) {
+                
+                // Remove or replace Contacts in the *ACTIVE* RouteTable
+                // only if there is something in the replacement cache or
+                // if the Contact has just too many errors and there is
+                // simply no point in keeping it in the RouteTable.
+                
+                if (!bucket.isCacheEmpty()) {
+                    ContactEntity mrs = null;
+                    while ((mrs = bucket.getMostRecentlySeenCachedContact()) != null) {
+                        ContactEntity removed = bucket.removeCache(mrs);
+                        assert (removed == mrs);
+                        
+                        if (isOkayToAdd(bucket, mrs)) {
+                            removed = bucket.removeActive(entity);
+                            assert (removed == entity 
+                                    && !bucket.isActiveFull());
+                            
+                            bucket.addActive(mrs);
+                            fireReplaceContact(bucket, 
+                                    entity.getContact(), mrs.getContact());
+                            break;
+                        }
+                    }
+                } else if (entity.getErrorCount() 
+                        >= settings.getTooManyErrorsCount()) {
+                    ContactEntity removed = bucket.removeActive(entity);
+                    assert(removed == entity && !bucket.isActiveFull());
+                    
+                    fireRemoveContact(bucket, entity.getContact());
+                }
+                
+            } else {
+                
+                // This looks strange as Contacts are never selected from the 
+                // RouteTable but it's however possible that FIND_NODE responses 
+                // return Contacts that happen to be in our RouteTable's cache 
+                // and if that's the case we want to remove them ASAP.
+                
+                ContactEntity removed = bucket.removeCache(contactId);
+                assert (removed == entity);
+            }
         }
     }
     
@@ -394,24 +484,24 @@ public class DefaultRouteTable extends AbstractRouteTable {
      * Returns all ACTIVE {@link ContactEntity}s.
      */
     public synchronized ContactEntity[] getActiveContacts() {
-        return getContacts(ContactType.ACTIVE);
+        return getContacts(true);
     }
 
     /**
      * Returns all CACHED {@link ContactEntity}s.
      */
     public synchronized ContactEntity[] getCachedContacts() {
-        return getContacts(ContactType.CACHED);
+        return getContacts(false);
     }
 
     /**
      * Returns {@link ContactEntity}ies of the given {@link ContactType}.
      */
-    private ContactEntity[] getContacts(ContactType contactType) {
+    private ContactEntity[] getContacts(boolean active) {
         List<ContactEntity> contacts = new ArrayList<ContactEntity>();
         for (DefaultBucket bucket : buckets.values()) {
             
-            ContactEntity[] entitis = bucket.getContacts(contactType);
+            ContactEntity[] entitis = active ? bucket.getActive() : bucket.getCached();
             
             for (ContactEntity entity : entitis) {
                 contacts.add(entity);
@@ -450,7 +540,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         // Sort the CACHED contacts by their time stamp (most recently encountered
         // to least recently encountered) and try to add them to the RouteTable.
-        ContactUtils.byTimeStamp(cached);
+        LongevityUtils.byTimeStamp(cached);
         for (ContactEntity entity : cached) {
             add(entity.getContact());
         }
@@ -511,10 +601,6 @@ public class DefaultRouteTable extends AbstractRouteTable {
             return cached.size();
         }
         
-        public int getMaxCacheSize() {
-            return cached.getMaxSize();
-        }
-        
         public boolean isCacheFull() {
             return cached.isFull();
         }
@@ -560,17 +646,6 @@ public class DefaultRouteTable extends AbstractRouteTable {
             return cached.get(contactId);
         }
 
-        public ContactEntity[] getContacts(ContactType contactType) {
-            switch (contactType) {
-                case ACTIVE:
-                    return getActive();
-                case CACHED:
-                    return getCached();
-                default:
-                    throw new IllegalArgumentException("contactType=" + contactType);
-            }
-        }
-        
         @Override
         public ContactEntity[] getActive() {
             return active.values().toArray(new ContactEntity[0]);
@@ -600,14 +675,15 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
         
         private boolean addActive(ContactEntity entity) {
-            Contact contact = entity.getContact();
-            KUID contactId = contact.getId();
+            KUID contactId = entity.getId();
             
             // Make sure Bucket does not contain the Contact!
             assert (!contains(contactId));
                 
             if (hasOrMakeSpace()) {
                 active.put(contactId, entity);
+                
+                Contact contact = entity.getContact();
                 counter.add(contact.getRemoteAddress());
                 return true;
             }
@@ -659,8 +735,18 @@ public class DefaultRouteTable extends AbstractRouteTable {
             return lrs;
         }
         
+        private ContactEntity getMostRecentlySeenCachedContact() {
+            for (ContactEntity entity : cached.values()) {
+                return entity;
+            }
+            return null;
+        }
+        
         private ContactEntity removeCache(ContactEntity entity) {
-            KUID contactId = entity.getId();
+            return removeCache(entity.getId());
+        }
+        
+        private ContactEntity removeCache(KUID contactId) {
             return cached.remove(contactId);
         }
         
@@ -677,13 +763,18 @@ public class DefaultRouteTable extends AbstractRouteTable {
             return !isActiveFull();
         }
         
-        private void removeActive(ContactEntity entity) {
-            ContactEntity other = active.remove(entity.getId());
-            assert (entity == other);
+        private ContactEntity removeActive(ContactEntity entity) {
+            return removeActive(entity.getId());
+        }
+        
+        private ContactEntity removeActive(KUID contactId) {
+            ContactEntity entity = active.remove(contactId);
             
-            Contact contact = other.getContact();
+            Contact contact = entity.getContact();
             SocketAddress address = contact.getRemoteAddress();
             counter.remove(address);
+            
+            return entity;
         }
         
         public DefaultBucket[] split() {

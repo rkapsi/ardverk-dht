@@ -10,6 +10,7 @@ import com.ardverk.dht.entity.PingEntity;
 /**
  * 
  */
+
 public interface AddressPinger {
 
     /**

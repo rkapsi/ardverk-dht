@@ -10,6 +10,7 @@ import org.ardverk.collection.Iterators;
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.lang.Arguments;
 
+import com.ardverk.dht.config.StoreConfig;
 import com.ardverk.dht.entity.DefaultStoreEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.StoreEntity;
@@ -28,16 +29,14 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     
     private final ProcessCounter counter = new ProcessCounter(K / 4);
     
+    private final List<StoreResponse> responses 
+        = new ArrayList<StoreResponse>();
+
     private final Iterator<Contact> contacts;
     
     private final ValueTuple tuple;
     
-    private final long timeout;
-    
-    private final TimeUnit unit;
-    
-    private final List<StoreResponse> responses 
-        = new ArrayList<StoreResponse>();
+    private final StoreConfig config;
     
     private long startTime = -1L;
     
@@ -45,20 +44,13 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     
     public StoreResponseHandler(
             MessageDispatcher messageDispatcher, 
-            Contact[] contacts, ValueTuple tuple) {
-        this(messageDispatcher, contacts, tuple, 10L, TimeUnit.SECONDS);
-    }
-    
-    public StoreResponseHandler(
-            MessageDispatcher messageDispatcher, 
             Contact[] contacts, ValueTuple tuple, 
-            long timeout, TimeUnit unit) {
+            StoreConfig config) {
         super(messageDispatcher);
         
         this.contacts = Iterators.fromArray(contacts);
         this.tuple = Arguments.notNull(tuple, "tuple");
-        this.timeout = Arguments.notNegative(timeout, "timeout");
-        this.unit = Arguments.notNull(unit, "unit");
+        this.config = Arguments.notNull(config, "config");
     }
 
     @Override
@@ -112,8 +104,11 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
         MessageFactory factory = messageDispatcher.getMessageFactory();
         StoreRequest request = factory.createStoreRequest(dst, tuple);
         
-        long adaptiveTimeout = dst.getAdaptiveTimeout(timeout, unit);
-        send(dst, request, adaptiveTimeout, unit);
+        long defaultTimeout = config.getFooTimeoutInMillis();
+        long adaptiveTimeout = config.getAdaptiveTimeout(
+                dst, defaultTimeout, TimeUnit.MILLISECONDS);
+        
+        send(dst, request, adaptiveTimeout, TimeUnit.MILLISECONDS);
     }
     
     @Override

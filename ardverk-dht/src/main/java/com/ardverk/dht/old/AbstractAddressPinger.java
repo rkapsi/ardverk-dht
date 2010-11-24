@@ -10,6 +10,7 @@ import com.ardverk.dht.entity.PingEntity;
 /**
  * 
  */
+
 public abstract class AbstractAddressPinger implements AddressPinger {
 
     @Override

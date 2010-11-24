@@ -10,25 +10,7 @@ import org.ardverk.utils.ReverseComparator;
 public class ContactUtils {
 
     private ContactUtils() {}
-    
-    /**
-     * Sorts the {@link Identity} in ascending order.
-     * 
-     * IMPORTANT NOTE: Ascending order means from most recently seen
-     * to least recently seen.
-     */
-    private static final Comparator<Identity> TIMESTAMP_ASCENDING 
-        = new Comparator<Identity>() {
-            @Override
-            public int compare(Identity o1, Identity o2) {
-                // NOTE: See the negative sign!!!
-                return -LongComparator.compare(o1.getTimeStamp(), o2.getTimeStamp());
-            }
-        };
-        
-    private static final Comparator<Identity> TIMESTAMP_DESCENDING 
-        = new ReverseComparator<Identity>(TIMESTAMP_ASCENDING);
-        
+      
     private static final Comparator<ContactEntity> HEALTH_ASCENDING 
         = new Comparator<ContactEntity>() {
             @Override
@@ -37,7 +19,7 @@ public class ContactUtils {
                 int e2 = o2.getErrorCount();
                 
                 if (e1 == 0 && e2 == 0) {
-                    return TIMESTAMP_ASCENDING.compare(o1, o2);
+                    return LongevityUtils.TIMESTAMP_ASCENDING.compare(o1, o2);
                 } else if (e1 == 0 && e2 != 0) {
                     return -1;
                 } else if (e1 != 0 && e2 == 0) {
@@ -65,20 +47,7 @@ public class ContactUtils {
         return Math.min((long)(rtt * 1.5f), defaultValue);
     }
     
-    /**
-     * Sorts the given {@link Identity}'s by their time stamp
-     */
-    public static <T extends Identity> T[] byTimeStamp(T[] contacts) {
-        return byTimeStamp(contacts, true);
-    }
     
-    /**
-     * Sorts the given {@link Identity}'s by their time stamp
-     */
-    public static <T extends Identity> T[] byTimeStamp(T[] contacts, boolean ascending) {
-        Arrays.sort(contacts, ascending ? TIMESTAMP_ASCENDING : TIMESTAMP_DESCENDING);
-        return contacts;
-    }
     
     public static ContactEntity[] byHealth(ContactEntity[] entities) {
         return byHealth(entities, true);

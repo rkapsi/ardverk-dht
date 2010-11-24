@@ -18,6 +18,7 @@ import com.ardverk.dht.storage.DefaultDatabase;
 
 public class SimpleFactory {
     
+    
     public static final int KEY_SIZE = 20;
     
     public static final int MESSAGE_ID_SIZE = 20;

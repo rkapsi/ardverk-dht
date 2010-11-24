@@ -7,6 +7,7 @@ import org.ardverk.collection.FixedSizeArrayList;
 import org.ardverk.lang.Arguments;
 
 import com.ardverk.dht.KUID;
+import com.ardverk.dht.config.ValueConfig;
 import com.ardverk.dht.entity.DefaultValueEntity;
 import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.message.MessageFactory;
@@ -26,10 +27,11 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     private final Key key;
     
     public ValueResponseHandler(MessageDispatcher messageDispatcher,
-            RouteTable routeTable, Key key) {
-        super(messageDispatcher, routeTable, key.getPrimaryKey());
+            RouteTable routeTable, Key key, ValueConfig config) {
+        super(messageDispatcher, routeTable, 
+                key.getPrimaryKey(), config);
         
-        tuples = new FixedSizeArrayList<ValueTuple>(settings.getR());
+        tuples = new FixedSizeArrayList<ValueTuple>(config.getR());
         this.key = Arguments.notNull(key, "key");
     }
 
@@ -74,8 +76,7 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
         MessageFactory factory = messageDispatcher.getMessageFactory();
         ValueRequest message = factory.createValueRequest(dst, key);
         
-        long adaptiveTimeout = dst.getAdaptiveTimeout(timeout, unit);
-        send(dst, message, adaptiveTimeout, unit);
+        send(dst, message, timeout, unit);
     }
     
     @Override

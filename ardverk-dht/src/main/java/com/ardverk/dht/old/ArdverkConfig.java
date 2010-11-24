@@ -2,6 +2,7 @@ package com.ardverk.dht;
 
 import java.util.Properties;
 
+
 public class ArdverkConfig {
     
     private static final int DEFAULT_K = 20;

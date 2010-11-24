@@ -38,6 +38,7 @@ public class ArdverkDHT extends AbstractDHT implements Closeable {
     
     private final Database database;
     
+    
     //private final MessageFactory messageFactory;
     
     private final MessageDispatcher messageDispatcher;

@@ -11,6 +11,7 @@ import org.ardverk.lang.NullArgumentException;
 import org.ardverk.net.NetworkUtils;
 
 import com.ardverk.dht.KUID;
+import com.ardverk.dht.config.PingConfig;
 import com.ardverk.dht.entity.DefaultPingEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.message.MessageFactory;
@@ -21,30 +22,34 @@ import com.ardverk.dht.routing.Contact;
 
 public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
     
+    private final PingConfig config;
+    
     private final PingSender sender;
     
     public PingResponseHandler(MessageDispatcher messageDispatcher, 
-            String address, int port) {
-        this(messageDispatcher, new InetSocketAddress(address, port));
+            String address, int port, PingConfig config) {
+        this(messageDispatcher, new InetSocketAddress(address, port), config);
     }
     
     public PingResponseHandler(MessageDispatcher messageDispatcher, 
-            InetAddress address, int port) {
-        this(messageDispatcher, new InetSocketAddress(address, port));
+            InetAddress address, int port, PingConfig config) {
+        this(messageDispatcher, new InetSocketAddress(address, port), config);
     }
     
     public PingResponseHandler(MessageDispatcher messageDispatcher, 
-            SocketAddress address) {
+            SocketAddress address, PingConfig config) {
         super(messageDispatcher);
         
         sender = new SocketAddressPingSender(address);
+        this.config = config;
     }
     
     public PingResponseHandler(MessageDispatcher messageDispatcher, 
-            Contact contact) {
+            Contact contact, PingConfig config) {
         super(messageDispatcher);
         
         sender = new ContactPingSender(contact);
+        this.config = config;
     }
     
     @Override
@@ -62,10 +67,6 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
     protected void processTimeout(RequestEntity entity, 
             long time, TimeUnit unit) throws IOException {
         setException(new TimeoutIoException(entity, time, unit));
-    }
-    
-    private long getTimeoutInMillis() {
-        return future.getTimeout(TimeUnit.MILLISECONDS);
     }
     
     private interface PingSender {
@@ -101,7 +102,7 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
             MessageFactory factory = messageDispatcher.getMessageFactory();
             PingRequest request = factory.createPingRequest(address);
             
-            long timeout = getTimeoutInMillis();
+            long timeout = config.getTimeout(TimeUnit.MILLISECONDS);
             send(contactId, request, timeout, TimeUnit.MILLISECONDS);
         }
     }
@@ -123,8 +124,9 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
             MessageFactory factory = messageDispatcher.getMessageFactory();
             PingRequest request = factory.createPingRequest(contact);
             
-            long adaptiveTimeout = contact.getAdaptiveTimeout(
-                    getTimeoutInMillis(), TimeUnit.MILLISECONDS);
+            long timeout = config.getTimeoutInMillis();
+            long adaptiveTimeout = config.getAdaptiveTimeout(
+                    contact, timeout, TimeUnit.MILLISECONDS);
             send(contact, request, adaptiveTimeout, TimeUnit.MILLISECONDS);
         }
     }

@@ -16,6 +16,7 @@ import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.routing.Contact;
 
+
 public class BootstrapProcess implements AsyncProcess<BootstrapEntity> {
 
     private final DHT dht;

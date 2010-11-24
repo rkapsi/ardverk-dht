@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import com.ardverk.dht.KUID;
+import com.ardverk.dht.config.LookupConfig;
 import com.ardverk.dht.entity.DefaultNodeEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.message.MessageFactory;
@@ -16,8 +17,8 @@ import com.ardverk.dht.routing.RouteTable;
 public class NodeResponseHandler extends LookupResponseHandler<NodeEntity> {
     
     public NodeResponseHandler(MessageDispatcher messageDispatcher,
-            RouteTable routeTable, KUID key) {
-        super(messageDispatcher, routeTable, key);
+            RouteTable routeTable, KUID key, LookupConfig config) {
+        super(messageDispatcher, routeTable, key, config);
     }
     
     @Override
@@ -27,8 +28,7 @@ public class NodeResponseHandler extends LookupResponseHandler<NodeEntity> {
         MessageFactory factory = messageDispatcher.getMessageFactory();
         NodeRequest message = factory.createNodeRequest(dst, lookupId);
         
-        long adaptiveTimeout = dst.getAdaptiveTimeout(timeout, unit);
-        send(dst, message, adaptiveTimeout, unit);
+        send(dst, message, timeout, unit);
     }
 
     @Override

@@ -5,6 +5,7 @@ import java.net.SocketAddress;
 
 import org.ardverk.concurrent.AsyncProcess;
 
+import com.ardverk.dht.ContactPinger;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.config.BootstrapConfig;
@@ -56,6 +57,14 @@ public class ArdverkDHT extends AbstractDHT {
         
         bootstrapManager = new BootstrapManager(this, routeTable);
         storeManager = new StoreManager(this, messageDispatcher);
+        
+        routeTable.bind(new ContactPinger() {
+            @Override
+            public ArdverkFuture<PingEntity> ping(Contact contact,
+                    PingConfig config) {
+                return ArdverkDHT.this.ping(QueueKey.BACKEND, contact, config);
+            }
+        });
     }
     
     @Override
@@ -111,7 +120,7 @@ public class ArdverkDHT extends AbstractDHT {
     public ArdverkFuture<PingEntity> ping(QueueKey queueKey, 
             Contact contact, PingConfig config) {
         AsyncProcess<PingEntity> process 
-            = new PingResponseHandler(messageDispatcher, contact);
+            = new PingResponseHandler(messageDispatcher, contact, config);
         return submit(queueKey, process, config);
     }
 
@@ -119,7 +128,7 @@ public class ArdverkDHT extends AbstractDHT {
     public ArdverkFuture<PingEntity> ping(QueueKey queueKey,
             InetAddress address, int port, PingConfig config) {
         AsyncProcess<PingEntity> process 
-            = new PingResponseHandler(messageDispatcher, address, port);
+            = new PingResponseHandler(messageDispatcher, address, port, config);
         return submit(queueKey, process, config);
     }
 
@@ -127,7 +136,7 @@ public class ArdverkDHT extends AbstractDHT {
     public ArdverkFuture<PingEntity> ping(QueueKey queueKey, 
             SocketAddress dst, PingConfig config) {
         AsyncProcess<PingEntity> process 
-            = new PingResponseHandler(messageDispatcher, dst);
+            = new PingResponseHandler(messageDispatcher, dst, config);
         return submit(queueKey, process, config);
     }
 
@@ -135,7 +144,7 @@ public class ArdverkDHT extends AbstractDHT {
     public ArdverkFuture<PingEntity> ping(QueueKey queueKey, 
             String address, int port, PingConfig config) {
         AsyncProcess<PingEntity> process 
-            = new PingResponseHandler(messageDispatcher, address, port);
+            = new PingResponseHandler(messageDispatcher, address, port, config);
         return submit(queueKey, process, config);
     }
 
@@ -143,7 +152,7 @@ public class ArdverkDHT extends AbstractDHT {
     public ArdverkFuture<NodeEntity> lookup(QueueKey queueKey, KUID key,
             LookupConfig config) {
         AsyncProcess<NodeEntity> process 
-            = new NodeResponseHandler(messageDispatcher, routeTable, key);
+            = new NodeResponseHandler(messageDispatcher, routeTable, key, config);
         return submit(queueKey, process, config);
     }
 
@@ -152,7 +161,7 @@ public class ArdverkDHT extends AbstractDHT {
             ValueConfig config) {
         AsyncProcess<ValueEntity> process
             = new ValueResponseHandler(messageDispatcher, routeTable, 
-                    new DefaultKey(key));
+                    new DefaultKey(key), config);
         return submit(queueKey, process, config);
     }
 

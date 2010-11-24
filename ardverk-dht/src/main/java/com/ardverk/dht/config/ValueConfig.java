@@ -1,8 +1,5 @@
 package com.ardverk.dht.config;
 
-public interface ValueConfig extends Config {
+public interface ValueConfig extends LookupConfig {
     
-    public boolean isExhaustive();
-    
-    public void setExhaustive(boolean exhaustive);
 }

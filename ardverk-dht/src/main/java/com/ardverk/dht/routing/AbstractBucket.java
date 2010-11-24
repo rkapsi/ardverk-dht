@@ -1,9 +1,10 @@
 package com.ardverk.dht.routing;
 
-import java.util.concurrent.TimeUnit;
-
 import com.ardverk.dht.KUID;
 
+/**
+ * An abstract implementation of {@link Bucket}.
+ */
 public abstract class AbstractBucket implements Bucket {
 
     private final long creationTime = System.currentTimeMillis();
@@ -28,15 +29,21 @@ public abstract class AbstractBucket implements Bucket {
     public long getTimeStamp() {
         return timeStamp;
     }
-    
-    @Override
-    public boolean isTimeout(long timeout, TimeUnit unit) {
-        long timeoutInMillis = unit.toMillis(timeout);
-        return (System.currentTimeMillis()-timeStamp) >= timeoutInMillis;
-    }
 
-    protected void touch() {
-        timeStamp = System.currentTimeMillis();
+    /**
+     * Sets the {@link Bucket}'s time stamp
+     */
+    public void setTimeStamp(long timeStamp) {
+        this.timeStamp = timeStamp;
+    }
+    
+    /**
+     * Sets the {@link Bucket}'s time stamp to <tt>now</tt>
+     * 
+     * @see System#currentTimeMillis()
+     */
+    public void touch() {
+        setTimeStamp(System.currentTimeMillis());
     }
     
     @Override

@@ -24,14 +24,14 @@ public class IdentifierUtils {
     private IdentifierUtils() {}
     
     /**
-     * Sorts the given {@link Identifier}'s by XOR distance.
+     * Sorts the given {@link Identifier}'s by their XOR distance to the given key.
      */
     public static <T extends Identifier> T[] byXor(T[] values, Identifier key) {
         return byXor(values, key, true);
     }
     
     /**
-     * Sorts the given {@link Identifier}'s by XOR distance.
+     * Sorts the given {@link Identifier}'s by their XOR distance to the given key.
      */
     public static <T extends Identifier> T[] byXor(T[] values, 
             Identifier key, boolean ascending) {
