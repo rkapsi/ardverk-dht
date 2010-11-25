@@ -2,10 +2,8 @@ package com.ardverk.dht.io;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
 import java.util.NoSuchElementException;
@@ -384,21 +382,37 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         public Contact next() {
             Contact contact = null;
             
-            if (randomize) {
+            if (randomize && !query.isEmpty()) {
                 
-                // TODO: There is a much better way to do this!
-                if (!query.isEmpty()) {
-                    List<Contact> contacts = new ArrayList<Contact>();
-                    for (Contact c : query) {
-                        contacts.add(c);
-                        if (contacts.size() >= routeTable.getK()) {
-                            break;
-                        }
+                // Knuth: Can we pick a random element from a set of 
+                // items whose cardinality we do not know?
+                //
+                // Pick an item and store it. Pick the next one, and replace 
+                // the first one with it with probability 1/2. Pick the third 
+                // one, and do a replace with probability 1/3, and so on. At 
+                // the end, the item you've stored has a probability of 1/n 
+                // of being any particular element.
+                //
+                // NOTE: We do know the cardinality but we don't have the 
+                // required methods to retrieve elements by index from the
+                // Set and are therefore forced to use the streaming approach
+                // as described above.
+                
+                int index = 0;
+                for (Contact c : query) {
+                    
+                    if (1d/(index + 1) >= Math.random()) {
+                        contact = c;
                     }
                     
-                    contact = contacts.get((int)(Math.random() * contacts.size()));
-                    query.remove(contact);
+                    if (index >= routeTable.getK()) {
+                        break;
+                    }
+                    
+                    ++index;
                 }
+                
+                query.remove(contact);
                 
             } else {
                 contact = query.pollFirst();
