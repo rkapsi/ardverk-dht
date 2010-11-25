@@ -394,13 +394,14 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
                 // of being any particular element.
                 //
                 // NOTE: We do know the cardinality but we don't have the 
-                // required methods to retrieve elements by index from the
-                // Set and are therefore forced to use the streaming approach
-                // as described above.
+                // required methods to retrieve elements from the Set and 
+                // are forced to use the Iterator (streaming) as described 
+                // above.
                 
                 int index = 0;
                 for (Contact c : query) {
                     
+                    // First element is always true because 1/1 >= random[0..1]!
                     if (1d/(index + 1) >= Math.random()) {
                         contact = c;
                     }
