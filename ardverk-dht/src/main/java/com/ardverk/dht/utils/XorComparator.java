@@ -4,12 +4,13 @@ import java.util.Comparator;
 
 import org.ardverk.lang.Arguments;
 
+import com.ardverk.dht.Identifier;
 import com.ardverk.dht.KUID;
 
 /**
- * The {@link XorComparator} compares {@link KUID}s by their XOR distance.
+ * The {@link XorComparator} compares {@link Identifier}s by their XOR distance.
  */
-public class XorComparator implements Comparator<KUID> {
+public class XorComparator implements Comparator<Identifier> {
 
     private final KUID key;
     
@@ -25,7 +26,7 @@ public class XorComparator implements Comparator<KUID> {
     }
     
     @Override
-    public int compare(KUID o1, KUID o2) {
-        return o1.xor(key).compareTo(o2.xor(key));
+    public int compare(Identifier o1, Identifier o2) {
+        return key.xor(o1.getId()).compareTo(key.xor(o2.getId()));
     }
 }

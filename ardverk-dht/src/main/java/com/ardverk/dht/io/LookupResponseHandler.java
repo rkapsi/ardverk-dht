@@ -1,8 +1,6 @@
 package com.ardverk.dht.io;
 
 import java.io.IOException;
-import java.io.Serializable;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NavigableSet;
@@ -25,6 +23,7 @@ import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.utils.SchedulingUtils;
+import com.ardverk.dht.utils.XorComparator;
 import com.ardverk.logging.LoggerUtils;
 
 public abstract class LookupResponseHandler<T extends LookupEntity> 
@@ -423,29 +422,6 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
                 throw new NoSuchElementException();
             }
             return contact;
-        }
-    }
-    
-    /**
-     * 
-     */
-    private static class XorComparator implements Comparator<Contact>, Serializable {
-        
-        private static final long serialVersionUID = -7543333434594933816L;
-        
-        private final KUID key;
-        
-        public XorComparator(KUID key) {
-            if (key == null) {
-                throw new NullArgumentException("key");
-            }
-            
-            this.key = key;
-        }
-        
-        @Override
-        public int compare(Contact o1, Contact o2) {
-            return o1.getId().xor(key).compareTo(o2.getId().xor(key));
         }
     }
     
