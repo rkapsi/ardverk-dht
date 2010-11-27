@@ -10,8 +10,8 @@ import java.util.Random;
 
 import org.apache.commons.lang.NullArgumentException;
 import org.ardverk.coding.CodingUtils;
+import org.ardverk.collection.ByteArrayKeyAnalyzer;
 import org.ardverk.collection.Key;
-import org.ardverk.collection.KeyAnalyzer;
 import org.ardverk.io.Writable;
 
 import com.ardverk.dht.security.SecurityUtils;
@@ -135,55 +135,25 @@ public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>,
     public int length() {
         return key.length;
     }
-
-    /**
-     * Returns the length of the {@link KUID} in bits.
-     */
+    
     @Override
     public int lengthInBits() {
-        return key.length * Byte.SIZE;
+        return ByteArrayKeyAnalyzer.INSTANCE.lengthInBits(key);
     }
     
     @Override
     public boolean isBitSet(int bitIndex) {
-        if (bitIndex < 0 || lengthInBits() < bitIndex) {
-            throw new IllegalArgumentException("bitIndex=" + bitIndex);
-        }
-        
-        int index = (int)(bitIndex / Byte.SIZE);
-        int bit = (int)(bitIndex % Byte.SIZE);
-        return (key[index] & (0x80 >>> bit)) != 0x00;
+        return ByteArrayKeyAnalyzer.INSTANCE.isBitSet(key, bitIndex);
     }
     
     @Override
     public int bitIndex(KUID otherKey) {
-        int length = lengthInBits();
-        
-        boolean allNull = true;
-        for (int i = 0; i < length; i++) {
-            boolean value = isBitSet(i);
-                
-            if (value) {
-                allNull = false;
-            }
-            
-            boolean otherValue = otherKey.isBitSet(i);
-            
-            if (value != otherValue) {
-                return i;
-            }
-        }
-        
-        if (allNull) {
-            return KeyAnalyzer.NULL_BIT_KEY;
-        }
-        
-        return KeyAnalyzer.EQUAL_BIT_KEY;
+        return ByteArrayKeyAnalyzer.INSTANCE.bitIndex(key, otherKey.key);
     }
 
     @Override
     public boolean isPrefixedBy(KUID prefix) {
-        return equals(prefix);
+        return ByteArrayKeyAnalyzer.INSTANCE.isPrefix(key, prefix.key);
     }
 
     @Override
