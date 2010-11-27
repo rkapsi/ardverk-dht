@@ -10,6 +10,8 @@ import com.ardverk.utils.EventUtils;
 public class ArdverkValueFuture<V> extends AsyncValueFuture<V> 
         implements ArdverkFuture<V> {
 
+    private volatile Object attachment;
+    
     public ArdverkValueFuture() {
         super();
     }
@@ -20,6 +22,16 @@ public class ArdverkValueFuture<V> extends AsyncValueFuture<V>
 
     public ArdverkValueFuture(V value) {
         super(value);
+    }
+    
+    @Override
+    public void setAttachment(Object attachment) {
+        this.attachment = attachment;
+    }
+
+    @Override
+    public Object getAttachment() {
+        return attachment;
     }
 
     @Override

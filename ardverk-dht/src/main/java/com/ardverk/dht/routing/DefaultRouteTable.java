@@ -31,7 +31,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
     private static final Logger LOG 
         = LoggerUtils.getLogger(DefaultRouteTable.class);
     
-    private final RouteTableSettings settings;
+    private final RouteTableConfig config;
     
     private final Contact localhost;
     
@@ -40,13 +40,13 @@ public class DefaultRouteTable extends AbstractRouteTable {
     private int consecutiveErrors = 0;
     
     public DefaultRouteTable(Contact localhost) {
-        this(new RouteTableSettings(), localhost);
+        this(new RouteTableConfig(), localhost);
     }
     
-    public DefaultRouteTable(RouteTableSettings settings, Contact localhost) {
-        this.settings = Arguments.notNull(settings, "settings");
+    public DefaultRouteTable(RouteTableConfig config, Contact localhost) {
+        this.config = Arguments.notNull(config, "config");
+        this.localhost = Arguments.notNull(localhost, "localhost");
         
-        this.localhost = localhost;
         this.buckets = new PatriciaTrie<KUID, DefaultBucket>();
         
         init();
@@ -65,10 +65,10 @@ public class DefaultRouteTable extends AbstractRouteTable {
     }
     
     /**
-     * Returns the {@link DefaultRouteTable}'s {@link RouteTableSettings}.
+     * Returns the {@link DefaultRouteTable}'s {@link RouteTableConfig}.
      */
-    public RouteTableSettings getSettings() {
-        return settings;
+    public RouteTableConfig getRouteTableConfig() {
+        return config;
     }
     
     @Override
@@ -167,7 +167,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
     private synchronized void checkContact(DefaultBucket bucket, 
             ContactEntity entity, final Contact contact) {
         
-        if (settings.isCheckIdentity()) {
+        if (config.isCheckIdentity()) {
             
             final Contact previous = entity.getContact();
             
@@ -230,7 +230,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
     
     private synchronized boolean isOkayToAdd(DefaultBucket bucket, SocketAddress remoteAddress) {
         return bucket.getActiveCount(remoteAddress) 
-                < settings.getMaxContactsFromSameNetwork();
+                < config.getMaxContactsFromSameNetwork();
     }
     
     private synchronized void addActive(DefaultBucket bucket, Contact contact) {
@@ -334,7 +334,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
      * depth in the RoutingTable Tree.
      */
     private synchronized boolean isTooDeep(DefaultBucket bucket) {
-        return bucket.getDepth() >= settings.getMaxDepth();
+        return bucket.getDepth() >= config.getMaxDepth();
     }
     
     /**
@@ -367,7 +367,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
     
     @Override
     public int getK() {
-        return settings.getK();
+        return config.getK();
     }
 
     @Override
@@ -400,8 +400,8 @@ public class DefaultRouteTable extends AbstractRouteTable {
     private synchronized ArdverkFuture<PingEntity> ping(ContactEntity entity) {
         Contact contact = entity.getContact();
         
-        PingConfig config = settings.getPingConfig();
-        return ping(contact, config);
+        PingConfig pingConfig = config.getPingConfig();
+        return ping(contact, pingConfig);
     }
     
     @Override
@@ -423,7 +423,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         // Make sure we're not going kill the entire RouteTable 
         // if the Network goes down!
-        if (++consecutiveErrors >= settings.getMaxConsecutiveErrors()) {
+        if (++consecutiveErrors >= config.getMaxConsecutiveErrors()) {
             return;
         }
         
@@ -455,7 +455,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
                         }
                     }
                 } else if (entity.getErrorCount() 
-                        >= settings.getTooManyErrorsCount()) {
+                        >= config.getTooManyErrorsCount()) {
                     ContactEntity removed = bucket.removeActive(entity);
                     assert(removed == entity && !bucket.isActiveFull());
                     
@@ -578,12 +578,12 @@ public class DefaultRouteTable extends AbstractRouteTable {
             
             active = new PatriciaTrie<KUID, ContactEntity>();
             
-            int maxCacheSize = settings.getMaxCacheSize();
+            int maxCacheSize = config.getMaxCacheSize();
             cached = new FixedSizeHashMap<KUID, ContactEntity>(
                     maxCacheSize, 1.0f, true, maxCacheSize);
             
             counter = new NetworkCounter(
-                    settings.getNetworkMask());
+                    config.getNetworkMask());
         }
         
         @Override
@@ -601,13 +601,13 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
         
         public boolean isActiveFull() {
-            return active.size() >= settings.getK();
+            return active.size() >= config.getK();
         }
         
         public Decision select(KUID contactId, 
                 final Collection<Contact> dst, final int count) {
             
-            final double probability = settings.getProbability();
+            final double probability = config.getProbability();
             active.select(contactId, new Cursor<KUID, ContactEntity>() {
                 @Override
                 public Decision select(Entry<? extends KUID, 

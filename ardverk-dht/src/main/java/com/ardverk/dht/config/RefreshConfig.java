@@ -4,9 +4,9 @@ import java.util.concurrent.TimeUnit;
 
 public interface RefreshConfig extends Config {
 
-    public int getPingCount();
+    public float getPingCount();
     
-    public void setPingCount(int pingCount);
+    public void setPingCount(float pingCount);
     
     public long getContactTimeout(TimeUnit unit);
     

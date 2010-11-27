@@ -11,6 +11,8 @@ import com.ardverk.utils.EventUtils;
 public class ArdverkFutureTask<V> extends AsyncProcessFutureTask<V> 
         implements ArdverkRunnableFuture<V> {
 
+    private volatile Object attachment;
+    
     public ArdverkFutureTask() {
         super();
     }
@@ -22,6 +24,16 @@ public class ArdverkFutureTask<V> extends AsyncProcessFutureTask<V>
 
     public ArdverkFutureTask(AsyncProcess<V> process) {
         super(process);
+    }
+    
+    @Override
+    public void setAttachment(Object attachment) {
+        this.attachment = attachment;
+    }
+
+    @Override
+    public Object getAttachment() {
+        return attachment;
     }
 
     @Override

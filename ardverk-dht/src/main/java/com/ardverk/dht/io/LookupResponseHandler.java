@@ -15,7 +15,6 @@ import org.ardverk.lang.Arguments;
 import org.ardverk.lang.NullArgumentException;
 import org.slf4j.Logger;
 
-import com.ardverk.dht.Constants;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.config.LookupConfig;
 import com.ardverk.dht.entity.LookupEntity;
@@ -369,7 +368,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
                 
                 Contact contact = query.first();
                 if (force || exhaustive
-                        || closest.size() < Constants.K 
+                        || closest.size() < routeTable.getK() 
                         || isCloserThanClosest(contact)) {
                     return true;
                 }

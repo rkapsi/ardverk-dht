@@ -4,13 +4,11 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.utils.TimeUtils;
 
-import com.ardverk.dht.Constants;
-
 public class DefaultRefreshConfig extends AbstractConfig implements RefreshConfig {
 
     private volatile PingConfig pingConfig = new DefaultPingConfig();
 
-    private volatile int pingCount = Constants.K;
+    private volatile float pingCount = 1.0f;
     
     private volatile long contactTimeoutInMillis 
         = TimeUtils.convert(5L, TimeUnit.MINUTES, TimeUnit.MILLISECONDS);
@@ -31,12 +29,12 @@ public class DefaultRefreshConfig extends AbstractConfig implements RefreshConfi
     }
     
     @Override
-    public int getPingCount() {
+    public float getPingCount() {
         return pingCount;
     }
     
     @Override
-    public void setPingCount(int pingCount) {
+    public void setPingCount(float pingCount) {
         this.pingCount = pingCount;
     }
 

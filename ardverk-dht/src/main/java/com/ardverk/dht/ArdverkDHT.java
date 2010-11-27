@@ -36,6 +36,8 @@ public class ArdverkDHT extends AbstractDHT {
     
     private final BootstrapManager bootstrapManager;
     
+    private final RouteTableManager routeTableManager;
+    
     private final StoreManager storeManager;
     
     private final RouteTable routeTable;
@@ -53,7 +55,8 @@ public class ArdverkDHT extends AbstractDHT {
         messageDispatcher = new DefaultMessageDispatcher(
                 messageFactory, codec, routeTable, database);
         
-        bootstrapManager = new BootstrapManager(this, routeTable);
+        bootstrapManager = new BootstrapManager(this);
+        routeTableManager = new RouteTableManager(this, routeTable);
         storeManager = new StoreManager(this, messageDispatcher);
         
         routeTable.bind(new RouteTable.ContactPinger() {
@@ -111,7 +114,7 @@ public class ArdverkDHT extends AbstractDHT {
     
     @Override
     public ArdverkFuture<RefreshEntity> refresh(QueueKey queueKey, RefreshConfig config) {
-        return bootstrapManager.refresh(queueKey, config);
+        return routeTableManager.refresh(queueKey, config);
     }
 
     @Override
