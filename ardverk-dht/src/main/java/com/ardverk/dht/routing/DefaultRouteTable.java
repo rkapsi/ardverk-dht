@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 import org.ardverk.collection.Cursor;
 import org.ardverk.collection.Cursor.Decision;
 import org.ardverk.collection.FixedSizeHashMap;
-import org.ardverk.collection.KeyAnalyzer;
 import org.ardverk.collection.PatriciaTrie;
 import org.ardverk.collection.Trie;
 import org.ardverk.concurrent.AsyncFuture;
@@ -36,8 +35,6 @@ public class DefaultRouteTable extends AbstractRouteTable {
     
     private final Contact localhost;
     
-    private final KeyAnalyzer<KUID> keyAnalyzer;
-    
     private final Trie<KUID, DefaultBucket> buckets;
     
     private int consecutiveErrors = 0;
@@ -49,11 +46,8 @@ public class DefaultRouteTable extends AbstractRouteTable {
     public DefaultRouteTable(RouteTableSettings settings, Contact localhost) {
         this.settings = Arguments.notNull(settings, "settings");
         
-        KUID contactId = localhost.getId();
-        this.keyAnalyzer = KUID.createKeyAnalyzer(contactId);
-        
         this.localhost = localhost;
-        this.buckets = new PatriciaTrie<KUID, DefaultBucket>(keyAnalyzer);
+        this.buckets = new PatriciaTrie<KUID, DefaultBucket>();
         
         init();
     }
@@ -582,7 +576,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         private DefaultBucket(KUID bucketId, int depth) {
             super(bucketId, depth);
             
-            active = new PatriciaTrie<KUID, ContactEntity>(keyAnalyzer);
+            active = new PatriciaTrie<KUID, ContactEntity>();
             
             int maxCacheSize = settings.getMaxCacheSize();
             cached = new FixedSizeHashMap<KUID, ContactEntity>(
@@ -787,7 +781,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
             
             for (ContactEntity entity : active.values()) {
                 KUID contactId = entity.getId();
-                if (!contactId.isSet(depth)) {
+                if (!contactId.isBitSet(depth)) {
                     left.add(entity);
                 } else {
                     right.add(entity);
@@ -796,7 +790,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
             
             for (ContactEntity entity : cached.values()) {
                 KUID contactId = entity.getId();
-                if (!contactId.isSet(depth)) {
+                if (!contactId.isBitSet(depth)) {
                     left.add(entity);
                 } else {
                     right.add(entity);

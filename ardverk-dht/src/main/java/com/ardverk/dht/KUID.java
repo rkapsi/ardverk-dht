@@ -10,7 +10,7 @@ import java.util.Random;
 
 import org.apache.commons.lang.NullArgumentException;
 import org.ardverk.coding.CodingUtils;
-import org.ardverk.collection.ByteArrayKeyAnalyzer;
+import org.ardverk.collection.Key;
 import org.ardverk.collection.KeyAnalyzer;
 import org.ardverk.io.Writable;
 
@@ -21,7 +21,7 @@ import com.ardverk.lang.Xor;
 /**
  * Kademlia Unique Identifier ({@link KUID}) 
  */
-public class KUID implements Identifier, Xor<KUID>, Negation<KUID>, 
+public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>, 
         Writable, Serializable, Comparable<KUID>, Cloneable {
 
     private static final long serialVersionUID = -4611363711131603626L;
@@ -139,10 +139,53 @@ public class KUID implements Identifier, Xor<KUID>, Negation<KUID>,
     /**
      * Returns the length of the {@link KUID} in bits.
      */
+    @Override
     public int lengthInBits() {
         return key.length * Byte.SIZE;
     }
     
+    @Override
+    public boolean isBitSet(int bitIndex) {
+        if (bitIndex < 0 || lengthInBits() < bitIndex) {
+            throw new IllegalArgumentException("bitIndex=" + bitIndex);
+        }
+        
+        int index = (int)(bitIndex / Byte.SIZE);
+        int bit = (int)(bitIndex % Byte.SIZE);
+        return (key[index] & (0x80 >>> bit)) != 0x00;
+    }
+    
+    @Override
+    public int bitIndex(KUID otherKey) {
+        int length = lengthInBits();
+        
+        boolean allNull = true;
+        for (int i = 0; i < length; i++) {
+            boolean value = isBitSet(i);
+                
+            if (value) {
+                allNull = false;
+            }
+            
+            boolean otherValue = otherKey.isBitSet(i);
+            
+            if (value != otherValue) {
+                return i;
+            }
+        }
+        
+        if (allNull) {
+            return KeyAnalyzer.NULL_BIT_KEY;
+        }
+        
+        return KeyAnalyzer.EQUAL_BIT_KEY;
+    }
+
+    @Override
+    public boolean isPrefixedBy(KUID prefix) {
+        return equals(prefix);
+    }
+
     @Override
     public KUID xor(KUID otherId) {
         if (!isCompatible(otherId)) {
@@ -185,19 +228,6 @@ public class KUID implements Identifier, Xor<KUID>, Negation<KUID>,
     }
     
     /**
-     * Returns true if the bit at the given bitIndex position is true (one, 1).
-     */
-    public boolean isSet(int bitIndex) {
-        if (bitIndex < 0 || lengthInBits() < bitIndex) {
-            throw new IllegalArgumentException("bitIndex=" + bitIndex);
-        }
-        
-        int index = (int)(bitIndex / Byte.SIZE);
-        int bit = (int)(bitIndex % Byte.SIZE);
-        return (key[index] & (0x80 >>> bit)) != 0x00;
-    }
-    
-    /**
      * Sets the bit at the given bitIndex position to true (one, 1) 
      * and returns the {@link KUID}.
      */
@@ -218,7 +248,7 @@ public class KUID implements Identifier, Xor<KUID>, Negation<KUID>,
      * {@link KUID}.
      */
     public KUID flip(int bitIndex) {
-        return set(bitIndex, !isSet(bitIndex));
+        return set(bitIndex, !isBitSet(bitIndex));
     }
     
     private KUID set(int bitIndex, boolean on) {
@@ -470,69 +500,5 @@ public class KUID implements Identifier, Xor<KUID>, Negation<KUID>,
     public String toString() {
         return toHexString();
         //return toBinString();
-    }
-    
-    public static KeyAnalyzer<KUID> createKeyAnalyzer(KUID key) {
-        if (key == null) {
-            throw new NullArgumentException("key");
-        }
-        
-        return createKeyAnalyzer(key.lengthInBits());
-    }
-    
-    public static KeyAnalyzer<KUID> createKeyAnalyzer(int maxLengthInBits) {
-        return new KUIDKeyAnalyzer(maxLengthInBits);
-    }
-    
-    private static class KUIDKeyAnalyzer implements KeyAnalyzer<KUID> {
-
-        private static final long serialVersionUID = -7088064139086808955L;
-        
-        private final ByteArrayKeyAnalyzer keyAnalyzer;
-        
-        public KUIDKeyAnalyzer(int maxLengthInBits) {
-            keyAnalyzer = new ByteArrayKeyAnalyzer(maxLengthInBits);
-        }
-        
-        @Override
-        public int bitIndex(KUID key, int offsetInBits, int lengthInBits,
-                KUID other, int otherOffsetInBits, int otherLengthInBits) {
-            
-            return keyAnalyzer.bitIndex(key != null ? key.key : null, 
-                    offsetInBits, 
-                    lengthInBits, 
-                    other != null ? other.key : null, 
-                    otherOffsetInBits, 
-                    otherLengthInBits);
-        }
-
-        @Override
-        public int bitsPerElement() {
-            return keyAnalyzer.bitsPerElement();
-        }
-
-        @Override
-        public boolean isBitSet(KUID key, int bitIndex, int lengthInBits) {
-            return keyAnalyzer.isBitSet(key != null ? key.key : null, 
-                    bitIndex, lengthInBits);
-        }
-
-        @Override
-        public boolean isPrefix(KUID prefix, int offsetInBits,
-                int lengthInBits, KUID key) {
-            return keyAnalyzer.isPrefix(prefix != null ? prefix.key : null, 
-                    offsetInBits, lengthInBits, key != null ? key.key : null);
-        }
-
-        @Override
-        public int lengthInBits(KUID key) {
-            return keyAnalyzer.lengthInBits(key != null ? key.key : null);
-        }
-
-        @Override
-        public int compare(KUID o1, KUID o2) {
-            return keyAnalyzer.compare(o1 != null ? o1.key : null, 
-                    o2 != null ? o2.key : null);
-        }
     }
 }
