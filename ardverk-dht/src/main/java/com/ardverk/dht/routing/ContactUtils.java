@@ -47,8 +47,6 @@ public class ContactUtils {
         return Math.min((long)(rtt * 1.5f), defaultValue);
     }
     
-    
-    
     public static ContactEntity[] byHealth(ContactEntity[] entities) {
         return byHealth(entities, true);
     }

@@ -26,8 +26,6 @@ import com.ardverk.logging.LoggerUtils;
 
 public class DefaultRouteTable extends AbstractRouteTable {
     
-    private static final long serialVersionUID = 2942655317183321858L;
-    
     private static final Logger LOG 
         = LoggerUtils.getLogger(DefaultRouteTable.class);
     
@@ -234,7 +232,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
     }
     
     private synchronized void addActive(DefaultBucket bucket, Contact contact) {
-        ContactEntity entity = new ContactEntity(contact);
+        ContactEntity entity = new ContactEntity(config, contact);
         boolean success = bucket.addActive(entity);
         
         if (success) {
@@ -243,7 +241,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
     }
     
     private synchronized ContactEntity addCache(DefaultBucket bucket, Contact contact) {
-        ContactEntity entity = new ContactEntity(contact);
+        ContactEntity entity = new ContactEntity(config, contact);
         ContactEntity other = bucket.addCache(entity);
         
         if (other != null) {
@@ -267,7 +265,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
                 ContactEntity entity = bucket.removeActive(lrs);
                 assert (entity == lrs);
                 
-                bucket.addActive(new ContactEntity(contact));
+                bucket.addActive(new ContactEntity(config, contact));
                 bucket.touch();
                 
                 fireReplaceContact(bucket, lrs.getContact(), contact);

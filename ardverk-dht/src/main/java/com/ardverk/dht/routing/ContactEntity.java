@@ -8,7 +8,7 @@ import com.ardverk.dht.KUID;
 
 class ContactEntity implements Identifier, Longevity {
     
-    private static final int MAX_ERRORS = 5;
+    private final RouteTableConfig config;
     
     private Contact contact;
     
@@ -16,7 +16,8 @@ class ContactEntity implements Identifier, Longevity {
     
     private long errorTimeStamp;
     
-    public ContactEntity(Contact contact) {
+    public ContactEntity(RouteTableConfig config, Contact contact) {
+        this.config = config;
         this.contact = contact;
     }
     
@@ -94,7 +95,7 @@ class ContactEntity implements Identifier, Longevity {
     }
     
     public boolean isDead() {
-        return errorCount >= MAX_ERRORS;
+        return errorCount >= config.getMaxContactErrors();
     }
     
     public boolean isAlive() {
@@ -111,10 +112,9 @@ class ContactEntity implements Identifier, Longevity {
                 contact.getRemoteAddress());
     }
     
-    private static final long X = 5L*60L*1000L;
-    
     public boolean hasBeenActiveRecently() {
-        return (System.currentTimeMillis() - getTimeStamp()) < X;
+        long timeout = config.getHasBeenActiveTimeoutInMillis();
+        return (System.currentTimeMillis() - getTimeStamp()) < timeout;
     }
     
     public boolean same(Contact other) {
@@ -133,7 +133,7 @@ class ContactEntity implements Identifier, Longevity {
         
         private final Contact merged;
 
-        public Update(Contact previous, Contact other, Contact merged) {
+        private Update(Contact previous, Contact other, Contact merged) {
             this.previous = previous;
             this.other = other;
             this.merged = merged;

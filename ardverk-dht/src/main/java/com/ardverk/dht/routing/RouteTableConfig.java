@@ -1,6 +1,9 @@
 package com.ardverk.dht.routing;
 
+import java.util.concurrent.TimeUnit;
+
 import org.ardverk.net.NetworkMask;
+import org.ardverk.utils.TimeUtils;
 
 import com.ardverk.dht.Constants;
 import com.ardverk.dht.config.DefaultPingConfig;
@@ -27,6 +30,11 @@ public class RouteTableConfig {
     private volatile int tooManyErrorsCount = Integer.MAX_VALUE;
     
     private volatile boolean checkIdentity = true;
+    
+    private volatile int maxContactErrors = 5;
+    
+    private volatile long hasBeenActiveTimeoutInMillis 
+        = TimeUtils.convert(5L, TimeUnit.MINUTES, TimeUnit.MILLISECONDS);
     
     public RouteTableConfig() {
         this(Constants.K);
@@ -110,5 +118,25 @@ public class RouteTableConfig {
 
     public void setPingConfig(PingConfig pingConfig) {
         this.pingConfig = pingConfig;
+    }
+
+    public int getMaxContactErrors() {
+        return maxContactErrors;
+    }
+
+    public void setMaxContactErrors(int maxContactErrors) {
+        this.maxContactErrors = maxContactErrors;
+    }
+    
+    public void setHasBeenActiveTimeout(long foo, TimeUnit unit) {
+        this.hasBeenActiveTimeoutInMillis = unit.toMillis(foo);
+    }
+    
+    public long getHasBeenActiveTimeout(TimeUnit unit) {
+        return unit.convert(hasBeenActiveTimeoutInMillis, TimeUnit.MILLISECONDS);
+    }
+    
+    public long getHasBeenActiveTimeoutInMillis() {
+        return getHasBeenActiveTimeout(TimeUnit.MILLISECONDS);
     }
 }
