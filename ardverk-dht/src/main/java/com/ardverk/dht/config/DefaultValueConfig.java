@@ -4,10 +4,8 @@ import java.util.concurrent.TimeUnit;
 
 public class DefaultValueConfig extends DefaultLookupConfig 
         implements ValueConfig {
-
-    private static final int R = 1;
     
-    private volatile int r = R;
+    private volatile int r = 1;
     
     public DefaultValueConfig() {
         super();

@@ -8,8 +8,8 @@ import com.ardverk.dht.routing.Contact;
 public abstract class AbstractConfig implements Config {
 
     @Override
-    public long getTimeoutInMillis() {
-        return getTimeout(TimeUnit.MILLISECONDS);
+    public final long getOperationTimeoutInMillis() {
+        return getOperationTimeout(TimeUnit.MILLISECONDS);
     }
     
     @Override

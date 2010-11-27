@@ -6,11 +6,11 @@ import com.ardverk.dht.routing.Contact;
 
 public interface Config {
     
-    public void setTimeout(long timeout, TimeUnit unit);
+    public void setOperationTimeout(long timeout, TimeUnit unit);
     
-    public long getTimeout(TimeUnit unit);
+    public long getOperationTimeout(TimeUnit unit);
     
-    public long getTimeoutInMillis();
+    public long getOperationTimeoutInMillis();
     
     public long getAdaptiveTimeout(Contact dst, 
             long defaultTimeout, TimeUnit unit);

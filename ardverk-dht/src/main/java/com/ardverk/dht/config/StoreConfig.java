@@ -4,9 +4,9 @@ import java.util.concurrent.TimeUnit;
 
 public interface StoreConfig extends Config {
     
-    public long getFooTimeout(TimeUnit unit);
+    public long getStoreTimeout(TimeUnit unit);
     
-    public long getFooTimeoutInMillis();
+    public long getStoreTimeoutInMillis();
     
-    public void setFooTimeout(long timeout, TimeUnit unit);
+    public void setStoreTimeout(long timeout, TimeUnit unit);
 }

@@ -104,7 +104,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
         MessageFactory factory = messageDispatcher.getMessageFactory();
         StoreRequest request = factory.createStoreRequest(dst, tuple);
         
-        long defaultTimeout = config.getFooTimeoutInMillis();
+        long defaultTimeout = config.getStoreTimeoutInMillis();
         long adaptiveTimeout = config.getAdaptiveTimeout(
                 dst, defaultTimeout, TimeUnit.MILLISECONDS);
         

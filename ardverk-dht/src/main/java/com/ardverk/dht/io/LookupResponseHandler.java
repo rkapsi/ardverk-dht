@@ -124,7 +124,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     }
     
     private void lookup(Contact dst) throws IOException {
-        long defaultTimeout = config.getFooTimeoutInMillis();
+        long defaultTimeout = config.getLookupTimeoutInMillis();
         long adaptiveTimeout = config.getAdaptiveTimeout(
                 dst, defaultTimeout, TimeUnit.MILLISECONDS);
         lookup(dst, lookupManager.key, adaptiveTimeout, TimeUnit.MILLISECONDS);

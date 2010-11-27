@@ -4,22 +4,22 @@ import java.util.concurrent.TimeUnit;
 
 public class DefaultConfig extends AbstractConfig {
     
-    private volatile long timeoutInMillis;
+    private volatile long operationTimeoutInMillis;
     
     public DefaultConfig() {
     }
     
     public DefaultConfig(long timeout, TimeUnit unit) {
-        setTimeout(timeout, unit);
+        setOperationTimeout(timeout, unit);
     }
     
     @Override
-    public void setTimeout(long timeout, TimeUnit unit) {
-        this.timeoutInMillis = unit.toMillis(timeout);
+    public void setOperationTimeout(long timeout, TimeUnit unit) {
+        this.operationTimeoutInMillis = unit.toMillis(timeout);
     }
     
     @Override
-    public long getTimeout(TimeUnit unit) {
-        return unit.convert(timeoutInMillis, TimeUnit.MILLISECONDS);
+    public long getOperationTimeout(TimeUnit unit) {
+        return unit.convert(operationTimeoutInMillis, TimeUnit.MILLISECONDS);
     }
 }

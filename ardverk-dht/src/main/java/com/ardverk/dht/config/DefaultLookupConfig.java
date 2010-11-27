@@ -2,33 +2,31 @@ package com.ardverk.dht.config;
 
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.utils.TimeUtils;
+
 public class DefaultLookupConfig extends DefaultConfig 
         implements LookupConfig {
     
-    private static final boolean EXHAUSTIVE = false;
+    private static final long DEFAULT_OPERATION_TIMEOUT 
+        = TimeUtils.convert(1L, TimeUnit.MINUTES, TimeUnit.MILLISECONDS);
     
-    private static final boolean RANDOMIZE = false;
+    private volatile boolean exhaustive = false;
     
-    private static final long BOOST_FREQUENCY = 1000L;
+    private volatile boolean randomize = false;
     
-    private static final long BOOST_TIMEOUT = 3000L;
-    
-    private static final int ALPHA = 4;
-    
-    private volatile boolean exhaustive = EXHAUSTIVE;
-    
-    private volatile boolean randomize = RANDOMIZE;
-    
-    private volatile int alpha = ALPHA;
+    private volatile int alpha = 4;
 
-    private volatile long boostFrequency = BOOST_FREQUENCY;
+    private volatile long boostFrequency 
+        = TimeUtils.convert(5L, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
     
-    private volatile long boostTimeout = BOOST_TIMEOUT;
+    private volatile long boostTimeout 
+        = TimeUtils.convert(3L, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
     
-    private volatile long fooTimeoutInMillis = 3L * 1000L;
+    private volatile long lookupTimeoutInMillis 
+        = TimeUtils.convert(10L, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
     
     public DefaultLookupConfig() {
-        this(1L, TimeUnit.MINUTES);
+        this(DEFAULT_OPERATION_TIMEOUT, TimeUnit.MINUTES);
     }
     
     public DefaultLookupConfig(long timeout, TimeUnit unit) {
@@ -96,17 +94,17 @@ public class DefaultLookupConfig extends DefaultConfig
     }
 
     @Override
-    public long getFooTimeout(TimeUnit unit) {
-        return unit.convert(fooTimeoutInMillis, TimeUnit.MILLISECONDS);
+    public long getLookupTimeout(TimeUnit unit) {
+        return unit.convert(lookupTimeoutInMillis, TimeUnit.MILLISECONDS);
     }
 
     @Override
-    public long getFooTimeoutInMillis() {
-        return getFooTimeout(TimeUnit.MILLISECONDS);
+    public long getLookupTimeoutInMillis() {
+        return getLookupTimeout(TimeUnit.MILLISECONDS);
     }
 
     @Override
-    public void setFooTimeout(long timeout, TimeUnit unit) {
-        this.fooTimeoutInMillis = unit.toMillis(timeout);
+    public void setLookupTimeout(long timeout, TimeUnit unit) {
+        this.lookupTimeoutInMillis = unit.toMillis(timeout);
     }
 }

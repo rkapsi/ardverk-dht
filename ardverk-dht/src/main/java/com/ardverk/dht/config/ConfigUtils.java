@@ -6,15 +6,15 @@ public class ConfigUtils {
 
     public ConfigUtils() {}
     
-    public static long getTimeoutInMillis(Config... configs) {
-        return getTimeout(TimeUnit.MILLISECONDS, configs);
+    public static long getOperationTimeoutInMillis(Config... configs) {
+        return getOperationTimeout(configs, TimeUnit.MILLISECONDS);
     }
     
-    public static long getTimeout(TimeUnit unit, Config... configs) {
+    public static long getOperationTimeout(Config[] configs, TimeUnit unit) {
         long time = 0;
         
         for (Config config : configs) {
-            time += config.getTimeout(unit);
+            time += config.getOperationTimeout(unit);
         }
         
         return time;

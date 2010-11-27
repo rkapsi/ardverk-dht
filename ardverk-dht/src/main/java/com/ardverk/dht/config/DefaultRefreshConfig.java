@@ -81,12 +81,12 @@ public class DefaultRefreshConfig extends AbstractConfig implements RefreshConfi
     }
 
     @Override
-    public void setTimeout(long timeout, TimeUnit unit) {
+    public void setOperationTimeout(long timeout, TimeUnit unit) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public long getTimeout(TimeUnit unit) {
+    public long getOperationTimeout(TimeUnit unit) {
         throw new UnsupportedOperationException();
     }
 }

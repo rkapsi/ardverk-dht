@@ -14,7 +14,7 @@ abstract class AbstractDHT implements DHT {
     @Override
     public <V> ArdverkFuture<V> submit(QueueKey queueKey, 
             AsyncProcess<V> process, Config config) {
-        long timeout = config.getTimeoutInMillis();
+        long timeout = config.getOperationTimeoutInMillis();
         return submit(queueKey, process, timeout, TimeUnit.MILLISECONDS);
     }
 

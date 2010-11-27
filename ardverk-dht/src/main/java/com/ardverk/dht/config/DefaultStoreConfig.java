@@ -2,27 +2,34 @@ package com.ardverk.dht.config;
 
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.utils.TimeUtils;
+
 public class DefaultStoreConfig extends DefaultConfig 
         implements StoreConfig {
     
-    private volatile long fooTimeoutInMillis = 10L * 1000L;
+    private static final long DEFAULT_STORE_TIMEOUT
+        = TimeUtils.convert(1L, TimeUnit.MINUTES, TimeUnit.MILLISECONDS);
     
     public DefaultStoreConfig() {
-        super(1L, TimeUnit.MINUTES);
+        super(DEFAULT_STORE_TIMEOUT, TimeUnit.MILLISECONDS);
     }
     
-    @Override
-    public long getFooTimeout(TimeUnit unit) {
-        return unit.convert(fooTimeoutInMillis, TimeUnit.MILLISECONDS);
+    public DefaultStoreConfig(long storeTimeout, TimeUnit unit) {
+        super(storeTimeout, unit);
     }
 
     @Override
-    public long getFooTimeoutInMillis() {
-        return getFooTimeout(TimeUnit.MILLISECONDS);
+    public long getStoreTimeout(TimeUnit unit) {
+        return getOperationTimeout(unit);
     }
 
     @Override
-    public void setFooTimeout(long timeout, TimeUnit unit) {
-        this.fooTimeoutInMillis = unit.toMillis(timeout);
+    public long getStoreTimeoutInMillis() {
+        return getOperationTimeoutInMillis();
+    }
+
+    @Override
+    public void setStoreTimeout(long timeout, TimeUnit unit) {
+        setOperationTimeout(timeout, unit);
     }
 }

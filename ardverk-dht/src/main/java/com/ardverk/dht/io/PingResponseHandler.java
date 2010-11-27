@@ -7,7 +7,7 @@ import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncFuture;
-import org.ardverk.lang.NullArgumentException;
+import org.ardverk.lang.Arguments;
 import org.ardverk.net.NetworkUtils;
 
 import com.ardverk.dht.KUID;
@@ -85,10 +85,6 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
         
         public SocketAddressPingSender(KUID contactId, 
                 SocketAddress address) {
-            if (address == null) {
-                throw new NullArgumentException("address");
-            }
-            
             if (!NetworkUtils.isValidPort(address)) {
                 throw new IllegalArgumentException("address=" + address);
             }
@@ -102,7 +98,7 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
             MessageFactory factory = messageDispatcher.getMessageFactory();
             PingRequest request = factory.createPingRequest(address);
             
-            long timeout = config.getTimeout(TimeUnit.MILLISECONDS);
+            long timeout = config.getPingTimeout(TimeUnit.MILLISECONDS);
             send(contactId, request, timeout, TimeUnit.MILLISECONDS);
         }
     }
@@ -112,11 +108,7 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
         private final Contact contact;
         
         public ContactPingSender(Contact contact) {
-            if (contact == null) {
-                throw new NullArgumentException("contact");
-            }
-            
-            this.contact = contact;
+            this.contact = Arguments.notNull(contact, "contact");
         }
         
         @Override
@@ -124,7 +116,7 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
             MessageFactory factory = messageDispatcher.getMessageFactory();
             PingRequest request = factory.createPingRequest(contact);
             
-            long timeout = config.getTimeoutInMillis();
+            long timeout = config.getPingTimeoutInMillis();
             long adaptiveTimeout = config.getAdaptiveTimeout(
                     contact, timeout, TimeUnit.MILLISECONDS);
             send(contact, request, adaptiveTimeout, TimeUnit.MILLISECONDS);

@@ -28,9 +28,9 @@ public interface LookupConfig extends Config {
     
     public void setBoostTimeout(long boostTimeout, TimeUnit unit);
     
-    public long getFooTimeout(TimeUnit unit);
+    public long getLookupTimeout(TimeUnit unit);
     
-    public long getFooTimeoutInMillis();
+    public long getLookupTimeoutInMillis();
     
-    public void setFooTimeout(long timeout, TimeUnit unit);
+    public void setLookupTimeout(long timeout, TimeUnit unit);
 }
