@@ -4,6 +4,26 @@ import java.util.concurrent.TimeUnit;
 
 public interface RefreshConfig extends Config {
 
+    /**
+     * Returns the {@link PingConfig} that's used for refreshing.
+     */
+    public PingConfig getPingConfig();
+    
+    /**
+     * Sets the {@link PingConfig} that's used for refreshing.
+     */
+    public void setPingConfig(PingConfig pingConfig);
+    
+    /**
+     * Returns the {@link LookupConfig} that's used for refreshing.
+     */
+    public LookupConfig getLookupConfig();
+    
+    /**
+     * Returns the {@link LookupConfig} that's used for refreshing.
+     */
+    public void setLookupConfig(LookupConfig lookupConfig);
+    
     public float getPingCount();
     
     public void setPingCount(float pingCount);
@@ -13,14 +33,6 @@ public interface RefreshConfig extends Config {
     public long getContactTimeoutInMillis();
     
     public void setContactTimeout(long timeout, TimeUnit unit);
-    
-    public PingConfig getPingConfig();
-    
-    public void setPingConfig(PingConfig pingConfig);
-    
-    public LookupConfig getLookupConfig();
-    
-    public void setLookupConfig(LookupConfig lookupConfig);
     
     public long getBucketTimeout(TimeUnit unit);
     
