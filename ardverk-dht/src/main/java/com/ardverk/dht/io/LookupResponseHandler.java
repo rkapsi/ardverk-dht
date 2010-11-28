@@ -88,7 +88,8 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     private synchronized void boost() throws IOException {
         if (lookupManager.hasNext(true)) {
             long boostTimeout = config.getBoostTimeoutInMillis();
-            if (getLastResponseTime(TimeUnit.MILLISECONDS) >= boostTimeout) {
+            
+            if (boostTimeout >= 0L && getLastResponseTimeInMillis() >= boostTimeout) {
                 try {
                     Contact contact = lookupManager.next();
                     

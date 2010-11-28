@@ -37,6 +37,10 @@ public abstract class AbstractResponseHandler<V extends Entity>
         return convertTime(lastSendTime, unit);
     }
     
+    public long getLastSendTimeInMillis() {
+        return getLastSendTime(TimeUnit.MILLISECONDS);
+    }
+    
     /**
      * 
      */
@@ -44,10 +48,14 @@ public abstract class AbstractResponseHandler<V extends Entity>
         return convertTime(lastResponseTime, unit);
     }
     
+    public long getLastResponseTimeInMillis() {
+        return getLastResponseTime(TimeUnit.MILLISECONDS);
+    }
+    
     /**
      * 
      */
-    private long convertTime(long timeInMillis, TimeUnit unit) {
+    private static long convertTime(long timeInMillis, TimeUnit unit) {
         if (unit == null) {
             throw new NullArgumentException("unit");
         }
