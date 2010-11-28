@@ -3,10 +3,20 @@ package com.ardverk.dht.storage;
 
 public interface Database {
     
+    /**
+     * Returned by {@link Database#store(ValueTuple)}.
+     */
     public static interface Condition {
         
+        /**
+         * Returns {@code true} if a {@link ValueTuple} was stored 
+         * successfully in the {@link Database}.
+         */
         public boolean isSuccess();
         
+        /**
+         * Returns the name of the {@link Condition}.
+         */
         public String name();
     }
     

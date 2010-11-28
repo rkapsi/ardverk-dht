@@ -10,6 +10,8 @@ public class DefaultStoreConfig extends DefaultConfig
     private static final long DEFAULT_STORE_TIMEOUT
         = TimeUtils.convert(1L, TimeUnit.MINUTES, TimeUnit.MILLISECONDS);
     
+    public int s = 5;
+    
     public DefaultStoreConfig() {
         super(DEFAULT_STORE_TIMEOUT, TimeUnit.MILLISECONDS);
     }
@@ -31,5 +33,15 @@ public class DefaultStoreConfig extends DefaultConfig
     @Override
     public void setStoreTimeout(long timeout, TimeUnit unit) {
         setOperationTimeout(timeout, unit);
+    }
+
+    @Override
+    public int getS() {
+        return s;
+    }
+
+    @Override
+    public void setS(int s) {
+        this.s = s;
     }
 }

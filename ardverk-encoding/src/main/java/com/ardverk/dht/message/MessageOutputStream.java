@@ -174,6 +174,6 @@ class MessageOutputStream extends BencodingOutputStream {
     }
     
     private void writeStoreResponse(StoreResponse message) throws IOException {
-        writeCondition(message.getStatus());
+        writeCondition(message.getCondition());
     }
 }

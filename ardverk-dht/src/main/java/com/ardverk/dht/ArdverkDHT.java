@@ -57,7 +57,7 @@ public class ArdverkDHT extends AbstractDHT {
         
         bootstrapManager = new BootstrapManager(this);
         routeTableManager = new RouteTableManager(this, routeTable);
-        storeManager = new StoreManager(this, messageDispatcher);
+        storeManager = new StoreManager(this, routeTable, messageDispatcher);
         
         routeTable.bind(new RouteTable.ContactPinger() {
             @Override

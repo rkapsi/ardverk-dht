@@ -208,7 +208,7 @@ class MessageInputStream extends BencodingInputStream {
     
     private StoreResponse readStoreResponse(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
-        Condition status = readCondition();
-        return new DefaultStoreResponse(messageId, contact, address, status);
+        Condition condition = readCondition();
+        return new DefaultStoreResponse(messageId, contact, address, condition);
     }
 }

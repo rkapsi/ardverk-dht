@@ -78,10 +78,10 @@ public class DefaultMessageFactory extends AbstractMessageFactory {
     }
 
     @Override
-    public StoreResponse createStoreResponse(StoreRequest request, Condition status) {
+    public StoreResponse createStoreResponse(StoreRequest request, Condition condition) {
         Contact dst = request.getContact();
         SocketAddress address = dst.getRemoteAddress();
         MessageId messageId = request.getMessageId();
-        return new DefaultStoreResponse(messageId, localhost, address, status);
+        return new DefaultStoreResponse(messageId, localhost, address, condition);
     }
 }

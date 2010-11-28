@@ -35,10 +35,10 @@ public class StoreRequestHandler extends AbstractRequestHandler {
         StoreRequest request = (StoreRequest)message;
         
         ValueTuple tuple = request.getValueTuple();
-        Condition status = database.store(tuple);
+        Condition condition = database.store(tuple);
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
-        ResponseMessage response = factory.createStoreResponse(request, status);
+        ResponseMessage response = factory.createStoreResponse(request, condition);
         send(request, response);
     }
 }

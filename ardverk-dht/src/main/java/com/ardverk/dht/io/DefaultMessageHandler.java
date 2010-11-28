@@ -14,14 +14,9 @@ import com.ardverk.dht.routing.RouteTable;
 
 public class DefaultMessageHandler implements MessageCallback {
 
-    private final MessageDispatcher messageDispatcher;
-    
     private final RouteTable routeTable;
     
-    public DefaultMessageHandler(MessageDispatcher messageDispatcher, 
-            RouteTable routeTable) {
-        
-        this.messageDispatcher = Arguments.notNull(messageDispatcher, "messageDispatcher");
+    public DefaultMessageHandler(RouteTable routeTable) {
         this.routeTable = Arguments.notNull(routeTable, "routeTable");
     }
     

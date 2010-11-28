@@ -25,14 +25,14 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
 
     public static final NodeEntity DEFAULT = null;
     
-    private static final int K = 20;
-    
-    private final ProcessCounter counter = new ProcessCounter(K / 4);
+    private final ProcessCounter counter;
     
     private final List<StoreResponse> responses 
         = new ArrayList<StoreResponse>();
 
     private final Iterator<Contact> contacts;
+    
+    private final int k;
     
     private final ValueTuple tuple;
     
@@ -44,13 +44,17 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     
     public StoreResponseHandler(
             MessageDispatcher messageDispatcher, 
-            Contact[] contacts, ValueTuple tuple, 
-            StoreConfig config) {
+            Contact[] contacts, int k,
+            ValueTuple tuple, StoreConfig config) {
         super(messageDispatcher);
         
         this.contacts = Iterators.fromArray(contacts);
+        this.k = k;
+        
         this.tuple = Arguments.notNull(tuple, "tuple");
         this.config = Arguments.notNull(config, "config");
+        
+        counter = new ProcessCounter(config.getS());
     }
 
     @Override
@@ -62,7 +66,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
         try {
             preProcess(pop);
             
-            while (counter.hasNext() && counter.getCount() < K) {
+            while (counter.hasNext() && counter.getCount() < k) {
                 if (!contacts.hasNext()) {
                     break;
                 }
@@ -95,7 +99,8 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
                 setException(new IOException());
             } else {
                 long time = System.currentTimeMillis() - startTime;
-                setValue(new DefaultStoreEntity(time, TimeUnit.MILLISECONDS));
+                setValue(new DefaultStoreEntity(values, 
+                        time, TimeUnit.MILLISECONDS));
             }
         }
     }

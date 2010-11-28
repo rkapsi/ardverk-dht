@@ -1,7 +1,5 @@
 package com.ardverk.dht;
 
-import java.util.concurrent.TimeUnit;
-
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.AsyncProcess;
@@ -9,7 +7,6 @@ import org.ardverk.concurrent.FutureUtils;
 import org.ardverk.concurrent.NopAsyncProcess;
 import org.ardverk.concurrent.ValueReference;
 
-import com.ardverk.dht.KUID;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.config.PutConfig;
 import com.ardverk.dht.config.StoreConfig;
@@ -19,6 +16,7 @@ import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.io.StoreResponseHandler;
 import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.DefaultValueTuple;
 import com.ardverk.dht.storage.Value;
 import com.ardverk.dht.storage.ValueTuple;
@@ -27,10 +25,14 @@ class StoreManager {
 
     private final DHT dht;
     
+    private final RouteTable routeTable;
+    
     private final MessageDispatcher messageDispatcher;
     
-    public StoreManager(DHT dht, MessageDispatcher messageDispatcher) {
+    public StoreManager(DHT dht, RouteTable routeTable, 
+            MessageDispatcher messageDispatcher) {
         this.dht = dht;
+        this.routeTable = routeTable;
         this.messageDispatcher = messageDispatcher;
     }
     
@@ -96,11 +98,8 @@ class StoreManager {
                         }
                         
                         private void handleStoreEntity(StoreEntity storeEntity) {
-                            long time = nodeEntity.getTimeInMillis() 
-                                    + storeEntity.getTimeInMillis();
-                            
                             userFuture.setValue(new DefaultNodeStoreEntity(
-                                    nodeEntity, time, TimeUnit.MILLISECONDS));
+                                    nodeEntity, storeEntity));
                         }
                     });
                 }
@@ -137,12 +136,14 @@ class StoreManager {
     private ArdverkFuture<StoreEntity> store(QueueKey queueKey, 
             Contact[] contacts, KUID key, Value value, StoreConfig config) {
         
+        int k = routeTable.getK();
+        
         Contact localhost = dht.getLocalhost();
         ValueTuple valueTuple = new DefaultValueTuple(localhost, key, value);
         
         AsyncProcess<StoreEntity> process 
             = new StoreResponseHandler(messageDispatcher, 
-                contacts, valueTuple, config);
+                contacts, k, valueTuple, config);
         
         return dht.submit(queueKey, process, config);
     }
