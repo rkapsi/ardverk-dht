@@ -9,7 +9,6 @@ import org.ardverk.lang.Arguments;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.config.ValueConfig;
 import com.ardverk.dht.entity.DefaultValueEntity;
-import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.NodeResponse;
@@ -63,9 +62,9 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
         tuples.add(tuple);
         
         if (tuples.isFull()) {
-            NodeEntity nodeEntity = createNodeEntity();
+            Outcome outcome = createOutcome();
             ValueTuple[] values = tuples.toArray(new ValueTuple[0]);
-            setValue(new DefaultValueEntity(nodeEntity, values));
+            setValue(new DefaultValueEntity(outcome, values));
         }
     }
     
@@ -82,28 +81,13 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     }
     
     @Override
-    protected void complete(NodeEntity nodeEntity) {
+    protected void complete(Outcome outcome) {
         
         if (tuples.isEmpty()) {
-            setException(new NoSuchValueException(nodeEntity));
+            setException(new NoSuchValueException(outcome));
         } else {
             ValueTuple[] values = tuples.toArray(new ValueTuple[0]);
-            setValue(new DefaultValueEntity(nodeEntity, values));
-        }
-    }
-    
-    public static class NoSuchValueException extends IOException {
-        
-        private static final long serialVersionUID = -2753236114164880872L;
-
-        private final NodeEntity nodeEntity;
-        
-        private NoSuchValueException(NodeEntity nodeEntity) {
-            this.nodeEntity = nodeEntity;
-        }
-
-        public NodeEntity getNodeEntity() {
-            return nodeEntity;
+            setValue(new DefaultValueEntity(outcome, values));
         }
     }
 }

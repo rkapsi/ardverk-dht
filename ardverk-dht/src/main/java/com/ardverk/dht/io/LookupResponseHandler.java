@@ -16,9 +16,7 @@ import org.slf4j.Logger;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.config.LookupConfig;
-import com.ardverk.dht.entity.DefaultNodeEntity;
 import com.ardverk.dht.entity.LookupEntity;
-import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
@@ -84,7 +82,8 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     }
     
     /**
-     * 
+     * Kicks off an additional lookup if we haven't received any 
+     * responses for a while. 
      */
     private synchronized void boost() throws IOException {
         if (lookupManager.hasNext(true)) {
@@ -103,7 +102,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     }
     
     /**
-     * 
+     * The {@link #process(int)} method is the heart of the lookup process.
      */
     private synchronized void process(int decrement) throws IOException {
         try {
@@ -123,6 +122,9 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         }
     }
     
+    /**
+     * Sends a lookup request to the given {@link Contact}.
+     */
     private void lookup(Contact dst) throws IOException {
         long defaultTimeout = config.getLookupTimeoutInMillis();
         long adaptiveTimeout = config.getAdaptiveTimeout(
@@ -131,7 +133,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     }
     
     /**
-     * 
+     * Called by {@link #process(int)} before it is executing its own code.
      */
     private synchronized void preProcess(int decrement) {
         if (startTime == -1L) {
@@ -144,25 +146,25 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     }
     
     /**
-     * 
+     * Called by {@link #process(int)} after it has executed its own code.
      */
     private synchronized void postProcess() {
         int count = lookupCounter.getProcesses();
         if (count == 0) {
-            complete(createNodeEntity());
+            complete(createOutcome());
         }
     }
     
     /**
-     * 
+     * Sends a lookup request to the given {@link Contact}.
      */
     protected abstract void lookup(Contact dst, KUID lookupId, 
             long timeout, TimeUnit unit) throws IOException;
     
     /**
-     * 
+     * Called upon completion.
      */
-    protected abstract void complete(NodeEntity nodeEntity);
+    protected abstract void complete(Outcome outcome);
     
     
     @Override
@@ -178,13 +180,14 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     }
     
     /**
-     * 
+     * @see #processResponse(RequestEntity, ResponseMessage, long, TimeUnit)
      */
     protected abstract void processResponse0(RequestEntity entity,
             ResponseMessage response, long time, TimeUnit unit) throws IOException;
 
     /**
-     * 
+     * Adds the given {@link Contact}s to the lookup's internal processing
+     * queue.
      */
     protected synchronized void processContacts(Contact src, 
             Contact[] contacts, long time, TimeUnit unit) throws IOException {
@@ -202,27 +205,93 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         }
     }
     
+    /**
+     * @see #processTimeout(RequestEntity, long, TimeUnit)
+     */
     protected synchronized void processTimeout0(RequestEntity entity, 
             long time, TimeUnit unit) throws IOException {
         lookupManager.handleTimeout(time, unit);
     }
     
-    protected synchronized NodeEntity createNodeEntity() {
+    /**
+     * Creates and returns the current lookup {@link Outcome}.
+     */
+    protected synchronized Outcome createOutcome() {
         if (startTime == -1L) {
             throw new IllegalStateException("startTime=" + startTime);
         }
         
-        Contact[] contacts = lookupManager.getContacts();
-        int hop = lookupManager.getCurrentHop();
-        long time = System.currentTimeMillis() - startTime;
+        final long time = System.currentTimeMillis() - startTime;
+        final Contact[] contacts = lookupManager.getContacts();
+        final int hop = lookupManager.getHop();
+        final int timeouts = lookupManager.getErrorCount();
         
-        NodeEntity nodeEntity = new DefaultNodeEntity(
-                contacts, hop, time, TimeUnit.MILLISECONDS);
-        return nodeEntity;
+        return new Outcome() {
+
+            @Override
+            public Contact[] getContacts() {
+                return contacts;
+            }
+
+            @Override
+            public int getHop() {
+                return hop;
+            }
+            
+            @Override
+            public int getErrorCount() {
+                return timeouts;
+            }
+
+            @Override
+            public long getTime(TimeUnit unit) {
+                return unit.convert(time, TimeUnit.MILLISECONDS);
+            }
+        };
     }
     
     /**
-     * 
+     * The {@link Outcome} is a snapshot of the current lookup process.
+     */
+    public abstract class Outcome {
+        
+        /**
+         * Returns the lookup {@link KUID}.
+         */
+        public KUID getLookupId() {
+            return lookupManager.key;
+        }
+        
+        /**
+         * Returns the {@link Contact}s that have been found.
+         */
+        public abstract Contact[] getContacts();
+        
+        /**
+         * Returns the number of hops the lookup has taken.
+         */
+        public abstract int getHop();
+        
+        /**
+         * Returns the number of errors that have been occurred.
+         */
+        public abstract int getErrorCount();
+        
+        /**
+         * Returns the lookup time in the given {@link TimeUnit}.
+         */
+        public abstract long getTime(TimeUnit unit);
+        
+        /**
+         * Returns the lookup time in milliseconds.
+         */
+        public long getTimeInMillis() {
+            return getTime(TimeUnit.MILLISECONDS);
+        }
+    }
+    
+    /**
+     * The {@link LookupManager} controls the lookup process.
      */
     private class LookupManager {
         
@@ -307,11 +376,11 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
             return responses.toArray(new Contact[0]);
         }
         
-        public int getCurrentHop() {
+        public int getHop() {
             return currentHop;
         }
         
-        public int getTimeouts() {
+        public int getErrorCount() {
             return timeouts;
         }
         

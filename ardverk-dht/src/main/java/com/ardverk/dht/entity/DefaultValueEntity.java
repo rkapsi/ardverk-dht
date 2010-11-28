@@ -2,18 +2,19 @@ package com.ardverk.dht.entity;
 
 import java.util.concurrent.TimeUnit;
 
+import com.ardverk.dht.io.LookupResponseHandler.Outcome;
 import com.ardverk.dht.storage.ValueTuple;
 
 public class DefaultValueEntity extends AbstractEntity implements ValueEntity {
     
-    private final NodeEntity nodeEntity;
+    private final Outcome outcome;
     
     private final ValueTuple[] values;
     
-    public DefaultValueEntity(NodeEntity nodeEntity, ValueTuple[] values) {
-        super(nodeEntity.getTimeInMillis(), TimeUnit.MILLISECONDS);
+    public DefaultValueEntity(Outcome outcome, ValueTuple[] values) {
+        super(outcome.getTimeInMillis(), TimeUnit.MILLISECONDS);
         
-        this.nodeEntity = nodeEntity;
+        this.outcome = outcome;
         this.values = values;
     }
     
@@ -26,7 +27,7 @@ public class DefaultValueEntity extends AbstractEntity implements ValueEntity {
         return values;
     }
     
-    public NodeEntity getNodeEntity() {
-        return nodeEntity;
+    public Outcome getOutcome() {
+        return outcome;
     }
 }
