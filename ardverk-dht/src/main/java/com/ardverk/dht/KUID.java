@@ -13,8 +13,8 @@ import org.ardverk.coding.CodingUtils;
 import org.ardverk.collection.ByteArrayKeyAnalyzer;
 import org.ardverk.collection.Key;
 import org.ardverk.io.Writable;
+import org.ardverk.security.SecurityUtils;
 
-import com.ardverk.dht.security.SecurityUtils;
 import com.ardverk.lang.Negation;
 import com.ardverk.lang.Xor;
 

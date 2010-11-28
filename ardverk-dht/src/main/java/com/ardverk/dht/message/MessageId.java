@@ -10,9 +10,8 @@ import java.util.Random;
 import org.ardverk.coding.CodingUtils;
 import org.ardverk.io.Writable;
 import org.ardverk.lang.NullArgumentException;
+import org.ardverk.security.SecurityUtils;
 import org.ardverk.utils.ByteArrayComparator;
-
-import com.ardverk.dht.security.SecurityUtils;
 
 public final class MessageId implements Writable, Serializable, 
         Comparable<MessageId>, Cloneable {

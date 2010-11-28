@@ -4,8 +4,7 @@ import java.net.SocketAddress;
 import java.util.Random;
 
 import org.ardverk.lang.Arguments;
-
-import com.ardverk.dht.security.SecurityUtils;
+import org.ardverk.security.SecurityUtils;
 
 public abstract class AbstractMessageFactory implements MessageFactory {
 
