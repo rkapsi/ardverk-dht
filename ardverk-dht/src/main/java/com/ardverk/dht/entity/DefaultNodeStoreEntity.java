@@ -11,7 +11,7 @@ public class DefaultNodeStoreEntity extends DefaultStoreEntity
     
     public DefaultNodeStoreEntity(NodeEntity nodeEntity, StoreEntity storeEntity) {
         super(storeEntity.getStoreResponses(), 
-                time(nodeEntity, storeEntity, TimeUnit.MILLISECONDS), 
+                EntityUtils.getTimeInMillis(nodeEntity, storeEntity), 
                 TimeUnit.MILLISECONDS);
         
         this.nodeEntity = nodeEntity;
@@ -25,10 +25,5 @@ public class DefaultNodeStoreEntity extends DefaultStoreEntity
     
     public StoreEntity getStoreEntity() {
         return storeEntity;
-    }
-    
-    private static long time(NodeEntity nodeEntity, 
-            StoreEntity storeEntity, TimeUnit unit) {
-        return nodeEntity.getTime(unit) + storeEntity.getTime(unit);
     }
 }

@@ -11,7 +11,7 @@ public class DefaultBootstrapEntity extends AbstractEntity
     
     public DefaultBootstrapEntity(PingEntity pingEntity, 
             NodeEntity nodeEntity) {
-        super(getTimeInMillis(pingEntity, nodeEntity), 
+        super(EntityUtils.getTimeInMillis(pingEntity, nodeEntity), 
                 TimeUnit.MILLISECONDS);
         
         this.pingEntity = pingEntity;
@@ -26,13 +26,5 @@ public class DefaultBootstrapEntity extends AbstractEntity
     @Override
     public NodeEntity getNodeEntity() {
         return nodeEntity;
-    }
-    
-    private static long getTimeInMillis(Entity... entities) {
-        long time = 0;
-        for (Entity entity : entities) {
-            time += entity.getTimeInMillis();
-        }
-        return time;
     }
 }

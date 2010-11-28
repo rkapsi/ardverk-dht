@@ -230,6 +230,11 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         return new Outcome() {
 
             @Override
+            public KUID getLookupId() {
+                return lookupManager.key;
+            }
+
+            @Override
             public Contact[] getContacts() {
                 return contacts;
             }
@@ -254,14 +259,12 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     /**
      * The {@link Outcome} is a snapshot of the current lookup process.
      */
-    public abstract class Outcome {
+    public static abstract class Outcome {
         
         /**
          * Returns the lookup {@link KUID}.
          */
-        public KUID getLookupId() {
-            return lookupManager.key;
-        }
+        public abstract KUID getLookupId();
         
         /**
          * Returns the {@link Contact}s that have been found.
