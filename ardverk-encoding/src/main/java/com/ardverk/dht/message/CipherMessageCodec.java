@@ -13,13 +13,10 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 
 import org.ardverk.security.SecurityUtils;
 
 public class CipherMessageCodec extends AbstractMessageCodec {
-
-    private static final String ALGORITHM = "AES";
     
     private static final String TRANSFORMATION = "AES/CBC/PKCS5Padding";
         
@@ -31,9 +28,16 @@ public class CipherMessageCodec extends AbstractMessageCodec {
     
     private final SecureRandom random;
     
-    public CipherMessageCodec(MessageCodec codec, byte[] secretKey, byte[] iv) {
-        this(codec, new SecretKeySpec(secretKey, ALGORITHM), 
-                new IvParameterSpec(iv));
+    public CipherMessageCodec(MessageCodec codec, 
+            String secretKey, String initVector) {
+        this(codec, CipherUtils.createSecretKey(secretKey), 
+                CipherUtils.createInitVector(initVector));
+    }
+    
+    public CipherMessageCodec(MessageCodec codec, 
+            byte[] secretKey, byte[] initVector) {
+        this(codec, CipherUtils.createSecretKey(secretKey), 
+                CipherUtils.createInitVector(initVector));
     }
     
     public CipherMessageCodec(MessageCodec codec, SecretKey secretKey, 

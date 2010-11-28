@@ -7,10 +7,6 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
-
 import org.ardverk.security.MessageDigestCRC32;
 import org.ardverk.utils.DeadlockScanner;
 
@@ -44,23 +40,8 @@ import com.ardverk.dht.storage.ValueTuple;
 
 public class Main {
     
-    private static final byte[] INIT_VECTOR = new byte[] { (byte) 0x95, (byte) 0xc8, (byte) 0x0f, (byte) 0xec,
-        (byte) 0x46, (byte) 0xf0, (byte) 0x10, (byte) 0x52, (byte) 0xae, (byte) 0x73, (byte) 0x79, (byte) 0xc7,
-        (byte) 0x3c, (byte) 0x2b, (byte) 0x11, (byte) 0xd6 };
-    
-    private static SecretKey SECRET_KEY;
-    private static IvParameterSpec PARAMS;
-    
-    static {
-        try {
-            KeyGenerator generator = KeyGenerator.getInstance("AES");
-            generator.init(128);
-            SECRET_KEY = generator.generateKey();
-            PARAMS = new IvParameterSpec(INIT_VECTOR);
-        } catch (Exception err) {
-            throw new RuntimeException(err);
-        }
-    }
+    private static final String SECRET_KEY = "90fb237cbec71523ba9d883a8ec6ae9f";
+    private static final String INIT_VECTOR = "6fd7bda068bf2425980e5c9b1c9e2097";
     
     private static final int ID_SIZE = 20;
     
@@ -72,15 +53,8 @@ public class Main {
                 new CipherMessageCodec(
                     new CompressorMessageCodec(
                         new BencodeMessageCodec()), 
-                        SECRET_KEY, PARAMS), new MessageDigestCRC32());
-        
-        /*MessageCodec codec = new CipherMessageCodec(
-                    new CompressorMessageCodec(
-                        new BencodeMessageCodec()), 
-                        SECRET_KEY, PARAMS);*/
-        
-        /*MessageCodec codec = new DigestMessageCodec(
-                new BencodeMessageCodec(), new MessageDigestCRC32());*/
+                        SECRET_KEY, INIT_VECTOR), 
+                        new MessageDigestCRC32());
         
         MessageFactory messageFactory = new DefaultMessageFactory(
                 ID_SIZE, localhost);
@@ -103,7 +77,7 @@ public class Main {
         
         DHT first = null;
         List<DHT> dhts = new ArrayList<DHT>();
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 128; i++) {
             DHT dht = createDHT(2000 + i);
             dhts.add(dht);
             
