@@ -2,30 +2,31 @@ package com.ardverk.dht.entity;
 
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.lang.Arguments;
-
-import com.ardverk.dht.io.LookupResponseHandler.State;
 import com.ardverk.dht.storage.ValueTuple;
 
 public class DefaultValueEntity extends AbstractEntity implements ValueEntity {
     
-    private final ValueTuple value;
+    private final NodeEntity nodeEntity;
     
-    public DefaultValueEntity(ValueTuple value, 
-            long time, TimeUnit unit) {
-        super(time, unit);
+    private final ValueTuple[] values;
+    
+    public DefaultValueEntity(NodeEntity nodeEntity, ValueTuple[] values) {
+        super(nodeEntity.getTimeInMillis(), TimeUnit.MILLISECONDS);
         
-        this.value = Arguments.notNull(value, "value");
+        this.nodeEntity = nodeEntity;
+        this.values = values;
     }
     
-    public DefaultValueEntity(State state, ValueTuple value) {
-        super(state.getTimeInMillis(), TimeUnit.MILLISECONDS);
-        
-        this.value = Arguments.notNull(value, "value");
-    }
-
     @Override
     public ValueTuple getValue() {
-        return value;
+        return values[0];
+    }
+    
+    public ValueTuple[] getValues() {
+        return values;
+    }
+    
+    public NodeEntity getNodeEntity() {
+        return nodeEntity;
     }
 }

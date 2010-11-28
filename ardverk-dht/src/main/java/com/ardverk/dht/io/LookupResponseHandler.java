@@ -12,12 +12,13 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.lang.Arguments;
-import org.ardverk.lang.NullArgumentException;
 import org.slf4j.Logger;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.config.LookupConfig;
+import com.ardverk.dht.entity.DefaultNodeEntity;
 import com.ardverk.dht.entity.LookupEntity;
+import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
@@ -148,8 +149,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     private synchronized void postProcess() {
         int count = lookupCounter.getProcesses();
         if (count == 0) {
-            State state = getState();
-            complete(state);
+            complete(createNodeEntity());
         }
     }
     
@@ -162,7 +162,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     /**
      * 
      */
-    protected abstract void complete(State state);
+    protected abstract void complete(NodeEntity nodeEntity);
     
     
     @Override
@@ -207,7 +207,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         lookupManager.handleTimeout(time, unit);
     }
     
-    protected synchronized State getState() {
+    protected synchronized NodeEntity createNodeEntity() {
         if (startTime == -1L) {
             throw new IllegalStateException("startTime=" + startTime);
         }
@@ -216,7 +216,9 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         int hop = lookupManager.getCurrentHop();
         long time = System.currentTimeMillis() - startTime;
         
-        return new State(contacts, hop, time, TimeUnit.MILLISECONDS);
+        NodeEntity nodeEntity = new DefaultNodeEntity(
+                contacts, hop, time, TimeUnit.MILLISECONDS);
+        return nodeEntity;
     }
     
     /**
@@ -259,16 +261,8 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         private int timeouts = 0;
         
         public LookupManager(RouteTable routeTable, KUID key) {
-            if (routeTable == null) {
-                throw new NullArgumentException("routeTable");
-            }
-            
-            if (key == null) {
-                throw new NullArgumentException("key");
-            }
-            
-            this.routeTable = routeTable;
-            this.key = key;
+            this.routeTable = Arguments.notNull(routeTable, "routeTable");
+            this.key = Arguments.notNull(key, "key");
             
             Contact localhost = routeTable.getLocalhost();
             KUID contactId = localhost.getId();
@@ -399,16 +393,14 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
                 int index = 0;
                 for (Contact c : query) {
                     
-                    // First element is always true because 1/1 >= random[0..1]!
-                    if (1d/(index + 1) >= Math.random()) {
-                        contact = c;
-                    }
-                    
                     if (index >= routeTable.getK()) {
                         break;
                     }
                     
-                    ++index;
+                    // First element is always true because 1/1 >= random[0..1]!
+                    if (1d/++index >= Math.random()) {
+                        contact = c;
+                    }
                 }
                 
                 query.remove(contact);
@@ -421,48 +413,6 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
                 throw new NoSuchElementException();
             }
             return contact;
-        }
-    }
-    
-    public static class State {
-        
-        private final Contact[] contacts;
-        
-        private final int hop;
-        
-        private final long time;
-        
-        private final TimeUnit unit;
-        
-        private State(Contact[] contacts, int hop, long time, TimeUnit unit) {
-            if (contacts == null) {
-                throw new NullArgumentException("contacts");
-            }
-            
-            if (unit == null) {
-                throw new NullArgumentException("unit");
-            }
-            
-            this.contacts = contacts;
-            this.hop = hop;
-            this.time = time;
-            this.unit = unit;
-        }
-
-        public Contact[] getContacts() {
-            return contacts;
-        }
-        
-        public int getHop() {
-            return hop;
-        }
-
-        public long getTime(TimeUnit unit) {
-            return unit.convert(time, this.unit);
-        }
-        
-        public long getTimeInMillis() {
-            return getTime(TimeUnit.MILLISECONDS);
         }
     }
 }

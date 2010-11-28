@@ -23,6 +23,10 @@ public class DefaultNodeStoreEntity extends DefaultStoreEntity
         return nodeEntity;
     }
     
+    public StoreEntity getStoreEntity() {
+        return storeEntity;
+    }
+    
     private static long time(NodeEntity nodeEntity, 
             StoreEntity storeEntity, TimeUnit unit) {
         return nodeEntity.getTime(unit) + storeEntity.getTime(unit);

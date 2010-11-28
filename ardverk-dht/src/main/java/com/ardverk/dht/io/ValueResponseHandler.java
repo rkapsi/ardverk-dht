@@ -9,6 +9,7 @@ import org.ardverk.lang.Arguments;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.config.ValueConfig;
 import com.ardverk.dht.entity.DefaultValueEntity;
+import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.NodeResponse;
@@ -62,8 +63,9 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
         tuples.add(tuple);
         
         if (tuples.isFull()) {
-            State state = getState();
-            setValue(new DefaultValueEntity(state, tuple));
+            NodeEntity nodeEntity = createNodeEntity();
+            ValueTuple[] values = tuples.toArray(new ValueTuple[0]);
+            setValue(new DefaultValueEntity(nodeEntity, values));
         }
     }
     
@@ -80,12 +82,13 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     }
     
     @Override
-    protected void complete(State state) {
+    protected void complete(NodeEntity nodeEntity) {
         
         if (tuples.isEmpty()) {
-            setException(new NoSuchValueException(state));
+            setException(new NoSuchValueException(nodeEntity));
         } else {
-            setValue(new DefaultValueEntity(state, tuples.get(0)));
+            ValueTuple[] values = tuples.toArray(new ValueTuple[0]);
+            setValue(new DefaultValueEntity(nodeEntity, values));
         }
     }
     
@@ -93,26 +96,14 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
         
         private static final long serialVersionUID = -2753236114164880872L;
 
-        private final State state;
+        private final NodeEntity nodeEntity;
         
-        private NoSuchValueException(State state) {
-            this.state = state;
+        private NoSuchValueException(NodeEntity nodeEntity) {
+            this.nodeEntity = nodeEntity;
         }
 
-        public Contact[] getContacts() {
-            return state.getContacts();
-        }
-
-        public int getHop() {
-            return state.getHop();
-        }
-
-        public long getTime(TimeUnit unit) {
-            return state.getTime(unit);
-        }
-        
-        public long getTimeInMillis() {
-            return state.getTimeInMillis();
+        public NodeEntity getNodeEntity() {
+            return nodeEntity;
         }
     }
 }

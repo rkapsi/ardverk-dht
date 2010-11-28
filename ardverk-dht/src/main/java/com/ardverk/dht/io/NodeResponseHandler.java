@@ -5,7 +5,6 @@ import java.util.concurrent.TimeUnit;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.config.LookupConfig;
-import com.ardverk.dht.entity.DefaultNodeEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.NodeRequest;
@@ -32,14 +31,14 @@ public class NodeResponseHandler extends LookupResponseHandler<NodeEntity> {
     }
 
     @Override
-    protected void complete(State state) {
+    protected void complete(NodeEntity nodeEntity) {
         
-        Contact[] contacts = state.getContacts();
+        Contact[] contacts = nodeEntity.getContacts();
         
         if (contacts.length == 0) {
-            setException(new IOException());                
+            setException(new NodeNotFoundException(nodeEntity));                
         } else {
-            setValue(new DefaultNodeEntity(state));
+            setValue(nodeEntity);
         }
     }
     
@@ -51,5 +50,20 @@ public class NodeResponseHandler extends LookupResponseHandler<NodeEntity> {
         Contact src = response.getContact();
         Contact[] contacts = ((NodeResponse)response).getContacts();
         processContacts(src, contacts, time, unit);
+    }
+    
+    public static class NodeNotFoundException extends IOException {
+        
+        private static final long serialVersionUID = -2301202118771105303L;
+        
+        private final NodeEntity nodeEntity;
+        
+        private NodeNotFoundException(NodeEntity nodeEntity) {
+            this.nodeEntity = nodeEntity;
+        }
+
+        public NodeEntity getNodeEntity() {
+            return nodeEntity;
+        }
     }
 }

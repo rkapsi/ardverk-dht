@@ -2,23 +2,17 @@ package com.ardverk.dht.entity;
 
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.concurrent.AsyncProcessExecutorService;
-
 import com.ardverk.dht.io.LookupResponseHandler.State;
-import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.routing.Contact;
 
 public class DefaultNodeEntity extends AbstractEntity implements NodeEntity {
-
-    private final AsyncProcessExecutorService executor = null;
-    
-    private final MessageDispatcher messageDispatcher = null;
     
     private final Contact[] contacts;
     
     private final int hop;
     
-    public DefaultNodeEntity(Contact[] contacts, int hops, long time, TimeUnit unit) {
+    public DefaultNodeEntity(Contact[] contacts, int hops, 
+            long time, TimeUnit unit) {
         super(time, unit);
         
         this.contacts = contacts;
@@ -31,13 +25,6 @@ public class DefaultNodeEntity extends AbstractEntity implements NodeEntity {
         this.contacts = state.getContacts();
         this.hop = state.getHop();
     }
-    
-    /*@Override
-    public AsyncProcessFuture<StoreEntity> store(Contact creator, KUID key, byte[] value) {
-        AsyncProcess<StoreEntity> process = new StoreResponseHandler(
-                messageDispatcher, this, creator, key, value);
-        return executor.submit(process);
-    }*/
     
     @Override
     public Contact[] getContacts() {
