@@ -7,6 +7,7 @@ import java.net.SocketAddress;
 import org.junit.Test;
 
 import com.ardverk.dht.KUID;
+import com.ardverk.dht.codec.bencode.BencodeMessageCodec;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.Contact.Type;
 

@@ -1,4 +1,4 @@
-package com.ardverk.dht.message;
+package com.ardverk.dht.codec.bencode;
 
 class MessageUtils {
 

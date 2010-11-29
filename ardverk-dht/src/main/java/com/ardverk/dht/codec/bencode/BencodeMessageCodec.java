@@ -1,4 +1,4 @@
-package com.ardverk.dht.message;
+package com.ardverk.dht.codec.bencode;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -9,6 +9,7 @@ import org.ardverk.io.IoUtils;
 import org.ardverk.lang.NumberUtils;
 
 import com.ardverk.dht.codec.AbstractMessageCodec;
+import com.ardverk.dht.message.Message;
 
 public class BencodeMessageCodec extends AbstractMessageCodec {
     

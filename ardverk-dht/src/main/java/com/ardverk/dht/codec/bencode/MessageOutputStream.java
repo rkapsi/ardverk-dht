@@ -1,4 +1,4 @@
-package com.ardverk.dht.message;
+package com.ardverk.dht.codec.bencode;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -9,6 +9,16 @@ import java.net.SocketAddress;
 import org.ardverk.coding.BencodingOutputStream;
 
 import com.ardverk.dht.KUID;
+import com.ardverk.dht.message.Message;
+import com.ardverk.dht.message.MessageId;
+import com.ardverk.dht.message.NodeRequest;
+import com.ardverk.dht.message.NodeResponse;
+import com.ardverk.dht.message.PingRequest;
+import com.ardverk.dht.message.PingResponse;
+import com.ardverk.dht.message.StoreRequest;
+import com.ardverk.dht.message.StoreResponse;
+import com.ardverk.dht.message.ValueRequest;
+import com.ardverk.dht.message.ValueResponse;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.storage.Database.Condition;
 import com.ardverk.dht.storage.Key;

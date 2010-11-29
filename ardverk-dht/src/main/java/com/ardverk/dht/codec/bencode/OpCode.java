@@ -1,4 +1,14 @@
-package com.ardverk.dht.message;
+package com.ardverk.dht.codec.bencode;
+
+import com.ardverk.dht.message.Message;
+import com.ardverk.dht.message.NodeRequest;
+import com.ardverk.dht.message.NodeResponse;
+import com.ardverk.dht.message.PingRequest;
+import com.ardverk.dht.message.PingResponse;
+import com.ardverk.dht.message.StoreRequest;
+import com.ardverk.dht.message.StoreResponse;
+import com.ardverk.dht.message.ValueRequest;
+import com.ardverk.dht.message.ValueResponse;
 
 
 enum OpCode implements IntegerValue {

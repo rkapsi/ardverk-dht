@@ -5,7 +5,7 @@ import java.net.SocketAddress;
 
 import org.ardverk.security.MessageDigestCRC32;
 
-import com.ardverk.dht.message.BencodeMessageCodec;
+import com.ardverk.dht.codec.bencode.BencodeMessageCodec;
 import com.ardverk.dht.message.Message;
 
 public class DefaultMessageCodec extends AbstractMessageCodec {
