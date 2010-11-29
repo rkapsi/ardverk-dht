@@ -1,5 +1,6 @@
 package com.ardverk.dht;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketAddress;
 
@@ -66,6 +67,12 @@ public class ArdverkDHT extends AbstractDHT {
                 return ArdverkDHT.this.ping(QueueKey.BACKEND, contact, config);
             }
         });
+    }
+    
+    @Override
+    public void close() throws IOException {
+        super.close();
+        messageDispatcher.close();
     }
     
     @Override
