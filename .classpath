@@ -1,21 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="ardverk-utils/src/main/java"/>
 	<classpathentry kind="src" path="ardverk-encoding/src/main/java"/>
 	<classpathentry kind="src" path="ardverk-encoding/src/test/java"/>
 	<classpathentry excluding="com/ardverk/dht/utils/SizeEstimator.java|com/ardverk/dht/old/" kind="src" path="ardverk-dht/src/main/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="ardverk-utils/lib/main/java/slf4j/slf4j-api-1.5.6.jar"/>
-	<classpathentry kind="lib" path="ardverk-utils/lib/main/java/slf4j/slf4j-simple-1.5.6.jar"/>
-	<classpathentry kind="lib" path="ardverk-utils/lib/test/java/junit/junit-4.6.jar"/>
-	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/mina/commons-lang-2.4.jar"/>
-	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/mina/commons-logging-1.0.3.jar"/>
-	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/mina/javassist-3.7.ga.jar"/>
-	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/mina/mina-core-2.0.0-RC1.jar"/>
-	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/mina/slf4j-api-1.5.2.jar"/>
-	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/mina/ognl-2.7.2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Bee-Encode"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/patricia-trie"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardverk-base"/>
+	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/slf4j-api-1.6.1.jar"/>
+	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/slf4j-simple-1.6.1.jar"/>
+	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/junit-4.8.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

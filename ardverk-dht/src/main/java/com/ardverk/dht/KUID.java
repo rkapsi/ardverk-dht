@@ -8,11 +8,11 @@ import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Random;
 
-import org.apache.commons.lang.NullArgumentException;
 import org.ardverk.coding.CodingUtils;
 import org.ardverk.collection.ByteArrayKeyAnalyzer;
 import org.ardverk.collection.Key;
 import org.ardverk.io.Writable;
+import org.ardverk.lang.NullArgumentException;
 import org.ardverk.security.SecurityUtils;
 
 import com.ardverk.dht.lang.Identifier;
