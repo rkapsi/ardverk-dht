@@ -2,11 +2,20 @@ package com.ardverk.dht.config;
 
 import java.util.concurrent.TimeUnit;
 
+import com.ardverk.dht.QueueKey;
+
 public class DefaultPutConfig extends AbstractConfig implements PutConfig {
 
     private volatile LookupConfig lookupConfig = new DefaultLookupConfig();
     
     private volatile StoreConfig storeConfig = new DefaultStoreConfig();
+    
+    @Override
+    public void setQueueKey(QueueKey queueKey) {
+        super.setQueueKey(queueKey);
+        lookupConfig.setQueueKey(queueKey);
+        storeConfig.setQueueKey(queueKey);
+    }
     
     @Override
     public LookupConfig getLookupConfig() {

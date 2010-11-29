@@ -4,19 +4,28 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.utils.TimeUtils;
 
+import com.ardverk.dht.QueueKey;
+
 public class DefaultRefreshConfig extends AbstractConfig implements RefreshConfig {
 
     private volatile PingConfig pingConfig = new DefaultPingConfig();
+
+    private volatile LookupConfig lookupConfig = new DefaultLookupConfig();
 
     private volatile float pingCount = 1.0f;
     
     private volatile long contactTimeoutInMillis 
         = TimeUtils.convert(5L, TimeUnit.MINUTES, TimeUnit.MILLISECONDS);
     
-    private volatile LookupConfig lookupConfig = new DefaultLookupConfig();
-    
     private volatile long bucketTimeoutInMillis 
         = TimeUtils.convert(5L, TimeUnit.MINUTES, TimeUnit.MILLISECONDS);
+    
+    @Override
+    public void setQueueKey(QueueKey queueKey) {
+        super.setQueueKey(queueKey);
+        pingConfig.setQueueKey(queueKey);
+        lookupConfig.setQueueKey(queueKey);
+    }
     
     @Override
     public PingConfig getPingConfig() {

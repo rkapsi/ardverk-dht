@@ -2,9 +2,14 @@ package com.ardverk.dht.config;
 
 import java.util.concurrent.TimeUnit;
 
+import com.ardverk.dht.QueueKey;
 import com.ardverk.dht.routing.Contact;
 
 public interface Config {
+    
+    public QueueKey getQueueKey();
+    
+    public void setQueueKey(QueueKey queueKey);
     
     /**
      * Sets the timeout for the operation

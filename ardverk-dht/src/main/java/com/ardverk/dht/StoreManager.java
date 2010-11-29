@@ -36,7 +36,7 @@ class StoreManager {
         this.messageDispatcher = messageDispatcher;
     }
     
-    public ArdverkFuture<StoreEntity> put(final QueueKey queueKey, 
+    public ArdverkFuture<StoreEntity> put(
             final KUID key, final Value value, final PutConfig config) {
         
         final Object lock = new Object();
@@ -46,7 +46,7 @@ class StoreManager {
             // of this method (in most cases the user).
             AsyncProcess<StoreEntity> process = NopAsyncProcess.create();
             final ArdverkFuture<StoreEntity> userFuture 
-                = dht.submit(queueKey, process, config);
+                = dht.submit(process, config);
             
             // This will get initialized once we've found the k-closest
             // Contacts to the given KUID
@@ -55,7 +55,7 @@ class StoreManager {
             
             // Start the lookup for the given KUID
             final ArdverkFuture<NodeEntity> lookupFuture 
-                = dht.lookup(queueKey, key, config.getLookupConfig());
+                = dht.lookup(key, config.getLookupConfig());
             
             // Let's wait for the result of the FIND_NODE operation. On success we're 
             // going to initialize the storeFutureRef and do the actual STOREing.
@@ -78,7 +78,7 @@ class StoreManager {
                 private void handleNodeEntity(final NodeEntity nodeEntity) {
                     Contact[] contacts = nodeEntity.getContacts();
                     ArdverkFuture<StoreEntity> storeFuture 
-                        = storeFutureRef.make(store(queueKey, contacts, 
+                        = storeFutureRef.make(store(contacts, 
                                 key, value, config.getStoreConfig()));
                     
                     storeFuture.addAsyncFutureListener(new AsyncFutureListener<StoreEntity>() {
@@ -127,14 +127,13 @@ class StoreManager {
         }
     }
     
-    public ArdverkFuture<StoreEntity> put(QueueKey queueKey, 
-            Contact[] dst, KUID key, Value value, StoreConfig config) {
-        
-        return store(queueKey, dst, key, value, config);
+    public ArdverkFuture<StoreEntity> put(Contact[] dst, 
+            KUID key, Value value, StoreConfig config) {
+        return store(dst, key, value, config);
     }
     
-    private ArdverkFuture<StoreEntity> store(QueueKey queueKey, 
-            Contact[] contacts, KUID key, Value value, StoreConfig config) {
+    private ArdverkFuture<StoreEntity> store(Contact[] dst, 
+            KUID key, Value value, StoreConfig config) {
         
         int k = routeTable.getK();
         
@@ -143,8 +142,8 @@ class StoreManager {
         
         AsyncProcess<StoreEntity> process 
             = new StoreResponseHandler(messageDispatcher, 
-                contacts, k, valueTuple, config);
+                dst, k, valueTuple, config);
         
-        return dht.submit(queueKey, process, config);
+        return dht.submit(process, config);
     }
 }

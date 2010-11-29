@@ -63,7 +63,7 @@ public class ArdverkDHT extends AbstractDHT {
             @Override
             public ArdverkFuture<PingEntity> ping(Contact contact,
                     PingConfig config) {
-                return ArdverkDHT.this.ping(QueueKey.BACKEND, contact, config);
+                return ArdverkDHT.this.ping(contact, config);
             }
         });
     }
@@ -95,92 +95,88 @@ public class ArdverkDHT extends AbstractDHT {
     }
 
     @Override
-    public ArdverkFuture<BootstrapEntity> bootstrap(QueueKey queueKey,
+    public ArdverkFuture<BootstrapEntity> bootstrap(
             String host, int port, BootstrapConfig config) {
-        return bootstrapManager.bootstrap(queueKey, host, port, config);
+        return bootstrapManager.bootstrap(host, port, config);
     }
 
     @Override
-    public ArdverkFuture<BootstrapEntity> bootstrap(QueueKey queueKey,
+    public ArdverkFuture<BootstrapEntity> bootstrap(
             InetAddress address, int port, BootstrapConfig config) {
-        return bootstrapManager.bootstrap(queueKey, address, port, config);
+        return bootstrapManager.bootstrap(address, port, config);
     }
 
     @Override
-    public ArdverkFuture<BootstrapEntity> bootstrap(QueueKey queueKey,
+    public ArdverkFuture<BootstrapEntity> bootstrap(
             SocketAddress address, BootstrapConfig config) {
-        return bootstrapManager.bootstrap(queueKey, address, config);
+        return bootstrapManager.bootstrap(address, config);
     }
     
     @Override
-    public ArdverkFuture<BootstrapEntity> bootstrap(QueueKey queueKey,
+    public ArdverkFuture<BootstrapEntity> bootstrap(
             Contact contact, BootstrapConfig config) {
-        return bootstrapManager.bootstrap(queueKey, contact, config);
+        return bootstrapManager.bootstrap(contact, config);
     }
     
     @Override
-    public ArdverkFuture<RefreshEntity> refresh(QueueKey queueKey, RefreshConfig config) {
-        return routeTableManager.refresh(queueKey, config);
+    public ArdverkFuture<RefreshEntity> refresh(RefreshConfig config) {
+        return routeTableManager.refresh(config);
     }
 
     @Override
-    public ArdverkFuture<PingEntity> ping(QueueKey queueKey, 
-            Contact contact, PingConfig config) {
+    public ArdverkFuture<PingEntity> ping(Contact contact, PingConfig config) {
         AsyncProcess<PingEntity> process 
             = new PingResponseHandler(messageDispatcher, contact, config);
-        return submit(queueKey, process, config);
+        return submit(process, config);
     }
 
     @Override
-    public ArdverkFuture<PingEntity> ping(QueueKey queueKey,
+    public ArdverkFuture<PingEntity> ping(
             InetAddress address, int port, PingConfig config) {
         AsyncProcess<PingEntity> process 
             = new PingResponseHandler(messageDispatcher, address, port, config);
-        return submit(queueKey, process, config);
+        return submit(process, config);
     }
 
     @Override
-    public ArdverkFuture<PingEntity> ping(QueueKey queueKey, 
+    public ArdverkFuture<PingEntity> ping(
             SocketAddress dst, PingConfig config) {
         AsyncProcess<PingEntity> process 
             = new PingResponseHandler(messageDispatcher, dst, config);
-        return submit(queueKey, process, config);
+        return submit(process, config);
     }
 
     @Override
-    public ArdverkFuture<PingEntity> ping(QueueKey queueKey, 
+    public ArdverkFuture<PingEntity> ping(
             String address, int port, PingConfig config) {
         AsyncProcess<PingEntity> process 
             = new PingResponseHandler(messageDispatcher, address, port, config);
-        return submit(queueKey, process, config);
+        return submit(process, config);
     }
 
     @Override
-    public ArdverkFuture<NodeEntity> lookup(QueueKey queueKey, KUID key,
-            LookupConfig config) {
+    public ArdverkFuture<NodeEntity> lookup(KUID key, LookupConfig config) {
         AsyncProcess<NodeEntity> process 
             = new NodeResponseHandler(messageDispatcher, routeTable, key, config);
-        return submit(queueKey, process, config);
+        return submit(process, config);
     }
 
     @Override
-    public ArdverkFuture<ValueEntity> get(QueueKey queueKey, KUID key,
-            ValueConfig config) {
+    public ArdverkFuture<ValueEntity> get(KUID key, ValueConfig config) {
         AsyncProcess<ValueEntity> process
             = new ValueResponseHandler(messageDispatcher, routeTable, 
                     new DefaultKey(key), config);
-        return submit(queueKey, process, config);
+        return submit(process, config);
     }
 
     @Override
-    public ArdverkFuture<StoreEntity> put(QueueKey queueKey, 
-            KUID key, Value value, PutConfig config) {
-        return storeManager.put(queueKey, key, value, config);
+    public ArdverkFuture<StoreEntity> put(KUID key, Value value, PutConfig config) {
+        return storeManager.put(key, value, config);
     }
     
     @Override
-    public ArdverkFuture<StoreEntity> store(QueueKey queueKey, 
+    public ArdverkFuture<StoreEntity> store(
             Contact[] dst, KUID key, Value value, StoreConfig config) {
-        return storeManager.put(queueKey, dst, key, value, config);
+        return storeManager.put(dst, key, value, config);
     }
 }

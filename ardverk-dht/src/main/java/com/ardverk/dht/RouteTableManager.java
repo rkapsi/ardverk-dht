@@ -35,7 +35,7 @@ class RouteTableManager {
     }
     
     @SuppressWarnings("unchecked")
-    public ArdverkFuture<RefreshEntity> refresh(QueueKey queueKey, RefreshConfig config) {
+    public ArdverkFuture<RefreshEntity> refresh(RefreshConfig config) {
         
         long startTime = System.currentTimeMillis();
         
@@ -56,8 +56,8 @@ class RouteTableManager {
                 Contact[] contacts = routeTable.select(localhostId, pingCount);
                 for (Contact contact : contacts) {
                     if (contact.isTimeout(contactTimeout, TimeUnit.MILLISECONDS)) {
-                        ArdverkFuture<PingEntity> future = dht.ping(
-                                queueKey, contact, pingConfig);
+                        ArdverkFuture<PingEntity> future 
+                            = dht.ping(contact, pingConfig);
                         pingFutures.add(future);
                     }
                 }
@@ -83,8 +83,8 @@ class RouteTableManager {
                 KUID randomId = KUID.createWithPrefix(
                         bucket.getId(), bucket.getDepth());
                 
-                ArdverkFuture<NodeEntity> future = dht.lookup(
-                        queueKey, randomId, lookupConfig);
+                ArdverkFuture<NodeEntity> future 
+                    = dht.lookup(randomId, lookupConfig);
                 lookupFutures.add(future);
             }
         }

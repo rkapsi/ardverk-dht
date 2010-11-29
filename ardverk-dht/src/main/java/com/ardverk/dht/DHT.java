@@ -37,45 +37,45 @@ public interface DHT {
     
     public MessageDispatcher getMessageDispatcher();
     
-    public ArdverkFuture<BootstrapEntity> bootstrap(QueueKey queueKey, 
+    public ArdverkFuture<BootstrapEntity> bootstrap(
             String host, int port, BootstrapConfig config);
     
-    public ArdverkFuture<BootstrapEntity> bootstrap(QueueKey queueKey, 
+    public ArdverkFuture<BootstrapEntity> bootstrap(
             InetAddress address, int port, BootstrapConfig config);
     
-    public ArdverkFuture<BootstrapEntity> bootstrap(QueueKey queueKey, 
+    public ArdverkFuture<BootstrapEntity> bootstrap(
             SocketAddress address, BootstrapConfig config);
     
-    public ArdverkFuture<BootstrapEntity> bootstrap(QueueKey queueKey, 
+    public ArdverkFuture<BootstrapEntity> bootstrap(
             Contact contact, BootstrapConfig config);
     
-    public ArdverkFuture<RefreshEntity> refresh(QueueKey queueKey, RefreshConfig config);
+    public ArdverkFuture<RefreshEntity> refresh(RefreshConfig config);
     
-    public ArdverkFuture<PingEntity> ping(QueueKey queueKey, 
+    public ArdverkFuture<PingEntity> ping(
             String host, int port, PingConfig config);
     
-    public ArdverkFuture<PingEntity> ping(QueueKey queueKey, 
+    public ArdverkFuture<PingEntity> ping(
             InetAddress address, int port, PingConfig config);
     
-    public ArdverkFuture<PingEntity> ping(QueueKey queueKey, 
+    public ArdverkFuture<PingEntity> ping(
             SocketAddress address, PingConfig config);
     
-    public ArdverkFuture<PingEntity> ping(QueueKey queueKey, 
+    public ArdverkFuture<PingEntity> ping(
             Contact dst, PingConfig config);
     
-    public ArdverkFuture<NodeEntity> lookup(QueueKey queueKey, 
+    public ArdverkFuture<NodeEntity> lookup(
             KUID key, LookupConfig config);
     
-    public ArdverkFuture<ValueEntity> get(QueueKey queueKey,
+    public ArdverkFuture<ValueEntity> get(
             KUID key, ValueConfig config);
     
-    public ArdverkFuture<StoreEntity> put(QueueKey queueKey,
+    public ArdverkFuture<StoreEntity> put(
             KUID key, Value value, PutConfig config);
     
-    public ArdverkFuture<StoreEntity> store(QueueKey queueKey, 
+    public ArdverkFuture<StoreEntity> store(
             Contact[] dst, KUID key, Value value, StoreConfig config);
     
-    public <V> ArdverkFuture<V> submit(QueueKey queueKey, 
+    public <V> ArdverkFuture<V> submit(
             AsyncProcess<V> process, Config config);
     
     public <V> ArdverkFuture<V> submit(QueueKey queueKey, 

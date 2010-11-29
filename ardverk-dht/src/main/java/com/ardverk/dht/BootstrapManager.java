@@ -27,43 +27,43 @@ class BootstrapManager {
         this.dht = dht;
     }
     
-    public ArdverkFuture<BootstrapEntity> bootstrap(QueueKey queueKey, 
+    public ArdverkFuture<BootstrapEntity> bootstrap(
             String host, int port, BootstrapConfig config) {
-        return bootstrap(queueKey, new InetSocketAddress(host, port), config);
+        return bootstrap(new InetSocketAddress(host, port), config);
     }
     
-    public ArdverkFuture<BootstrapEntity> bootstrap(QueueKey queueKey, 
+    public ArdverkFuture<BootstrapEntity> bootstrap(
             InetAddress address, int port, BootstrapConfig config) {
-        return bootstrap(queueKey, new InetSocketAddress(address, port), config);
+        return bootstrap(new InetSocketAddress(address, port), config);
     }
     
-    public ArdverkFuture<BootstrapEntity> bootstrap(QueueKey queueKey, 
+    public ArdverkFuture<BootstrapEntity> bootstrap(
             Contact contact, BootstrapConfig config) {
-        return bootstrap(queueKey, contact.getContactAddress(), config);
+        return bootstrap(contact.getContactAddress(), config);
     }
     
-    public ArdverkFuture<BootstrapEntity> bootstrap(QueueKey queueKey, 
+    public ArdverkFuture<BootstrapEntity> bootstrap(
             SocketAddress address, BootstrapConfig config) {
         
         Object lock = new Object();
         ArdverkFuture<PingEntity> pingFuture = dht.ping(
-                queueKey, address, config.getPingConfig());
+                address, config.getPingConfig());
         
         synchronized (lock) {
-            return bootstrap(lock, pingFuture, queueKey, config);
+            return bootstrap(lock, pingFuture, config);
         }
     }
     
     private ArdverkFuture<BootstrapEntity> bootstrap(final Object lock, 
             final ArdverkFuture<PingEntity> pingFuture, 
-            final QueueKey queueKey, final BootstrapConfig config) {
+            final BootstrapConfig config) {
         
         // Make sure we're holding the lock!
         assert (Thread.holdsLock(lock));
         
         AsyncProcess<BootstrapEntity> process = NopAsyncProcess.create();
         final ArdverkFuture<BootstrapEntity> userFuture 
-            = dht.submit(queueKey, process, config);
+            = dht.submit(process, config);
         
         final ValueReference<ArdverkFuture<NodeEntity>> lookupFutureRef
             = new ValueReference<ArdverkFuture<NodeEntity>>();
@@ -89,8 +89,7 @@ class BootstrapManager {
                 KUID localhostId = localhost.getId();
                 AsyncFuture<NodeEntity> lookupFuture 
                     = lookupFutureRef.make(
-                        dht.lookup(queueKey, localhostId, 
-                            config.getLookupConfig()));
+                        dht.lookup(localhostId, config.getLookupConfig()));
                 
                 lookupFuture.addAsyncFutureListener(new AsyncFutureListener<NodeEntity>() {
                     @Override

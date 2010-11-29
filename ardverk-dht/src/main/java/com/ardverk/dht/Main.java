@@ -78,8 +78,10 @@ public class Main {
             
             if (0 < i) {
                 BootstrapConfig config = new DefaultBootstrapConfig();
+                config.setQueueKey(QueueKey.BACKEND);
+                
                 ArdverkFuture<BootstrapEntity> future = dht.bootstrap(
-                        QueueKey.BACKEND, first.getLocalhost(), config);
+                        first.getLocalhost(), config);
                 future.get();
             }
         }
@@ -87,10 +89,11 @@ public class Main {
         int index = 0;
         for (DHT dht : dhts) {
             DefaultRefreshConfig config = new DefaultRefreshConfig();
+            config.setQueueKey(QueueKey.BACKEND);
+            
             config.setBucketTimeout(-1L, TimeUnit.MILLISECONDS);
             
-            ArdverkFuture<RefreshEntity> future = dht.refresh(
-                    QueueKey.BACKEND, config);
+            ArdverkFuture<RefreshEntity> future = dht.refresh(config);
             RefreshEntity entity = future.get();
             System.out.println((index++) + ": " + entity);
         }
@@ -100,12 +103,12 @@ public class Main {
         
         KUID key = KUID.createRandom(ID_SIZE);
         Value value = new DefaultValue("Hello World".getBytes());
-        ArdverkFuture<StoreEntity> putFuture = first.put(
-                QueueKey.DEFAULT, key, value, new DefaultPutConfig());
+        ArdverkFuture<StoreEntity> putFuture 
+            = first.put(key, value, new DefaultPutConfig());
         putFuture.get();
         
-        ArdverkFuture<ValueEntity> valueFuture = first.get(
-                QueueKey.DEFAULT, key, new DefaultValueConfig());
+        ArdverkFuture<ValueEntity> valueFuture 
+            = first.get(key, new DefaultValueConfig());
         ValueEntity entity = valueFuture.get();
         ValueTuple tuple = entity.getValue();
         
