@@ -18,11 +18,16 @@ import org.ardverk.security.SecurityUtils;
 
 import com.ardverk.dht.message.Message;
 
+/**
+ * 
+ */
 public class CipherMessageCodec extends AbstractMessageCodec {
     
     private static final String TRANSFORMATION = "AES/CBC/PKCS5Padding";
         
     private final MessageCodec codec;
+    
+    private final Cipher cipher;
     
     private final SecretKey secretKey;
     
@@ -53,6 +58,14 @@ public class CipherMessageCodec extends AbstractMessageCodec {
         this.secretKey = secretKey;
         this.params = params;
         this.random = random;
+        
+        try {
+            this.cipher = Cipher.getInstance(TRANSFORMATION);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalArgumentException(TRANSFORMATION, e);
+        } catch (NoSuchPaddingException e) {
+            throw new IllegalArgumentException("NoSuchPaddingException", e);
+        }
     }
     
     @Override
@@ -78,10 +91,9 @@ public class CipherMessageCodec extends AbstractMessageCodec {
         return doFinal(mode, data, 0, data.length);
     }
     
-    private byte[] doFinal(int mode, byte[] data, 
+    private synchronized byte[] doFinal(int mode, byte[] data, 
             int offset, int length) throws IOException {
         try {
-            Cipher cipher = Cipher.getInstance(TRANSFORMATION);
             cipher.init(mode, secretKey, params, random);
             return cipher.doFinal(data, offset, length);
         } catch (InvalidKeyException e) {
@@ -92,10 +104,6 @@ public class CipherMessageCodec extends AbstractMessageCodec {
             throw new IOException("BadPaddingException", e);
         } catch (InvalidAlgorithmParameterException e) {
             throw new IOException("InvalidAlgorithmParameterException", e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new IOException("NoSuchAlgorithmException", e);
-        } catch (NoSuchPaddingException e) {
-            throw new IOException("NoSuchPaddingException", e);
         }
     }
 }
