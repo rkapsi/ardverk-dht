@@ -37,7 +37,7 @@ public class DigestMessageCodec extends AbstractMessageCodec {
         
         for (int i = 0; i < digest.length; i++) {
             if (digest[i] != data[offset + payload + i]) {
-                throw new IOException();
+                throw new IOException("Checksum Error in Message");
             }
         }
             
