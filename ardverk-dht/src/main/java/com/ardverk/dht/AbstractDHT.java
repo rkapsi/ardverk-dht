@@ -1,7 +1,6 @@
 package com.ardverk.dht;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncProcess;
@@ -14,7 +13,7 @@ abstract class AbstractDHT implements DHT, Closeable {
     private final FutureManager futureManager = new FutureManager();
     
     @Override
-    public void close() throws IOException {
+    public void close() {
         futureManager.close();
     }
 

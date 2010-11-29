@@ -1,6 +1,5 @@
 package com.ardverk.dht;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketAddress;
 
@@ -70,7 +69,7 @@ public class ArdverkDHT extends AbstractDHT {
     }
     
     @Override
-    public void close() throws IOException {
+    public void close() {
         super.close();
         messageDispatcher.close();
     }
