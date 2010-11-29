@@ -7,8 +7,14 @@ import com.ardverk.dht.routing.Contact;
 
 public interface Config {
     
+    /**
+     * Returns the {@link QueueKey}.
+     */
     public QueueKey getQueueKey();
     
+    /**
+     * Sets the {@link QueueKey}.
+     */
     public void setQueueKey(QueueKey queueKey);
     
     /**
@@ -27,9 +33,21 @@ public interface Config {
     public long getOperationTimeoutInMillis();
     
     /**
+     * The RTT multiplier is used multiply a {@link Contact}'s RTT
+     * by some number.
+     * 
+     * @see #getAdaptiveTimeout(Contact, long, TimeUnit)
+     */
+    public void setRountTripTimeMultiplier(double multiplier);
+    
+    /**
+     * @see #getAdaptiveTimeout(Contact, long, TimeUnit)
+     */
+    public double getRoundTripTimeMultiplier();
+    
+    /**
      * Returns an <tt>adaptive</tt> timeout for the given {@link Contact}
      * which is ideally less than the given default timeout.
      */
-    public long getAdaptiveTimeout(Contact dst, 
-            long defaultTimeout, TimeUnit unit);
+    public long getAdaptiveTimeout(Contact dst, long defaultTimeout, TimeUnit unit);
 }

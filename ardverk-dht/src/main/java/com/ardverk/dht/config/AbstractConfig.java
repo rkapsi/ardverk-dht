@@ -11,14 +11,6 @@ public abstract class AbstractConfig implements Config {
     
     private volatile QueueKey queueKey = QueueKey.DEFAULT;
     
-    public double getAdaptiveTimeoutMultiplier() {
-        return adaptiveTimeoutMultiplier;
-    }
-
-    public void setAdaptiveTimeoutMultiplier(double adaptiveTimeoutMultiplier) {
-        this.adaptiveTimeoutMultiplier = adaptiveTimeoutMultiplier;
-    }
-
     @Override
     public QueueKey getQueueKey() {
         return queueKey;
@@ -35,9 +27,19 @@ public abstract class AbstractConfig implements Config {
     }
     
     @Override
+    public double getRoundTripTimeMultiplier() {
+        return adaptiveTimeoutMultiplier;
+    }
+
+    @Override
+    public void setRountTripTimeMultiplier(double adaptiveTimeoutMultiplier) {
+        this.adaptiveTimeoutMultiplier = adaptiveTimeoutMultiplier;
+    }
+    
+    @Override
     public long getAdaptiveTimeout(Contact dst, 
             long defaultTimeout, TimeUnit unit) {
-        double multiplier = getAdaptiveTimeoutMultiplier();
+        double multiplier = getRoundTripTimeMultiplier();
         return dst.getAdaptiveTimeout(multiplier, defaultTimeout, unit);
     }
 }
