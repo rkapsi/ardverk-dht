@@ -7,12 +7,9 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.security.MessageDigestCRC32;
 import org.ardverk.utils.DeadlockScanner;
 
-import com.ardverk.dht.codec.CipherMessageCodec;
-import com.ardverk.dht.codec.CompressorMessageCodec;
-import com.ardverk.dht.codec.DigestMessageCodec;
+import com.ardverk.dht.codec.DefaultMessageCodec;
 import com.ardverk.dht.codec.MessageCodec;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.config.BootstrapConfig;
@@ -26,7 +23,6 @@ import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.io.transport.DatagramTransport;
 import com.ardverk.dht.io.transport.Transport;
-import com.ardverk.dht.message.BencodeMessageCodec;
 import com.ardverk.dht.message.DefaultMessageFactory;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.routing.Contact;
@@ -49,12 +45,7 @@ public class Main {
         Contact localhost = Contact.localhost(KUID.createRandom(ID_SIZE), 
                 new InetSocketAddress("localhost", port));
         
-        MessageCodec codec = new DigestMessageCodec(
-                new CipherMessageCodec(
-                    new CompressorMessageCodec(
-                        new BencodeMessageCodec()), 
-                        SECRET_KEY, INIT_VECTOR), 
-                        new MessageDigestCRC32());
+        MessageCodec codec = new DefaultMessageCodec(SECRET_KEY, INIT_VECTOR);
         
         MessageFactory messageFactory = new DefaultMessageFactory(
                 ID_SIZE, localhost);

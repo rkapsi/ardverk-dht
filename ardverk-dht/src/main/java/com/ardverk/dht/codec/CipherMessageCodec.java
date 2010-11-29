@@ -10,10 +10,13 @@ import java.security.SecureRandom;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
+import org.ardverk.coding.CodingUtils;
 import org.ardverk.security.SecurityUtils;
 
 import com.ardverk.dht.message.Message;
@@ -23,8 +26,14 @@ import com.ardverk.dht.message.Message;
  */
 public class CipherMessageCodec extends AbstractMessageCodec {
     
+    private static final String ALGORITHM = "AES";
+    
     private static final String TRANSFORMATION = "AES/CBC/PKCS5Padding";
-        
+
+    private static final int DEFAULT_KEY_SIZE = 128;
+    
+    private static final int DEFAULT_INIT_VECTOR_SIZE = 16;
+    
     private final MessageCodec codec;
     
     private final Cipher cipher;
@@ -37,14 +46,12 @@ public class CipherMessageCodec extends AbstractMessageCodec {
     
     public CipherMessageCodec(MessageCodec codec, 
             String secretKey, String initVector) {
-        this(codec, CipherUtils.createSecretKey(secretKey), 
-                CipherUtils.createInitVector(initVector));
+        this(codec, createSecretKey(secretKey), createInitVector(initVector));
     }
     
     public CipherMessageCodec(MessageCodec codec, 
             byte[] secretKey, byte[] initVector) {
-        this(codec, CipherUtils.createSecretKey(secretKey), 
-                CipherUtils.createInitVector(initVector));
+        this(codec, createSecretKey(secretKey), createInitVector(initVector));
     }
     
     public CipherMessageCodec(MessageCodec codec, SecretKey secretKey, 
@@ -105,5 +112,96 @@ public class CipherMessageCodec extends AbstractMessageCodec {
         } catch (InvalidAlgorithmParameterException e) {
             throw new IOException("InvalidAlgorithmParameterException", e);
         }
+    }
+    
+    /**
+     * Creates and returns an AES {@link SecretKey}.
+     */
+    public static SecretKey createSecretKey(int keySize) {
+        try {
+            KeyGenerator generator = KeyGenerator.getInstance(ALGORITHM);
+            generator.init(keySize);
+            return generator.generateKey();
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalArgumentException(ALGORITHM, e);
+        }
+    }
+    
+    /**
+     * Parses and returns an AES {@link SecretKey}.
+     */
+    public static SecretKey createSecretKey(byte[] secretKey) {
+        return new SecretKeySpec(secretKey, ALGORITHM);
+    }
+    
+    /**
+     * Parses and returns an AES {@link SecretKey} from a Base16 String.
+     */
+    public static SecretKey createSecretKey(String secretKey) {
+        byte[] data = CodingUtils.decodeBase16(secretKey);
+        return createSecretKey(data);
+    }
+    
+    /**
+     * Turns an AES {@link SecretKey} into a Base-16 encoded String.
+     */
+    public static String toString(SecretKey secretKey) {
+        byte[] encoded = secretKey.getEncoded();
+        return CodingUtils.encodeBase16(encoded);
+    }
+    
+    /**
+     * Creates and returns an {@link IvParameterSpec}.
+     */
+    public static IvParameterSpec createInitVector() {
+        byte[] initVector = new byte[DEFAULT_INIT_VECTOR_SIZE];
+        
+        SecureRandom random = SecurityUtils.createSecureRandom();
+        random.nextBytes(initVector);
+        
+        return createInitVector(initVector);
+    }
+    
+    /**
+     * Parses and returns an {@link IvParameterSpec}.
+     */
+    public static IvParameterSpec createInitVector(byte[] initVector) {
+        return new IvParameterSpec(initVector);
+    }
+    
+    /**
+     * Parses and returns an {@link IvParameterSpec} from a Base16 String.
+     */
+    public static IvParameterSpec createInitVector(String initVector) {
+        byte[] data = CodingUtils.decodeBase16(initVector);
+        return createInitVector(data);
+    }
+    
+    /**
+     * Turns an {@link IvParameterSpec} into a Base16 encoded String.
+     */
+    public static String toString(IvParameterSpec iv) {
+        return CodingUtils.encodeBase16(iv.getIV());
+    }
+    
+    /**
+     * Use this tool to generate a random {@link SecretKey} and 
+     * {@link IvParameterSpec} for your application. 
+     * 
+     * Take the two Base16 (hex) encoded Strings and deploy them
+     * with your application.
+     */
+    public static void main(String[] args) {
+        int keySize = DEFAULT_KEY_SIZE;
+        if (args.length != 0) {
+            keySize = Integer.parseInt(args[0]);
+        }
+        
+        System.out.println("Algorithm: " + ALGORITHM);
+        System.out.println("Key Size: " + keySize 
+                + ((keySize == DEFAULT_KEY_SIZE) ? " (default)" : ""));
+        
+        System.out.println("Secret Key: " + toString(createSecretKey(keySize)));
+        System.out.println("Init Vector: " + toString(createInitVector()));
     }
 }

@@ -12,7 +12,7 @@ import java.util.concurrent.Future;
 
 import org.ardverk.concurrent.ExecutorGroup;
 import org.ardverk.concurrent.ExecutorUtils;
-import org.ardverk.lang.NullArgumentException;
+import org.ardverk.lang.Arguments;
 import org.slf4j.Logger;
 
 import com.ardverk.dht.logging.LoggerUtils;
@@ -51,11 +51,7 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
     }
     
     public DatagramTransport(SocketAddress bindaddr) {
-        if (bindaddr == null) {
-            throw new NullArgumentException("bindaddr");
-        }
-        
-        this.bindaddr = bindaddr;
+        this.bindaddr = Arguments.notNull(bindaddr, "bindaddr");
     }
     
     @Override
@@ -158,7 +154,7 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
         final DatagramSocket socket = this.socket;
         
         if (socket == null) {
-            
+            throw new IOException();
         }
         
         Runnable task = new Runnable() {
