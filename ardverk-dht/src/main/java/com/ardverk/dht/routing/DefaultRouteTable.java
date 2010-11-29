@@ -22,7 +22,7 @@ import com.ardverk.dht.KUID;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.config.PingConfig;
 import com.ardverk.dht.entity.PingEntity;
-import com.ardverk.logging.LoggerUtils;
+import com.ardverk.dht.logging.LoggerUtils;
 
 public class DefaultRouteTable extends AbstractRouteTable {
     

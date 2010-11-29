@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 
 import com.ardverk.dht.io.transport.AbstractTransport;
 import com.ardverk.dht.io.transport.TransportCallback;
-import com.ardverk.logging.LoggerUtils;
+import com.ardverk.dht.logging.LoggerUtils;
 
 public class DatagramTransport extends AbstractTransport implements Closeable {
 

@@ -23,13 +23,13 @@ import com.ardverk.dht.KUID;
 import com.ardverk.dht.codec.MessageCodec;
 import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.io.transport.TransportCallback;
+import com.ardverk.dht.logging.LoggerUtils;
 import com.ardverk.dht.message.Message;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.MessageId;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
-import com.ardverk.logging.LoggerUtils;
 
 /**
  * 

@@ -13,16 +13,14 @@ import org.ardverk.coding.BencodingInputStream;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.Contact.Type;
+import com.ardverk.dht.storage.Database.Condition;
+import com.ardverk.dht.storage.DefaultDatabase.DefaultCondition;
 import com.ardverk.dht.storage.DefaultKey;
 import com.ardverk.dht.storage.DefaultValue;
 import com.ardverk.dht.storage.DefaultValueTuple;
 import com.ardverk.dht.storage.Key;
 import com.ardverk.dht.storage.Value;
 import com.ardverk.dht.storage.ValueTuple;
-import com.ardverk.dht.storage.Database.Condition;
-import com.ardverk.dht.storage.DefaultDatabase.DefaultCondition;
-import com.ardverk.enumeration.IntegerValue;
-import com.ardverk.enumeration.StringValue;
 
 class MessageInputStream extends BencodingInputStream {
     

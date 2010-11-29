@@ -6,9 +6,9 @@ import org.ardverk.lang.Arguments;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.storage.Database.Condition;
 import com.ardverk.dht.storage.Key;
 import com.ardverk.dht.storage.ValueTuple;
-import com.ardverk.dht.storage.Database.Condition;
 
 public class DefaultMessageFactory extends AbstractMessageFactory {
 

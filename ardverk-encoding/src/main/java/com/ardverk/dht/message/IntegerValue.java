@@ -1,4 +1,4 @@
-package com.ardverk.enumeration;
+package com.ardverk.dht.message;
 
 /**
  * An interface meant to be implemented only by {@link Enum}s.

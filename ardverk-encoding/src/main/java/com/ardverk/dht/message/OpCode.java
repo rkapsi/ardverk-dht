@@ -1,6 +1,5 @@
 package com.ardverk.dht.message;
 
-import com.ardverk.enumeration.IntegerValue;
 
 enum OpCode implements IntegerValue {
     

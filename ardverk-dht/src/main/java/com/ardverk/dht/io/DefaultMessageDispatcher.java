@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 
 import com.ardverk.dht.codec.MessageCodec;
+import com.ardverk.dht.logging.LoggerUtils;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.NodeRequest;
 import com.ardverk.dht.message.PingRequest;
@@ -15,7 +16,6 @@ import com.ardverk.dht.message.StoreRequest;
 import com.ardverk.dht.message.ValueRequest;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
-import com.ardverk.logging.LoggerUtils;
 
 public class DefaultMessageDispatcher extends MessageDispatcher {
 

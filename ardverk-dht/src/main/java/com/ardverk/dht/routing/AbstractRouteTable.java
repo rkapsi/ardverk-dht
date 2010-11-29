@@ -11,7 +11,7 @@ import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.concurrent.ArdverkValueFuture;
 import com.ardverk.dht.config.PingConfig;
 import com.ardverk.dht.entity.PingEntity;
-import com.ardverk.utils.EventUtils;
+import com.ardverk.dht.event.EventUtils;
 
 public abstract class AbstractRouteTable implements RouteTable {
     

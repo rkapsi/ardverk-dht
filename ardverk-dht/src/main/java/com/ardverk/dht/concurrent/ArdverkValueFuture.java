@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.AsyncValueFuture;
 
-import com.ardverk.utils.EventUtils;
+import com.ardverk.dht.event.EventUtils;
 
 public class ArdverkValueFuture<V> extends AsyncValueFuture<V> 
         implements ArdverkFuture<V> {

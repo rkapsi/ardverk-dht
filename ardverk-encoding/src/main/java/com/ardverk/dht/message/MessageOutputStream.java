@@ -14,8 +14,6 @@ import com.ardverk.dht.storage.Database.Condition;
 import com.ardverk.dht.storage.Key;
 import com.ardverk.dht.storage.Value;
 import com.ardverk.dht.storage.ValueTuple;
-import com.ardverk.enumeration.IntegerValue;
-import com.ardverk.enumeration.StringValue;
 
 class MessageOutputStream extends BencodingOutputStream {
     

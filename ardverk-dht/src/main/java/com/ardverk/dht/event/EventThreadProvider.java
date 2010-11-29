@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package com.ardverk.utils;
+package com.ardverk.dht.event;
 
 import java.util.ServiceLoader;
 

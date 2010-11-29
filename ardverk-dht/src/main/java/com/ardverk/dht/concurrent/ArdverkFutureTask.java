@@ -6,7 +6,7 @@ import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.AsyncProcess;
 import org.ardverk.concurrent.AsyncProcessFutureTask;
 
-import com.ardverk.utils.EventUtils;
+import com.ardverk.dht.event.EventUtils;
 
 public class ArdverkFutureTask<V> extends AsyncProcessFutureTask<V> 
         implements ArdverkRunnableFuture<V> {
