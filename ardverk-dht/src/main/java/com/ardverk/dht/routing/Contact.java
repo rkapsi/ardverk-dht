@@ -16,8 +16,8 @@ import org.ardverk.lang.NumberUtils;
 import org.ardverk.lang.PrimitiveProperties;
 import org.ardverk.net.NetworkUtils;
 
-import com.ardverk.dht.Identifier;
 import com.ardverk.dht.KUID;
+import com.ardverk.dht.lang.Identifier;
 
 /**
  * 

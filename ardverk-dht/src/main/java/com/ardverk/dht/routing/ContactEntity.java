@@ -3,8 +3,8 @@ package com.ardverk.dht.routing;
 import org.ardverk.lang.NullArgumentException;
 import org.ardverk.net.NetworkUtils;
 
-import com.ardverk.dht.Identifier;
 import com.ardverk.dht.KUID;
+import com.ardverk.dht.lang.Identifier;
 
 class ContactEntity implements Identifier, Longevity {
     

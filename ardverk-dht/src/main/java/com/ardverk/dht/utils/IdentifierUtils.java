@@ -5,8 +5,8 @@ import java.util.Comparator;
 
 import org.ardverk.utils.ReverseComparator;
 
-import com.ardverk.dht.Identifier;
 import com.ardverk.dht.KUID;
+import com.ardverk.dht.lang.Identifier;
 
 public class IdentifierUtils {
 

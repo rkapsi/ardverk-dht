@@ -2,7 +2,7 @@ package com.ardverk.dht.storage;
 
 import java.util.concurrent.TimeUnit;
 
-import com.ardverk.dht.Identifier;
+import com.ardverk.dht.lang.Identifier;
 import com.ardverk.dht.routing.Contact;
 
 public interface ValueTuple extends Identifier {

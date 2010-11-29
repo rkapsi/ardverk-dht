@@ -1,4 +1,4 @@
-package com.ardverk.lang;
+package com.ardverk.dht.lang;
 
 /**
  * Objects that support the XOR operation may implement this interface

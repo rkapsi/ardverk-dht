@@ -4,8 +4,8 @@ import java.util.Comparator;
 
 import org.ardverk.lang.Arguments;
 
-import com.ardverk.dht.Identifier;
 import com.ardverk.dht.KUID;
+import com.ardverk.dht.lang.Identifier;
 
 /**
  * The {@link XorComparator} compares {@link Identifier}s by their XOR distance.

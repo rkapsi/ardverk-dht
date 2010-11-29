@@ -6,7 +6,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncProcess;
 
-import com.ardverk.dht.KUID;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.config.BootstrapConfig;
 import com.ardverk.dht.config.Config;

@@ -1,4 +1,6 @@
-package com.ardverk.dht;
+package com.ardverk.dht.lang;
+
+import com.ardverk.dht.KUID;
 
 /**
  * An interface that provides an unique {@link KUID} identifier for an Object.

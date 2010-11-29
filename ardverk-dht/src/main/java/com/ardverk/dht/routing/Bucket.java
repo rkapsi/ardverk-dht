@@ -1,7 +1,7 @@
 package com.ardverk.dht.routing;
 
-import com.ardverk.dht.Identifier;
 import com.ardverk.dht.KUID;
+import com.ardverk.dht.lang.Identifier;
 
 /**
  * 

@@ -1,6 +1,6 @@
 package com.ardverk.dht.storage;
 
-import com.ardverk.dht.Identifier;
+import com.ardverk.dht.lang.Identifier;
 
 /**
  * 

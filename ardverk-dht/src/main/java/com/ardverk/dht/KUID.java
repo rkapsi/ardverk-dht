@@ -15,8 +15,9 @@ import org.ardverk.collection.Key;
 import org.ardverk.io.Writable;
 import org.ardverk.security.SecurityUtils;
 
-import com.ardverk.lang.Negation;
-import com.ardverk.lang.Xor;
+import com.ardverk.dht.lang.Identifier;
+import com.ardverk.dht.lang.Negation;
+import com.ardverk.dht.lang.Xor;
 
 /**
  * Kademlia Unique Identifier ({@link KUID}) 
