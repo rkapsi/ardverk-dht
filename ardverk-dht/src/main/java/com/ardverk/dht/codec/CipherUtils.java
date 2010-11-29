@@ -1,4 +1,4 @@
-package com.ardverk.dht.message;
+package com.ardverk.dht.codec;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;

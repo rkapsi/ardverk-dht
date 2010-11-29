@@ -1,11 +1,10 @@
 package com.ardverk.dht.storage;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.ardverk.dht.KUID;
+import com.ardverk.dht.utils.XorComparator;
 
 public class DefaultDatabase extends AbstractDatabase {
 
@@ -66,23 +65,5 @@ public class DefaultDatabase extends AbstractDatabase {
         }
         
         return buffer.toString();
-    }
-    
-    private static class XorComparator implements Comparator<ValueTuple> {
-        
-        private final KUID primaryKey;
-        
-        public XorComparator(Key key) {
-            this.primaryKey = key.getPrimaryKey();
-        }
-
-        private KUID xor(ValueTuple tuple) {
-            return tuple.getKey().getPrimaryKey().xor(primaryKey);
-        }
-        
-        @Override
-        public int compare(ValueTuple o1, ValueTuple o2) {
-            return xor(o1).compareTo(xor(o2));
-        }
     }
 }

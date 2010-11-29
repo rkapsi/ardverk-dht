@@ -1,7 +1,9 @@
-package com.ardverk.dht.message;
+package com.ardverk.dht.codec;
 
 import java.io.IOException;
 import java.net.SocketAddress;
+
+import com.ardverk.dht.message.Message;
 
 /**
  * 

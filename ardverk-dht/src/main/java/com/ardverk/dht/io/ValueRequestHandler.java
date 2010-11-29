@@ -44,7 +44,7 @@ public class ValueRequestHandler extends AbstractRequestHandler {
         if (value != null) {
             response = factory.createValueResponse(request, value);
         } else {
-            KUID primaryKey = key.getPrimaryKey();
+            KUID primaryKey = key.getId();
             Contact[] contacts = routeTable.select(primaryKey);
             response = factory.createNodeResponse(request, contacts);
         }

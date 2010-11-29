@@ -2,9 +2,10 @@ package com.ardverk.dht.storage;
 
 import java.util.concurrent.TimeUnit;
 
+import com.ardverk.dht.Identifier;
 import com.ardverk.dht.routing.Contact;
 
-public interface ValueTuple {
+public interface ValueTuple extends Identifier {
 
     /**
      * Returns the {@link ValueTuple}'s creation time.

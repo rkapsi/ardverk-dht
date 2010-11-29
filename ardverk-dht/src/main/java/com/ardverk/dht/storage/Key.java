@@ -1,14 +1,10 @@
 package com.ardverk.dht.storage;
 
-import com.ardverk.dht.KUID;
+import com.ardverk.dht.Identifier;
 
 /**
  * 
  */
-public interface Key {
-
-    /**
-     * 
-     */
-    public KUID getPrimaryKey();
+public interface Key extends Identifier {
+    
 }

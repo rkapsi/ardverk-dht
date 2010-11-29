@@ -10,7 +10,6 @@ public class ValueUtils {
     
     public static byte[] createId(byte[] value) {
         MessageDigest md = MessageDigestUtils.createCRC32();
-        md.update(value);
-        return md.digest();
+        return md.digest(value);
     }
 }

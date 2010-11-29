@@ -5,6 +5,7 @@ import java.net.SocketAddress;
 
 import org.ardverk.concurrent.AsyncProcess;
 
+import com.ardverk.dht.codec.MessageCodec;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.config.BootstrapConfig;
 import com.ardverk.dht.config.LookupConfig;
@@ -24,7 +25,6 @@ import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.io.NodeResponseHandler;
 import com.ardverk.dht.io.PingResponseHandler;
 import com.ardverk.dht.io.ValueResponseHandler;
-import com.ardverk.dht.message.MessageCodec;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;

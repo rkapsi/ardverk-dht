@@ -1,4 +1,4 @@
-package com.ardverk.dht.message;
+package com.ardverk.dht.codec;
 
 import java.io.IOException;
 import java.net.SocketAddress;
@@ -15,6 +15,8 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 
 import org.ardverk.security.SecurityUtils;
+
+import com.ardverk.dht.message.Message;
 
 public class CipherMessageCodec extends AbstractMessageCodec {
     

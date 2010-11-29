@@ -20,10 +20,10 @@ import org.ardverk.lang.NullArgumentException;
 import org.slf4j.Logger;
 
 import com.ardverk.dht.KUID;
+import com.ardverk.dht.codec.MessageCodec;
 import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.io.transport.TransportCallback;
 import com.ardverk.dht.message.Message;
-import com.ardverk.dht.message.MessageCodec;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.MessageId;
 import com.ardverk.dht.message.RequestMessage;

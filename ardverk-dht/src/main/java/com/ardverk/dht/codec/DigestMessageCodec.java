@@ -1,8 +1,10 @@
-package com.ardverk.dht.message;
+package com.ardverk.dht.codec;
 
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.security.MessageDigest;
+
+import com.ardverk.dht.message.Message;
 
 public class DigestMessageCodec extends AbstractMessageCodec {
 

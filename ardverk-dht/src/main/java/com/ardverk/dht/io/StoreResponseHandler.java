@@ -12,7 +12,6 @@ import org.ardverk.lang.Arguments;
 
 import com.ardverk.dht.config.StoreConfig;
 import com.ardverk.dht.entity.DefaultStoreEntity;
-import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.ResponseMessage;
@@ -22,8 +21,6 @@ import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.storage.ValueTuple;
 
 public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
-
-    public static final NodeEntity DEFAULT = null;
     
     private final ProcessCounter counter;
     
@@ -96,7 +93,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
         if (counter.getProcesses() == 0) {
             StoreResponse[] values = responses.toArray(new StoreResponse[0]);
             if (values.length == 0) {
-                setException(new IOException());
+                setException(new StoreException());
             } else {
                 long time = System.currentTimeMillis() - startTime;
                 setValue(new DefaultStoreEntity(values, 
@@ -132,5 +129,11 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     protected synchronized void processTimeout(RequestEntity entity, 
             long time, TimeUnit unit) throws IOException {
         process(1);
+    }
+    
+    private static class StoreException extends IOException {
+        
+        private static final long serialVersionUID = -1874658787780091708L;
+        
     }
 }

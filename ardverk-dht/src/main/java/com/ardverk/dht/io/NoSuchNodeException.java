@@ -8,13 +8,13 @@ public class NoSuchNodeException extends IOException {
     
     private static final long serialVersionUID = -2301202118771105303L;
     
-    private final Outcome coutcome;
+    private final Outcome outcome;
     
-    NoSuchNodeException(Outcome coutcome) {
-        this.coutcome = coutcome;
+    NoSuchNodeException(Outcome outcome) {
+        this.outcome = outcome;
     }
 
     public Outcome getOutcome() {
-        return coutcome;
+        return outcome;
     }
 }

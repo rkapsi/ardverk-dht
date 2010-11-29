@@ -10,6 +10,10 @@ import java.util.concurrent.TimeUnit;
 import org.ardverk.security.MessageDigestCRC32;
 import org.ardverk.utils.DeadlockScanner;
 
+import com.ardverk.dht.codec.CipherMessageCodec;
+import com.ardverk.dht.codec.CompressorMessageCodec;
+import com.ardverk.dht.codec.DigestMessageCodec;
+import com.ardverk.dht.codec.MessageCodec;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.config.BootstrapConfig;
 import com.ardverk.dht.config.DefaultBootstrapConfig;
@@ -23,11 +27,7 @@ import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.io.DatagramTransport;
 import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.message.BencodeMessageCodec;
-import com.ardverk.dht.message.CipherMessageCodec;
-import com.ardverk.dht.message.CompressorMessageCodec;
 import com.ardverk.dht.message.DefaultMessageFactory;
-import com.ardverk.dht.message.DigestMessageCodec;
-import com.ardverk.dht.message.MessageCodec;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.DefaultRouteTable;
@@ -120,7 +120,7 @@ public class Main {
         
         System.out.println(entity.getTimeInMillis());
         System.out.println(tuple.getSender());
-        System.out.println(tuple.getKey().getPrimaryKey() + " vs. " + key);
+        System.out.println(tuple.getKey().getId() + " vs. " + key);
         System.out.println(new String(tuple.getValue().getValue()));
         
         int foo = 0;

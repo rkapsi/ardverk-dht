@@ -7,6 +7,8 @@ import java.net.SocketAddress;
 
 import org.ardverk.lang.NumberUtils;
 
+import com.ardverk.dht.codec.AbstractMessageCodec;
+
 public class BencodeMessageCodec extends AbstractMessageCodec {
     
     private static final int DEFAULT_MESSAGE_SIZE = 1024;

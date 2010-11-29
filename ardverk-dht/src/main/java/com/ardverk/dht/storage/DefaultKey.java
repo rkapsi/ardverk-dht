@@ -13,7 +13,7 @@ public class DefaultKey implements Key {
     }
     
     @Override
-    public KUID getPrimaryKey() {
+    public KUID getId() {
         return primaryKey;
     }
     
@@ -31,7 +31,7 @@ public class DefaultKey implements Key {
         }
         
         Key other = (Key)o;
-        return primaryKey.equals(other.getPrimaryKey());
+        return primaryKey.equals(other.getId());
     }
     
     @Override

@@ -12,21 +12,25 @@ import com.ardverk.dht.KUID;
  */
 public class XorComparator implements Comparator<Identifier> {
 
-    private final KUID key;
+    private final Identifier identifier;
     
-    public XorComparator(KUID key) {
-        this.key = Arguments.notNull(key, "key");
+    public XorComparator(Identifier identifier) {
+        this.identifier = Arguments.notNull(identifier, "identifier");
     }
     
     /**
-     * Returns the key.
+     * Returns the {@link Identifier}.
      */
-    public KUID getKey() {
-        return key;
+    public Identifier getIdentifier() {
+        return identifier;
+    }
+    
+    private KUID xor(Identifier id) {
+        return identifier.getId().xor(id.getId());
     }
     
     @Override
     public int compare(Identifier o1, Identifier o2) {
-        return key.xor(o1.getId()).compareTo(key.xor(o2.getId()));
+        return xor(o1).compareTo(xor(o2));
     }
 }

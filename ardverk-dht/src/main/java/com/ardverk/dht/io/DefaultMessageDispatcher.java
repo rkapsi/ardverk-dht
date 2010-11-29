@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 
-import com.ardverk.dht.message.MessageCodec;
+import com.ardverk.dht.codec.MessageCodec;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.NodeRequest;
 import com.ardverk.dht.message.PingRequest;
@@ -41,7 +41,7 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
         ping = new PingRequestHandler(this);
         node = new NodeRequestHandler(this, routeTable);
         value = new ValueRequestHandler(this, routeTable, database);
-        store = new StoreRequestHandler(this, routeTable, database);
+        store = new StoreRequestHandler(this, database);
     }
 
     @Override

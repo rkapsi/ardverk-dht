@@ -59,6 +59,11 @@ public class DefaultValueTuple extends AbstractValueTuple {
     }
     
     @Override
+    public KUID getId() {
+        return key.getId();
+    }
+
+    @Override
     public boolean isEmpty() {
         return value.isEmpty();
     }
