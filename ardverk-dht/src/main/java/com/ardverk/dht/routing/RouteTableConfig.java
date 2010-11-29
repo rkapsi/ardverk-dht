@@ -5,12 +5,13 @@ import java.util.concurrent.TimeUnit;
 import org.ardverk.net.NetworkMask;
 import org.ardverk.utils.TimeUtils;
 
-import com.ardverk.dht.Constants;
 import com.ardverk.dht.QueueKey;
 import com.ardverk.dht.config.DefaultPingConfig;
 import com.ardverk.dht.config.PingConfig;
 
 public class RouteTableConfig {
+    
+    public static final int DEFAULT_K = 20;
     
     private final int k;
     
@@ -43,7 +44,7 @@ public class RouteTableConfig {
     }
     
     public RouteTableConfig() {
-        this(Constants.K);
+        this(DEFAULT_K);
     }
     
     public RouteTableConfig(int k) {
