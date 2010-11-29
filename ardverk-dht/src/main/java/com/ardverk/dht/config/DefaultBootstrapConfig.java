@@ -12,11 +12,6 @@ public class DefaultBootstrapConfig extends AbstractConfig
     private volatile LookupConfig lookupConfig = new DefaultLookupConfig();
     
     @Override
-    public QueueKey getQueueKey() {
-        return super.getQueueKey();
-    }
-
-    @Override
     public void setQueueKey(QueueKey queueKey) {
         super.setQueueKey(queueKey);
         pingConfig.setQueueKey(queueKey);
