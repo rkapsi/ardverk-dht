@@ -24,7 +24,7 @@ import com.ardverk.dht.entity.BootstrapEntity;
 import com.ardverk.dht.entity.RefreshEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.entity.ValueEntity;
-import com.ardverk.dht.io.DatagramTransport;
+import com.ardverk.dht.io.transport.DatagramTransport;
 import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.message.BencodeMessageCodec;
 import com.ardverk.dht.message.DefaultMessageFactory;

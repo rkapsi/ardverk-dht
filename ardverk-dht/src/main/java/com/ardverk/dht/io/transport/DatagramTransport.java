@@ -1,4 +1,4 @@
-package com.ardverk.dht.io;
+package com.ardverk.dht.io.transport;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -15,8 +15,6 @@ import org.ardverk.concurrent.ExecutorUtils;
 import org.ardverk.lang.NullArgumentException;
 import org.slf4j.Logger;
 
-import com.ardverk.dht.io.transport.AbstractTransport;
-import com.ardverk.dht.io.transport.TransportCallback;
 import com.ardverk.dht.logging.LoggerUtils;
 
 public class DatagramTransport extends AbstractTransport implements Closeable {
