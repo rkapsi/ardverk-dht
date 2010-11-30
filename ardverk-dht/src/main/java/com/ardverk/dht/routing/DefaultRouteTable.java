@@ -42,6 +42,10 @@ public class DefaultRouteTable extends AbstractRouteTable {
         this(new RouteTableConfig(), localhost);
     }
     
+    public DefaultRouteTable(int k, Contact localhost) {
+        this(new RouteTableConfig(k), localhost);
+    }
+    
     public DefaultRouteTable(RouteTableConfig config, Contact localhost) {
         this.config = Arguments.notNull(config, "config");
         this.localhost = Arguments.notNull(localhost, "localhost");
@@ -788,6 +792,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
             
             for (ContactEntity entity : active.values()) {
                 KUID contactId = entity.getId();
+                
                 if (!contactId.isBitSet(depth)) {
                     left.add(entity);
                 } else {

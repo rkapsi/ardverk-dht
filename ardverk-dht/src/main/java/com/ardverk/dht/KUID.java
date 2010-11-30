@@ -9,8 +9,8 @@ import java.util.Arrays;
 import java.util.Random;
 
 import org.ardverk.coding.CodingUtils;
-import org.ardverk.collection.ByteArrayKeyAnalyzer;
 import org.ardverk.collection.Key;
+import org.ardverk.collection.KeyAnalyzer;
 import org.ardverk.io.Writable;
 import org.ardverk.lang.NullArgumentException;
 import org.ardverk.security.SecurityUtils;
@@ -29,6 +29,8 @@ public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>,
     
     private static final Random GENERATOR 
         = SecurityUtils.createSecureRandom();
+    
+    private static final int MSB = 1 << Byte.SIZE-1;
     
     public static KUID createRandom(int length) {
         byte[] key = new byte[length];
@@ -139,22 +141,57 @@ public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>,
     
     @Override
     public int lengthInBits() {
-        return ByteArrayKeyAnalyzer.INSTANCE.lengthInBits(key);
+        return key.length * Byte.SIZE;
     }
     
     @Override
     public boolean isBitSet(int bitIndex) {
-        return ByteArrayKeyAnalyzer.INSTANCE.isBitSet(key, bitIndex);
+        int index = (int)(bitIndex / Byte.SIZE);
+        int bit = (int)(bitIndex % Byte.SIZE);
+        return (key[index] & mask(bit)) != 0;
     }
     
     @Override
     public int bitIndex(KUID otherKey) {
-        return ByteArrayKeyAnalyzer.INSTANCE.bitIndex(key, otherKey.key);
+        int lengthInBits = lengthInBits();
+        if (lengthInBits() != otherKey.lengthInBits()) {
+            throw new IllegalArgumentException("otherKey=" + otherKey);
+        }
+        
+        boolean allNull = true;
+        for (int i = 0; i < lengthInBits; i++) {
+            boolean value = isBitSet(i);
+                
+            if (value) {
+                allNull = false;
+            }
+            
+            boolean otherValue = otherKey.isBitSet(i);
+            if (value != otherValue) {
+                return i;
+            }
+        }
+        
+        if (allNull) {
+            return KeyAnalyzer.NULL_BIT_KEY;
+        }
+        
+        return KeyAnalyzer.EQUAL_BIT_KEY;
     }
 
     @Override
     public boolean isPrefixedBy(KUID prefix) {
-        return ByteArrayKeyAnalyzer.INSTANCE.isPrefix(key, prefix.key);
+        if (key.length < prefix.key.length) {
+            return false;
+        }
+        
+        for (int i = 0; i < prefix.key.length; i++) {
+            if (key[i] != prefix.key[i]) {
+                return false;
+            }
+        }
+        
+        return true;
     }
 
     @Override
@@ -471,5 +508,12 @@ public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>,
     public String toString() {
         return toHexString();
         //return toBinString();
+    }
+    
+    /**
+     * Returns a bit mask where the given bit is set
+     */
+    private static int mask(int bit) {
+        return MSB >>> bit;
     }
 }
