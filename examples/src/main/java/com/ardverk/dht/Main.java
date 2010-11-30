@@ -68,7 +68,7 @@ public class Main {
         
         DHT first = null;
         List<DHT> dhts = new ArrayList<DHT>();
-        for (int i = 0; i < 128; i++) {
+        for (int i = 0; i < 1000; i++) {
             DHT dht = createDHT(2000 + i);
             dhts.add(dht);
             

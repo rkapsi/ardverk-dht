@@ -52,6 +52,9 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     @Override
     protected synchronized void go(AsyncFuture<T> future) throws IOException {
         
+        // NOTE: We assume we're holding the future lock!
+        assert (Thread.holdsLock(future));
+        
         long boostFrequency = config.getBoostFrequencyInMillis();
         
         if (0L < boostFrequency) {
@@ -84,19 +87,32 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     /**
      * Kicks off an additional lookup if we haven't received any 
      * responses for a while. 
+     * 
+     * NOTE: This is called from a different {@link Thread}! We must 
+     * therefore pay great attention to the locking order and acquire 
+     * the locks in the same order as the other methods!
      */
-    private synchronized void boost() throws IOException {
-        if (lookupManager.hasNext(true)) {
-            long boostTimeout = config.getBoostTimeoutInMillis();
+    private void boost() throws IOException {
+        synchronized (future) {
             
-            if (boostTimeout >= 0L && getLastResponseTimeInMillis() >= boostTimeout) {
-                try {
-                    Contact contact = lookupManager.next();
+            if (future.isDone()) {
+                return;
+            }
+            
+            synchronized (this) {
+                if (lookupManager.hasNext(true)) {
+                    long boostTimeout = config.getBoostTimeoutInMillis();
                     
-                    lookup(contact);
-                    lookupCounter.increment(true);
-                } finally {
-                    postProcess();
+                    if (boostTimeout >= 0L && getLastResponseTimeInMillis() >= boostTimeout) {
+                        try {
+                            Contact contact = lookupManager.next();
+                            
+                            lookup(contact);
+                            lookupCounter.increment(true);
+                        } finally {
+                            postProcess();
+                        }
+                    }
                 }
             }
         }
