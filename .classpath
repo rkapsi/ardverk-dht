@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="com/ardverk/dht/utils/SizeEstimator.java" kind="src" path="src/main/java"/>
-	<classpathentry kind="src" path="src/test/java"/>
+	<classpathentry kind="src" path="ardverk-dht/src/test/java"/>
+	<classpathentry excluding="com/ardverk/dht/utils/SizeEstimator.java" kind="src" path="ardverk-dht/src/main/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/patricia-trie"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardverk-base"/>
-	<classpathentry kind="lib" path="lib/main/java/slf4j-api-1.6.1.jar"/>
-	<classpathentry kind="lib" path="lib/main/java/slf4j-simple-1.6.1.jar"/>
-	<classpathentry kind="lib" path="lib/test/java/junit-4.8.2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/bee-encode"/>
+	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/slf4j-api-1.6.1.jar"/>
+	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/slf4j-simple-1.6.1.jar"/>
+	<classpathentry kind="lib" path="ardverk-dht/lib/test/java/junit-4.8.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
