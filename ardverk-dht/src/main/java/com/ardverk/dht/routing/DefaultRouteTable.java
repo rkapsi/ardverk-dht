@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
 
 import org.ardverk.collection.Cursor;
 import org.ardverk.collection.Cursor.Decision;
@@ -177,6 +178,14 @@ public class DefaultRouteTable extends AbstractRouteTable {
                     // we received a PONG). We're simply dropping the new 
                     // Contact's information!
                     if (!future.isCompletedAbnormally()) {
+                        try {
+                            Contact contact = future.get().getContact();
+                            fireContactCollision(previous, contact);
+                        } catch (InterruptedException e) {
+                            LOG.error("InterruptedException", e);
+                        } catch (ExecutionException e) {
+                            LOG.error("ExecutionException", e);
+                        }
                         return;
                     }
                     
@@ -268,7 +277,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
                 bucket.addActive(new ContactEntity(config, contact));
                 bucket.touch();
                 
-                fireReplaceContact(bucket, lrs.getContact(), contact);
+                fireContactReplaced(bucket, lrs.getContact(), contact);
                 return;
             }
         }
@@ -304,7 +313,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
             DefaultBucket oldRight = buckets.put(right.getId(), right);
             assert (oldRight == null);
             
-            fireSplitBucket(bucket, left, right);
+            fireBucketSplit(bucket, left, right);
             return true;
         }
         
@@ -447,7 +456,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
                                     && !bucket.isActiveFull());
                             
                             bucket.addActive(mrs);
-                            fireReplaceContact(bucket, 
+                            fireContactReplaced(bucket, 
                                     entity.getContact(), mrs.getContact());
                             break;
                         }
@@ -457,7 +466,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
                     ContactEntity removed = bucket.removeActive(entity);
                     assert(removed == entity && !bucket.isActiveFull());
                     
-                    fireRemoveContact(bucket, entity.getContact());
+                    fireContactRemoved(bucket, entity.getContact());
                 }
                 
             } else {
@@ -808,54 +817,4 @@ public class DefaultRouteTable extends AbstractRouteTable {
             return cached.containsKey(contactId);
         }
     }
-    
-    /*public static void main(String[] args) {
-        TreeMap<KUID, KUID> tree = new TreeMap<KUID, KUID>();
-        Trie<KUID, KUID> trie = new PatriciaTrie<KUID, KUID>(KUID.createKeyAnalyzer(160));
-        
-        Random generator = new Random();
-        
-        for (int i = 0; i < 5; i++) {
-            byte[] data = new byte[20];
-            generator.nextBytes(data);
-            
-            KUID key = new KUID(data);
-            
-            tree.put(key, key);
-            trie.put(key, key);
-        }
-        
-        byte[] data = new byte[20];
-        generator.nextBytes(data);
-        final KUID lookupKey = new KUID(data);
-        
-        System.out.println("KEY: " + lookupKey);
-        System.out.println();
-        
-        Comparator<KUID> comparator = new Comparator<KUID>() {
-            @Override
-            public int compare(KUID o1, KUID o2) {
-                return o1.xor(lookupKey).compareTo(o2.xor(lookupKey));
-            }
-        };
-        
-        KUID[] keys = tree.keySet().toArray(new KUID[0]);
-        Arrays.sort(keys, comparator);
-        
-        for (KUID id : keys) {
-            System.out.println("TREE: " + id + ", " + id.xor(lookupKey));
-        }
-        
-        System.out.println();
-        
-        Cursor<KUID, KUID> cursor = new Cursor<KUID, KUID>() {
-            @Override
-            public Decision select(Entry<? extends KUID, ? extends KUID> entry) {
-                System.out.println("TRIE: " + entry.getKey() + ", " + entry.getKey().xor(lookupKey));
-                return Decision.CONTINUE;
-            }
-        };
-        
-        trie.select(lookupKey, cursor);
-    }*/
 }

@@ -78,97 +78,99 @@ public abstract class AbstractRouteTable implements RouteTable {
         return listeners.toArray(new RouteTableListener[0]);
     }
 
-    protected void fireSplitBucket(Bucket bucket, Bucket left, Bucket right) {
-        Runnable event = new Runnable() {
-            @Override
-            public void run() {
-                for (RouteTableListener l : listeners) {
-                    
-                }
-            }
-        };
+    protected void fireBucketSplit(final Bucket bucket, 
+            final Bucket left, final Bucket right) {
         
-        EventUtils.fireEvent(event);
+        if (!listeners.isEmpty()) {
+            Runnable event = new Runnable() {
+                @Override
+                public void run() {
+                    for (RouteTableListener l : listeners) {
+                        l.handleBucketSplit(bucket, left, right);
+                    }
+                }
+            };
+            
+            EventUtils.fireEvent(event);
+        }
     }
     
-    protected void fireContactAdded(Bucket bucket, Contact contact) {
-        Runnable event = new Runnable() {
-            @Override
-            public void run() {
-                for (RouteTableListener l : listeners) {
-                    
+    protected void fireContactAdded(final Bucket bucket, final Contact contact) {
+        if (!listeners.isEmpty()) {
+            Runnable event = new Runnable() {
+                @Override
+                public void run() {
+                    for (RouteTableListener l : listeners) {
+                        l.handleContactAdded(bucket, contact);
+                    }
                 }
-            }
-        };
-        
-        EventUtils.fireEvent(event);
+            };
+            
+            EventUtils.fireEvent(event);
+        }
     }
     
-    protected void fireContactReplaced(Bucket bucket, 
-            Contact existing, Contact contact) {
-        Runnable event = new Runnable() {
-            @Override
-            public void run() {
-                for (RouteTableListener l : listeners) {
-                    
-                }
-            }
-        };
+    protected void fireContactReplaced(final Bucket bucket, 
+            final Contact existing, final Contact contact) {
         
-        EventUtils.fireEvent(event);
+        if (!listeners.isEmpty()) {
+            Runnable event = new Runnable() {
+                @Override
+                public void run() {
+                    for (RouteTableListener l : listeners) {
+                        l.handleContactReplaced(bucket, existing, contact);
+                    }
+                }
+            };
+            
+            EventUtils.fireEvent(event);
+        }
     }
     
-    protected void fireContactChanged(Bucket bucket, 
-            Contact existing, Contact contact) {
-        Runnable event = new Runnable() {
-            @Override
-            public void run() {
-                for (RouteTableListener l : listeners) {
-                    
-                }
-            }
-        };
+    protected void fireContactChanged(final Bucket bucket, 
+            final Contact existing, final Contact contact) {
         
-        EventUtils.fireEvent(event);
+        if (!listeners.isEmpty()) {
+            Runnable event = new Runnable() {
+                @Override
+                public void run() {
+                    for (RouteTableListener l : listeners) {
+                        l.handleContactChanged(bucket, existing, contact);
+                    }
+                }
+            };
+            
+            EventUtils.fireEvent(event);
+        }
     }
     
-    protected void fireCollision(Contact contact) {
-        Runnable event = new Runnable() {
-            @Override
-            public void run() {
-                for (RouteTableListener l : listeners) {
-                    
+    protected void fireContactCollision(final Contact existing, final Contact contact) {
+        if (!listeners.isEmpty()) {
+            Runnable event = new Runnable() {
+                @Override
+                public void run() {
+                    for (RouteTableListener l : listeners) {
+                        l.handleContactCollision(existing, contact);
+                    }
                 }
-            }
-        };
-        
-        EventUtils.fireEvent(event);
+            };
+            
+            EventUtils.fireEvent(event);
+        }
     }
     
-    protected void fireReplaceContact(Bucket bucket, 
-            Contact existing, Contact contact) {
-        Runnable event = new Runnable() {
-            @Override
-            public void run() {
-                for (RouteTableListener l : listeners) {
-                    
+    protected void fireContactRemoved(final Bucket bucket, final Contact contact) {
+        if (!listeners.isEmpty()) {
+            Runnable event = new Runnable() {
+                @Override
+                public void run() {
+                    for (RouteTableListener l : listeners) {
+                        l.handleContactRemoved(bucket, contact);
+                    }
                 }
-            }
-        };
-        
-        EventUtils.fireEvent(event);
-    }
-    
-    protected void fireRemoveContact(Bucket bucket, Contact contact) {
-        Runnable event = new Runnable() {
-            @Override
-            public void run() {
-                for (RouteTableListener l : listeners) {
-                    
-                }
-            }
-        };
-        
-        EventUtils.fireEvent(event);
+            };
+            
+            EventUtils.fireEvent(event);
+        }
     }
 }
