@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="ardverk-dht/src/test/java"/>
+	<classpathentry kind="src" path="examples/src/main/java"/>
 	<classpathentry excluding="com/ardverk/dht/utils/SizeEstimator.java" kind="src" path="ardverk-dht/src/main/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/patricia-trie"/>
