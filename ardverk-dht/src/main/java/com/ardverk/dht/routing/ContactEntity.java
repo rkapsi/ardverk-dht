@@ -52,15 +52,6 @@ class ContactEntity implements Identifier, Longevity {
     }
     
     private Update update(Contact other, boolean force) {
-        if (!getId().equals(other.getId())) {
-            throw new IllegalArgumentException();
-        }
-        
-        if (!force && isSolicited() && other.isUnsolicited()) {
-            throw new IllegalArgumentException(
-                    contact.getType() + " vs. " + other.getType());
-        }
-        
         Contact previous = contact;
         contact = previous.merge(other);
         

@@ -5,15 +5,10 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.collection.CollectionUtils;
+import org.ardverk.lang.Arguments;
 import org.ardverk.lang.NullArgumentException;
-import org.ardverk.lang.NumberUtils;
-import org.ardverk.lang.PrimitiveProperties;
 import org.ardverk.net.NetworkUtils;
 
 import com.ardverk.dht.KUID;
@@ -22,8 +17,7 @@ import com.ardverk.dht.lang.Identifier;
 /**
  * 
  */
-public class Contact implements Identifier, Longevity, PrimitiveProperties<Object>, 
-        Comparable<Contact>, Serializable {
+public class Contact implements Identifier, Longevity, Comparable<Contact>, Serializable {
     
     private static final long serialVersionUID = 298059770472298142L;
 
@@ -112,8 +106,6 @@ public class Contact implements Identifier, Longevity, PrimitiveProperties<Objec
     
     private final SocketAddress remoteAddress;
     
-    private final Map<?, ?> attributes;
-    
     /**
      * Creates a {@link Contact}
      */
@@ -122,7 +114,7 @@ public class Contact implements Identifier, Longevity, PrimitiveProperties<Objec
             int instanceId, 
             SocketAddress address) {
         this(type, contactId, instanceId, address, address, 
-                null, -1L, TimeUnit.MILLISECONDS);
+                -1L, TimeUnit.MILLISECONDS);
     }
     
     /**
@@ -132,22 +124,8 @@ public class Contact implements Identifier, Longevity, PrimitiveProperties<Objec
             KUID contactId, 
             int instanceId, 
             SocketAddress address, 
-            Map<?, ?> attributes) {
-        this(type, contactId, instanceId, address, address, 
-                attributes, -1L, TimeUnit.MILLISECONDS);
-    }
-    
-    /**
-     * Creates a {@link Contact}
-     */
-    public Contact(Type type, 
-            KUID contactId, 
-            int instanceId, 
-            SocketAddress address, 
-            Map<?, ?> attributes, 
             long rtt, TimeUnit unit) {
-        this(type, contactId, instanceId, address, 
-                address, attributes, rtt, unit);
+        this(type, contactId, instanceId, address, address, rtt, unit);
     }
     
     /**
@@ -159,7 +137,7 @@ public class Contact implements Identifier, Longevity, PrimitiveProperties<Objec
             SocketAddress socketAddress, 
             SocketAddress contactAddress) {
         this(type, contactId, instanceId, socketAddress, 
-                contactAddress, null, -1L, TimeUnit.MILLISECONDS);
+                contactAddress, -1L, TimeUnit.MILLISECONDS);
     }
     
     /**
@@ -170,78 +148,22 @@ public class Contact implements Identifier, Longevity, PrimitiveProperties<Objec
             int instanceId, 
             SocketAddress socketAddress, 
             SocketAddress contactAddress,
-            Map<?, ?> attributes) {
-        this(type, contactId, instanceId, socketAddress, 
-                contactAddress, attributes, -1L, TimeUnit.MILLISECONDS);
-    }
-    
-    /**
-     * Creates a {@link Contact}
-     */
-    public Contact(Type type, 
-            KUID contactId, 
-            int instanceId, 
-            SocketAddress socketAddress, 
-            SocketAddress contactAddress,
-            Map<?, ?> attributes,
             long rtt, TimeUnit unit) {
-        
-        if (type == null) {
-            throw new NullArgumentException("type");
-        }
-        
-        if (contactId == null) {
-            throw new NullArgumentException("contactId");
-        }
-        
-        if (socketAddress == null) {
-            throw new NullArgumentException("socketAddress");
-        }
         
         if (contactAddress == null) {
             contactAddress = socketAddress;
         }
         
-        this.type = type;
+        this.type = Arguments.notNull(type, "type");
         this.creationTime = System.currentTimeMillis();
         this.timeStamp = creationTime;
         this.rtt = unit.toMillis(rtt);
         
-        this.contactId = contactId;
+        this.contactId = Arguments.notNull(contactId, "contactId");
         this.instanceId = instanceId;
-        this.socketAddress = socketAddress;
-        this.contactAddress = contactAddress;
-        this.remoteAddress = combine(
-                socketAddress, contactAddress);
-        
-        this.attributes = CollectionUtils.copy(attributes);
-    }
-    
-    /**
-     * 
-     */
-    private Contact(Contact existing, Map<?, ?> attributes) {
-        if (existing == null) {
-            throw new NullArgumentException("existing");
-        }
-        
-        if (attributes == null) {
-            throw new NullArgumentException("attributes");
-        }
-        
-        this.creationTime = existing.creationTime;
-        this.timeStamp = existing.timeStamp;
-        this.rtt = existing.rtt;
-        
-        this.contactId = existing.contactId;
-        this.instanceId = existing.instanceId;
-        this.socketAddress = existing.socketAddress;
-        this.contactAddress = existing.contactAddress;
-        this.remoteAddress = existing.remoteAddress;
-        
-        this.type = existing.type;
-        
-        this.attributes = attributes;
+        this.socketAddress = Arguments.notNull(socketAddress, "socketAddress");
+        this.contactAddress = Arguments.notNull(contactAddress, "contactAddress");
+        this.remoteAddress = combine(socketAddress, contactAddress);
     }
     
     /**
@@ -263,15 +185,9 @@ public class Contact implements Identifier, Longevity, PrimitiveProperties<Objec
         this.remoteAddress = existing.remoteAddress;
         
         this.type = existing.type;
-        
-        this.attributes = existing.attributes;
     }
     
     protected Contact(Contact existing, long rtt, TimeUnit unit) {
-        if (existing == null) {
-            throw new NullArgumentException("existing");
-        }
-        
         this.creationTime = existing.creationTime;
         this.timeStamp = existing.timeStamp;
         this.rtt = unit.toMillis(rtt);
@@ -283,25 +199,11 @@ public class Contact implements Identifier, Longevity, PrimitiveProperties<Objec
         this.remoteAddress = existing.remoteAddress;
         
         this.type = existing.type;
-        
-        this.attributes = existing.attributes;
     }
     
     protected Contact(Contact existing, 
             SocketAddress socketAddress, 
             SocketAddress contactAddress) {
-        
-        if (existing == null) {
-            throw new NullArgumentException("existing");
-        }
-        
-        if (socketAddress == null) {
-            throw new NullArgumentException("socketAddress");
-        }
-        
-        if (contactAddress == null) {
-            throw new NullArgumentException("contactAddress");
-        }
         
         this.creationTime = existing.creationTime;
         this.timeStamp = existing.timeStamp;
@@ -309,13 +211,11 @@ public class Contact implements Identifier, Longevity, PrimitiveProperties<Objec
         
         this.contactId = existing.contactId;
         this.instanceId = existing.instanceId;
-        this.socketAddress = socketAddress;
-        this.contactAddress = contactAddress;
+        this.socketAddress = Arguments.notNull(socketAddress, "socketAddress");
+        this.contactAddress = Arguments.notNull(contactAddress, "contactAddress");
         this.remoteAddress = combine(socketAddress, contactAddress);
         
         this.type = existing.type;
-        
-        this.attributes = existing.attributes;
     }
     
     /**
@@ -323,16 +223,8 @@ public class Contact implements Identifier, Longevity, PrimitiveProperties<Objec
      */
     protected Contact(Contact existing, Contact other) {
         
-        if (existing == null) {
-            throw new NullArgumentException("existing");
-        }
-        
-        if (other == null) {
-            throw new NullArgumentException("other");
-        }
-        
-        if (!existing.contactId.equals(other.contactId)) {
-            throw new IllegalArgumentException();
+        if (!existing.equals(other)) {
+            throw new IllegalArgumentException(existing + " vs. " + other);
         }
         
         // 2nd argument must be newer
@@ -352,7 +244,7 @@ public class Contact implements Identifier, Longevity, PrimitiveProperties<Objec
         
         this.contactId = existing.contactId;
         
-        if (existing.isBetterOrEqual(other)) {
+        if (existing.isBetter(other)) {
             this.instanceId = existing.instanceId;
             this.socketAddress = existing.socketAddress;
             this.contactAddress = existing.contactAddress;
@@ -365,12 +257,21 @@ public class Contact implements Identifier, Longevity, PrimitiveProperties<Objec
             this.remoteAddress = other.remoteAddress;
             this.type = other.type;
         }
-        
-        this.attributes = merge(existing.attributes, other.attributes);
     }
     
     /**
-     * 
+     * Returns {@code true} if this is a better {@link Contact} than
+     * the other given {@link Contact}.
+     */
+    private boolean isBetter(Contact other) {
+        // Everything is a better than an *UNKNOWN* Contact even
+        // if the other Contact is *UNKNOWN* too.
+        return type != Type.UNKNOWN && isBetterOrEqual(other);
+    }
+    
+    /**
+     * Returns {@code true} if this is a better or a equally good 
+     * {@link Contact} than the other given {@link Contact}.
      */
     private boolean isBetterOrEqual(Contact other) {
         return type.isBetterOrEqual(other.type);
@@ -381,28 +282,14 @@ public class Contact implements Identifier, Longevity, PrimitiveProperties<Objec
         return creationTime;
     }
     
-    /**
-     * 
-     */
-    public long getTimeSinceCreation(TimeUnit unit) {
-        long time = System.currentTimeMillis() - creationTime;
-        return unit.convert(time, TimeUnit.MILLISECONDS);
-    }
-    
-    /**
-     * 
-     */
-    public long getTimeSinceCreationInMillis() {
-        return getTimeSinceCreation(TimeUnit.MILLISECONDS);
-    }
-    
     @Override
     public long getTimeStamp() {
         return timeStamp;
     }
     
     /**
-     * 
+     * Returns the amount of time in the given {@link TimeUnit} that 
+     * has passed since we had contact with this {@link Contact}.
      */
     public long getTimeSinceLastContact(TimeUnit unit) {
         long time = System.currentTimeMillis() - timeStamp;
@@ -410,14 +297,19 @@ public class Contact implements Identifier, Longevity, PrimitiveProperties<Objec
     }
     
     /**
-     * 
+     * Returns the amount of time in milliseconds that has passed since 
+     * we had contact with this {@link Contact}.
      */
     public long getTimeSinceLastContactInMillis() {
         return getTimeSinceLastContact(TimeUnit.MILLISECONDS);
     }
     
     /**
+     * Returns {@code true} if we haven't had any contact with this
+     * {@link Contact} for the given period of time.
      * 
+     * @see #getTimeSinceLastContact(TimeUnit)
+     * @see #getTimeSinceLastContactInMillis()
      */
     public boolean isTimeout(long timeout, TimeUnit unit) {
         return getTimeSinceLastContact(unit) >= timeout;
@@ -453,7 +345,7 @@ public class Contact implements Identifier, Longevity, PrimitiveProperties<Objec
     }
     
     /**
-     * 
+     * Sets the {@link Contact}'s instance ID and returns a new {@link Contact}.
      */
     public Contact setInstanceId(int instanceId) {
         return this.instanceId != instanceId ? new Contact(this, instanceId) : this;
@@ -491,7 +383,7 @@ public class Contact implements Identifier, Longevity, PrimitiveProperties<Objec
     }
     
     /**
-     * 
+     * Returns the {@link Contact}'s remove address.
      */
     public SocketAddress getRemoteAddress() {
         return remoteAddress;
@@ -512,7 +404,7 @@ public class Contact implements Identifier, Longevity, PrimitiveProperties<Objec
     }
     
     /**
-     * 
+     * Returns {@code true} if this is a an authoritative {@link Contact}.
      */
     public boolean isAuthoritative() {
         return isType(Type.AUTHORITATIVE);
@@ -573,139 +465,6 @@ public class Contact implements Identifier, Longevity, PrimitiveProperties<Objec
         return other != this ? new Contact(this, other) : this;
     }
     
-    /**
-     * 
-     */
-    public Contact put(Object key, Object value) {
-        if (key == null) {
-            throw new NullArgumentException("key");
-        }
-        
-        if (value == null) {
-            throw new NullArgumentException("value");
-        }
-        
-        Map<Object, Object> copy 
-            = new HashMap<Object, Object>(attributes);
-        copy.put(key, value);
-        return new Contact(this, copy);
-    }
-    
-    /**
-     * 
-     */
-    public Contact putAll(Map<?, ?> m) {
-        if (m == null) {
-            throw new NullArgumentException("m");
-        }
-        
-        Map<Object, Object> copy 
-            = new HashMap<Object, Object>(attributes);
-        
-        for (Map.Entry<?, ?> entry : m.entrySet()) {
-            Object key = entry.getKey();
-            Object value = entry.getValue();
-            
-            if (key == null) {
-                throw new NullArgumentException("key");
-            }
-            
-            if (value == null) {
-                throw new NullArgumentException("value");
-            }
-            
-            copy.put(key, value);
-        }
-        
-        return new Contact(this, copy);
-    }
-    
-    /**
-     * 
-     */
-    public Contact remove(Object key) {
-        if (key == null) {
-            throw new NullArgumentException("key");
-        }
-        
-        // Do it only if the key exists.
-        if (containsKey(key)) {
-            Map<Object, Object> copy 
-                = new HashMap<Object, Object>(attributes);
-            copy.remove(key);
-            
-            // Replace it with an empty Map
-            if (copy.isEmpty()) {
-                copy = Collections.emptyMap();
-            }
-            
-            return new Contact(this, copy);
-        }
-        
-        return this;
-    }
-    
-    /**
-     * 
-     */
-    public boolean containsKey(Object key) {
-        return attributes.containsKey(key);
-    }
-    
-    /**
-     * 
-     */
-    public Object get(Object key) {
-        return attributes.get(key);
-    }
-    
-    /**
-     * 
-     */
-    public Map<Object, Object> getAll() {
-        return Collections.unmodifiableMap(attributes);
-    }
-    
-    @Override
-    public boolean getBoolean(Object key) {
-        return NumberUtils.getBoolean(attributes.get(key));
-    }
-    
-    @Override
-    public boolean getBoolean(Object key, boolean defaultValue) {
-        return NumberUtils.getBoolean(attributes.get(key), defaultValue);
-    }
-    
-    @Override
-    public int getInteger(Object key) {
-        return NumberUtils.getInteger(attributes.get(key));
-    }
-    
-    @Override
-    public int getInteger(Object key, int defaultValue) {
-        return NumberUtils.getInteger(attributes.get(key), defaultValue);
-    }
-    
-    @Override
-    public float getFloat(Object key) {
-        return NumberUtils.getFloat(attributes.get(key));
-    }
-    
-    @Override
-    public float getFloat(Object key, float defaultValue) {
-        return NumberUtils.getFloat(attributes.get(key), defaultValue);
-    }
-    
-    @Override
-    public double getDouble(Object key) {
-        return NumberUtils.getDouble(attributes.get(key));
-    }
-    
-    @Override
-    public double getDouble(Object key, double defaultValue) {
-        return NumberUtils.getDouble(attributes.get(key), defaultValue);
-    }
-    
     @Override
     public int hashCode() {
         return contactId.hashCode();
@@ -739,24 +498,6 @@ public class Contact implements Identifier, Longevity, PrimitiveProperties<Objec
             .append(", contactAddress=").append(contactAddress)
             .append(", rtt=").append(rtt);
         return buffer.toString();
-    }
-
-    /**
-     * Merges the two arguments into on {@link Map} unless one of them
-     * is either empty or null in which case the other one is returned.
-     */ 
-    private static Map<?, ?> merge(Map<?, ?> m1, Map<?, ?> m2) {
-        if (m1 == null || m1.isEmpty()) {
-            return m2;
-        } else if (m2 == null || m2.isEmpty()) {
-            return m1;
-        }
-        
-        Map<Object, Object> copy 
-            = new HashMap<Object, Object>(m1);
-        copy.putAll(m2);
-        
-        return copy;
     }
     
     /**

@@ -150,10 +150,9 @@ public class DefaultRouteTable extends AbstractRouteTable {
         assert (!entity.same(localhost) 
                 && !contact.equals(localhost));
         
-        // Never update an *ALIVE* contact with information from
-        // an another non-active Contact! 
-        // TODO: Need to think about this condition!
-        if (entity.isAlive() && !contact.isSolicited()) {
+        // Make sure non-ACTIVE contacts can never 
+        // replace an ACTIVE contact!
+        if (entity.isAlive() && !contact.isActive()) {
             return;
         }
         
