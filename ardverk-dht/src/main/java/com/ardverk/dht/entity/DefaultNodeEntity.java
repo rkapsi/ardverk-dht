@@ -5,12 +5,13 @@ import java.util.concurrent.TimeUnit;
 import com.ardverk.dht.io.LookupResponseHandler.Outcome;
 import com.ardverk.dht.routing.Contact;
 
-public class DefaultNodeEntity extends AbstractEntity implements NodeEntity {
+public class DefaultNodeEntity extends AbstractLookupEntity implements NodeEntity {
     
     private final Outcome outcome;
     
     public DefaultNodeEntity(Outcome outcome) {
-        super(outcome.getTimeInMillis(), TimeUnit.MILLISECONDS);
+        super(outcome.getLookupId(), 
+                outcome.getTimeInMillis(), TimeUnit.MILLISECONDS);
         
         this.outcome = outcome;
     }

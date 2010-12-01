@@ -14,6 +14,7 @@ import com.ardverk.dht.routing.*;
 import com.ardverk.dht.security.*;
 import com.ardverk.dht.storage.*;
 import com.ardverk.dht.utils.*;
+import com.ardverk.dht.ui.*;
 
 import org.ardverk.coding.*;
 import org.ardverk.collection.*;
@@ -56,7 +57,7 @@ put(String keyValue) {
 put(String key, String value) {
 	ArdverkFuture future = current().put(
 		KUID.create(hash(key)), 
-		new DefaultValue(StringUtils.getBytes(value)), 
+		StringUtils.getBytes(value), 
 		new DefaultPutConfig());
 		
 	StoreEntity entity = future.get();
@@ -67,15 +68,15 @@ put(String key, String value) {
 
 get(String key) {
 	ArdverkFuture future = current().get(
-		KUID.create(hash(key)), new DefaultValueConfig());
+		KUID.create(hash(key)), new DefaultGetConfig());
 	
 	ValueEntity entity = future.get();
-	ValueTuple tuple = entity.getValue();
+	byte[] value = entity.getValue();
 	
-	print("GET: " + tuple.getKey().getId() + " -> " 
-		+ StringUtils.toString(tuple.getValue().getValue())
-		+ "\n SENDER: " + tuple.getSender().getId()
-		+ "\n CREATOR: " + tuple.getCreator().getId()
+	print("GET: " + entity.getId() + " -> " 
+		+ StringUtils.toString(value)
+		+ "\n SENDER: " + entity.getSender().getId()
+		+ "\n CREATOR: " + entity.getCreator().getId()
 		+ "\n TIME: " + entity.getTimeInMillis() + "ms");
 }
 
@@ -89,8 +90,16 @@ close() {
 	IoUtils.closeAll(dhts);
 }
 
-init(100, 2000);
+init(256, 2000);
+frame = new JFrame("Test");
+panel = new PlasmaPanel(dhts.get(0));
+frame.setContentPane(panel);
+dhts.get(0).getMessageDispatcher().addMessageListener(panel);
+frame.setBounds(20, 30, 640, 480);
+frame.setVisible(true);
 bootstrap();
+
+//bootstrap();
 //refresh();
-put("Hello", "World");
-get("Hello");
+//put("Hello", "World");
+//get("Hello");
