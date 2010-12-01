@@ -155,9 +155,20 @@ public class ArdverkDHT extends AbstractDHT {
     }
 
     @Override
-    public ArdverkFuture<NodeEntity> lookup(KUID key, LookupConfig config) {
+    public ArdverkFuture<NodeEntity> lookup(KUID lookupId, LookupConfig config) {
         AsyncProcess<NodeEntity> process 
-            = new NodeResponseHandler(messageDispatcher, routeTable, key, config);
+            = new NodeResponseHandler(messageDispatcher, routeTable, lookupId, config);
+        return submit(process, config);
+    }
+    
+    @Override
+    public ArdverkFuture<NodeEntity> lookup(KUID lookupId, 
+            Contact contact, LookupConfig config) {
+        
+        Contact[] contacts = new Contact[] { contact };
+        AsyncProcess<NodeEntity> process 
+            = new NodeResponseHandler(messageDispatcher, 
+                    routeTable, lookupId, contacts, config);
         return submit(process, config);
     }
 

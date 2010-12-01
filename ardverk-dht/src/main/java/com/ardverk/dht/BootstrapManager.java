@@ -89,7 +89,8 @@ class BootstrapManager {
                 KUID localhostId = localhost.getId();
                 AsyncFuture<NodeEntity> lookupFuture 
                     = lookupFutureRef.make(
-                        dht.lookup(localhostId, config.getLookupConfig()));
+                        dht.lookup(localhostId, pingEntity.getContact(), 
+                                config.getLookupConfig()));
                 
                 lookupFuture.addAsyncFutureListener(new AsyncFutureListener<NodeEntity>() {
                     @Override

@@ -64,7 +64,10 @@ public interface DHT {
             Contact dst, PingConfig config);
     
     public ArdverkFuture<NodeEntity> lookup(
-            KUID key, LookupConfig config);
+            KUID lookupId, LookupConfig config);
+    
+    public ArdverkFuture<NodeEntity> lookup(
+            KUID lookupId, Contact contact, LookupConfig config);
     
     public ArdverkFuture<ValueEntity> get(
             KUID key, ValueConfig config);

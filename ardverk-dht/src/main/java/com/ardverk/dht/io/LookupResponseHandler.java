@@ -42,10 +42,16 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     
     public LookupResponseHandler(MessageDispatcher messageDispatcher, 
             RouteTable routeTable, KUID lookupId, LookupConfig config) {
+        this(messageDispatcher, routeTable, lookupId, null, config);
+    }
+    
+    public LookupResponseHandler(MessageDispatcher messageDispatcher, 
+            RouteTable routeTable, KUID lookupId, Contact[] contacts, 
+            LookupConfig config) {
         super(messageDispatcher);
         
         this.config = Arguments.notNull(config, "config");
-        lookupManager = new LookupManager(routeTable, lookupId);
+        lookupManager = new LookupManager(routeTable, lookupId, contacts);
         lookupCounter = new ProcessCounter(config.getAlpha());
     }
 
@@ -146,7 +152,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         long defaultTimeout = config.getLookupTimeoutInMillis();
         long adaptiveTimeout = config.getAdaptiveTimeout(
                 dst, defaultTimeout, TimeUnit.MILLISECONDS);
-        lookup(dst, lookupManager.key, adaptiveTimeout, TimeUnit.MILLISECONDS);
+        lookup(dst, lookupManager.lookupId, adaptiveTimeout, TimeUnit.MILLISECONDS);
     }
     
     /**
@@ -247,7 +253,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
 
             @Override
             public KUID getLookupId() {
-                return lookupManager.key;
+                return lookupManager.lookupId;
             }
 
             @Override
@@ -321,7 +327,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         
         private final RouteTable routeTable;
         
-        private final KUID key;
+        private final KUID lookupId;
         
         /**
          * A {@link Set} of all responses
@@ -349,25 +355,28 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         
         private int timeouts = 0;
         
-        public LookupManager(RouteTable routeTable, KUID key) {
+        public LookupManager(RouteTable routeTable, KUID lookupId, Contact[] optional) {
             this.routeTable = Arguments.notNull(routeTable, "routeTable");
-            this.key = Arguments.notNull(key, "key");
+            this.lookupId = Arguments.notNull(lookupId, "lookupId");
             
             Contact localhost = routeTable.getLocalhost();
             KUID contactId = localhost.getId();
             
-            XorComparator comparator = new XorComparator(key);
+            XorComparator comparator = new XorComparator(lookupId);
             this.responses = new TreeSet<Contact>(comparator);
             this.closest = new TreeSet<Contact>(comparator);
             this.query = new TreeSet<Contact>(comparator);
             
             history.put(contactId, 0);
-            Contact[] contacts = routeTable.select(key);
+            Contact[] contacts = routeTable.select(lookupId);
             
-            if (0 < contacts.length) {
-                addToResponses(localhost);
-                
-                for (Contact contact : contacts) {
+            addToResponses(localhost);
+            for (Contact contact : contacts) {
+                addToQuery(contact, 1);
+            }
+            
+            if (optional != null) {
+                for (Contact contact : optional) {
                     addToQuery(contact, 1);
                 }
             }
@@ -436,7 +445,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
                 Contact contact = closest.last();
                 KUID contactId = contact.getId();
                 KUID otherId = other.getId();
-                return otherId.isCloserTo(key, contactId);
+                return otherId.isCloserTo(lookupId, contactId);
             }
             
             return true;

@@ -576,6 +576,26 @@ public class DefaultRouteTable extends AbstractRouteTable {
         return buckets.values().toArray(new Bucket[0]);
     }
     
+    @Override
+    public synchronized String toString() {
+        StringBuilder buffer = new StringBuilder();
+        
+        int bucketIndex = 0;
+        for (Bucket bucket : getBuckets()) {
+            buffer.append(bucketIndex++).append(")")
+                .append(bucket.getId()).append("[")
+                .append(bucket.getDepth()).append("]\n");
+            
+            int contactIndex = 0;
+            for (ContactEntity entity : bucket.getActive()) {
+                buffer.append(" ").append(contactIndex++).append(") ")
+                    .append(entity.getContact()).append("\n");
+            }
+        }
+        
+        return buffer.toString();
+    }
+    
     private class DefaultBucket extends AbstractBucket {
         
         private final Trie<KUID, ContactEntity> active;
