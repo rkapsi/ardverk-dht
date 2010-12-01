@@ -9,6 +9,8 @@ import java.net.SocketAddress;
 import org.ardverk.coding.BencodingOutputStream;
 
 import com.ardverk.dht.KUID;
+import com.ardverk.dht.lang.IntegerValue;
+import com.ardverk.dht.lang.StringValue;
 import com.ardverk.dht.message.Message;
 import com.ardverk.dht.message.MessageId;
 import com.ardverk.dht.message.NodeRequest;

@@ -1,5 +1,6 @@
 package com.ardverk.dht.codec.bencode;
 
+import com.ardverk.dht.lang.IntegerValue;
 import com.ardverk.dht.message.Message;
 import com.ardverk.dht.message.NodeRequest;
 import com.ardverk.dht.message.NodeResponse;

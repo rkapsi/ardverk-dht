@@ -11,6 +11,8 @@ import java.net.SocketAddress;
 import org.ardverk.coding.BencodingInputStream;
 
 import com.ardverk.dht.KUID;
+import com.ardverk.dht.lang.IntegerValue;
+import com.ardverk.dht.lang.StringValue;
 import com.ardverk.dht.message.DefaultNodeRequest;
 import com.ardverk.dht.message.DefaultNodeResponse;
 import com.ardverk.dht.message.DefaultPingRequest;
