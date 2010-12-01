@@ -1,0 +1,92 @@
+import com.ardverk.dht.*;
+import com.ardverk.dht.codec.*;
+import com.ardverk.dht.codec.bencode.*;
+import com.ardverk.dht.concurrent.*;
+import com.ardverk.dht.config.*;
+import com.ardverk.dht.entity.*;
+import com.ardverk.dht.event.*;
+import com.ardverk.dht.io.*;
+import com.ardverk.dht.io.transport.*;
+import com.ardverk.dht.lang.*;
+import com.ardverk.dht.logging.*;
+import com.ardverk.dht.message.*;
+import com.ardverk.dht.routing.*;
+import com.ardverk.dht.security.*;
+import com.ardverk.dht.storage.*;
+import com.ardverk.dht.utils.*;
+
+import org.ardverk.coding.*;
+import org.ardverk.collection.*;
+import org.ardverk.concurrent.*;
+import org.ardverk.io.*;
+import org.ardverk.lang.*;
+import org.ardverk.net.*;
+import org.ardverk.security.*;
+import org.ardverk.utils.*;
+import java.security.*;
+
+java.util.List dhts = null;
+int current = 0;
+
+init(int count, int port) {
+	dhts = ArdverkUtils.createDHTs(count, port);
+}
+
+current() {
+	return dhts.get(current);
+}
+
+current(int current) {
+	this.current = current;
+	return current();
+}
+
+bootstrap() {
+	ArdverkUtils.bootstrap(dhts);
+}
+
+refresh() {
+	ArdverkUtils.refresh(dhts);
+}
+
+put(String key, String value) {
+	ArdverkFuture future = current().put(
+		KUID.create(hash(key)), 
+		new DefaultValue(StringUtils.getBytes(value)), 
+		new DefaultPutConfig());
+		
+	StoreEntity entity = future.get();
+	for (StoreResponse response : entity.getStoreResponses()) {
+		print("PUT: " + response.getContact().getId() + " -> " + response.getCondition());
+	}
+}
+
+get(String key) {
+	ArdverkFuture future = current().get(
+		KUID.create(hash(key)), new DefaultValueConfig());
+	
+	ValueEntity entity = future.get();
+	ValueTuple tuple = entity.getValue();
+	
+	print("GET: " + tuple.getKey().getId() + " -> " 
+		+ StringUtils.toString(tuple.getValue().getValue())
+		+ "\n SENDER: " + tuple.getSender()
+		+ "\n CREATOR: " + tuple.getCreator()
+		+ "\n TIME: " + entity.getTimeInMillis() + "ms");
+}
+
+hash(String value) {
+	MessageDigest md = MessageDigestUtils.createSHA1();
+	md.update(StringUtils.getBytes(value));
+	return md.digest();
+}
+
+close() {
+	IoUtils.closeAll(dhts);
+}
+
+init(100, 2000);
+bootstrap();
+//refresh();
+put("Hello", "World");
+get("Hello");
