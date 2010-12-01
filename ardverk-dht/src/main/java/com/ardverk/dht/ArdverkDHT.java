@@ -13,7 +13,7 @@ import com.ardverk.dht.config.PingConfig;
 import com.ardverk.dht.config.PutConfig;
 import com.ardverk.dht.config.RefreshConfig;
 import com.ardverk.dht.config.StoreConfig;
-import com.ardverk.dht.config.ValueConfig;
+import com.ardverk.dht.config.GetConfig;
 import com.ardverk.dht.entity.BootstrapEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
@@ -166,7 +166,7 @@ public class ArdverkDHT extends AbstractDHT {
 
     @Override
     public ArdverkFuture<ValueEntity> get(Contact[] contacts, 
-            KUID lookupId, ValueConfig config) {
+            KUID lookupId, GetConfig config) {
         AsyncProcess<ValueEntity> process
             = new ValueResponseHandler(messageDispatcher, contacts, 
                     routeTable, new DefaultKey(lookupId), config);

@@ -2,16 +2,16 @@ package com.ardverk.dht.config;
 
 import java.util.concurrent.TimeUnit;
 
-public class DefaultValueConfig extends DefaultLookupConfig 
-        implements ValueConfig {
+public class DefaultGetConfig extends DefaultLookupConfig 
+        implements GetConfig {
     
     private volatile int r = 1;
     
-    public DefaultValueConfig() {
+    public DefaultGetConfig() {
         super();
     }
 
-    public DefaultValueConfig(long timeout, TimeUnit unit) {
+    public DefaultGetConfig(long timeout, TimeUnit unit) {
         super(timeout, unit);
     }
     

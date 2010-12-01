@@ -1,6 +1,6 @@
 package com.ardverk.dht.config;
 
-public interface ValueConfig extends LookupConfig {
+public interface GetConfig extends LookupConfig {
     
     public int getR();
 

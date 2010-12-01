@@ -7,7 +7,7 @@ import org.ardverk.collection.FixedSizeArrayList;
 import org.ardverk.lang.Arguments;
 
 import com.ardverk.dht.KUID;
-import com.ardverk.dht.config.ValueConfig;
+import com.ardverk.dht.config.GetConfig;
 import com.ardverk.dht.entity.DefaultValueEntity;
 import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.message.MessageFactory;
@@ -27,7 +27,7 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     private final Key key;
     
     public ValueResponseHandler(MessageDispatcher messageDispatcher,
-            Contact[] contacts, RouteTable routeTable, Key key, ValueConfig config) {
+            Contact[] contacts, RouteTable routeTable, Key key, GetConfig config) {
         super(messageDispatcher, contacts, routeTable, key.getId(), config);
         
         tuples = new FixedSizeArrayList<ValueTuple>(config.getR());
