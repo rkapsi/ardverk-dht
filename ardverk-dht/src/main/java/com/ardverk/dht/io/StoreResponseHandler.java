@@ -37,8 +37,6 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     
     private long startTime = -1L;
     
-    private int total = 0;
-    
     public StoreResponseHandler(
             MessageDispatcher messageDispatcher, 
             Contact[] contacts, int k,
