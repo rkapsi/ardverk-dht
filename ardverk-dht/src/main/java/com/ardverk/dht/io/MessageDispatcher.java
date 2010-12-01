@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -21,6 +23,7 @@ import org.slf4j.Logger;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.codec.MessageCodec;
+import com.ardverk.dht.event.EventUtils;
 import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.io.transport.TransportCallback;
 import com.ardverk.dht.logging.LoggerUtils;
@@ -52,6 +55,9 @@ public abstract class MessageDispatcher implements Closeable {
                     src, message, offset, length);
         }
     };
+    
+    private final List<MessageListener> listeners 
+        = new CopyOnWriteArrayList<MessageListener>();
     
     private final MessageEntityManager entityManager 
         = new MessageEntityManager();
@@ -124,7 +130,7 @@ public abstract class MessageDispatcher implements Closeable {
     }
     
     /**
-     * 
+     * Returns the {@link Transport}
      */
     public synchronized Transport getTransport() {
         return transport;
@@ -137,21 +143,21 @@ public abstract class MessageDispatcher implements Closeable {
     }
     
     /**
-     * 
+     * Returns the {@link MessageFactory}
      */
     public MessageFactory getMessageFactory() {
         return factory;
     }
     
     /**
-     * 
+     * Returns the {@link MessageCodec}
      */
     public MessageCodec getMessageCodec() {
         return codec;
     }
     
     /**
-     * 
+     * Sends the given {@link Message}.
      */
     protected void send(Message message) throws IOException {
         SocketAddress address = message.getAddress();
@@ -160,14 +166,14 @@ public abstract class MessageDispatcher implements Closeable {
     }
     
     /**
-     * 
+     * Sends the given bytes (message) to the given {@link SocketAddress}.
      */
     protected void send(SocketAddress dst, byte[] message) throws IOException {
         send(dst, message, 0, message.length);
     }
     
     /**
-     * 
+     * Sends the given bytes (message) to the given {@link SocketAddress}.
      */
     protected void send(SocketAddress dst, byte[] message, 
             int offset, int length) throws IOException {
@@ -185,14 +191,15 @@ public abstract class MessageDispatcher implements Closeable {
     }
     
     /**
-     * 
+     * Sends a {@link ResponseMessage} to the given {@link Contact}.
      */
     public void send(Contact dst, ResponseMessage message) throws IOException {
         send(message);
+        fireMessageSent(dst, message);
     }
     
     /**
-     * 
+     * Sends a {@link RequestMessage} to the given {@link Contact}.
      */
     public void send(MessageCallback callback, 
             Contact dst, RequestMessage message, 
@@ -203,7 +210,12 @@ public abstract class MessageDispatcher implements Closeable {
     }
     
     /**
+     * Sends a {@link RequestMessage} to the a {@link Contact} with the 
+     * given {@link KUID}.
      * 
+     * NOTE: The destination {@link SocketAddress} is encoded in the 
+     * {@link RequestMessage}. The {@link KUID} is used to validate
+     * {@link ResponseMessage}s.
      */
     public void send(MessageCallback callback, 
             KUID contactId, RequestMessage request, 
@@ -216,22 +228,23 @@ public abstract class MessageDispatcher implements Closeable {
         }
         
         send(request);
+        fireMessageSent(contactId, request);
     }
     
     /**
-     * 
+     * Callback method for incoming {@link Message}s.
      */
     public void handleMessage(SocketAddress src, 
             byte[] data, int offset, int length) throws IOException {
         Message message = codec.decode(src, data, offset, length);
         handleMessage(message);
+        fireMessageReceived(message);
     }
     
     /**
-     * 
+     * Callback method for incoming {@link Message}s.
      */
     public void handleMessage(Message message) throws IOException {
-        
         if (message instanceof RequestMessage) {
             handleRequest((RequestMessage)message);
         } else {
@@ -240,7 +253,7 @@ public abstract class MessageDispatcher implements Closeable {
     }
     
     /**
-     * 
+     * Callback method for incoming {@link ResponseMessage}s.
      */
     private void handleResponse(ResponseMessage response) throws IOException {
         
@@ -257,17 +270,17 @@ public abstract class MessageDispatcher implements Closeable {
     }
     
     /**
-     * 
+     * Callback method for incoming {@link RequestMessage}s.
      */
     protected abstract void handleRequest(RequestMessage request) throws IOException;
     
     /**
-     * 
+     * Callback method for late incoming {@link ResponseMessage}s.
      */
     protected abstract void lateResponse(ResponseMessage response) throws IOException;
     
     /**
-     * 
+     * Callback method for late incoming {@link ResponseMessage}s.
      */
     protected void handleResponse(MessageCallback callback, 
             RequestEntity entity, ResponseMessage response, 
@@ -276,7 +289,7 @@ public abstract class MessageDispatcher implements Closeable {
     }
     
     /**
-     * 
+     * Callback method for timeouts.
      */
     protected void handleTimeout(MessageCallback callback, 
             RequestEntity entity, long time, TimeUnit unit) 
@@ -285,7 +298,7 @@ public abstract class MessageDispatcher implements Closeable {
     }
     
     /**
-     * 
+     * Callback method for illegal {@link ResponseMessage}s.
      */
     protected void handleIllegalResponse(MessageCallback callback, 
             RequestEntity entity, ResponseMessage response, 
@@ -293,6 +306,69 @@ public abstract class MessageDispatcher implements Closeable {
         
         if (LOG.isErrorEnabled()) {
             LOG.error("Illegal Response: " + entity + " -> " + response);
+        }
+    }
+    
+    /**
+     * Adds the given {@link MessageListener}.
+     */
+    public void addMessageListener(MessageListener l) {
+        listeners.add(Arguments.notNull(l, "l"));
+    }
+    
+    /**
+     * Removes the given {@link MessageListener}.
+     */
+    public void removeMessageListener(MessageListener l) {
+        listeners.remove(l);
+    }
+    
+    /**
+     * Returns all {@link MessageListener}s.
+     */
+    public MessageListener[] getMessageListeners() {
+        return listeners.toArray(new MessageListener[0]);
+    }
+    
+    /**
+     * Fires a message sent event.
+     */
+    protected void fireMessageSent(Contact dst, Message message) {
+        fireMessageSent(dst.getId(), message);
+    }
+    
+    /**
+     * Fires a message sent event.
+     */
+    protected void fireMessageSent(final KUID contactId, final Message message) {
+        
+        if (!listeners.isEmpty()) {
+            Runnable event = new Runnable() {
+                @Override
+                public void run() {
+                    for (MessageListener l : listeners) {
+                        l.handleMessageSent(contactId, message);
+                    }
+                }
+            };
+            EventUtils.fireEvent(event);
+        }
+    }
+    
+    /**
+     * Fires a message received event.
+     */
+    protected void fireMessageReceived(final Message message) {
+        if (!listeners.isEmpty()) {
+            Runnable event = new Runnable() {
+                @Override
+                public void run() {
+                    for (MessageListener l : listeners) {
+                        l.handleMessageReceived(message);
+                    }
+                }
+            };
+            EventUtils.fireEvent(event);
         }
     }
     
@@ -392,21 +468,9 @@ public abstract class MessageDispatcher implements Closeable {
                 MessageCallback callback, 
                 RequestEntity entity) {
             
-            if (future == null) {
-                throw new NullArgumentException("future");
-            }
-            
-            if (callback == null) {
-                throw new NullArgumentException("callback");
-            }
-            
-            if (entity == null) {
-                throw new NullArgumentException("entity");
-            }
-            
-            this.future = future;
-            this.callback = callback;
-            this.entity = entity;
+            this.future = Arguments.notNull(future, "future");
+            this.callback = Arguments.notNull(callback, "callback");
+            this.entity = Arguments.notNull(entity, "entity");
         }
 
         /**

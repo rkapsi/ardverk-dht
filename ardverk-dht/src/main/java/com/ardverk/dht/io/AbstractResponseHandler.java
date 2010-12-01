@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.AsyncProcessFuture;
+import org.ardverk.lang.Arguments;
 import org.ardverk.lang.NullArgumentException;
 
 import com.ardverk.dht.KUID;
@@ -142,11 +143,7 @@ public abstract class AbstractResponseHandler<V extends Entity>
     
     @Override
     public final void start(AsyncProcessFuture<V> future) throws Exception {
-        if (future == null) {
-            throw new NullArgumentException("future");
-        }
-        
-        this.future = future;
+        this.future = Arguments.notNull(future, "future");
         
         future.addAsyncFutureListener(new AsyncFutureListener<V>() {
             @Override
