@@ -66,7 +66,7 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
     @Override
     protected void processTimeout(RequestEntity entity, 
             long time, TimeUnit unit) throws IOException {
-        setException(new TimeoutIoException(entity, time, unit));
+        setException(new PingTimeoutException(entity, time, unit));
     }
     
     private interface PingSender {

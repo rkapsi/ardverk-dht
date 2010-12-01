@@ -49,6 +49,10 @@ refresh() {
 	ArdverkUtils.refresh(dhts);
 }
 
+put(String keyValue) {
+	put(keyValue, keyValue);
+}
+
 put(String key, String value) {
 	ArdverkFuture future = current().put(
 		KUID.create(hash(key)), 
@@ -70,8 +74,8 @@ get(String key) {
 	
 	print("GET: " + tuple.getKey().getId() + " -> " 
 		+ StringUtils.toString(tuple.getValue().getValue())
-		+ "\n SENDER: " + tuple.getSender()
-		+ "\n CREATOR: " + tuple.getCreator()
+		+ "\n SENDER: " + tuple.getSender().getId()
+		+ "\n CREATOR: " + tuple.getCreator().getId()
 		+ "\n TIME: " + entity.getTimeInMillis() + "ms");
 }
 

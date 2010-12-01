@@ -91,11 +91,12 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     
     private synchronized void postProcess() {
         if (counter.getProcesses() == 0) {
+            long time = System.currentTimeMillis() - startTime;
+            
             StoreResponse[] values = responses.toArray(new StoreResponse[0]);
             if (values.length == 0) {
-                setException(new StoreException());
+                setException(new StoreException(tuple, time, TimeUnit.MILLISECONDS));
             } else {
-                long time = System.currentTimeMillis() - startTime;
                 setValue(new DefaultStoreEntity(values, 
                         time, TimeUnit.MILLISECONDS));
             }
@@ -129,11 +130,5 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     protected synchronized void processTimeout(RequestEntity entity, 
             long time, TimeUnit unit) throws IOException {
         process(1);
-    }
-    
-    private static class StoreException extends IOException {
-        
-        private static final long serialVersionUID = -1874658787780091708L;
-        
     }
 }
