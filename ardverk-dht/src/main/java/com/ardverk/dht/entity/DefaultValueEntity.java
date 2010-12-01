@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 import com.ardverk.dht.io.LookupResponseHandler.Outcome;
 import com.ardverk.dht.storage.ValueTuple;
 
-public class DefaultValueEntity extends AbstractEntity implements ValueEntity {
+public class DefaultValueEntity extends AbstractValueEntity {
     
     private final Outcome outcome;
     
@@ -19,11 +19,7 @@ public class DefaultValueEntity extends AbstractEntity implements ValueEntity {
     }
     
     @Override
-    public ValueTuple getValue() {
-        return values[0];
-    }
-    
-    public ValueTuple[] getValues() {
+    public ValueTuple[] getValueTuples() {
         return values;
     }
     
