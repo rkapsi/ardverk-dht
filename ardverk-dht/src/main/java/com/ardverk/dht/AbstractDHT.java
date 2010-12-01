@@ -7,6 +7,11 @@ import org.ardverk.concurrent.AsyncProcess;
 
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.config.Config;
+import com.ardverk.dht.config.LookupConfig;
+import com.ardverk.dht.config.ValueConfig;
+import com.ardverk.dht.entity.NodeEntity;
+import com.ardverk.dht.entity.ValueEntity;
+import com.ardverk.dht.routing.Contact;
 
 abstract class AbstractDHT implements DHT, Closeable {
 
@@ -15,6 +20,18 @@ abstract class AbstractDHT implements DHT, Closeable {
     @Override
     public void close() {
         futureManager.close();
+    }
+    
+    @Override
+    public ArdverkFuture<NodeEntity> lookup(KUID lookupId, LookupConfig config) {
+        Contact[] contacts = getRouteTable().select(lookupId);
+        return lookup(contacts, lookupId, config);
+    }
+    
+    @Override
+    public ArdverkFuture<ValueEntity> get(KUID lookupId, ValueConfig config) {
+        Contact[] contacts = getRouteTable().select(lookupId);
+        return get(contacts, lookupId, config);
     }
 
     @Override

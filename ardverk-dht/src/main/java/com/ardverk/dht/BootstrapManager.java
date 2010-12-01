@@ -85,11 +85,13 @@ class BootstrapManager {
             }
             
             private void handlePingEntity(final PingEntity pingEntity) {
+                Contact[] contacts = new Contact[] { pingEntity.getContact() };
+                
                 Contact localhost = dht.getLocalhost();
                 KUID localhostId = localhost.getId();
                 AsyncFuture<NodeEntity> lookupFuture 
                     = lookupFutureRef.make(
-                        dht.lookup(localhostId, pingEntity.getContact(), 
+                        dht.lookup(contacts, localhostId, 
                                 config.getLookupConfig()));
                 
                 lookupFuture.addAsyncFutureListener(new AsyncFutureListener<NodeEntity>() {

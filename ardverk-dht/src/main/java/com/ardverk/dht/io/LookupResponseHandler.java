@@ -41,17 +41,12 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     private ScheduledFuture<?> boostFuture;
     
     public LookupResponseHandler(MessageDispatcher messageDispatcher, 
-            RouteTable routeTable, KUID lookupId, LookupConfig config) {
-        this(messageDispatcher, routeTable, lookupId, null, config);
-    }
-    
-    public LookupResponseHandler(MessageDispatcher messageDispatcher, 
-            RouteTable routeTable, KUID lookupId, Contact[] contacts, 
+            Contact[] contacts, RouteTable routeTable, KUID lookupId, 
             LookupConfig config) {
         super(messageDispatcher);
         
         this.config = Arguments.notNull(config, "config");
-        lookupManager = new LookupManager(routeTable, lookupId, contacts);
+        lookupManager = new LookupManager(contacts, routeTable, lookupId);
         lookupCounter = new ProcessCounter(config.getAlpha());
     }
 
@@ -355,7 +350,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         
         private int timeouts = 0;
         
-        public LookupManager(RouteTable routeTable, KUID lookupId, Contact[] optional) {
+        public LookupManager(Contact[] contacts, RouteTable routeTable, KUID lookupId) {
             this.routeTable = Arguments.notNull(routeTable, "routeTable");
             this.lookupId = Arguments.notNull(lookupId, "lookupId");
             
@@ -368,17 +363,10 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
             this.query = new TreeSet<Contact>(comparator);
             
             history.put(contactId, 0);
-            Contact[] contacts = routeTable.select(lookupId);
             
             addToResponses(localhost);
             for (Contact contact : contacts) {
                 addToQuery(contact, 1);
-            }
-            
-            if (optional != null) {
-                for (Contact contact : optional) {
-                    addToQuery(contact, 1);
-                }
             }
         }
         

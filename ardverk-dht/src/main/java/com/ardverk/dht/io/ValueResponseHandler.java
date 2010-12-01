@@ -27,8 +27,8 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     private final Key key;
     
     public ValueResponseHandler(MessageDispatcher messageDispatcher,
-            RouteTable routeTable, Key key, ValueConfig config) {
-        super(messageDispatcher, routeTable, key.getId(), config);
+            Contact[] contacts, RouteTable routeTable, Key key, ValueConfig config) {
+        super(messageDispatcher, contacts, routeTable, key.getId(), config);
         
         tuples = new FixedSizeArrayList<ValueTuple>(config.getR());
         this.key = Arguments.notNull(key, "key");

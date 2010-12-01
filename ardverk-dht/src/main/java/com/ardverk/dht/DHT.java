@@ -67,10 +67,13 @@ public interface DHT {
             KUID lookupId, LookupConfig config);
     
     public ArdverkFuture<NodeEntity> lookup(
-            KUID lookupId, Contact contact, LookupConfig config);
+            Contact[] contacts, KUID lookupId, LookupConfig config);
     
     public ArdverkFuture<ValueEntity> get(
-            KUID key, ValueConfig config);
+            KUID lookupId, ValueConfig config);
+    
+    public ArdverkFuture<ValueEntity> get(
+            Contact[] contacts, KUID lookupId, ValueConfig config);
     
     public ArdverkFuture<StoreEntity> put(
             KUID key, Value value, PutConfig config);
