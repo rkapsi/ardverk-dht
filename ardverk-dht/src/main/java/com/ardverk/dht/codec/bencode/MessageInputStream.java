@@ -33,11 +33,7 @@ import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.Contact.Type;
 import com.ardverk.dht.storage.Database.Condition;
 import com.ardverk.dht.storage.DefaultDatabase.DefaultCondition;
-import com.ardverk.dht.storage.DefaultKey;
-import com.ardverk.dht.storage.DefaultValue;
 import com.ardverk.dht.storage.DefaultValueTuple;
-import com.ardverk.dht.storage.Key;
-import com.ardverk.dht.storage.Value;
 import com.ardverk.dht.storage.ValueTuple;
 
 class MessageInputStream extends BencodingInputStream {
@@ -127,22 +123,10 @@ class MessageInputStream extends BencodingInputStream {
             SocketAddress address) throws IOException {
         Contact creator = readContact(Type.UNKNOWN, address);
         
-        Key key = readKey();
-        Value value = readValue();
-        
-        return new DefaultValueTuple(contact, creator, key, value);
-    }
-    
-    public Key readKey() throws IOException {
-        KUID primaryKey = readKUID();
-        return new DefaultKey(primaryKey);
-    }
-    
-    public Value readValue() throws IOException {
-        byte[] id = readBytes();
+        KUID key = readKUID();
         byte[] value = readBytes();
         
-        return new DefaultValue(id, value);
+        return new DefaultValueTuple(contact, creator, key, value);
     }
     
     public Message readMessage(SocketAddress src) throws IOException {
@@ -204,7 +188,8 @@ class MessageInputStream extends BencodingInputStream {
     
     private ValueRequest readValueRequest(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
-        Key key = readKey();
+        
+        KUID key = readKUID();
         return new DefaultValueRequest(messageId, contact, address, key);
     }
     

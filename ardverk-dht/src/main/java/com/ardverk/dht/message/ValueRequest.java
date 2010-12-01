@@ -1,6 +1,6 @@
 package com.ardverk.dht.message;
 
-import com.ardverk.dht.storage.Key;
+import com.ardverk.dht.KUID;
 
 /**
  * 
@@ -10,5 +10,5 @@ public interface ValueRequest extends LookupRequest {
     /**
      * 
      */
-    public Key getKey();
+    public KUID getKey();
 }

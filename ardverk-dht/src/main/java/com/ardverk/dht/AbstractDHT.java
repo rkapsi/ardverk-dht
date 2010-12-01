@@ -29,9 +29,9 @@ abstract class AbstractDHT implements DHT, Closeable {
     }
     
     @Override
-    public ArdverkFuture<ValueEntity> get(KUID lookupId, GetConfig config) {
-        Contact[] contacts = getRouteTable().select(lookupId);
-        return get(contacts, lookupId, config);
+    public ArdverkFuture<ValueEntity> get(KUID key, GetConfig config) {
+        Contact[] contacts = getRouteTable().select(key);
+        return get(contacts, key, config);
     }
 
     @Override

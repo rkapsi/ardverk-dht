@@ -1,5 +1,7 @@
 package com.ardverk.dht.storage;
 
+import com.ardverk.dht.KUID;
+
 
 public interface Database {
     
@@ -28,12 +30,12 @@ public interface Database {
     /**
      * Returns a {@link ValueTuple} for the given {@link Key}.
      */
-    public ValueTuple get(Key key);
+    public ValueTuple get(KUID key);
     
     /**
      * Returns all {@link ValueTuple}s for the given {@link Key}.
      */
-    public ValueTuple[] select(Key key);
+    public ValueTuple[] select(KUID key);
     
     /**
      * Returns all {@link ValueTuple}s.

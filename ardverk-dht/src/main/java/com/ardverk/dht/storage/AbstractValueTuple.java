@@ -24,4 +24,9 @@ abstract class AbstractValueTuple implements ValueTuple {
     public long getAgeInMillis() {
         return getAge(TimeUnit.MILLISECONDS);
     }
+
+    @Override
+    public boolean isEmpty() {
+        return size() == 0;
+    }
 }

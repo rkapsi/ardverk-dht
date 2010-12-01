@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.ardverk.dht.KUID;
 import com.ardverk.dht.utils.XorComparator;
 
 public class DefaultDatabase extends AbstractDatabase {
@@ -18,17 +19,17 @@ public class DefaultDatabase extends AbstractDatabase {
         }
     }
     
-    private final Map<Key, ValueTuple> database 
-        = new ConcurrentHashMap<Key, ValueTuple>();
+    private final Map<KUID, ValueTuple> database 
+        = new ConcurrentHashMap<KUID, ValueTuple>();
     
     @Override
-    public ValueTuple get(Key key) {
+    public ValueTuple get(KUID key) {
         return database.get(key);
     }
 
     @Override
     public Condition store(ValueTuple tuple) {
-        Key key = tuple.getKey();
+        KUID key = tuple.getId();
         
         if (!tuple.isEmpty()) {
             database.put(key, tuple);
@@ -45,7 +46,7 @@ public class DefaultDatabase extends AbstractDatabase {
     }
     
     @Override
-    public ValueTuple[] select(Key key) {
+    public ValueTuple[] select(KUID key) {
         ValueTuple[] values = values();
         Arrays.sort(values, new XorComparator(key));
         return values;

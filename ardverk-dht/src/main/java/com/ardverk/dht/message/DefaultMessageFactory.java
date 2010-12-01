@@ -7,7 +7,6 @@ import org.ardverk.lang.Arguments;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.storage.Database.Condition;
-import com.ardverk.dht.storage.Key;
 import com.ardverk.dht.storage.ValueTuple;
 
 public class DefaultMessageFactory extends AbstractMessageFactory {
@@ -55,7 +54,7 @@ public class DefaultMessageFactory extends AbstractMessageFactory {
     }
 
     @Override
-    public ValueRequest createValueRequest(Contact dst, Key key) {
+    public ValueRequest createValueRequest(Contact dst, KUID key) {
         SocketAddress address = dst.getRemoteAddress();
         MessageId messageId = createMessageId(address);
         return new DefaultValueRequest(messageId, localhost, address, key);

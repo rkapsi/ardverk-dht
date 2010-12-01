@@ -21,8 +21,6 @@ import com.ardverk.dht.message.ValueRequest;
 import com.ardverk.dht.message.ValueResponse;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.storage.Database.Condition;
-import com.ardverk.dht.storage.Key;
-import com.ardverk.dht.storage.Value;
 import com.ardverk.dht.storage.ValueTuple;
 
 class MessageOutputStream extends BencodingOutputStream {
@@ -95,17 +93,8 @@ class MessageOutputStream extends BencodingOutputStream {
     public void writeValueTuple(ValueTuple tuple) throws IOException {
         writeContact(tuple.getCreator());
         
-        writeKey(tuple.getKey());
-        writeValue(tuple.getValue());
-    }
-    
-    public void writeKey(Key key) throws IOException {
-        writeKUID(key.getId());
-    }
-    
-    public void writeValue(Value value) throws IOException {
-        writeBytes(value.getId());
-        writeBytes(value.getValue());
+        writeKUID(tuple.getId());
+        writeBytes(tuple.getValue());
     }
     
     public void writeMessage(Message message) throws IOException {
@@ -170,7 +159,7 @@ class MessageOutputStream extends BencodingOutputStream {
     }
     
     private void writeValueRequest(ValueRequest message) throws IOException {
-        writeKey(message.getKey());
+        writeKUID(message.getKey());
     }
     
     private void writeValueResponse(ValueResponse message) throws IOException {

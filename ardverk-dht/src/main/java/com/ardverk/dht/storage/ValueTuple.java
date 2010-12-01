@@ -33,14 +33,16 @@ public interface ValueTuple extends Identifier {
     public Contact getCreator();
     
     /**
-     * Returns the {@link Key} of the {@link ValueTuple}.
-     */
-    public Key getKey();
-    
-    /**
      * Returns the {@link Value} of the {@link ValueTuple}.
      */
-    public Value getValue();
+    public byte[] getValue();
+    
+    /**
+     * Returns the size of the value.
+     * 
+     * @see #getValue()
+     */
+    public int size();
     
     /**
      * Returns {@code true} if the {@link Value} is empty.

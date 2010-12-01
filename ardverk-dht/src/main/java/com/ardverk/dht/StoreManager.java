@@ -18,7 +18,6 @@ import com.ardverk.dht.io.StoreResponseHandler;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.DefaultValueTuple;
-import com.ardverk.dht.storage.Value;
 import com.ardverk.dht.storage.ValueTuple;
 
 class StoreManager {
@@ -37,7 +36,7 @@ class StoreManager {
     }
     
     public ArdverkFuture<StoreEntity> put(
-            final KUID key, final Value value, final PutConfig config) {
+            final KUID key, final byte[] value, final PutConfig config) {
         
         final Object lock = new Object();
         synchronized (lock) {
@@ -128,12 +127,12 @@ class StoreManager {
     }
     
     public ArdverkFuture<StoreEntity> put(Contact[] dst, 
-            KUID key, Value value, StoreConfig config) {
+            KUID key, byte[] value, StoreConfig config) {
         return store(dst, key, value, config);
     }
     
     private ArdverkFuture<StoreEntity> store(Contact[] dst, 
-            KUID key, Value value, StoreConfig config) {
+            KUID key, byte[] value, StoreConfig config) {
         
         int k = routeTable.getK();
         

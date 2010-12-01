@@ -12,7 +12,6 @@ import com.ardverk.dht.message.ValueRequest;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
-import com.ardverk.dht.storage.Key;
 import com.ardverk.dht.storage.ValueTuple;
 
 public class ValueRequestHandler extends AbstractRequestHandler {
@@ -35,7 +34,7 @@ public class ValueRequestHandler extends AbstractRequestHandler {
     public void handleRequest(RequestMessage message) throws IOException {
         ValueRequest request = (ValueRequest)message;
         
-        Key key = request.getKey();
+        KUID key = request.getKey();
         ValueTuple value = database.get(key);
         
         MessageFactory factory = messageDispatcher.getMessageFactory();

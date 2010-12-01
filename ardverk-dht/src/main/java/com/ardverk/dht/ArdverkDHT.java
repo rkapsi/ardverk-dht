@@ -8,12 +8,12 @@ import org.ardverk.concurrent.AsyncProcess;
 import com.ardverk.dht.codec.MessageCodec;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.config.BootstrapConfig;
+import com.ardverk.dht.config.GetConfig;
 import com.ardverk.dht.config.LookupConfig;
 import com.ardverk.dht.config.PingConfig;
 import com.ardverk.dht.config.PutConfig;
 import com.ardverk.dht.config.RefreshConfig;
 import com.ardverk.dht.config.StoreConfig;
-import com.ardverk.dht.config.GetConfig;
 import com.ardverk.dht.entity.BootstrapEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
@@ -29,8 +29,6 @@ import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
-import com.ardverk.dht.storage.DefaultKey;
-import com.ardverk.dht.storage.Value;
 
 public class ArdverkDHT extends AbstractDHT {
     
@@ -166,21 +164,21 @@ public class ArdverkDHT extends AbstractDHT {
 
     @Override
     public ArdverkFuture<ValueEntity> get(Contact[] contacts, 
-            KUID lookupId, GetConfig config) {
+            KUID key, GetConfig config) {
         AsyncProcess<ValueEntity> process
             = new ValueResponseHandler(messageDispatcher, contacts, 
-                    routeTable, new DefaultKey(lookupId), config);
+                    routeTable, key, config);
         return submit(process, config);
     }
 
     @Override
-    public ArdverkFuture<StoreEntity> put(KUID key, Value value, PutConfig config) {
+    public ArdverkFuture<StoreEntity> put(KUID key, byte[] value, PutConfig config) {
         return storeManager.put(key, value, config);
     }
     
     @Override
     public ArdverkFuture<StoreEntity> store(
-            Contact[] dst, KUID key, Value value, StoreConfig config) {
+            Contact[] dst, KUID key, byte[] value, StoreConfig config) {
         return storeManager.put(dst, key, value, config);
     }
 }

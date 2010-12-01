@@ -25,7 +25,6 @@ import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
-import com.ardverk.dht.storage.Value;
 
 public interface DHT {
     
@@ -70,16 +69,16 @@ public interface DHT {
             Contact[] contacts, KUID lookupId, LookupConfig config);
     
     public ArdverkFuture<ValueEntity> get(
-            KUID lookupId, GetConfig config);
+            KUID key, GetConfig config);
     
     public ArdverkFuture<ValueEntity> get(
-            Contact[] contacts, KUID lookupId, GetConfig config);
+            Contact[] contacts, KUID key, GetConfig config);
     
     public ArdverkFuture<StoreEntity> put(
-            KUID key, Value value, PutConfig config);
+            KUID key, byte[] value, PutConfig config);
     
     public ArdverkFuture<StoreEntity> store(
-            Contact[] dst, KUID key, Value value, StoreConfig config);
+            Contact[] dst, KUID key, byte[] value, StoreConfig config);
     
     public <V> ArdverkFuture<V> submit(
             AsyncProcess<V> process, Config config);
