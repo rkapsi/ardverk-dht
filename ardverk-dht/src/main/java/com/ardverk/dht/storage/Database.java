@@ -19,7 +19,7 @@ public interface Database {
         /**
          * Returns the name of the {@link Condition}.
          */
-        public String name();
+        public String stringValue();
     }
     
     /**
@@ -28,12 +28,12 @@ public interface Database {
     public Condition store(ValueTuple tuple);
     
     /**
-     * Returns a {@link ValueTuple} for the given {@link Key}.
+     * Returns a {@link ValueTuple} for the given {@link KUID}.
      */
     public ValueTuple get(KUID key);
     
     /**
-     * Returns all {@link ValueTuple}s for the given {@link Key}.
+     * Returns all {@link ValueTuple}s for the given {@link KUID}.
      */
     public ValueTuple[] select(KUID key);
     

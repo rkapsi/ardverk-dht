@@ -17,6 +17,11 @@ public class DefaultDatabase extends AbstractDatabase {
         public boolean isSuccess() {
             return this == SUCCESS;
         }
+        
+        @Override
+        public String stringValue() {
+            return name();
+        }
     }
     
     private final Map<KUID, ValueTuple> database 

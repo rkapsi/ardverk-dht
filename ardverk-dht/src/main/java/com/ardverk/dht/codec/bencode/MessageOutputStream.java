@@ -86,8 +86,8 @@ class MessageOutputStream extends BencodingOutputStream {
         writeArray(contacts);
     }
     
-    public void writeCondition(Condition status) throws IOException {
-        writeString(status.name());
+    public void writeCondition(Condition condition) throws IOException {
+        writeString(condition.stringValue());
     }
     
     public void writeValueTuple(ValueTuple tuple) throws IOException {
