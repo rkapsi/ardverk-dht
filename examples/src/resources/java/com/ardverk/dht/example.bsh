@@ -91,12 +91,9 @@ close() {
 }
 
 init(256, 2000);
-frame = new JFrame("Test");
-panel = new PlasmaPanel(dhts.get(0));
-frame.setContentPane(panel);
-dhts.get(0).getMessageDispatcher().addMessageListener(panel);
-frame.setBounds(20, 30, 640, 480);
+frame = new PainterFrame(dhts.get(0));
 frame.setVisible(true);
+frame.start();
 bootstrap();
 
 //bootstrap();
