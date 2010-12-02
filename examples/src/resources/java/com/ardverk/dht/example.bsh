@@ -107,7 +107,7 @@ print("\nGetting a Key-Value...");
 get("Hello");
 
 rnd = (int)(Math.random() * (dhts.size()-1));
-print("\nSwithcing to DHT instance #" + rnd);
+print("\nSwithcing to random DHT instance #" + rnd);
 current = dht(rnd);
 
 print("\nGetting the same Key-Value through DHT instance #" + rnd);
