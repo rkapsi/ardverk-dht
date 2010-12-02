@@ -5,12 +5,12 @@
 	<classpathentry kind="src" path="examples/src/main/java"/>
 	<classpathentry kind="src" path="examples/src/resources/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/patricia-trie"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardverk-base"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/bee-encode"/>
 	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/slf4j-api-1.6.1.jar"/>
 	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/slf4j-simple-1.6.1.jar"/>
 	<classpathentry kind="lib" path="ardverk-dht/lib/test/java/junit-4.8.2.jar"/>
 	<classpathentry kind="lib" path="examples/lib/main/java/bsh-2.0b4.jar"/>
+	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/bee-encode-0.2.jar"/>
+	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/patricia-trie-0.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
