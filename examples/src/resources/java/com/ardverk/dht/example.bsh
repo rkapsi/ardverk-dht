@@ -26,8 +26,11 @@ import org.ardverk.security.*;
 import org.ardverk.utils.*;
 import java.security.*;
 
+// Make everything accessible!
+setAccessibility(true);
+
 java.util.List dhts = null;
-DHT current = null;
+com.ardverk.dht.DHT current = null;
 
 create(int count, int port) {
 	return ArdverkUtils.createDHTs(count, port);
@@ -91,10 +94,6 @@ hash(String value) {
 	return md.digest();
 }
 
-close() {
-	IoUtils.closeAll(dhts);
-}
-
 createUI() {
 	return createUI(current);
 }
@@ -107,30 +106,33 @@ createUI(DHT dht) {
 	return frame;
 }
 
-INSTANCE_COUNT = 256;
-INITIAL_PORT = 2000;
+close() {
+	IoUtils.closeAll(dhts);
+}
 
-print("Creating DHTs...");
-dhts = create(INSTANCE_COUNT, INITIAL_PORT);
-current = dht(0);
+quit() {
+	close();
+	System.exit(0);
+}
 
-print("Creating UI for the first DHT instance...");
-frame = createUI();
+example() {
+	INSTANCE_COUNT = 256;
+	INITIAL_PORT = 2000;
 
-print("Bootstrapping all DHTs...");
-bootstrap();
+	print("Creating DHTs...");
+	dhts = create(INSTANCE_COUNT, INITIAL_PORT);
+	current = dht(0);
 
-print("\nStoring a Key-Value...");
-put("Hello", "World");
+	print("Creating UI for the first DHT instance...");
+	frame = createUI();
 
-print("\nGetting a Key-Value...");
-get("Hello");
+	print("Bootstrapping all DHTs...");
+	bootstrap();
 
-rnd = (int)(Math.random() * (dhts.size()-1));
-print("\nSwithcing to random DHT instance #" + rnd);
-current = dht(rnd);
-createUI();
+	print("\nStoring a Key-Value...");
+	put("Hello", "World");
 
-print("\nGetting the same Key-Value through DHT instance #" + rnd);
-get("Hello");
+	print("\nGetting a Key-Value...");
+	get("Hello");
+}
 
