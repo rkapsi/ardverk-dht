@@ -27,19 +27,14 @@ import org.ardverk.utils.*;
 import java.security.*;
 
 java.util.List dhts = null;
-int current = 0;
+DHT current = null;
 
-init(int count, int port) {
-	dhts = ArdverkUtils.createDHTs(count, port);
+create(int count, int port) {
+	return ArdverkUtils.createDHTs(count, port);
 }
 
-current() {
-	return dhts.get(current);
-}
-
-current(int current) {
-	this.current = current;
-	return current();
+dht(int index) {
+	return dhts.get(index);
 }
 
 bootstrap() {
@@ -55,7 +50,7 @@ put(String keyValue) {
 }
 
 put(String key, String value) {
-	ArdverkFuture future = current().put(
+	ArdverkFuture future = current.put(
 		KUID.create(hash(key)), 
 		StringUtils.getBytes(value), 
 		new DefaultPutConfig());
@@ -67,7 +62,7 @@ put(String key, String value) {
 }
 
 get(String key) {
-	ArdverkFuture future = current().get(
+	ArdverkFuture future = current.get(
 		KUID.create(hash(key)), new DefaultGetConfig());
 	
 	ValueEntity entity = future.get();
@@ -90,13 +85,31 @@ close() {
 	IoUtils.closeAll(dhts);
 }
 
-init(256, 2000);
-frame = new PainterFrame(dhts.get(0));
+INSTANCE_COUNT = 256;
+INITIAL_PORT = 2000;
+
+print("Creating DHTs...");
+dhts = create(INSTANCE_COUNT, INITIAL_PORT);
+current = dht(0);
+
+print("Creating UI for first DHT instance...");
+frame = new PainterFrame(current);
 frame.setVisible(true);
 frame.start();
+
+print("Bootstrapping all DHTs...");
 bootstrap();
 
-//bootstrap();
-//refresh();
-//put("Hello", "World");
-//get("Hello");
+print("\nStoring a Key-Value...");
+put("Hello", "World");
+
+print("\nGetting a Key-Value...");
+get("Hello");
+
+rnd = (int)(Math.random() * (dhts.size()-1));
+print("\nSwithcing to DHT instance #" + rnd);
+current = dht(rnd);
+
+print("\nGetting the same Key-Value through DHT instance #" + rnd);
+get("Hello");
+
