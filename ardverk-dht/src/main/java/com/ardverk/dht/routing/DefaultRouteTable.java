@@ -3,7 +3,9 @@ package com.ardverk.dht.routing;
 import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 
@@ -14,6 +16,7 @@ import org.ardverk.collection.PatriciaTrie;
 import org.ardverk.collection.Trie;
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
+import org.ardverk.concurrent.FutureUtils;
 import org.ardverk.lang.Arguments;
 import org.ardverk.lang.NullArgumentException;
 import org.ardverk.net.NetworkCounter;
@@ -29,6 +32,9 @@ public class DefaultRouteTable extends AbstractRouteTable {
     
     private static final Logger LOG 
         = LoggerUtils.getLogger(DefaultRouteTable.class);
+    
+    private final Map<PingKey, ArdverkFuture<PingEntity>> pingFutures 
+        = new HashMap<PingKey, ArdverkFuture<PingEntity>>();
     
     private final RouteTableConfig config;
     
@@ -158,9 +164,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         // Everything is fine if they've got the same address.
         if (entity.isSameRemoteAddress(contact)) {
-            ContactEntity.Update update = entity.update(contact);
-            fireContactChanged(bucket, update.getPrevious(), 
-                    update.getMerged());
+            update(bucket, entity, contact);
         } else {
             checkContact(bucket, entity, contact);
         }
@@ -206,9 +210,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
                         // Make sure the pre-condition still holds and we're
                         // not replacing some other Contact.
                         if (current != null && current.getContact() == previous) {
-                            ContactEntity.Update update = current.update(contact);
-                            fireContactChanged(bucket, 
-                                    update.getPrevious(), update.getMerged());
+                            update(bucket, current, contact);
                             
                             if (bucket.containsCached(contactId)) {
                                 pingLeastRecentlySeenContact(bucket);
@@ -221,8 +223,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
                 }
             });
         } else {
-            Contact existing = entity.replace(contact);
-            fireContactChanged(bucket, existing, contact);
+            replace(bucket, entity, contact);
             
             if (bucket.containsCached(contact.getId())) {
                 pingLeastRecentlySeenContact(bucket);
@@ -278,7 +279,6 @@ public class DefaultRouteTable extends AbstractRouteTable {
                 assert (entity == lrs);
                 
                 bucket.addActive(new ContactEntity(config, contact));
-                bucket.touch();
                 
                 fireContactReplaced(bucket, lrs.getContact(), contact);
                 return;
@@ -287,6 +287,23 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         addCache(bucket, contact);
         pingLeastRecentlySeenContact(bucket);
+    }
+    
+    private synchronized void update(DefaultBucket bucket, 
+            ContactEntity entity, Contact contact) {
+        ContactEntity.Update update = entity.update(contact);
+        bucket.touch();
+        
+        fireContactChanged(bucket, 
+                update.getPrevious(), update.getMerged());
+    }
+    
+    private synchronized void replace(DefaultBucket bucket, 
+            ContactEntity entity, Contact contact) {
+        Contact existing = entity.replace(contact);
+        bucket.touch();
+        
+        fireContactChanged(bucket, existing, contact);
     }
     
     private synchronized void pingLeastRecentlySeenContact(DefaultBucket bucket) {
@@ -410,8 +427,28 @@ public class DefaultRouteTable extends AbstractRouteTable {
     private synchronized ArdverkFuture<PingEntity> ping(ContactEntity entity) {
         Contact contact = entity.getContact();
         
-        PingConfig pingConfig = config.getPingConfig();
-        return ping(contact, pingConfig);
+        // Make sure we're not pinging the same host in parallel.
+        // It is an unlikely but possible case...
+        final PingKey pingKey = new PingKey(contact);
+        ArdverkFuture<PingEntity> future 
+            = pingFutures.get(pingKey);
+        
+        if (future == null) {
+            PingConfig pingConfig = config.getPingConfig();
+            future = ping(contact, pingConfig);
+            
+            future.addAsyncFutureListener(new AsyncFutureListener<PingEntity>() {
+                @Override
+                public void operationComplete(AsyncFuture<PingEntity> future) {
+                    synchronized (DefaultRouteTable.this) {
+                        pingFutures.remove(pingKey);
+                    }
+                }
+            });
+            pingFutures.put(pingKey, future);
+        }
+        
+        return future;
     }
     
     @Override
@@ -555,6 +592,9 @@ public class DefaultRouteTable extends AbstractRouteTable {
      * Clears the {@link RouteTable}.
      */
     public synchronized void clear() {
+        FutureUtils.cancelAll(pingFutures.values(), true);
+        pingFutures.clear();
+        
         buckets.clear();
         init();
     }
@@ -710,6 +750,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
                 
                 Contact contact = entity.getContact();
                 counter.add(contact.getRemoteAddress());
+                touch();
                 return true;
             }
             
@@ -839,6 +880,36 @@ public class DefaultRouteTable extends AbstractRouteTable {
         @Override
         public boolean containsCached(KUID contactId) {
             return cached.containsKey(contactId);
+        }
+    }
+    
+    private static class PingKey {
+        
+        private final KUID contactId;
+        
+        private final SocketAddress address;
+        
+        public PingKey(Contact contact) {
+            this.contactId = contact.getId();
+            this.address = contact.getRemoteAddress();
+        }
+        
+        @Override
+        public int hashCode() {
+            return 31*contactId.hashCode() + address.hashCode();
+        }
+        
+        @Override
+        public boolean equals(Object o) {
+            if (o == this) {
+                return true;
+            } else if (!(o instanceof PingKey)) {
+                return false;
+            }
+            
+            PingKey other = (PingKey)o;
+            return contactId.equals(other.contactId) 
+                    && address.equals(other.address);
         }
     }
 }

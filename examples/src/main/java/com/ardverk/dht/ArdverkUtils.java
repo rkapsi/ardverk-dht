@@ -128,7 +128,8 @@ public class ArdverkUtils {
             DefaultRefreshConfig config = new DefaultRefreshConfig();
             config.setQueueKey(QueueKey.BACKEND);
             
-            config.setBucketTimeout(-1L, TimeUnit.MILLISECONDS);
+            //config.setBucketTimeout(-1L, TimeUnit.MILLISECONDS);
+            config.setBucketTimeout(1L, TimeUnit.MINUTES);
             
             ArdverkFuture<RefreshEntity> future 
                 = dhts.get(offset + i).refresh(config);

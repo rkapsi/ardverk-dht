@@ -50,9 +50,12 @@ put(String keyValue) {
 }
 
 put(String key, String value) {
-	ArdverkFuture future = current.put(
-		KUID.create(hash(key)), 
-		StringUtils.getBytes(value), 
+	put(current, key, value);
+}
+
+put(DHT dht, String key, String value) {
+	ArdverkFuture future = dht.put(
+		kuid(key), StringUtils.getBytes(value), 
 		new DefaultPutConfig());
 		
 	StoreEntity entity = future.get();
@@ -62,17 +65,24 @@ put(String key, String value) {
 }
 
 get(String key) {
-	ArdverkFuture future = current.get(
-		KUID.create(hash(key)), new DefaultGetConfig());
+	get(current, key);
+}
+
+get(DHT dht, String key) {
+	ArdverkFuture future = dht.get(kuid(key), new DefaultGetConfig());
 	
 	ValueEntity entity = future.get();
 	byte[] value = entity.getValue();
 	
-	print("GET: " + entity.getId() + " -> " 
+	print("GET: " + entity.getId() + " (" + key + ")" + " -> " 
 		+ StringUtils.toString(value)
 		+ "\n SENDER: " + entity.getSender().getId()
 		+ "\n CREATOR: " + entity.getCreator().getId()
 		+ "\n TIME: " + entity.getTimeInMillis() + "ms");
+}
+
+kuid(String value) {
+	return KUID.create(hash(value));
 }
 
 hash(String value) {
@@ -85,6 +95,18 @@ close() {
 	IoUtils.closeAll(dhts);
 }
 
+createUI() {
+	return createUI(current);
+}
+
+createUI(DHT dht) {
+	PainterFrame frame = new PainterFrame(dht);
+	frame.setTitle(dht.getLocalhost().getId().toString());
+	frame.setVisible(true);
+	frame.start();
+	return frame;
+}
+
 INSTANCE_COUNT = 256;
 INITIAL_PORT = 2000;
 
@@ -92,10 +114,8 @@ print("Creating DHTs...");
 dhts = create(INSTANCE_COUNT, INITIAL_PORT);
 current = dht(0);
 
-print("Creating UI for first DHT instance...");
-frame = new PainterFrame(current);
-frame.setVisible(true);
-frame.start();
+print("Creating UI for the first DHT instance...");
+frame = createUI();
 
 print("Bootstrapping all DHTs...");
 bootstrap();
@@ -109,6 +129,7 @@ get("Hello");
 rnd = (int)(Math.random() * (dhts.size()-1));
 print("\nSwithcing to random DHT instance #" + rnd);
 current = dht(rnd);
+createUI();
 
 print("\nGetting the same Key-Value through DHT instance #" + rnd);
 get("Hello");

@@ -47,7 +47,9 @@ class RouteTableManager {
         
         synchronized (routeTable) {
             int pingCount = (int)(routeTable.getK() * config.getPingCount());
-            KUID localhostId = dht.getLocalhost().getId();
+            
+            Contact localhost = dht.getLocalhost();
+            KUID localhostId = localhost.getId();
 
             if (0 < pingCount) {
                 PingConfig pingConfig = config.getPingConfig();
@@ -55,6 +57,11 @@ class RouteTableManager {
                 
                 Contact[] contacts = routeTable.select(localhostId, pingCount);
                 for (Contact contact : contacts) {
+                    // Don't send PINGs to the localhost!
+                    if (contact.equals(localhost)) {
+                        continue;
+                    }
+                    
                     if (contact.isTimeout(contactTimeout, TimeUnit.MILLISECONDS)) {
                         ArdverkFuture<PingEntity> future 
                             = dht.ping(contact, pingConfig);
