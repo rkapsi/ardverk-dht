@@ -3,7 +3,7 @@
 	<classpathentry excluding="com/ardverk/dht/utils/SizeEstimator.java" kind="src" path="ardverk-dht/src/main/java"/>
 	<classpathentry kind="src" path="ardverk-dht/src/test/java"/>
 	<classpathentry kind="src" path="examples/src/main/java"/>
-	<classpathentry kind="src" path="examples/src/resources/java"/>
+	<classpathentry kind="src" path="examples/src/main/resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/slf4j-api-1.6.1.jar"/>
 	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/slf4j-simple-1.6.1.jar"/>
