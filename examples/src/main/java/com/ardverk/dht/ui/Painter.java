@@ -13,8 +13,6 @@ interface Painter {
         MESSAGE_RECEIVED;
     }
     
-    public void clear();
-    
     public void paint(Component c, Graphics g);
     
     public void handleEvent(EventType type, KUID contactId, Message message);

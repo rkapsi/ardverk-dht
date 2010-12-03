@@ -16,18 +16,9 @@ import java.util.Random;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.message.Message;
-import com.ardverk.dht.message.RequestMessage;
 
 public class JuicePainter extends AbstractPainter {
 
-    private static final long ATTACK = 250L;
-    
-    private static final long RELEASE = 2750L;
-    
-    private static final long DURATION = ATTACK + RELEASE;
-    
-    private static final float DOT_SIZE = 6f;
-    
     private static final Random GENERATOR = new Random();
     
     private final List<Node> nodes 
@@ -58,7 +49,7 @@ public class JuicePainter extends AbstractPainter {
         double arc_height = 2d*radius;
         
         g.setColor(Color.orange);
-        g.setStroke(TWO_PIXEL_STROKE);
+        g.setStroke(PainterUtils.TWO_PIXEL_STROKE);
         
         ellipse.setFrame(arc_x, arc_y, arc_width, arc_height);
         g.draw(ellipse);
@@ -69,8 +60,10 @@ public class JuicePainter extends AbstractPainter {
         
         localhost.setLocation(dx, dy);
         
-        dot.setFrame(dx - DOT_SIZE/2d, dy - DOT_SIZE/2d, 
-                DOT_SIZE, DOT_SIZE);
+        dot.setFrame(dx - PainterUtils.DOT_SIZE/2d, 
+            dy - PainterUtils.DOT_SIZE/2d, 
+            PainterUtils.DOT_SIZE, 
+            PainterUtils.DOT_SIZE);
         
         synchronized (nodes) {
             for (Iterator<Node> it = nodes.iterator(); it.hasNext(); ) {
@@ -80,37 +73,22 @@ public class JuicePainter extends AbstractPainter {
             }
         }
         
-        g.setColor(Color.orange);
-        g.setStroke(DEFAULT_STROKE);
+        g.setColor(Color.ORANGE);
+        g.setStroke(PainterUtils.DEFAULT_STROKE);
         g.fill(dot);
     }
     
     @Override
     public void handleEvent(EventType type, KUID contactId, Message message) {
         if (contactId != null) {
-            nodes.add(new Node(dot, type, contactId, message));
+            nodes.add(new Node(contactId, message));
         }
     }
     
-    @Override
-    public void clear() {
-        nodes.clear();
-    }
-
     private class Node {
         
-        private final Ellipse2D.Double dot;
-        
-        private final EventType type;
-        
-        private final KUID contactId;
-        
-        private final boolean request;
-        
-        private final int noise;
-        
-        private final long timeStamp = System.currentTimeMillis();
-        
+        private final long creationTime = System.currentTimeMillis();
+
         private final Point2D.Double remote = new Point2D.Double();
         
         private final Point2D.Double point = new Point2D.Double();
@@ -121,15 +99,19 @@ public class JuicePainter extends AbstractPainter {
         
         private final Ellipse2D.Double prxDot = new Ellipse2D.Double();
         
+        private final KUID contactId;
+        
+        private final int noise;
+        
         private final Stroke stroke;
         
-        public Node(Ellipse2D.Double dot, EventType type, KUID contactId, Message message) {
-            this.dot = dot;
-            this.type = type;
+        private final Color color;
+        
+        public Node(KUID contactId, Message message) {
             this.contactId = contactId;
-            this.request = (message instanceof RequestMessage);
             
             this.stroke = PainterUtils.getStrokeForMessage(message);
+            this.color = PainterUtils.getColorForMessage(message);
             
             int noise = GENERATOR.nextInt(50);
             if (GENERATOR.nextBoolean()) {
@@ -139,20 +121,20 @@ public class JuicePainter extends AbstractPainter {
         }
         
         private int alpha() {
-            long delta = System.currentTimeMillis() - timeStamp;
+            long delta = System.currentTimeMillis() - creationTime;
             
-            if (delta < ATTACK) {
-                return (int)(255f/ATTACK * delta);
+            if (delta < PainterUtils.ATTACK) {
+                return (int)(255f/PainterUtils.ATTACK * delta);
             }
             
-            return Math.max(255 - (int)(255f/DURATION * delta), 0);
+            return Math.max(255 - (int)(255f/PainterUtils.DURATION * delta), 0);
         }
         
         private double radius() {
             final double r = 20d;
-            long delta = System.currentTimeMillis() - timeStamp;
-            if (delta < DURATION) {
-                return r/DURATION * delta;
+            long delta = System.currentTimeMillis() - creationTime;
+            if (delta < PainterUtils.DURATION) {
+                return r/PainterUtils.DURATION * delta;
             }
             return r;
         }
@@ -167,22 +149,6 @@ public class JuicePainter extends AbstractPainter {
             
             double dx = cx + radius * Math.cos(fi);
             double dy = cy + radius * Math.sin(fi);
-            
-            int red = 0;
-            int green = 0;
-            int blue = 0;
-            
-            if (type.equals(EventType.MESSAGE_SENT)) {
-                red = 255;
-                if (!request) {
-                    blue = 255;
-                }
-            } else {
-                green = 255;
-                if (request) {
-                    blue = 255;
-                }
-            }
             
             remote.setLocation(dx, dy);
             
@@ -205,15 +171,11 @@ public class JuicePainter extends AbstractPainter {
             
             if (shape != null) {
                 g2.setStroke(stroke);
-                g2.setColor(new Color(red, green, blue, alpha()));
+                g2.setColor(PainterUtils.alpha(color, alpha()));
                 g2.draw(shape);
             }
             
-            //g2.setStroke(ONE_PIXEL_STROKE);
-            //g2.setColor(Color.red);
-            //g2.draw(prxDot);
-            
-            return System.currentTimeMillis() - timeStamp >= DURATION;
+            return System.currentTimeMillis() - creationTime >= PainterUtils.DURATION;
         }
     }
 }

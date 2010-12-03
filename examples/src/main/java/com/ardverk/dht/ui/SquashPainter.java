@@ -17,17 +17,8 @@ import java.util.List;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.message.Message;
-import com.ardverk.dht.message.RequestMessage;
 
 public class SquashPainter extends AbstractPainter {
-
-    private static final long ATTACK = 250L;
-    
-    private static final long RELEASE = 2750L;
-    
-    private static final long DURATION = ATTACK + RELEASE;
-    
-    private static final float DOT_SIZE = 6f;
     
     private final List<Node> nodes 
         = Collections.synchronizedList(new LinkedList<Node>());
@@ -45,7 +36,7 @@ public class SquashPainter extends AbstractPainter {
         int width = c.getWidth();
         int height = c.getHeight();
         
-        g.setColor(Color.orange);
+        g.setColor(Color.ORANGE);
         g.setStroke(new BasicStroke(2.0f));
         g.draw(new Line2D.Float(width/2f, 0f, width/2f, height));
         
@@ -61,35 +52,29 @@ public class SquashPainter extends AbstractPainter {
             }
         }
         
-        g.setColor(Color.orange);
-        dot.setFrame(x-DOT_SIZE/2d, y-DOT_SIZE/2d, DOT_SIZE, DOT_SIZE);
-        g.setStroke(DEFAULT_STROKE);
+        g.setColor(Color.ORANGE);
+        dot.setFrame(x-PainterUtils.DOT_SIZE/2d, 
+                y-PainterUtils.DOT_SIZE/2d, 
+                PainterUtils.DOT_SIZE, 
+                PainterUtils.DOT_SIZE);
+        g.setStroke(PainterUtils.DEFAULT_STROKE);
         g.fill(dot);
     }
     
     @Override
     public void handleEvent(EventType type, KUID contactId, Message message) {
         if (contactId != null) {
-            nodes.add(new Node(dot, type, contactId, message));
+            nodes.add(new Node(type, contactId, message));
         }
-    }
-    
-    @Override
-    public void clear() {
-        nodes.clear();
     }
     
     private class Node {
         
-        private final Ellipse2D.Double dot;
-        
+        private final long creationTime = System.currentTimeMillis();
+
         private final EventType type;
         
-        private final KUID nodeId;
-        
-        private final boolean request;
-        
-        private final long timeStamp = System.currentTimeMillis();
+        private final KUID contactId;
         
         private final Arc2D.Double arc = new Arc2D.Double();
         
@@ -99,58 +84,55 @@ public class SquashPainter extends AbstractPainter {
         
         private final Stroke stroke;
         
-        public Node(Ellipse2D.Double dot, EventType type, KUID nodeId, Message message) {
-            this.dot = dot;
+        private final Color color;
+        
+        public Node(EventType type, KUID contactId, Message message) {
             this.type = type;
-            this.nodeId = nodeId;
-            this.request = (message instanceof RequestMessage);
+            this.contactId = contactId;
             
             this.stroke = PainterUtils.getStrokeForMessage(message);
-            
-            if (nodeId == null) {
-                assert (request && type.equals(EventType.MESSAGE_SENT));
-            }
+            this.color = PainterUtils.getColorForMessage(message);
         }
         
         private int alpha() {
-            long delta = System.currentTimeMillis() - timeStamp;
-            if (delta < DURATION) {
-                return 255 - (int)(255f/DURATION * delta);
+            long delta = System.currentTimeMillis() - creationTime;
+            if (delta < PainterUtils.DURATION) {
+                return 255 - (int)(255f/PainterUtils.DURATION * delta);
             }
             return 0;
         }
         
         private double extent() {
-            long delta = System.currentTimeMillis() - timeStamp;
-            if (delta < DURATION/3L) {
-                return 3d * 180f/DURATION * delta;
+            long delta = System.currentTimeMillis() - creationTime;
+            if (delta < PainterUtils.DURATION/3L) {
+                return 3d * 180f/PainterUtils.DURATION * delta;
             }
             return 180d;
         }
         
         private double radius() {
             final double r = 20d;
-            long delta = System.currentTimeMillis() - timeStamp;
-            if (delta < DURATION) {
-                return r/DURATION * delta;
+            long delta = System.currentTimeMillis() - creationTime;
+            if (delta < PainterUtils.DURATION) {
+                return r/PainterUtils.DURATION * delta;
             }
             return r;
         }
         
         public boolean paint(Point2D.Double localhost, double width, double height, Graphics2D g) {
             
-            if (nodeId != null) {
+            if (contactId != null) {
                 paintArc(localhost, width, height, g);
             } else {
                 paintLine(localhost, width, height, g);
             }
             
-            return (System.currentTimeMillis() - timeStamp) >= DURATION;
+            return (System.currentTimeMillis() - creationTime) >= PainterUtils.DURATION;
         }
         
         private void paintArc(Point2D.Double localhost, double width, double height, Graphics2D g) {
             
-            double nodeY = position(nodeId, height);
+            double nodeY = position(contactId, height);
             double distance = Math.max(localhost.y, nodeY) - Math.min(localhost.y, nodeY);
             double bow = distance;
             double nodeX = (width-bow)/2d;
@@ -161,15 +143,7 @@ public class SquashPainter extends AbstractPainter {
             double start = 0f;
             double extent = 0f;
             
-            int red = 0;
-            int green = 0;
-            int blue = 0;
-            
-            if (type.equals(EventType.MESSAGE_SENT)) {
-                red = 255;
-                if (!request) {
-                    blue = 255;
-                }
+            if (type == EventType.MESSAGE_SENT) {
                 if (localhost.y < nodeY) {
                     start = 90f;
                     extent = -extent();
@@ -178,10 +152,6 @@ public class SquashPainter extends AbstractPainter {
                     extent = extent();
                 }
             } else {
-                green = 255;
-                if (request) {
-                    blue = 255;
-                }
                 if (localhost.y < nodeY) {
                     start = -90f;
                     extent = -extent();
@@ -192,7 +162,8 @@ public class SquashPainter extends AbstractPainter {
             }
 
             Point2D.Double corner = new Point2D.Double(
-                    localhost.x + 2 * dot.width, localhost.y + 2 * dot.height);
+                    localhost.x + 2 * dot.width, 
+                    localhost.y + 2 * dot.height);
             
             this.prxDot.setFrameFromCenter(localhost, corner);
             
@@ -209,17 +180,13 @@ public class SquashPainter extends AbstractPainter {
             
             if (shape != null) {
                 g.setStroke(stroke);
-                g.setColor(new Color(red, green, blue, alpha()));
+                g.setColor(PainterUtils.alpha(color, alpha()));
                 g.draw(shape);
             }
-            
-            //g.setStroke(ONE_PIXEL_STROKE);
-            //g.setColor(Color.red);
-            //g.draw(prxDot);
         }
         
         private void paintLine(Point2D.Double localhost, double width, double height, Graphics2D g) {
-            g.setStroke(DEFAULT_STROKE);
+            g.setStroke(PainterUtils.DEFAULT_STROKE);
             g.setColor(new Color(255, 0, 0, alpha()));
             
             double x1 = localhost.x;

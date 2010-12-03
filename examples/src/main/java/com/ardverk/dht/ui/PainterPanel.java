@@ -132,9 +132,5 @@ public class PainterPanel extends JPanel {
         public void handleEvent(EventType type, 
                 KUID contactId, Message message) {
         }
-
-        @Override
-        public void clear() {
-        }
     }
 }

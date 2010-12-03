@@ -1,6 +1,7 @@
 package com.ardverk.dht.ui;
 
 import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Stroke;
 
 import com.ardverk.dht.message.Message;
@@ -8,6 +9,7 @@ import com.ardverk.dht.message.NodeRequest;
 import com.ardverk.dht.message.NodeResponse;
 import com.ardverk.dht.message.PingRequest;
 import com.ardverk.dht.message.PingResponse;
+import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.StoreRequest;
 import com.ardverk.dht.message.StoreResponse;
 import com.ardverk.dht.message.ValueRequest;
@@ -15,33 +17,74 @@ import com.ardverk.dht.message.ValueResponse;
 
 class PainterUtils {
 
+    public static final int SCALE = 10;
+
+    public static final Stroke DEFAULT_STROKE = new BasicStroke(1.0f);
+
+    public static final Stroke TWO_PIXEL_STROKE = new BasicStroke(2.0f);
+    
+    public static final long ATTACK = 250L;
+    
+    public static final long RELEASE = 2750L;
+    
+    public static final long DURATION = ATTACK + RELEASE;
+    
+    public static final float DOT_SIZE = 6f;
+    
+    private static final Color PING_REQUEST = Color.RED;
+    
+    private static final Color PING_RESPONSE = PING_REQUEST.darker();
+    
+    private static final Color NODE_REQUEST = Color.GREEN;
+    
+    private static final Color NODE_RESPONSE = NODE_REQUEST.darker();
+    
+    private static final Color VALUE_REQUEST = Color.BLUE;
+    
+    private static final Color VALUE_RESPONSE = VALUE_REQUEST.darker();
+    
+    private static final Color STORE_REQUEST = Color.CYAN;
+    
+    private static final Color STORE_RESPONSE = STORE_REQUEST.darker();
+
     private PainterUtils() {}
 
+    public static Color alpha(Color color, int alpha) {
+        int rgb = (color.getRGB() & 0x00FFFFFF) | ((alpha & 0xFF) << 24);
+        return new Color(rgb, true);
+    }
+    
+    public static Color getColorForMessage(Message message) {
+        if (message instanceof PingRequest) {
+            return PING_REQUEST;
+        } else if (message instanceof PingResponse) {
+            return PING_RESPONSE;
+        } else if (message instanceof NodeRequest) {
+            return NODE_REQUEST;
+        } else if (message instanceof NodeResponse) {
+            return NODE_RESPONSE;
+        } else if (message instanceof ValueRequest) {
+            return VALUE_REQUEST;
+        } else if (message instanceof ValueResponse) {
+            return VALUE_RESPONSE;
+        } else if (message instanceof StoreRequest) {
+            return STORE_REQUEST;
+        } else if (message instanceof StoreResponse) {
+            return STORE_RESPONSE;
+        }
+        
+        return Color.WHITE;
+    }
+    
     public static Stroke getStrokeForMessage(Message message) {
         float dash_phase = (float)Math.random() * 10f;
         
-        if (message instanceof PingRequest
-                || message instanceof PingResponse) {
+        if (message instanceof RequestMessage) {
+            return PainterUtils.DEFAULT_STROKE;
+        } else {
             return new BasicStroke(1.0f, BasicStroke.CAP_ROUND, 
-                    BasicStroke.JOIN_ROUND, 10.0f, 
-                    new float[]{ 2f, 2f }, dash_phase);
-        } else if (message instanceof NodeRequest
-                || message instanceof NodeResponse) {
-            return new BasicStroke(1.0f, BasicStroke.CAP_ROUND, 
-                    BasicStroke.JOIN_ROUND, 10.0f, 
-                    new float[]{ 1f, 5f, 5f }, dash_phase);
-        } else if (message instanceof ValueRequest
-                || message instanceof ValueResponse) {
-            return new BasicStroke(1.0f, BasicStroke.CAP_ROUND, 
-                    BasicStroke.JOIN_ROUND, 10.0f, 
-                    new float[]{ 5f, 5f }, dash_phase);
-        } else if (message instanceof StoreRequest
-                || message instanceof StoreResponse) {
-            return new BasicStroke(1.0f, BasicStroke.CAP_ROUND, 
-                    BasicStroke.JOIN_ROUND, 10.0f, 
-                    new float[]{ 5f, 3f }, dash_phase);
+                BasicStroke.JOIN_ROUND, 10.0f, 
+                new float[]{ 2f, 4f }, dash_phase);
         }
-        
-        return JuicePainter.DEFAULT_STROKE;
     }
 }
