@@ -1,9 +1,6 @@
 package com.ardverk.dht.io;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import org.ardverk.lang.Arguments;
 
@@ -16,8 +13,6 @@ import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 
 public class NodeRequestHandler extends AbstractRequestHandler {
-    
-    public final List<KUID> c = Collections.synchronizedList(new ArrayList<KUID>());
     
     private final RouteTable routeTable;
     
@@ -33,7 +28,6 @@ public class NodeRequestHandler extends AbstractRequestHandler {
     public void handleRequest(RequestMessage message) throws IOException {
         
         //System.out.println("REQUEST: " + message);
-        c.add(message.getContact().getId());
         
         NodeRequest request = (NodeRequest)message;
         KUID lookupId = request.getKey();

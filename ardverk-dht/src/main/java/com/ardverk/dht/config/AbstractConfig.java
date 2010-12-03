@@ -7,7 +7,7 @@ import com.ardverk.dht.routing.Contact;
 
 public abstract class AbstractConfig implements Config {
 
-    private volatile double adaptiveTimeoutMultiplier = 1.5;
+    private volatile double adaptiveTimeoutMultiplier = -1;
     
     private volatile QueueKey queueKey = QueueKey.DEFAULT;
     

@@ -27,13 +27,11 @@ public class NodeResponseHandler extends LookupResponseHandler<NodeEntity> {
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
         NodeRequest message = factory.createNodeRequest(dst, lookupId);
-        
         send(dst, message, timeout, unit);
     }
 
     @Override
     protected void complete(Outcome outcome) {
-        
         Contact[] contacts = outcome.getContacts();
         
         if (contacts.length == 0) {

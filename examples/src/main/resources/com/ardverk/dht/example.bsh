@@ -69,7 +69,7 @@ put(DHT dht, String key, String value) {
 }
 
 get(String key) {
-	get(current, key);
+	return get(current, key);
 }
 
 get(DHT dht, String key) {
@@ -83,6 +83,8 @@ get(DHT dht, String key) {
 		+ "\n SENDER: " + entity.getSender().getId()
 		+ "\n CREATOR: " + entity.getCreator().getId()
 		+ "\n TIME: " + entity.getTimeInMillis() + "ms");
+		
+	return StringUtils.toString(value);
 }
 
 kuid(String value) {
@@ -135,5 +137,20 @@ example() {
 
 	print("\nGetting a Key-Value...");
 	get("Hello");
+	
+	print("\nTry also storeLoop(count);...");
+}
+
+storeLoop(int count) {
+	for(int i = 0; i < count; i++) {
+		String key = "Key-" + i;
+		String value1 = "Value-" + i;
+		put(key, value1);
+		
+		String value2 = get(key);
+		if (!value1.equals(value2)) {
+			throw new IllegalStateException(value1 + ", " + value2);
+		}
+	}
 }
 

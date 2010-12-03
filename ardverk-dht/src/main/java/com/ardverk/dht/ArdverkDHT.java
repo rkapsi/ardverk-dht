@@ -159,7 +159,9 @@ public class ArdverkDHT extends AbstractDHT {
         AsyncProcess<NodeEntity> process 
             = new NodeResponseHandler(messageDispatcher, 
                     contacts, routeTable, lookupId, config);
-        return submit(process, config);
+        ArdverkFuture<NodeEntity> future = submit(process, config);
+        future.setAttachment(process);
+        return future;
     }
 
     @Override

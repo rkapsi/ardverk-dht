@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.io.IoUtils;
 import org.ardverk.net.NetworkUtils;
 
 import com.ardverk.dht.codec.DefaultMessageCodec;
@@ -64,8 +65,14 @@ public class ArdverkUtils {
     
     public static List<ArdverkDHT> createDHTs(int count, int port) throws IOException {
         List<ArdverkDHT> dhts = new ArrayList<ArdverkDHT>(count);
-        for (int i = 0; i < count; i++) {
-            dhts.add(createDHT(port + i));
+        
+        try {
+            for (int i = 0; i < count; i++) {
+                dhts.add(createDHT(port + i));
+            }
+        } catch (IOException err) {
+            IoUtils.closeAll(dhts);
+            throw err;
         }
         
         return dhts;
@@ -100,10 +107,10 @@ public class ArdverkUtils {
         List<ArdverkFuture<BootstrapEntity>> futures 
             = new ArrayList<ArdverkFuture<BootstrapEntity>>();
         
+        BootstrapConfig config = new DefaultBootstrapConfig();
+        config.setQueueKey(QueueKey.BACKEND);
+        
         for (int i = 0; i < length; i++) {
-            BootstrapConfig config = new DefaultBootstrapConfig();
-            config.setQueueKey(QueueKey.BACKEND);
-            
             ArdverkFuture<BootstrapEntity> future 
                 = dhts.get(offset+i).bootstrap(from, config);
             futures.add(future);
@@ -124,10 +131,10 @@ public class ArdverkUtils {
         List<ArdverkFuture<RefreshEntity>> futures 
             = new ArrayList<ArdverkFuture<RefreshEntity>>();
         
+        DefaultRefreshConfig config = new DefaultRefreshConfig();
+        config.setQueueKey(QueueKey.BACKEND);
+        
         for (int i = 0; i < length; i++) {
-            DefaultRefreshConfig config = new DefaultRefreshConfig();
-            config.setQueueKey(QueueKey.BACKEND);
-            
             config.setBucketTimeout(-1L, TimeUnit.MILLISECONDS);
             //config.setBucketTimeout(1L, TimeUnit.MINUTES);
             
