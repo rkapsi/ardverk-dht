@@ -43,6 +43,26 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
         value = new ValueRequestHandler(this, routeTable, database);
         store = new StoreRequestHandler(this, database);
     }
+    
+    public DefaultMessageHandler getDefaultHandler() {
+        return defaultHandler;
+    }
+    
+    public PingRequestHandler getPingRequestHandler() {
+        return ping;
+    }
+
+    public NodeRequestHandler getNodeRequestHandler() {
+        return node;
+    }
+    
+    public ValueRequestHandler getValueRequestHandler() {
+        return value;
+    }
+
+    public StoreRequestHandler getStoreRequestHandler() {
+        return store;
+    }
 
     @Override
     protected void handleRequest(RequestMessage request) throws IOException {

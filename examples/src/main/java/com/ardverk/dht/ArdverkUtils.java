@@ -28,7 +28,7 @@ import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
 import com.ardverk.dht.storage.DefaultDatabase;
 
-class ArdverkUtils {
+public class ArdverkUtils {
 
     private static final String SECRET_KEY = "90fb237cbec71523ba9d883a8ec6ae9f";
     private static final String INIT_VECTOR = "6fd7bda068bf2425980e5c9b1c9e2097";
@@ -128,8 +128,8 @@ class ArdverkUtils {
             DefaultRefreshConfig config = new DefaultRefreshConfig();
             config.setQueueKey(QueueKey.BACKEND);
             
-            //config.setBucketTimeout(-1L, TimeUnit.MILLISECONDS);
-            config.setBucketTimeout(1L, TimeUnit.MINUTES);
+            config.setBucketTimeout(-1L, TimeUnit.MILLISECONDS);
+            //config.setBucketTimeout(1L, TimeUnit.MINUTES);
             
             ArdverkFuture<RefreshEntity> future 
                 = dhts.get(offset + i).refresh(config);

@@ -114,7 +114,7 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
                 
                 process(packet);
             } catch (IOException err) {
-                uncaughtException(err);
+                uncaughtException(socket, err);
             }
         }
     }
@@ -136,7 +136,7 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
                 try {
                     received(src, message, 0, message.length);
                 } catch (IOException err) {
-                    uncaughtException(err);
+                    uncaughtException(socket, err);
                 }
             }
         };
@@ -163,7 +163,7 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
                 try {
                     socket.send(packet);
                 } catch (IOException err) {
-                    uncaughtException(err);
+                    uncaughtException(socket, err);
                 }
             }
         };
@@ -171,7 +171,11 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
         executor.execute(task);
     }
     
-    protected void uncaughtException(Throwable t) {
-        LOG.error("Exception", t);
+    protected void uncaughtException(DatagramSocket socket, Throwable t) {
+        if (socket.isClosed()) {
+            LOG.debug("Exception", t);
+        } else {
+            LOG.error("Exception", t);
+        }
     }
 }

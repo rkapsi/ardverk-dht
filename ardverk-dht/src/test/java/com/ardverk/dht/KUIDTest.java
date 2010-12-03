@@ -1,9 +1,13 @@
 package com.ardverk.dht;
 
+import java.util.Arrays;
+
 import junit.framework.TestCase;
 
 import org.ardverk.collection.KeyAnalyzer;
 import org.junit.Test;
+
+import com.ardverk.dht.utils.XorComparator;
 
 public class KUIDTest {
 
@@ -78,5 +82,22 @@ public class KUIDTest {
         
         int bitIndex = contactId.bitIndex(contactId);
         TestCase.assertEquals(KeyAnalyzer.NULL_BIT_KEY, bitIndex);
+    }
+    
+    @Test
+    public void isCloserTo() {
+        for (int i = 0; i < 1000000; i++) {
+        KUID lookupId = KUID.createRandom(20);
+        
+        KUID[] contacts = new KUID[] {
+            KUID.createRandom(lookupId),
+            KUID.createRandom(lookupId)
+        };
+        
+        Arrays.sort(contacts, new XorComparator(lookupId));
+        
+        TestCase.assertTrue(contacts[0].isCloserTo(lookupId, contacts[1]));
+        TestCase.assertFalse(contacts[1].isCloserTo(lookupId, contacts[0]));
+        }
     }
 }
