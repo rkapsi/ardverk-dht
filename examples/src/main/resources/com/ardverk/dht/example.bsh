@@ -28,6 +28,7 @@ import java.security.*;
 
 // Make everything accessible!
 setAccessibility(true);
+print("\nHello, please type example(); and press Enter. For further instructions and examples see 'example.bsh' and www.beanshell.org.\n");
 
 java.util.List dhts = null;
 com.ardverk.dht.DHT current = null;
