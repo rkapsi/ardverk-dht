@@ -183,7 +183,6 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
      */
     protected abstract void complete(Outcome outcome);
     
-    
     @Override
     protected final synchronized void processResponse(RequestEntity entity,
             ResponseMessage response, long time, TimeUnit unit)
