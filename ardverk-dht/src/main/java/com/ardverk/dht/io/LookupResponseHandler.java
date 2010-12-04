@@ -11,6 +11,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncFuture;
+import org.ardverk.concurrent.FutureUtils;
 import org.ardverk.lang.Arguments;
 import org.slf4j.Logger;
 
@@ -80,9 +81,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     
     @Override
     protected synchronized void done() {
-        if (boostFuture != null) {
-            boostFuture.cancel(true);
-        }
+        FutureUtils.cancel(boostFuture, true);
     }
     
     /**
