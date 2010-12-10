@@ -1,28 +1,45 @@
 package com.ardverk.dht.routing;
 
-import java.net.SocketAddress;
-
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.config.PingConfig;
 import com.ardverk.dht.entity.PingEntity;
 
-public interface RouteTable {
+public interface RouteTable extends IoErrorCallback {
     
+    /**
+     * Returns the {@link RouteTable}'s K parameter as 
+     * defined in the Kademlia specification.
+     */
     public int getK();
     
+    /**
+     * Binds the {@link RouteTable} to the given {@link ContactPinger}.
+     */
     public void bind(ContactPinger pinger);
     
+    /**
+     * Unbinds the {@link RouteTable}.
+     */
     public void unbind();
     
+    /**
+     * Returns true if the {@link RouteTable} is bound to a {@link ContactPinger}.
+     */
     public boolean isBound();
     
+    /**
+     * Returns the localhost {@link Contact}.
+     */
     public Contact getLocalhost();
     
+    /**
+     * Adds the given {@link Contact} to the {@link RouteTable}.
+     */
     public void add(Contact contact);
     
     /**
-     * 
+     * Returns a {@link Contact} for the given {@link KUID}.
      */
     public Contact get(KUID contactId);
     
@@ -32,7 +49,7 @@ public interface RouteTable {
     public Contact[] select(KUID contactId);
     
     /**
-     * Returns up to <i>count</i> number of {@link Contact}s that are
+     * Returns up to <tt>count</tt> number of {@link Contact}s that are
      * XOR bit-wise closest to the given {@link KUID}. The {@link Contact}s
      * array is ordered by closeness.
      */
@@ -43,7 +60,10 @@ public interface RouteTable {
      */
     public Bucket[] getBuckets();
     
-    public void failure(KUID contactId, SocketAddress address);
+    /**
+     * Returns the number of active {@link Contact}s in the {@link RouteTable}.
+     */
+    public int size();
     
     /**
      * Adds the given {@link RouteTableListener}.
@@ -59,8 +79,6 @@ public interface RouteTable {
      * Returns all {@link RouteTableListener}s.
      */
     public RouteTableListener[] getRouteTableListeners();
-    
-    public int size();
     
     /**
      * A callback interface the {@link RouteTable} uses to send 

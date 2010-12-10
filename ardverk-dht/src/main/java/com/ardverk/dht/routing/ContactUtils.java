@@ -1,6 +1,7 @@
 package com.ardverk.dht.routing;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.concurrent.TimeUnit;
 
@@ -72,5 +73,35 @@ public class ContactUtils {
             contacts[i] = entities[offset + i].getContact();
         }
         return contacts;
+    }
+    
+    /**
+     * Returns the least recently seen {@link ContactEntity} in the 
+     * given {@link Collection}.
+     */
+    public static ContactEntity getLeastRecentlySeen(
+            Collection<? extends ContactEntity> entities) {
+        ContactEntity lrs = null;
+        for (ContactEntity entity : entities) {
+            if (lrs == null || entity.getTimeStamp() < lrs.getTimeStamp()) {
+                lrs = entity;
+            }
+        }
+        return lrs;
+    }
+    
+    /**
+     * Returns the most recently seen {@link ContactEntity} in the 
+     * given {@link Collection}.
+     */
+    public static ContactEntity getMostRecentlySeen(
+            Collection<? extends ContactEntity> entities) {
+        ContactEntity mrs = null;
+        for (ContactEntity entity : entities) {
+            if (mrs == null || entity.getTimeStamp() >= mrs.getTimeStamp()) {
+                mrs = entity;
+            }
+        }
+        return mrs;
     }
 }

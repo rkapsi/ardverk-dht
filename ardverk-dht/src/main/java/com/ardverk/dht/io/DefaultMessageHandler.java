@@ -46,7 +46,7 @@ public class DefaultMessageHandler implements MessageCallback {
         KUID contactId = entity.getContactId();
         SocketAddress address = entity.getAddress();
         
-        routeTable.failure(contactId, address);
+        routeTable.handleIoError(contactId, address);
     }
 
     @Override
