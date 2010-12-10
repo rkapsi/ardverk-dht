@@ -7,8 +7,8 @@ import org.ardverk.concurrent.AsyncProcess;
 
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.config.Config;
-import com.ardverk.dht.config.LookupConfig;
 import com.ardverk.dht.config.GetConfig;
+import com.ardverk.dht.config.LookupConfig;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.routing.Contact;

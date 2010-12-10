@@ -2,6 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="ardverk-dht/src/main/java"/>
 	<classpathentry kind="src" path="ardverk-dht/src/test/java"/>
+	<classpathentry kind="src" path="tools/src/main/java"/>
 	<classpathentry kind="src" path="examples/src/main/java"/>
 	<classpathentry kind="src" path="examples/src/main/resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>

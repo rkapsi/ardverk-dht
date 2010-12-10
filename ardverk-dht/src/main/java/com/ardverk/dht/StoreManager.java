@@ -1,5 +1,6 @@
 package com.ardverk.dht;
 
+
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.AsyncProcess;
@@ -20,7 +21,7 @@ import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.DefaultValueTuple;
 import com.ardverk.dht.storage.ValueTuple;
 
-class StoreManager {
+public class StoreManager {
 
     private final DHT dht;
     
@@ -28,7 +29,7 @@ class StoreManager {
     
     private final MessageDispatcher messageDispatcher;
     
-    public StoreManager(DHT dht, RouteTable routeTable, 
+    StoreManager(DHT dht, RouteTable routeTable, 
             MessageDispatcher messageDispatcher) {
         this.dht = dht;
         this.routeTable = routeTable;
@@ -131,13 +132,20 @@ class StoreManager {
         return store(dst, key, value, config);
     }
     
-    private ArdverkFuture<StoreEntity> store(Contact[] dst, 
+    public ArdverkFuture<StoreEntity> store(Contact[] dst, 
             KUID key, byte[] value, StoreConfig config) {
         
-        int k = routeTable.getK();
-        
         Contact localhost = dht.getLocalhost();
-        ValueTuple valueTuple = new DefaultValueTuple(localhost, key, value);
+        ValueTuple valueTuple = new DefaultValueTuple(
+                localhost, key, value);
+        
+        return store(dst, valueTuple, config);
+    }
+    
+    public ArdverkFuture<StoreEntity> store(Contact[] dst, 
+            ValueTuple valueTuple, StoreConfig config) {
+        
+        int k = routeTable.getK();
         
         AsyncProcess<StoreEntity> process 
             = new StoreResponseHandler(messageDispatcher, 

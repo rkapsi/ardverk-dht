@@ -28,14 +28,15 @@ import com.ardverk.dht.config.PingConfig;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.lang.Identifier;
 import com.ardverk.dht.logging.LoggerUtils;
+import com.ardverk.dht.utils.ContactKey;
 
 public class DefaultRouteTable extends AbstractRouteTable {
     
     private static final Logger LOG 
         = LoggerUtils.getLogger(DefaultRouteTable.class);
     
-    private final Map<PingKey, ArdverkFuture<PingEntity>> pingFutures 
-        = new HashMap<PingKey, ArdverkFuture<PingEntity>>();
+    private final Map<ContactKey, ArdverkFuture<PingEntity>> pingFutures 
+        = new HashMap<ContactKey, ArdverkFuture<PingEntity>>();
     
     private final RouteTableConfig config;
     
@@ -457,7 +458,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         // Make sure we're not pinging the same host in parallel.
         // It is an unlikely but possible case...
-        final PingKey pingKey = new PingKey(contact);
+        final ContactKey pingKey = new ContactKey(contact);
         ArdverkFuture<PingEntity> future 
             = pingFutures.get(pingKey);
         
@@ -945,43 +946,6 @@ public class DefaultRouteTable extends AbstractRouteTable {
             }
             
             return new DefaultBucket[] { left, right };
-        }
-    }
-    
-    /**
-     * The {@link PingKey} is used to keep track of PING request 
-     * we're sending out.
-     * 
-     * Its purpose is to prevent us from sending parallel PINGs 
-     * to the same host.
-     */
-    private static class PingKey {
-        
-        private final KUID contactId;
-        
-        private final SocketAddress address;
-        
-        public PingKey(Contact contact) {
-            this.contactId = contact.getId();
-            this.address = contact.getRemoteAddress();
-        }
-        
-        @Override
-        public int hashCode() {
-            return 31*contactId.hashCode() + address.hashCode();
-        }
-        
-        @Override
-        public boolean equals(Object o) {
-            if (o == this) {
-                return true;
-            } else if (!(o instanceof PingKey)) {
-                return false;
-            }
-            
-            PingKey other = (PingKey)o;
-            return contactId.equals(other.contactId) 
-                    && address.equals(other.address);
         }
     }
 }

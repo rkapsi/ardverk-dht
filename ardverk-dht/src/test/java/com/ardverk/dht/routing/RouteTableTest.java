@@ -118,6 +118,22 @@ public class RouteTableTest {
         TestCase.assertEquals(2, routeTable.getBuckets().length);
     }
     
+    @Test
+    public void select() {
+        Contact localhost = createLocalhost();
+        DefaultRouteTable routeTable = createRouteTable(localhost);
+        
+        while (routeTable.size() < routeTable.getK()) {
+            Contact contact = createContact();
+            routeTable.add(contact);
+        }
+        
+        Contact[] contacts = routeTable.select(localhost.getId());
+        TestCase.assertEquals(routeTable.getK(), contacts.length);
+        
+        TestCase.assertEquals(localhost, contacts[0]);
+    }
+    
     private static DefaultRouteTable createRouteTable() {
         Contact localhost = createLocalhost();
         return createRouteTable(localhost);

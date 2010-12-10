@@ -38,6 +38,8 @@ public class ArdverkDHT extends AbstractDHT {
     
     private final StoreManager storeManager;
     
+    private final SyncManager syncManager;
+    
     private final RouteTable routeTable;
     
     private final Database database;
@@ -55,7 +57,10 @@ public class ArdverkDHT extends AbstractDHT {
         
         bootstrapManager = new BootstrapManager(this);
         routeTableManager = new RouteTableManager(this, routeTable);
-        storeManager = new StoreManager(this, routeTable, messageDispatcher);
+        storeManager = new StoreManager(this, routeTable, 
+                messageDispatcher);
+        syncManager = new SyncManager(this, 
+                storeManager, routeTable, database);
         
         routeTable.bind(new RouteTable.ContactPinger() {
             @Override
@@ -90,6 +95,14 @@ public class ArdverkDHT extends AbstractDHT {
     @Override
     public MessageDispatcher getMessageDispatcher() {
         return messageDispatcher;
+    }
+    
+    public StoreManager getStoreManager() {
+        return storeManager;
+    }
+    
+    public SyncManager getSyncManager() {
+        return syncManager;
     }
 
     @Override

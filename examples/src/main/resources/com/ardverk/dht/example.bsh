@@ -154,3 +154,9 @@ storeLoop(int count) {
 	}
 }
 
+sync() {
+	for (DHT dht : dhts) {
+		((ArdverkDHT)dht).getSyncManager().sync(new DefaultSyncConfig());
+	}
+}
+
