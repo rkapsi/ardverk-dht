@@ -86,18 +86,32 @@ public class KUIDTest {
     
     @Test
     public void isCloserTo() {
-        for (int i = 0; i < 1000000; i++) {
-        KUID lookupId = KUID.createRandom(20);
-        
-        KUID[] contacts = new KUID[] {
-            KUID.createRandom(lookupId),
-            KUID.createRandom(lookupId)
-        };
-        
-        Arrays.sort(contacts, new XorComparator(lookupId));
-        
-        TestCase.assertTrue(contacts[0].isCloserTo(lookupId, contacts[1]));
-        TestCase.assertFalse(contacts[1].isCloserTo(lookupId, contacts[0]));
+        for (int i = 0; i < 1000; i++) {
+            KUID lookupId = KUID.createRandom(20);
+            
+            KUID[] contacts = new KUID[] {
+                KUID.createRandom(lookupId),
+                KUID.createRandom(lookupId)
+            };
+            
+            Arrays.sort(contacts, new XorComparator(lookupId));
+            
+            TestCase.assertTrue(contacts[0].isCloserTo(lookupId, contacts[1]));
+            TestCase.assertFalse(contacts[1].isCloserTo(lookupId, contacts[0]));
+        }
+    }
+    
+    @Test
+    public void commonPrefix() {
+        for (int i = 0; i < 1000; i++) {
+            
+            KUID a = KUID.createRandom(20);
+            
+            int bits = (int)(a.lengthInBits() * Math.random());
+            KUID b = KUID.createWithPrefix(a, bits);
+            
+            int common = a.commonPrefix(b);
+            TestCase.assertTrue(common + " < " + bits, common >= bits);
         }
     }
 }

@@ -12,7 +12,6 @@ import org.ardverk.coding.CodingUtils;
 import org.ardverk.collection.Key;
 import org.ardverk.collection.KeyAnalyzer;
 import org.ardverk.io.Writable;
-import org.ardverk.lang.NullArgumentException;
 import org.ardverk.security.SecurityUtils;
 
 import com.ardverk.dht.lang.Identifier;
@@ -32,46 +31,67 @@ public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>,
     
     private static final int MSB = 1 << Byte.SIZE-1;
     
+    /**
+     * Creates and returns a random {@link KUID} of the given length in bytes.
+     */
     public static KUID createRandom(int length) {
         byte[] key = new byte[length];
         GENERATOR.nextBytes(key);
         return new KUID(key);
     }
     
+    /**
+     * Creates and returns a random {@link KUID} of the same 
+     * length as the given {@link KUID}.
+     */
     public static KUID createRandom(KUID otherId) {
         return createRandom(otherId.length());
     }
     
+    /**
+     * Creates and returns a {@link KUID} from the given bytes.
+     */
     public static KUID create(byte[] key) {
         return new KUID(key);
     }
     
+    /**
+     * Creates and returns a {@link KUID} from the given bytes.
+     */
     public static KUID create(byte[] key, int offset, int length) {
         byte[] copy = new byte[length];
         System.arraycopy(key, 0, copy, 0, copy.length);
         return new KUID(copy);
     }
     
-    public static KUID create(BigInteger key) {
-        return create(key.toByteArray());
+    /**
+     * Creates and returns a {@link KUID} from a hex string.
+     */
+    public static KUID createWithHexString(String key) {
+        byte[] data = CodingUtils.decodeBase16(key);
+        return create(data);
     }
     
-    public static KUID create(String key, int radix) {
-        return create(new BigInteger(key, radix));
-    }
-    
-    public static KUID createWithPrefix(KUID prefix, int bits) {
+    /**
+     * Creates and returns a random {@link KUID} that has the same
+     * prefix as the given {@link KUID}.
+     * 
+     * NOTE: The bitIndex is counted 0 through n and is inclusive.
+     * If you want the first three (3) bits to be the same then
+     * pass two (2) as an argument (0 through 2 inclusive is 3).
+     */
+    public static KUID createWithPrefix(KUID prefix, int bitIndex) {
         // 1) Create a random KUID of the same length
         byte[] dst = new byte[prefix.length()];
         GENERATOR.nextBytes(dst);
         
         // 2) Overwrite the prefix bytes
-        ++bits;
-        int length = bits/8;
+        ++bitIndex;
+        int length = bitIndex/8;
         System.arraycopy(prefix.key, 0, dst, 0, length);
         
         // 3) Overwrite the remaining bits
-        int bitsToCopy = bits % 8;
+        int bitsToCopy = bitIndex % 8;
         if (bitsToCopy != 0) {
             // Mask has the low-order (8-bits) bits set
             int mask = (1 << (8-bitsToCopy)) - 1;
@@ -152,12 +172,12 @@ public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>,
     }
     
     @Override
-    public int bitIndex(KUID otherKey) {
-        int lengthInBits = lengthInBits();
-        if (lengthInBits() != otherKey.lengthInBits()) {
-            throw new IllegalArgumentException("otherKey=" + otherKey);
+    public int bitIndex(KUID otherId) {
+        if (!isCompatible(otherId)) {
+            throw new IllegalArgumentException("otherKey=" + otherId);            
         }
         
+        int lengthInBits = lengthInBits();
         boolean allNull = true;
         for (int i = 0; i < lengthInBits; i++) {
             boolean value = isBitSet(i);
@@ -166,7 +186,7 @@ public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>,
                 allNull = false;
             }
             
-            boolean otherValue = otherKey.isBitSet(i);
+            boolean otherValue = otherId.isBitSet(i);
             if (value != otherValue) {
                 return i;
             }
@@ -286,52 +306,22 @@ public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>,
         return this;
     }
     
+    /**
+     * Returns the number of bits the two {@link KUID}s have in common.
+     */
     public int commonPrefix(KUID otherId) {
-        return commonPrefix(otherId, 0, lengthInBits());
-    }
-    
-    public int commonPrefix(KUID otherId, int offsetInBits, int length) {
-        if (otherId == null) {
-            throw new NullArgumentException("otherId");
-        }
-        
-        int lengthInBits = lengthInBits();
-        if (offsetInBits < 0 || length < 0 
-                || lengthInBits < (offsetInBits+length)) {
-            throw new IllegalArgumentException(
-                    "offsetInBits=" + offsetInBits + ", length=" + length);
-        }
-        
-        if (lengthInBits != otherId.lengthInBits()) {
-            throw new IllegalArgumentException("otherId=" + otherId);
-        }
-        
-        if (otherId != this) {
-            int index = (int)(offsetInBits / Byte.SIZE);
-            int bit = offsetInBits % Byte.SIZE;
-            
-            int bitIndex = 0;
-            for (int i = index; i < key.length && bitIndex < length; i++) {
-                int value = (int)(key[i] ^ otherId.key[i]);
-                
-                // A short cut we can take...
-                if (value == 0 && (bit == 0 || i != index) && i < (key.length-1)) {
-                    bitIndex += Byte.SIZE;
-                    continue;
-                }
-                
-                for (int j = (i == index ? bit : 0); j < Byte.SIZE 
-                        && bitIndex < length; j++) {
-                    if ((value & (0x80 >>> j)) != 0) {
-                        return offsetInBits + bitIndex;
-                    }
-                    
-                    ++bitIndex;
-                }
+        int bitIndex = bitIndex(otherId);
+        if (bitIndex < 0) {
+            switch (bitIndex) {
+                case KeyAnalyzer.EQUAL_BIT_KEY:
+                case KeyAnalyzer.NULL_BIT_KEY:
+                    return lengthInBits();
+                default:
+                    throw new IllegalStateException("bitIndex=" + bitIndex);
             }
         }
         
-        return offsetInBits + length;
+        return bitIndex;
     }
     
     /**
@@ -370,7 +360,7 @@ public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>,
     }
     
     /**
-     * 
+     * Compares the {@link KUID}s by their XOR distance.
      */
     public int compareTo(KUID key, KUID otherId) {
         return xor(key).compareTo(otherId.xor(key));
@@ -378,11 +368,11 @@ public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>,
     
     @Override
     public int compareTo(KUID otherId) {
-        int length = length();
-        if (length != otherId.length()) {
+        if (!isCompatible(otherId)) {
             throw new IllegalArgumentException("otherId=" + otherId);
         }
         
+        int length = length();
         for (int i = 0; i < length; i++) {
             int diff = (int)(key[i] & 0xFF) - (int)(otherId.key[i] & 0xFF);
             if (diff != 0) {
