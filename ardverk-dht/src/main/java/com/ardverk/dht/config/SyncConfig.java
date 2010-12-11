@@ -1,6 +1,6 @@
 package com.ardverk.dht.config;
 
-public interface SyncConfig extends Config {
+public interface SyncConfig {
 
     public PingConfig getPingConfig();
     

@@ -23,13 +23,13 @@ import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.utils.IdentifierUtils;
 
-class RouteTableManager {
+public class RouteTableManager {
 
     private final DHT dht;
     
     private final RouteTable routeTable;
     
-    public RouteTableManager(DHT dht, RouteTable routeTable) {
+    RouteTableManager(DHT dht, RouteTable routeTable) {
         this.dht = dht;
         this.routeTable = routeTable;
     }

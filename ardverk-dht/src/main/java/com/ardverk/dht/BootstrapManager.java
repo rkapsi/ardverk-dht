@@ -19,11 +19,11 @@ import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.routing.Contact;
 
-class BootstrapManager {
+public class BootstrapManager {
 
     private final DHT dht;
     
-    public BootstrapManager(DHT dht) {
+    BootstrapManager(DHT dht) {
         this.dht = dht;
     }
     

@@ -18,10 +18,10 @@ import com.ardverk.dht.concurrent.ArdverkValueFuture;
 import com.ardverk.dht.config.PingConfig;
 import com.ardverk.dht.config.StoreConfig;
 import com.ardverk.dht.config.SyncConfig;
-import com.ardverk.dht.entity.AbstractEntity;
-import com.ardverk.dht.entity.Entity;
+import com.ardverk.dht.entity.DefaultSyncEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.StoreEntity;
+import com.ardverk.dht.entity.SyncEntity;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
@@ -29,6 +29,11 @@ import com.ardverk.dht.storage.ValueTuple;
 import com.ardverk.dht.utils.ContactKey;
 
 public class SyncManager {
+    
+    private static enum Sync {
+        STORE_VALUE,
+        SKIP_VALUE;
+    }
     
     private final DHT dht;
     
@@ -76,18 +81,32 @@ public class SyncManager {
                 KUID valueId = tuple.getId();
                 Contact[] contacts = routeTable.select(valueId);
                 
-                // 
+                // Skip all values for which we're not in the k-closest.
+                // This can happen in caching scenarios!
                 int index = ArrayUtils.indexOf(localhost, contacts);
                 if (index == -1) {
                     continue;
                 }
                 
+                // This is a bit tricky: We're sending a PING to the Contacts
+                // 0 through index. NOTE: The Contact at contacts[index] is the
+                // localhost! The idea is that any of these Contacts is better
+                // suited to do this sync operation because they're closer to
+                // the value's KUID. We're therefore sending them PINGs to check
+                // if they're alive. If they are we're simply skipping the value
+                // and assume they'll take care of the value.
+                //
+                // SPECIAL CASE: Let index be 0 (i.e. we're the closest Contact).
+                // In this case we're actually never sending any PINGs because
+                // we're already the closest Contact and PingFuture is acting
+                // just as a proxy.
+                
                 PingFuture pingFuture = ping(futures, contacts, index, pingConfig);
                 pingCounter.incrementAndGet();
                 
-                pingFuture.addAsyncFutureListener(new AsyncFutureListener<Boolean>() {
+                pingFuture.addAsyncFutureListener(new AsyncFutureListener<Sync>() {
                     @Override
-                    public void operationComplete(AsyncFuture<Boolean> future) {
+                    public void operationComplete(AsyncFuture<Sync> future) {
                         synchronized (lock) {
                             try {
                                 process(future);
@@ -97,19 +116,19 @@ public class SyncManager {
                         }
                     }
                     
-                    private void process(AsyncFuture<Boolean> future) 
+                    private void process(AsyncFuture<Sync> future) 
                             throws InterruptedException, ExecutionException {
                         try {
                             if (!future.isCancelled()) {
                                 handleValue(future.get());
                             }
                         } finally {
-                            postProcess(pingCounter);
+                            countdown(pingCounter);
                         }
                     }
                     
-                    private void handleValue(boolean store) {
-                        if (!store) {
+                    private void handleValue(Sync operation) {
+                        if (operation != Sync.STORE_VALUE) {
                             return;
                         }
                         
@@ -124,7 +143,7 @@ public class SyncManager {
                                     try {
                                         storeFutures.add((ArdverkFuture<StoreEntity>)future);
                                     } finally {
-                                        postProcess(storeCounter);
+                                        countdown(storeCounter);
                                     }
                                 }
                             }
@@ -135,7 +154,7 @@ public class SyncManager {
                         userFuture.setException(t);
                     }
                     
-                    private void postProcess(AtomicInteger counter) {
+                    private void countdown(AtomicInteger counter) {
                         assert (Thread.holdsLock(lock));
                         counter.decrementAndGet();
                         
@@ -166,7 +185,8 @@ public class SyncManager {
                 }
             });
             
-            if (pingCounter.get() == 0 && storeCounter.get() == 0) {
+            if (pingCounter.get() == 0 
+                    && storeCounter.get() == 0) {
                 long time = System.currentTimeMillis() - startTime;
                 userFuture.setValue(new DefaultSyncEntity(time, TimeUnit.MILLISECONDS));
             }
@@ -180,9 +200,10 @@ public class SyncManager {
         Contact[] contacts = routeTable.select(localhost.getId());
         assert (localhost.equals(contacts[0]));
         
-        Contact[] dst = new Contact[contacts.length];
-        System.arraycopy(contacts, 1, dst, 0, dst.length);
+        //Contact[] dst = new Contact[contacts.length-1];
+        //System.arraycopy(contacts, 1, dst, 0, dst.length);
         
+        Contact[] dst = contacts;
         return storeManager.store(dst, tuple, storeConfig);
     }
     
@@ -205,17 +226,20 @@ public class SyncManager {
             pingFutures.add(future);
         }
         
-        return new PingFuture(pingFutures);
+        return new PingFuture(pingFutures, toIndex);
     }
     
-    private static class PingFuture extends ArdverkValueFuture<Boolean> {
+    private static class PingFuture extends ArdverkValueFuture<Sync> {
         
         private final AtomicInteger countdown = new AtomicInteger();
         
         private final List<ArdverkFuture<PingEntity>> futures;
         
-        private PingFuture(List<ArdverkFuture<PingEntity>> futures) {
+        private final int index;
+        
+        private PingFuture(List<ArdverkFuture<PingEntity>> futures, int index) {
             this.futures = futures;
+            this.index = index;
             
             countdown.set(futures.size());
             
@@ -251,40 +275,15 @@ public class SyncManager {
         }
         
         private void complete() {
-            boolean doStore = true;
+            boolean store = true;
             for (ArdverkFuture<PingEntity> future : futures) {
                 if (!future.isCompletedAbnormally()) {
-                    doStore = false;
+                    store = false;
                     break;
                 }
             }
-            setValue(doStore);
-        }
-    }
-    
-    private static interface SyncEntity extends Entity {
-        
-        public ArdverkFuture<StoreEntity>[] getStoreFutures();
-    }
-    
-    private static class DefaultSyncEntity extends AbstractEntity implements SyncEntity {
-
-        private final ArdverkFuture<StoreEntity>[] futures;
-        
-        @SuppressWarnings("unchecked")
-        public DefaultSyncEntity(long time, TimeUnit unit) {
-            this(new ArdverkFuture[0], time, unit);
-        }
-        
-        public DefaultSyncEntity(ArdverkFuture<StoreEntity>[] futures, 
-                long time, TimeUnit unit) {
-            super(time, unit);
-            this.futures = futures;
-        }
-
-        @Override
-        public ArdverkFuture<StoreEntity>[] getStoreFutures() {
-            return futures;
+            
+            setValue((store || index == 0) ? Sync.STORE_VALUE : Sync.SKIP_VALUE);
         }
     }
 }

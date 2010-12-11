@@ -41,4 +41,9 @@ public class ContactKey {
         return contactId.equals(other.contactId) 
                 && address.equals(other.address);
     }
+    
+    @Override
+    public String toString() {
+        return contactId + "/" + address;
+    }
 }

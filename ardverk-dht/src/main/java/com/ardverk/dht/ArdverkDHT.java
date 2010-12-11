@@ -14,11 +14,13 @@ import com.ardverk.dht.config.PingConfig;
 import com.ardverk.dht.config.PutConfig;
 import com.ardverk.dht.config.RefreshConfig;
 import com.ardverk.dht.config.StoreConfig;
+import com.ardverk.dht.config.SyncConfig;
 import com.ardverk.dht.entity.BootstrapEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.RefreshEntity;
 import com.ardverk.dht.entity.StoreEntity;
+import com.ardverk.dht.entity.SyncEntity;
 import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.io.DefaultMessageDispatcher;
 import com.ardverk.dht.io.MessageDispatcher;
@@ -97,6 +99,14 @@ public class ArdverkDHT extends AbstractDHT {
         return messageDispatcher;
     }
     
+    public BootstrapManager getBootstrapManager() {
+        return bootstrapManager;
+    }
+
+    public RouteTableManager getRouteTableManager() {
+        return routeTableManager;
+    }
+
     public StoreManager getStoreManager() {
         return storeManager;
     }
@@ -195,5 +205,12 @@ public class ArdverkDHT extends AbstractDHT {
     public ArdverkFuture<StoreEntity> store(
             Contact[] dst, KUID key, byte[] value, StoreConfig config) {
         return storeManager.put(dst, key, value, config);
+    }
+    
+    /**
+     * 
+     */
+    public ArdverkFuture<SyncEntity> sync(SyncConfig config) {
+        return syncManager.sync(config);
     }
 }

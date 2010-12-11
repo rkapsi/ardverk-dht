@@ -1,20 +1,17 @@
 package com.ardverk.dht.config;
 
-import java.util.concurrent.TimeUnit;
-
 import com.ardverk.dht.QueueKey;
 
-public class DefaultSyncConfig extends AbstractConfig implements SyncConfig {
+public class DefaultSyncConfig implements SyncConfig {
 
     private volatile PingConfig pingConfig = new DefaultPingConfig();
     
     private volatile StoreConfig storeConfig = new DefaultStoreConfig();
     
-    @Override
-    public void setQueueKey(QueueKey queueKey) {
-        super.setQueueKey(queueKey);
-        pingConfig.setQueueKey(queueKey);
-        storeConfig.setQueueKey(queueKey);
+    // INIT
+    {
+        pingConfig.setQueueKey(QueueKey.BACKEND);
+        storeConfig.setQueueKey(QueueKey.BACKEND);
     }
     
     @Override
@@ -35,15 +32,5 @@ public class DefaultSyncConfig extends AbstractConfig implements SyncConfig {
     @Override
     public void setStoreConfig(StoreConfig storeConfig) {
         this.storeConfig = storeConfig;
-    }
-
-    @Override
-    public void setOperationTimeout(long timeout, TimeUnit unit) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public long getOperationTimeout(TimeUnit unit) {
-        return ConfigUtils.getOperationTimeout(new Config[] { pingConfig, storeConfig }, unit);
     }
 }
