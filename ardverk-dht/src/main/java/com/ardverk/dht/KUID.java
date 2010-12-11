@@ -269,7 +269,7 @@ public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>,
         int index = (int)(bitIndex / Byte.SIZE);
         int bit = (int)(bitIndex % Byte.SIZE);
         
-        int mask = (int)(0x80 >>> bit);
+        int mask = mask(bit);
         int value = (int)(key[index] & 0xFF);
         
         if (on != ((value & mask) != 0x00)) {
@@ -335,55 +335,30 @@ public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>,
     }
     
     /**
-     * Returns true if all bits of the {@link KUID} are zero
+     * Returns {@code true} if all bits of the {@link KUID} are zero
      */
     public boolean isMin() {
-        int lengthInBits = lengthInBits();
-        return compare(0x00, 0, lengthInBits) == lengthInBits;
+        return compare((byte)0x00);
     }
     
     /**
-     * Returns true if all bits of the {@link KUID} are one
+     * Returns {@code true} if all bits of the {@link KUID} are one
      */
     public boolean isMax() {
-        int lengthInBits = lengthInBits();
-        return compare(0xFF, 0, lengthInBits) == lengthInBits;
+        return compare((byte)0xFF);
     }
     
-    private int compare(int expected, int offsetInBits, int length) {
-        
-        int lengthInBits = lengthInBits();
-        if (offsetInBits < 0 || length < 0 
-                || lengthInBits < (offsetInBits + length)) {
-            throw new IllegalArgumentException(
-                    "offsetInBits=" + offsetInBits + ", length=" + length);
-        }
-        
-        int index = (int)(offsetInBits / Byte.SIZE);
-        int bit = offsetInBits % Byte.SIZE;
-        
-        int bitIndex = 0;
-        for (int i = 0; i < key.length && bitIndex < length; i++) {
-            int value = (key[i] & 0xFF) ^ expected;
-            
-            // A shortcut we can take...
-            if (value == 0 && (bit == 0 || i != index)) {
-                bitIndex += Byte.SIZE;
-                continue;
-            }
-            
-            for (int j = (i == index ? bit : 0); 
-                    j < Byte.SIZE && bitIndex < length; j++) {
-                
-                if ((value & (0x80 >>> j)) != 0) {
-                    return offsetInBits + bitIndex;
-                }
-                
-                ++bitIndex;
+    /**
+     * Returns {@code true} if the {@link KUID}'s bytes have 
+     * all the given expected value.
+     */
+    private boolean compare(byte expected) {
+        for (int i = 0; i < key.length; i++) {
+            if (expected != key[i]) {
+                return false;
             }
         }
-        
-        return offsetInBits + length;
+        return true;
     }
     
     /**
@@ -403,55 +378,15 @@ public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>,
     
     @Override
     public int compareTo(KUID otherId) {
-        return compareTo(otherId, 0, lengthInBits());
-    }
-
-    public int compareTo(KUID otherId, int offsetInBits, int length) {
-        if (otherId == null) {
-            throw new NullArgumentException("otherId");
+        int length = length();
+        if (length != otherId.length()) {
+            throw new IllegalArgumentException("otherId=" + otherId);
         }
         
-        int lengthInBits = lengthInBits();
-        if (offsetInBits < 0 || length < 0 
-                || lengthInBits < (offsetInBits + length)) {
-            throw new IllegalArgumentException(
-                    "offsetInBits=" + offsetInBits + ", length=" + length);
-        }
-        
-        if (otherId.lengthInBits() != lengthInBits) {
-            throw new IllegalArgumentException();
-        }
-        
-        if (otherId != this) {
-            int index = (int)(offsetInBits / Byte.SIZE);
-            int bit = offsetInBits % Byte.SIZE;
-            
-            int bitIndex = 0;
-            int mask, diff;
-            byte value1, value2;
-            
-            for (int i = index; i < key.length && bitIndex < length; i++) {
-                
-                value1 = key[i];
-                value2 = otherId.key[i];
-                
-                // A shot cut we can take...
-                if (value1 == value2 && (bit == 0 || i != index)) {
-                    bitIndex += Byte.SIZE;
-                    continue;
-                }
-                
-                for (int j = (i == index ? bit : 0); 
-                        j < Byte.SIZE && bitIndex < length; j++) {
-                    mask = 0x80 >>> j;
-                    diff = (value1 & mask) - (value2 & mask);
-                    
-                    if (diff != 0) {
-                        return diff;
-                    }
-                    
-                    ++bitIndex;
-                }
+        for (int i = 0; i < length; i++) {
+            int diff = (int)(key[i] & 0xFF) - (int)(otherId.key[i] & 0xFF);
+            if (diff != 0) {
+                return diff;
             }
         }
         
@@ -482,10 +417,6 @@ public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>,
     
     @Override
     public int write(OutputStream out) throws IOException {
-        if (out == null) {
-            throw new NullArgumentException("out");
-        }
-        
         out.write(key);
         return length();
     }
