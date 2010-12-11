@@ -387,11 +387,18 @@ public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>,
     }
     
     /**
-     * Returns true if this {@link KUID} is closer in terms of XOR distance
-     * to the given key than the other {@link KUID} is to the key.
+     * Returns {@code true} if this {@link KUID} is closer in terms of XOR 
+     * distance to the given key than the other {@link KUID} is to the key.
      */
     public boolean isCloserTo(KUID key, KUID otherId) {
-        return xor(key).compareTo(key.xor(otherId)) < 0;
+        return compareTo(key, otherId) < 0;
+    }
+    
+    /**
+     * 
+     */
+    public int compareTo(KUID key, KUID otherId) {
+        return xor(key).compareTo(otherId.xor(key));
     }
     
     @Override

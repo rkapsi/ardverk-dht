@@ -16,6 +16,7 @@ import com.ardverk.dht.message.StoreRequest;
 import com.ardverk.dht.message.ValueRequest;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
+import com.ardverk.dht.storage.StoreForward;
 
 public class DefaultMessageDispatcher extends MessageDispatcher {
 
@@ -33,11 +34,11 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
     private final StoreRequestHandler store;
     
     public DefaultMessageDispatcher(MessageFactory factory, 
-            MessageCodec codec, RouteTable routeTable, 
-            Database database) {
+            MessageCodec codec, StoreForward storeForward, 
+            RouteTable routeTable, Database database) {
         super(factory, codec);
         
-        defaultHandler = new DefaultMessageHandler(routeTable);
+        defaultHandler = new DefaultMessageHandler(storeForward, routeTable);
         ping = new PingRequestHandler(this);
         node = new NodeRequestHandler(this, routeTable);
         value = new ValueRequestHandler(this, routeTable, database);

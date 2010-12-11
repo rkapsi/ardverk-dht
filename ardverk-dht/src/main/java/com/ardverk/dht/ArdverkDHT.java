@@ -31,6 +31,8 @@ import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
+import com.ardverk.dht.storage.StoreForward;
+import com.ardverk.dht.storage.ValueTuple;
 
 public class ArdverkDHT extends AbstractDHT {
     
@@ -54,8 +56,20 @@ public class ArdverkDHT extends AbstractDHT {
         this.routeTable = routeTable;
         this.database = database;
         
+        StoreForward.Callback callback = new StoreForward.Callback() {
+            @Override
+            public ArdverkFuture<StoreEntity> store(Contact dst, 
+                    ValueTuple valueTuple, StoreConfig config) {
+                return storeManager.store(new Contact[] { dst }, valueTuple, config);
+            }
+        };
+        
+        StoreForward storeForward = new StoreForward(
+                callback, routeTable, database);
+        
         messageDispatcher = new DefaultMessageDispatcher(
-                messageFactory, codec, routeTable, database);
+                messageFactory, codec, storeForward, 
+                routeTable, database);
         
         bootstrapManager = new BootstrapManager(this);
         routeTableManager = new RouteTableManager(this, routeTable);
