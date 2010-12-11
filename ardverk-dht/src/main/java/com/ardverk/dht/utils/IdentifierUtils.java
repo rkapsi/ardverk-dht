@@ -57,6 +57,16 @@ public class IdentifierUtils {
         return values;
     }
     
+    /**
+     * Returns {@code true} if the first {@link Identifier} is XOR distance 
+     * wise closer to the given {@link KUID} than the other {@link Identifier}.
+     * 
+     * @see KUID#isCloserTo(KUID, KUID)
+     */
+    public static boolean isCloserTo(Identifier identifier, KUID valueId, Identifier other) {
+        return identifier.getId().isCloserTo(valueId, other.getId());
+    }
+    
     private static class ValueRef<T extends Identifier> {
         
         private final T value;

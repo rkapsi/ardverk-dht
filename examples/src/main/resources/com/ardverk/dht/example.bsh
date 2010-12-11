@@ -160,3 +160,32 @@ sync() {
 	}
 }
 
+java.util.List nu = null;
+forward(int count, int port) {
+	nu = create(count, port);
+	nu.get(0).ping("localhost", 2000, new DefaultPingConfig());
+	createUI(nu.get(0));
+	ArdverkUtils.bootstrap(nu);
+}
+
+node(String hex) {
+	KUID id = KUID.createWithHexString(hex);
+	if (dhts != null) {
+		for (DHT dht : dhts) {
+			if (dht.getLocalhost().getId().equals(id)) {
+				return dht;
+			}
+		}
+	}
+	
+	if (nu != null) {
+		for (DHT dht : nu) {
+			if (dht.getLocalhost().getId().equals(id)) {
+				return dht;
+			}
+		}
+	}
+	
+	return null;
+}
+

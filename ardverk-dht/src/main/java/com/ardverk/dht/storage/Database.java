@@ -18,6 +18,8 @@ public interface Database {
         public boolean isSuccess();
     }
     
+    public DatabaseConfig getDatabaseConfig();
+    
     /**
      * Stores the given {@link ValueTuple} and returns a {@link Condition}.
      */

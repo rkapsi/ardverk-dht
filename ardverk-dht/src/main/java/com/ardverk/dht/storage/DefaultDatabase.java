@@ -4,29 +4,31 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.ardverk.lang.Arguments;
+
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.utils.XorComparator;
 
 public class DefaultDatabase extends AbstractDatabase {
 
-    public static enum DefaultCondition implements Condition {
-        SUCCESS,
-        FAILURE;
-
-        @Override
-        public boolean isSuccess() {
-            return this == SUCCESS;
-        }
-        
-        @Override
-        public String stringValue() {
-            return name();
-        }
-    }
-    
     private final Map<KUID, ValueTuple> database 
         = new ConcurrentHashMap<KUID, ValueTuple>();
     
+    private final DatabaseConfig config;
+    
+    public DefaultDatabase() {
+        this(new DefaultDatabaseConfig());
+    }
+    
+    public DefaultDatabase(DatabaseConfig config) {
+        this.config = Arguments.notNull(config, "config");
+    }
+    
+    @Override
+    public DatabaseConfig getDatabaseConfig() {
+        return config;
+    }
+
     @Override
     public ValueTuple get(KUID key) {
         return database.get(key);

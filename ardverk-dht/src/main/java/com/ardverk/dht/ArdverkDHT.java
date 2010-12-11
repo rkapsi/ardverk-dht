@@ -56,16 +56,8 @@ public class ArdverkDHT extends AbstractDHT {
         this.routeTable = routeTable;
         this.database = database;
         
-        StoreForward.Callback callback = new StoreForward.Callback() {
-            @Override
-            public ArdverkFuture<StoreEntity> store(Contact dst, 
-                    ValueTuple valueTuple, StoreConfig config) {
-                return storeManager.store(new Contact[] { dst }, valueTuple, config);
-            }
-        };
-        
-        StoreForward storeForward = new StoreForward(
-                callback, routeTable, database);
+        StoreForward storeForward 
+            = new StoreForward(routeTable, database);
         
         messageDispatcher = new DefaultMessageDispatcher(
                 messageFactory, codec, storeForward, 
@@ -83,6 +75,14 @@ public class ArdverkDHT extends AbstractDHT {
             public ArdverkFuture<PingEntity> ping(Contact contact,
                     PingConfig config) {
                 return ArdverkDHT.this.ping(contact, config);
+            }
+        });
+        
+        storeForward.bind(new StoreForward.Callback() {
+            @Override
+            public ArdverkFuture<StoreEntity> store(Contact dst, 
+                    ValueTuple valueTuple, StoreConfig config) {
+                return storeManager.store(new Contact[] { dst }, valueTuple, config);
             }
         });
     }

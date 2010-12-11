@@ -34,7 +34,7 @@ import com.ardverk.dht.message.ValueResponse;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.Contact.Type;
 import com.ardverk.dht.storage.Database.Condition;
-import com.ardverk.dht.storage.DefaultDatabase.DefaultCondition;
+import com.ardverk.dht.storage.DefaultCondition;
 import com.ardverk.dht.storage.DefaultValueTuple;
 import com.ardverk.dht.storage.ValueTuple;
 
