@@ -97,15 +97,11 @@ public class StoreForward {
     }
     
     private static boolean isNewOrHasChanged(Contact contact, Contact existing) {
-        if (existing == null) {
-            return true;
+        if (existing != null) {
+            assert (contact.equals(existing));
+            return contact.getInstanceId() != existing.getInstanceId();
         }
-        
-        if (!contact.equals(existing)) {
-            return false;
-        }
-        
-        return contact.getInstanceId() != existing.getInstanceId();
+        return true;
     }
     
     public static interface Callback {
