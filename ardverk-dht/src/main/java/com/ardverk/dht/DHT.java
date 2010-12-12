@@ -22,22 +22,13 @@ import java.net.SocketAddress;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.concurrent.ArdverkFutureService;
 import com.ardverk.dht.config.BootstrapConfig;
-import com.ardverk.dht.config.GetConfig;
-import com.ardverk.dht.config.LookupConfig;
-import com.ardverk.dht.config.PingConfig;
-import com.ardverk.dht.config.PutConfig;
-import com.ardverk.dht.config.StoreConfig;
 import com.ardverk.dht.entity.BootstrapEntity;
-import com.ardverk.dht.entity.NodeEntity;
-import com.ardverk.dht.entity.PingEntity;
-import com.ardverk.dht.entity.StoreEntity;
-import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
 
-public interface DHT extends ArdverkFutureService {
+public interface DHT extends DHT2, ArdverkFutureService {
     
     /**
      * Returns the localhost {@link Contact}.
@@ -84,60 +75,4 @@ public interface DHT extends ArdverkFutureService {
      */
     public ArdverkFuture<BootstrapEntity> bootstrap(
             Contact contact, BootstrapConfig config);
-    
-    /**
-     * Sends a PING to the given host.
-     */
-    public ArdverkFuture<PingEntity> ping(
-            String host, int port, PingConfig config);
-    
-    /**
-     * Sends a PING to the given host.
-     */
-    public ArdverkFuture<PingEntity> ping(
-            InetAddress address, int port, PingConfig config);
-    
-    /**
-     * Sends a PING to the given host.
-     */
-    public ArdverkFuture<PingEntity> ping(
-            SocketAddress address, PingConfig config);
-    
-    /**
-     * Sends a PING to the given host.
-     */
-    public ArdverkFuture<PingEntity> ping(
-            Contact dst, PingConfig config);
-    
-    /**
-     * 
-     */
-    public ArdverkFuture<NodeEntity> lookup(
-            KUID lookupId, LookupConfig config);
-    
-    /**
-     * Retrieves a key-value from the DHT.
-     */
-    public ArdverkFuture<ValueEntity> get(
-            KUID key, GetConfig config);
-    
-    /**
-     * Stores the given key-value in the DHT.
-     */
-    public ArdverkFuture<StoreEntity> put(
-            KUID key, byte[] value, PutConfig config);
-    
-    /**
-     * Removes the given {@link KUID} from the DHT.
-     */
-    public ArdverkFuture<StoreEntity> remove(KUID key, PutConfig config);
-    
-    /**
-     * Sends a STORE request to the given list of {@link Contact}s.
-     * 
-     * NOTE: It's being assumed the {@link Contact}s are already sorted by
-     * their XOR distance to the given {@link KUID}.
-     */
-    public ArdverkFuture<StoreEntity> store(Contact[] dst, 
-            KUID key, byte[] value, StoreConfig config);
 }

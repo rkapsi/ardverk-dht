@@ -208,12 +208,6 @@ public class ArdverkDHT extends AbstractDHT {
     public ArdverkFuture<StoreEntity> remove(KUID key, PutConfig config) {
         return storeManager.remove(key, config);
     }
-
-    @Override
-    public ArdverkFuture<StoreEntity> store(
-            Contact[] dst, KUID key, byte[] value, StoreConfig config) {
-        return storeManager.put(dst, key, value, config);
-    }
     
     /**
      * Performs specially targeted PING and FIND_NODE requests with the

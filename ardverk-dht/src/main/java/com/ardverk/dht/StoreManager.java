@@ -162,6 +162,12 @@ public class StoreManager {
         return store(dst, valueTuple, config);
     }
     
+    /**
+     * Sends a STORE request to the given list of {@link Contact}s.
+     * 
+     * NOTE: It's being assumed the {@link Contact}s are already sorted by
+     * their XOR distance to the given {@link KUID}.
+     */
     public ArdverkFuture<StoreEntity> store(Contact[] dst, 
             ValueTuple valueTuple, StoreConfig config) {
         
