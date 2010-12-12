@@ -119,10 +119,10 @@ public class QuickenManager {
         ArdverkFuture<NodeEntity>[] lookups 
             = lookupFutures.toArray(new ArdverkFuture[0]);
         
-        return new RefreshFuture(startTime, pings, lookups);
+        return new QuickenFuture(startTime, pings, lookups);
     }
     
-    public static class RefreshFuture extends ArdverkValueFuture<QuickenEntity> {
+    public static class QuickenFuture extends ArdverkValueFuture<QuickenEntity> {
         
         private final AtomicInteger countdown = new AtomicInteger();
         
@@ -133,7 +133,7 @@ public class QuickenManager {
         private final ArdverkFuture<NodeEntity>[] lookupFutures;
         
         @SuppressWarnings("unchecked")
-        private RefreshFuture(long startTime, 
+        private QuickenFuture(long startTime, 
                 ArdverkFuture<PingEntity>[] pingFutures, 
                 ArdverkFuture<NodeEntity>[] lookupFutures) {
             this.startTime = startTime;
