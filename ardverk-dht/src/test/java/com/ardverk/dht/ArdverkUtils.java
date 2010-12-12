@@ -25,32 +25,21 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.io.IoUtils;
-import org.ardverk.net.NetworkUtils;
 
-import com.ardverk.dht.codec.DefaultMessageCodec;
-import com.ardverk.dht.codec.MessageCodec;
+import com.ardverk.dht.SimpleArdverkDHT.SimpleConfig;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.config.BootstrapConfig;
 import com.ardverk.dht.config.DefaultBootstrapConfig;
 import com.ardverk.dht.config.DefaultQuickenConfig;
 import com.ardverk.dht.entity.BootstrapEntity;
 import com.ardverk.dht.entity.QuickenEntity;
-import com.ardverk.dht.io.transport.DatagramTransport;
-import com.ardverk.dht.io.transport.Transport;
-import com.ardverk.dht.message.DefaultMessageFactory;
-import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.DefaultRouteTable;
-import com.ardverk.dht.routing.RouteTable;
-import com.ardverk.dht.storage.Database;
-import com.ardverk.dht.storage.DefaultDatabase;
 
 public class ArdverkUtils {
 
     private static final String SECRET_KEY = "90fb237cbec71523ba9d883a8ec6ae9f";
     private static final String INIT_VECTOR = "6fd7bda068bf2425980e5c9b1c9e2097";
-    
-    private static final int ID_SIZE = 20;
     
     private ArdverkUtils() {}
     
@@ -59,24 +48,10 @@ public class ArdverkUtils {
     }
     
     public static ArdverkDHT createDHT(SocketAddress address) throws IOException {
-        Contact localhost = Contact.localhost(
-                KUID.createRandom(ID_SIZE), address);
-        
-        MessageCodec codec = new DefaultMessageCodec(SECRET_KEY, INIT_VECTOR);
-        
-        MessageFactory messageFactory = new DefaultMessageFactory(
-                ID_SIZE, localhost);
-        
-        Database database = new DefaultDatabase();
-        RouteTable routeTable = new DefaultRouteTable(localhost);
-        
-        ArdverkDHT dht = new ArdverkDHT(codec, messageFactory, routeTable, database);
-        
-        Transport transport = new DatagramTransport(
-                NetworkUtils.getPort(address));
-        dht.bind(transport);
-        
-        return dht;
+        SimpleConfig config = new SimpleConfig();
+        config.setSecretKey(SECRET_KEY);
+        config.setInitVector(INIT_VECTOR);
+        return SimpleArdverkDHT.create(config, address);
     }
     
     public static List<ArdverkDHT> createDHTs(int count, int port) throws IOException {
