@@ -59,9 +59,17 @@ import com.ardverk.dht.storage.DefaultDatabase;
 
 public class SimpleArdverkDHT extends ArdverkDHT {
     
+    public static SimpleArdverkDHT create(int port) throws IOException {
+        return create(new SimpleConfig(), port);
+    }
+    
     public static SimpleArdverkDHT create(
             SimpleConfig config, int port) throws IOException {
         return create(config, new DatagramTransport(port));
+    }
+    
+    public static SimpleArdverkDHT create(String address, int port) throws IOException {
+        return create(new SimpleConfig(), address, port);
     }
     
     public static SimpleArdverkDHT create(SimpleConfig config, 
@@ -69,9 +77,17 @@ public class SimpleArdverkDHT extends ArdverkDHT {
         return create(config, new DatagramTransport(address, port));
     }
     
+    public static SimpleArdverkDHT create(SocketAddress address) throws IOException {
+        return create(new SimpleConfig(), address);
+    }
+    
     public static SimpleArdverkDHT create(SimpleConfig config, 
             SocketAddress address) throws IOException {
         return create(config, new DatagramTransport(address));
+    }
+    
+    public static SimpleArdverkDHT create(Transport transport) throws IOException {
+        return create(new SimpleConfig(), transport);
     }
     
     public static SimpleArdverkDHT create(SimpleConfig config, 
@@ -166,7 +182,7 @@ public class SimpleArdverkDHT extends ArdverkDHT {
     
     public static class SimpleConfig {
         
-        private static final int DEFAULT_KEY_SIZE = 20;
+        private static final int DEFAULT_KEY_SIZE = 20; // SHA-1
         
         private final int keySize;
         
