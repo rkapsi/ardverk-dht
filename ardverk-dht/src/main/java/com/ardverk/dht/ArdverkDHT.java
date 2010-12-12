@@ -19,8 +19,6 @@ package com.ardverk.dht;
 import java.net.InetAddress;
 import java.net.SocketAddress;
 
-import org.ardverk.concurrent.AsyncProcess;
-
 import com.ardverk.dht.codec.MessageCodec;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.config.BootstrapConfig;
@@ -40,7 +38,6 @@ import com.ardverk.dht.entity.SyncEntity;
 import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.io.DefaultMessageDispatcher;
 import com.ardverk.dht.io.MessageDispatcher;
-import com.ardverk.dht.io.PingResponseHandler;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
@@ -59,6 +56,8 @@ public class ArdverkDHT extends AbstractDHT {
     private final SyncManager syncManager;
     
     private final LookupManager lookupManager;
+    
+    private final PingManager pingManager;
     
     private final RouteTable routeTable;
     
@@ -87,6 +86,7 @@ public class ArdverkDHT extends AbstractDHT {
                 storeManager, routeTable, database);
         lookupManager = new LookupManager(this, 
                 messageDispatcher, routeTable);
+        pingManager = new PingManager(this, messageDispatcher);
         
         routeTable.bind(new RouteTable.ContactPinger() {
             @Override
@@ -150,6 +150,10 @@ public class ArdverkDHT extends AbstractDHT {
     public LookupManager getLookupManager() {
         return lookupManager;
     }
+    
+    public PingManager getPingManager() {
+        return pingManager;
+    }
 
     @Override
     public ArdverkFuture<BootstrapEntity> bootstrap(
@@ -182,29 +186,22 @@ public class ArdverkDHT extends AbstractDHT {
 
     @Override
     public ArdverkFuture<PingEntity> ping(Contact contact, PingConfig config) {
-        AsyncProcess<PingEntity> process 
-            = new PingResponseHandler(messageDispatcher, contact, config);
-        return submit(process, config);
+        return pingManager.ping(contact, config);
     }
 
     @Override
-    public ArdverkFuture<PingEntity> ping(
-            SocketAddress dst, PingConfig config) {
-        AsyncProcess<PingEntity> process 
-            = new PingResponseHandler(messageDispatcher, dst, config);
-        return submit(process, config);
+    public ArdverkFuture<PingEntity> ping(SocketAddress dst, PingConfig config) {
+        return pingManager.ping(dst, config);
     }
 
     @Override
     public ArdverkFuture<NodeEntity> lookup(KUID lookupId, LookupConfig config) {
-        Contact[] contacts = getRouteTable().select(lookupId);
-        return lookupManager.lookup(contacts, lookupId, config);
+        return lookupManager.lookup(lookupId, config);
     }
     
     @Override
     public ArdverkFuture<ValueEntity> get(KUID key, GetConfig config) {
-        Contact[] contacts = getRouteTable().select(key);
-        return lookupManager.get(contacts, key, config);
+        return lookupManager.get(key, config);
     }
 
     @Override

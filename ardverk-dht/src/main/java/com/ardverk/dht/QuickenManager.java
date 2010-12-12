@@ -50,7 +50,6 @@ public class QuickenManager {
         this.routeTable = routeTable;
     }
     
-    @SuppressWarnings("unchecked")
     public ArdverkFuture<QuickenEntity> quicken(QuickenConfig config) {
         
         long startTime = System.currentTimeMillis();
@@ -112,9 +111,11 @@ public class QuickenManager {
             }
         }
         
+        @SuppressWarnings("unchecked")
         ArdverkFuture<PingEntity>[] pings 
             = pingFutures.toArray(new ArdverkFuture[0]);
         
+        @SuppressWarnings("unchecked")
         ArdverkFuture<NodeEntity>[] lookups 
             = lookupFutures.toArray(new ArdverkFuture[0]);
         

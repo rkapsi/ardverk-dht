@@ -44,6 +44,11 @@ public class LookupManager {
         this.routeTable = routeTable;
     }
     
+    public ArdverkFuture<NodeEntity> lookup(KUID lookupId, LookupConfig config) {
+        Contact[] contacts = routeTable.select(lookupId);
+        return lookup(contacts, lookupId, config);
+    }
+    
     public ArdverkFuture<NodeEntity> lookup(Contact[] contacts, 
             KUID lookupId, LookupConfig config) {
         
@@ -51,6 +56,11 @@ public class LookupManager {
             = new NodeResponseHandler(messageDispatcher, 
                     contacts, routeTable, lookupId, config);
         return dht.submit(process, config);
+    }
+    
+    public ArdverkFuture<ValueEntity> get(KUID key, GetConfig config) {
+        Contact[] contacts = routeTable.select(key);
+        return get(contacts, key, config);
     }
     
     public ArdverkFuture<ValueEntity> get(Contact[] contacts, 
