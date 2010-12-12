@@ -209,17 +209,12 @@ public class ArdverkDHT extends AbstractDHT {
         return storeManager.remove(key, config);
     }
     
-    /**
-     * Performs specially targeted PING and FIND_NODE requests with the
-     * goal to refresh the {@link RouteTable} and keep it up-to-date.
-     */
+    @Override
     public ArdverkFuture<QuickenEntity> quicken(QuickenConfig config) {
         return quickenManager.quicken(config);
     }
     
-    /**
-     * Synchronizes this {@link Contact}'s values with the k-closest.
-     */
+    @Override
     public ArdverkFuture<SyncEntity> sync(SyncConfig config) {
         return syncManager.sync(config);
     }

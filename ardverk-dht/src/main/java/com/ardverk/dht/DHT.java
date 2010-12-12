@@ -16,19 +16,14 @@
 
 package com.ardverk.dht;
 
-import java.net.InetAddress;
-import java.net.SocketAddress;
-
-import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.concurrent.ArdverkFutureService;
-import com.ardverk.dht.config.BootstrapConfig;
-import com.ardverk.dht.entity.BootstrapEntity;
 import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
 
-public interface DHT extends DHT2, ArdverkFutureService {
+public interface DHT extends ArdverkService, BootstrapService, 
+        QuickenService, SyncService, ArdverkFutureService {
     
     /**
      * Returns the localhost {@link Contact}.
@@ -51,28 +46,4 @@ public interface DHT extends DHT2, ArdverkFutureService {
      * Returns the {@link DHT}'s {@link MessageDispatcher}.
      */
     public MessageDispatcher getMessageDispatcher();
-    
-    /**
-     * 
-     */
-    public ArdverkFuture<BootstrapEntity> bootstrap(
-            String host, int port, BootstrapConfig config);
-    
-    /**
-     * 
-     */
-    public ArdverkFuture<BootstrapEntity> bootstrap(
-            InetAddress address, int port, BootstrapConfig config);
-    
-    /**
-     * 
-     */
-    public ArdverkFuture<BootstrapEntity> bootstrap(
-            SocketAddress address, BootstrapConfig config);
-    
-    /**
-     * 
-     */
-    public ArdverkFuture<BootstrapEntity> bootstrap(
-            Contact contact, BootstrapConfig config);
 }

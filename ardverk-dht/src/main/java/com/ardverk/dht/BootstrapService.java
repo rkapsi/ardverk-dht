@@ -14,42 +14,39 @@
  * limitations under the License.
  */
 
-package com.ardverk.dht.io.transport;
+package com.ardverk.dht;
 
-import java.io.IOException;
+import java.net.InetAddress;
 import java.net.SocketAddress;
 
-/**
- * 
- */
-public interface Transport {
+import com.ardverk.dht.concurrent.ArdverkFuture;
+import com.ardverk.dht.config.BootstrapConfig;
+import com.ardverk.dht.entity.BootstrapEntity;
+import com.ardverk.dht.routing.Contact;
 
-    public SocketAddress getSocketAddress();
-    
-    /**
-     * 
-     */
-    public void bind(TransportCallback callback) throws IOException;
-    
-    /**
-     * 
-     */
-    public void unbind();
-    
-    /**
-     * 
-     */
-    public boolean isBound();
-    
-    /**
-     * 
-     */
-    public void send(SocketAddress dst, byte[] message)
-            throws IOException;
+public interface BootstrapService {
 
     /**
      * 
      */
-    public void send(SocketAddress dst, byte[] message, int offset,
-            int length) throws IOException;
+    public ArdverkFuture<BootstrapEntity> bootstrap(
+            String host, int port, BootstrapConfig config);
+    
+    /**
+     * 
+     */
+    public ArdverkFuture<BootstrapEntity> bootstrap(
+            InetAddress address, int port, BootstrapConfig config);
+    
+    /**
+     * 
+     */
+    public ArdverkFuture<BootstrapEntity> bootstrap(
+            SocketAddress address, BootstrapConfig config);
+    
+    /**
+     * 
+     */
+    public ArdverkFuture<BootstrapEntity> bootstrap(
+            Contact contact, BootstrapConfig config);
 }

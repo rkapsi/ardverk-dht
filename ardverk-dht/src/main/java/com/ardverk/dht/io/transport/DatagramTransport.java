@@ -71,6 +71,11 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
     }
     
     @Override
+    public SocketAddress getSocketAddress() {
+        return bindaddr;
+    }
+
+    @Override
     public synchronized void bind(TransportCallback callback) throws IOException {
         if (!open) {
             throw new IOException();
