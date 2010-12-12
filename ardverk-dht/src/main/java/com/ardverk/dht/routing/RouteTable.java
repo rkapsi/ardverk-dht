@@ -82,6 +82,12 @@ public interface RouteTable extends IoErrorCallback {
     public int size();
     
     /**
+     * The {@link #prune()} operation removes all dead {@link Contact}s from
+     * the {@link RouteTable} and rebuilds it from the ground up.
+     */
+    public void prune();
+    
+    /**
      * Adds the given {@link RouteTableListener}.
      */
     public void addRouteTableListener(RouteTableListener l);

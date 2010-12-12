@@ -178,11 +178,6 @@ public class ArdverkDHT extends AbstractDHT {
             Contact contact, BootstrapConfig config) {
         return bootstrapManager.bootstrap(contact, config);
     }
-    
-    @Override
-    public ArdverkFuture<QuickenEntity> quicken(QuickenConfig config) {
-        return quickenManager.quicken(config);
-    }
 
     @Override
     public ArdverkFuture<PingEntity> ping(Contact contact, PingConfig config) {
@@ -218,6 +213,14 @@ public class ArdverkDHT extends AbstractDHT {
     public ArdverkFuture<StoreEntity> store(
             Contact[] dst, KUID key, byte[] value, StoreConfig config) {
         return storeManager.put(dst, key, value, config);
+    }
+    
+    /**
+     * Performs specially targeted PING and FIND_NODE requests with the
+     * goal to refresh the {@link RouteTable} and keep it up-to-date.
+     */
+    public ArdverkFuture<QuickenEntity> quicken(QuickenConfig config) {
+        return quickenManager.quicken(config);
     }
     
     /**

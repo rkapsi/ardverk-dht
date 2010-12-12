@@ -26,12 +26,10 @@ import com.ardverk.dht.config.GetConfig;
 import com.ardverk.dht.config.LookupConfig;
 import com.ardverk.dht.config.PingConfig;
 import com.ardverk.dht.config.PutConfig;
-import com.ardverk.dht.config.QuickenConfig;
 import com.ardverk.dht.config.StoreConfig;
 import com.ardverk.dht.entity.BootstrapEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
-import com.ardverk.dht.entity.QuickenEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.io.MessageDispatcher;
@@ -86,11 +84,6 @@ public interface DHT extends ArdverkFutureService {
      */
     public ArdverkFuture<BootstrapEntity> bootstrap(
             Contact contact, BootstrapConfig config);
-    
-    /**
-     * 
-     */
-    public ArdverkFuture<QuickenEntity> quicken(QuickenConfig config);
     
     /**
      * Sends a PING to the given host.

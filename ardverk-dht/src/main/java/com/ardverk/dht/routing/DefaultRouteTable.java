@@ -598,17 +598,8 @@ public class DefaultRouteTable extends AbstractRouteTable {
         return contacts.toArray(new ContactEntity[0]);
     }
     
-    /**
-     * Rebuilds the {@link RouteTable} by.
-     * 
-     * <ol>
-     * <li>Making a copy of all ACTIVE and CACHED contacts
-     * <li>Clearing the RouteTable
-     * <li>Sorting all ACTIVE contacts by their health and throwing away everything that is considered dead
-     * <li>Sorting all CACHED contacts by their time (most recently seen to least recently seen) and adding them back
-     * </ol>
-     */
-    public synchronized void rebuild() {
+    @Override
+    public synchronized void prune() {
         ContactEntity[] active = getActiveContacts();
         ContactEntity[] cached = getCachedContacts();
         

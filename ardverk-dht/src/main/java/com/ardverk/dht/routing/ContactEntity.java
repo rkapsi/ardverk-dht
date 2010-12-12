@@ -16,12 +16,14 @@
 
 package com.ardverk.dht.routing;
 
+import java.net.SocketAddress;
+
 import org.ardverk.net.NetworkUtils;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.lang.Identifier;
 
-class ContactEntity implements Identifier, Longevity {
+public class ContactEntity implements Identifier, Longevity {
     
     private final RouteTableConfig config;
     
@@ -31,7 +33,7 @@ class ContactEntity implements Identifier, Longevity {
     
     private long errorTimeStamp;
     
-    public ContactEntity(RouteTableConfig config, Contact contact) {
+    ContactEntity(RouteTableConfig config, Contact contact) {
         this.config = config;
         this.contact = contact;
     }
@@ -78,53 +80,103 @@ class ContactEntity implements Identifier, Longevity {
         return new Update(previous, other, contact);
     }
     
+    /**
+     * Returns the number of errors this {@link ContactEntity} has
+     * encountered.
+     */
     public int getErrorCount() {
         return errorCount;
     }
     
+    /**
+     * Returns the time when the most recent error occurred.
+     */
     public long getErrorTimeStamp() {
         return errorTimeStamp;
     }
     
+    /**
+     * Increments the error count, sets the error time stamp and
+     * returns {@code true} if the {@link Contact} is considered
+     * dead.
+     */
     public boolean error() {
         ++errorCount;
         errorTimeStamp = System.currentTimeMillis();
         return isDead();
     }
     
+    /**
+     * @see Contact#isSolicited()
+     */
     public boolean isSolicited() {
         return contact.isSolicited();
     }
     
+    /**
+     * @see Contact#isUnsolicited()
+     */
     public boolean isUnsolicited() {
         return contact.isUnsolicited();
     }
     
+    /**
+     * Returns {@code true} if the error count has exceeded the maximum error 
+     * count as defined in {@link RouteTableConfig#getMaxContactErrors()}.
+     */
     public boolean isDead() {
         return errorCount >= config.getMaxContactErrors();
     }
     
+    /**
+     * Returns {@code true} if the {@link Contact} is not dead
+     * and active.
+     * 
+     * @see #isDead()
+     * @see Contact#isActive()
+     */
     public boolean isAlive() {
         return !isDead() && contact.isActive();
     }
     
+    /**
+     * Returns {@code true} if the {@link Contact} is not dead
+     * but unsolicited.
+     * 
+     * @see #isDead()
+     * @see #isUnsolicited()
+     */
     public boolean isUnknown() {
         return !isDead() && isUnsolicited();
     }
     
-    public boolean isSameRemoteAddress(Contact contact) {
-        return NetworkUtils.isSameAddress(
-                this.contact.getRemoteAddress(), 
-                contact.getRemoteAddress());
-    }
-    
+    /**
+     * Returns {@code true} if the {@link Contact} has been recently active as 
+     * defined in {@link RouteTableConfig#getHasBeenActiveTimeoutInMillis()}.
+     */
     public boolean hasBeenActiveRecently() {
         long timeout = config.getHasBeenActiveTimeoutInMillis();
         return (System.currentTimeMillis() - getTimeStamp()) < timeout;
     }
     
+    /**
+     * Returns {@code true} if both {@link Contact}s are equal as defined in
+     * {@link Contact#equals(Object)}.
+     */
     public boolean isSameContact(Contact other) {
         return contact.equals(other);
+    }
+    
+    /**
+     * Returns {@code true} if both {@link Contact}s have the same
+     * remote {@link SocketAddress}.
+     * 
+     * @see Contact#getRemoteAddress()
+     */
+    public boolean isSameRemoteAddress(Contact contact) {
+        return NetworkUtils.isSameAddress(
+                this.contact.getRemoteAddress(), 
+                contact.getRemoteAddress());
     }
     
     public static class Update {
