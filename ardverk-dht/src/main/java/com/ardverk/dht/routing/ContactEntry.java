@@ -23,7 +23,17 @@ import org.ardverk.net.NetworkUtils;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.lang.Identifier;
 
-public class ContactEntity implements Identifier, Longevity {
+/**
+ * The {@link DefaultRouteTable} uses internally {@link ContactEntry}s 
+ * instead of {@link Contact}s directly.
+ * 
+ * <p>NOTE: This class is <b>NOT</b> Thread-safe! All read/write operations
+ * must be done while a lock on the {@link DefaultRouteTable} instance
+ * is being held.
+ * 
+ * @see DefaultRouteTable
+ */
+public class ContactEntry implements Identifier, Longevity {
     
     private final RouteTableConfig config;
     
@@ -33,7 +43,7 @@ public class ContactEntity implements Identifier, Longevity {
     
     private long errorTimeStamp;
     
-    ContactEntity(RouteTableConfig config, Contact contact) {
+    ContactEntry(RouteTableConfig config, Contact contact) {
         this.config = config;
         this.contact = contact;
     }
@@ -54,21 +64,16 @@ public class ContactEntity implements Identifier, Longevity {
     }
     
     /**
-     * Returns the {@link ContactEntity}'s {@link Contact}.
+     * Returns the {@link ContactEntry}'s {@link Contact}.
      */
     public Contact getContact() {
         return contact;
     }
     
+    /**
+     * Updates the current {@link Contact} with the given {@link Contact}.
+     */
     public Update update(Contact other) {
-        return update(other, false);
-    }
-    
-    public Contact replace(Contact other) {
-        return update(other, true).getPrevious();
-    }
-    
-    private Update update(Contact other, boolean force) {
         Contact previous = contact;
         contact = previous.merge(other);
         
@@ -81,7 +86,7 @@ public class ContactEntity implements Identifier, Longevity {
     }
     
     /**
-     * Returns the number of errors this {@link ContactEntity} has
+     * Returns the number of errors this {@link ContactEntry} has
      * encountered.
      */
     public int getErrorCount() {

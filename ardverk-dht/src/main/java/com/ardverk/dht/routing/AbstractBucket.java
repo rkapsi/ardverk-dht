@@ -73,12 +73,12 @@ public abstract class AbstractBucket implements Bucket {
     }
 
     @Override
-    public ContactEntity get(KUID contactId) {
-        ContactEntity entity = getActive(contactId);
-        if (entity == null) {
-            entity = getCached(contactId);
+    public ContactEntry get(KUID contactId) {
+        ContactEntry entry = getActive(contactId);
+        if (entry == null) {
+            entry = getCached(contactId);
         }
-        return entity;
+        return entry;
     }
 
     @Override

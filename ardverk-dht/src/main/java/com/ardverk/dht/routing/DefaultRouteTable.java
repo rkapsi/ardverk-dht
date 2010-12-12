@@ -44,6 +44,7 @@ import com.ardverk.dht.config.PingConfig;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.lang.Identifier;
 import com.ardverk.dht.logging.LoggerUtils;
+import com.ardverk.dht.routing.ContactEntry.Update;
 import com.ardverk.dht.utils.ContactKey;
 
 public class DefaultRouteTable extends AbstractRouteTable {
@@ -103,8 +104,8 @@ public class DefaultRouteTable extends AbstractRouteTable {
         return localhost;
     }
     
-    private boolean isLocalhost(ContactEntity entity) {
-        return isLocalhost(entity.getContact());
+    private boolean isLocalhost(ContactEntry entry) {
+        return isLocalhost(entry.getContact());
     }
     
     private boolean isLocalhost(Contact contact) {
@@ -150,15 +151,15 @@ public class DefaultRouteTable extends AbstractRouteTable {
     private synchronized void add0(Contact contact) {
         KUID contactId = contact.getId();
         DefaultBucket bucket = buckets.selectValue(contactId);
-        ContactEntity entity = bucket.get(contactId);
+        ContactEntry entry = bucket.get(contactId);
         
         if (contact.isAuthoritative()) {
-            authoritative(bucket, entity, contact);
+            authoritative(bucket, entry, contact);
             return;
         }
         
-        if (entity != null) {
-            updateContact(bucket, entity, contact);
+        if (entry != null) {
+            updateContact(bucket, entry, contact);
         } else if (!bucket.isActiveFull()) {
             if (isOkayToAdd(bucket, contact)) {
                 addActive(bucket, contact);
@@ -173,18 +174,18 @@ public class DefaultRouteTable extends AbstractRouteTable {
     }
     
     private synchronized void authoritative(DefaultBucket bucket, 
-            ContactEntity entity, Contact contact) {
+            ContactEntry entry, Contact contact) {
         
         assert (contact.isAuthoritative());
         
-        if (entity != null) {
-            ContactEntity removed = bucket.remove(entity);
-            assert (removed == entity);
+        if (entry != null) {
+            ContactEntry removed = bucket.remove(entry);
+            assert (removed == entry);
         }
         
         if (bucket.isActiveFull()) {
-            ContactEntity lrs = bucket.getLeastRecentlySeenActiveContact();
-            ContactEntity removed = bucket.removeActive(lrs);
+            ContactEntry lrs = bucket.getLeastRecentlySeenActiveContact();
+            ContactEntry removed = bucket.removeActive(lrs);
             assert (removed == lrs);
             
             if (!lrs.isDead()) {
@@ -192,38 +193,38 @@ public class DefaultRouteTable extends AbstractRouteTable {
             }
         }
         
-        bucket.addActive(new ContactEntity(config, contact));
+        bucket.addActive(new ContactEntry(config, contact));
     }
     
     private synchronized void updateContact(DefaultBucket bucket, 
-            ContactEntity entity, Contact contact) {
+            ContactEntry entry, Contact contact) {
         
         // Make sure neither is the localhost!
-        assert (!entity.isSameContact(localhost) 
+        assert (!entry.isSameContact(localhost) 
                 && !contact.equals(localhost));
         
         // Make sure non-ACTIVE contacts can never 
         // replace an ACTIVE contact!
-        if (entity.isAlive() && !contact.isActive()) {
+        if (entry.isAlive() && !contact.isActive()) {
             return;
         }
         
         // Everything is fine if they've got the same address.
-        if (entity.isSameRemoteAddress(contact)) {
-            update(bucket, entity, contact);
+        if (entry.isSameRemoteAddress(contact)) {
+            update(bucket, entry, contact);
         } else {
-            checkContact(bucket, entity, contact);
+            checkContact(bucket, entry, contact);
         }
     }
     
     private synchronized void checkContact(DefaultBucket bucket, 
-            ContactEntity entity, final Contact contact) {
+            ContactEntry entry, final Contact contact) {
         
         if (config.isCheckIdentity()) {
             
-            final Contact previous = entity.getContact();
+            final Contact previous = entry.getContact();
             
-            ArdverkFuture<PingEntity> future = ping(entity);
+            ArdverkFuture<PingEntity> future = ping(entry);
             future.addAsyncFutureListener(new AsyncFutureListener<PingEntity>() {
                 @Override
                 public void operationComplete(AsyncFuture<PingEntity> future) {
@@ -251,7 +252,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
                     
                     synchronized (DefaultRouteTable.this) {
                         DefaultBucket bucket = buckets.selectValue(contactId);
-                        ContactEntity current = bucket.get(contactId);
+                        ContactEntry current = bucket.get(contactId);
                         
                         // Make sure the pre-condition still holds and we're
                         // not replacing some other Contact.
@@ -269,7 +270,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
                 }
             });
         } else {
-            replace(bucket, entity, contact);
+            replace(bucket, entry, contact);
             
             if (bucket.containsCached(contact.getId())) {
                 pingLeastRecentlySeenContact(bucket);
@@ -277,8 +278,8 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
     }
     
-    private synchronized boolean isOkayToAdd(DefaultBucket bucket, ContactEntity entity) {
-        return isOkayToAdd(bucket, entity.getContact());
+    private synchronized boolean isOkayToAdd(DefaultBucket bucket, ContactEntry entry) {
+        return isOkayToAdd(bucket, entry.getContact());
     }
     
     private synchronized boolean isOkayToAdd(DefaultBucket bucket, Contact contact) {
@@ -291,20 +292,20 @@ public class DefaultRouteTable extends AbstractRouteTable {
     }
     
     private synchronized void addActive(DefaultBucket bucket, Contact contact) {
-        ContactEntity entity = new ContactEntity(config, contact);
-        boolean success = bucket.addActive(entity);
+        ContactEntry entry = new ContactEntry(config, contact);
+        boolean success = bucket.addActive(entry);
         
         if (success) {
             fireContactAdded(bucket, contact);
         }
     }
     
-    private synchronized ContactEntity addCache(DefaultBucket bucket, Contact contact) {
-        ContactEntity entity = new ContactEntity(config, contact);
-        ContactEntity other = bucket.addCache(entity);
+    private synchronized ContactEntry addCache(DefaultBucket bucket, Contact contact) {
+        ContactEntry entry = new ContactEntry(config, contact);
+        ContactEntry other = bucket.addCache(entry);
         
         if (other != null) {
-            if (entity == other) {
+            if (entry == other) {
                 fireContactAdded(bucket, contact);
             } else {
                 fireContactReplaced(bucket, other.getContact(), contact);
@@ -316,14 +317,14 @@ public class DefaultRouteTable extends AbstractRouteTable {
     
     private synchronized void replaceCache(DefaultBucket bucket, Contact contact) {
         if (contact.isActive() && isOkayToAdd(bucket, contact)) {
-            ContactEntity lrs = bucket.getLeastRecentlySeenActiveContact();
+            ContactEntry lrs = bucket.getLeastRecentlySeenActiveContact();
             
             if (!isLocalhost(lrs) && (lrs.isUnknown() || lrs.isDead())) {
                 
-                ContactEntity entity = bucket.removeActive(lrs);
-                assert (entity == lrs);
+                ContactEntry entry = bucket.removeActive(lrs);
+                assert (entry == lrs);
                 
-                bucket.addActive(new ContactEntity(config, contact));
+                bucket.addActive(new ContactEntry(config, contact));
                 
                 fireContactReplaced(bucket, lrs.getContact(), contact);
                 return;
@@ -335,8 +336,8 @@ public class DefaultRouteTable extends AbstractRouteTable {
     }
     
     private synchronized void update(DefaultBucket bucket, 
-            ContactEntity entity, Contact contact) {
-        ContactEntity.Update update = entity.update(contact);
+            ContactEntry entry, Contact contact) {
+        ContactEntry.Update update = entry.update(contact);
         bucket.touch();
         
         fireContactChanged(bucket, 
@@ -344,15 +345,15 @@ public class DefaultRouteTable extends AbstractRouteTable {
     }
     
     private synchronized void replace(DefaultBucket bucket, 
-            ContactEntity entity, Contact contact) {
-        Contact existing = entity.replace(contact);
+            ContactEntry entry, Contact contact) {
+        Update update = entry.update(contact);
         bucket.touch();
         
-        fireContactChanged(bucket, existing, contact);
+        fireContactChanged(bucket, update.getPrevious(), contact);
     }
     
     private synchronized void pingLeastRecentlySeenContact(DefaultBucket bucket) {
-        ContactEntity lrs = bucket.getLeastRecentlySeenActiveContact();
+        ContactEntry lrs = bucket.getLeastRecentlySeenActiveContact();
         if (!isLocalhost(lrs)) {
             ping(lrs);
         }
@@ -433,8 +434,8 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
         
         DefaultBucket bucket = buckets.selectValue(contactId);
-        ContactEntity entity = bucket.get(contactId);
-        return entity != null ? entity.getContact() : null;
+        ContactEntry entry = bucket.get(contactId);
+        return entry != null ? entry.getContact() : null;
     }
     
     @Override
@@ -469,8 +470,8 @@ public class DefaultRouteTable extends AbstractRouteTable {
         });
     }
     
-    private synchronized ArdverkFuture<PingEntity> ping(ContactEntity entity) {
-        Contact contact = entity.getContact();
+    private synchronized ArdverkFuture<PingEntity> ping(ContactEntry entry) {
+        Contact contact = entry.getContact();
         
         // Make sure we're not pinging the same host in parallel.
         // It is an unlikely but possible case...
@@ -506,10 +507,10 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
         
         DefaultBucket bucket = buckets.selectValue(contactId);
-        ContactEntity entity = bucket.get(contactId);
+        ContactEntry entry = bucket.get(contactId);
         
         // Huh? There is no such contact for the given KUID?
-        if (entity == null) {
+        if (entry == null) {
             return;
         }
         
@@ -519,7 +520,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
             return;
         }
         
-        boolean dead = entity.error();
+        boolean dead = entry.error();
         if (dead) {
             
             if (bucket.containsActive(contactId)) {
@@ -530,28 +531,28 @@ public class DefaultRouteTable extends AbstractRouteTable {
                 // simply no point in keeping it in the RouteTable.
                 
                 if (!bucket.isCacheEmpty()) {
-                    ContactEntity mrs = null;
+                    ContactEntry mrs = null;
                     while ((mrs = bucket.getMostRecentlySeenCachedContact()) != null) {
-                        ContactEntity removed = bucket.removeCache(mrs);
+                        ContactEntry removed = bucket.removeCache(mrs);
                         assert (removed == mrs);
                         
                         if (isOkayToAdd(bucket, mrs)) {
-                            removed = bucket.removeActive(entity);
-                            assert (removed == entity 
+                            removed = bucket.removeActive(entry);
+                            assert (removed == entry 
                                     && !bucket.isActiveFull());
                             
                             bucket.addActive(mrs);
                             fireContactReplaced(bucket, 
-                                    entity.getContact(), mrs.getContact());
+                                    entry.getContact(), mrs.getContact());
                             break;
                         }
                     }
-                } else if (entity.getErrorCount() 
+                } else if (entry.getErrorCount() 
                         >= config.getTooManyErrorsCount()) {
-                    ContactEntity removed = bucket.removeActive(entity);
-                    assert(removed == entity && !bucket.isActiveFull());
+                    ContactEntry removed = bucket.removeActive(entry);
+                    assert(removed == entry && !bucket.isActiveFull());
                     
-                    fireContactRemoved(bucket, entity.getContact());
+                    fireContactRemoved(bucket, entry.getContact());
                 }
                 
             } else {
@@ -561,66 +562,66 @@ public class DefaultRouteTable extends AbstractRouteTable {
                 // return Contacts that happen to be in our RouteTable's cache 
                 // and if that's the case we want to remove them ASAP.
                 
-                ContactEntity removed = bucket.removeCache(contactId);
-                assert (removed == entity);
+                ContactEntry removed = bucket.removeCache(contactId);
+                assert (removed == entry);
             }
         }
     }
     
     /**
-     * Returns all ACTIVE {@link ContactEntity}s.
+     * Returns all ACTIVE {@link ContactEntry}s.
      */
-    public synchronized ContactEntity[] getActiveContacts() {
+    public synchronized ContactEntry[] getActiveContacts() {
         return getContacts(true);
     }
 
     /**
-     * Returns all CACHED {@link ContactEntity}s.
+     * Returns all CACHED {@link ContactEntry}s.
      */
-    public synchronized ContactEntity[] getCachedContacts() {
+    public synchronized ContactEntry[] getCachedContacts() {
         return getContacts(false);
     }
 
     /**
-     * Returns {@link ContactEntity}ies of the given {@link ContactType}.
+     * Returns {@link ContactEntry}ies of the given {@link ContactType}.
      */
-    private ContactEntity[] getContacts(boolean active) {
-        List<ContactEntity> contacts = new ArrayList<ContactEntity>();
+    private ContactEntry[] getContacts(boolean active) {
+        List<ContactEntry> contacts = new ArrayList<ContactEntry>();
         for (DefaultBucket bucket : buckets.values()) {
             
-            ContactEntity[] entitis = active ? bucket.getActive() : bucket.getCached();
+            ContactEntry[] entitis = active ? bucket.getActive() : bucket.getCached();
             
-            for (ContactEntity entity : entitis) {
-                contacts.add(entity);
+            for (ContactEntry entry : entitis) {
+                contacts.add(entry);
             }
         }
         
-        return contacts.toArray(new ContactEntity[0]);
+        return contacts.toArray(new ContactEntry[0]);
     }
     
     @Override
     public synchronized void prune() {
-        ContactEntity[] active = getActiveContacts();
-        ContactEntity[] cached = getCachedContacts();
+        ContactEntry[] active = getActiveContacts();
+        ContactEntry[] cached = getCachedContacts();
         
         clear();
         
         // Sort the ACTIVE contacts by their health (most healthy to least healthy)
         // and exit the loop as soon as we encounter the first DEAD contact.
         ContactUtils.byHealth(active);
-        for (ContactEntity entity : active) {
-            if (entity.isDead()) {
+        for (ContactEntry entry : active) {
+            if (entry.isDead()) {
                 break;
             }
             
-            add(entity.getContact());
+            add(entry.getContact());
         }
         
         // Sort the CACHED contacts by their time stamp (most recently encountered
         // to least recently encountered) and try to add them to the RouteTable.
         LongevityUtils.byTimeStamp(cached);
-        for (ContactEntity entity : cached) {
-            add(entity.getContact());
+        for (ContactEntry entry : cached) {
+            add(entry.getContact());
         }
     }
     
@@ -662,9 +663,9 @@ public class DefaultRouteTable extends AbstractRouteTable {
                 .append(bucket.getDepth()).append("]\n");
             
             int contactIndex = 0;
-            for (ContactEntity entity : bucket.getActive()) {
+            for (ContactEntry entry : bucket.getActive()) {
                 buffer.append(" ").append(contactIndex++).append(") ")
-                    .append(entity.getContact()).append("\n");
+                    .append(entry.getContact()).append("\n");
             }
         }
         
@@ -673,19 +674,19 @@ public class DefaultRouteTable extends AbstractRouteTable {
     
     private class DefaultBucket extends AbstractBucket {
         
-        private final Trie<KUID, ContactEntity> active;
+        private final Trie<KUID, ContactEntry> active;
         
-        private final FixedSizeHashMap<KUID, ContactEntity> cached;
+        private final FixedSizeHashMap<KUID, ContactEntry> cached;
         
         private final NetworkCounter counter;
         
         private DefaultBucket(KUID bucketId, int depth) {
             super(bucketId, depth);
             
-            active = new PatriciaTrie<KUID, ContactEntity>();
+            active = new PatriciaTrie<KUID, ContactEntry>();
             
             int maxCacheSize = config.getMaxCacheSize();
-            cached = new FixedSizeHashMap<KUID, ContactEntity>(
+            cached = new FixedSizeHashMap<KUID, ContactEntry>(
                     maxCacheSize, maxCacheSize);
             
             counter = new NetworkCounter(
@@ -713,23 +714,23 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
         
         @Override
-        public ContactEntity getActive(KUID contactId) {
+        public ContactEntry getActive(KUID contactId) {
             return active.get(contactId);
         }
 
         @Override
-        public ContactEntity getCached(KUID contactId) {
+        public ContactEntry getCached(KUID contactId) {
             return cached.get(contactId);
         }
 
         @Override
-        public ContactEntity[] getActive() {
-            return active.values().toArray(new ContactEntity[0]);
+        public ContactEntry[] getActive() {
+            return active.values().toArray(new ContactEntry[0]);
         }
         
         @Override
-        public ContactEntity[] getCached() {
-            return cached.values().toArray(new ContactEntity[0]);
+        public ContactEntry[] getCached() {
+            return cached.values().toArray(new ContactEntry[0]);
         }
         
         /**
@@ -754,20 +755,20 @@ public class DefaultRouteTable extends AbstractRouteTable {
                 final Collection<Contact> dst, final int count) {
             
             final double probability = config.getProbability();
-            active.select(contactId, new Cursor<KUID, ContactEntity>() {
+            active.select(contactId, new Cursor<KUID, ContactEntry>() {
                 @Override
                 public Decision select(Entry<? extends KUID, 
-                        ? extends ContactEntity> entry) {
+                        ? extends ContactEntry> entry) {
                     
-                    ContactEntity entity = entry.getValue();
+                    ContactEntry value = entry.getValue();
                     
                     double random = 1.0d;
-                    if (entity.isDead()) {
+                    if (value.isDead()) {
                         random = Math.random();
                     }
                     
                     if (random >= probability) {
-                        dst.add(entity.getContact());
+                        dst.add(value.getContact());
                     }
                     
                     return (dst.size() < count ? Decision.CONTINUE : Decision.EXIT);
@@ -787,35 +788,35 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
         
         /**
-         * Adds the given {@link ContactEntity} to the {@link Bucket}.
+         * Adds the given {@link ContactEntry} to the {@link Bucket}.
          */
-        private void add(ContactEntity entity) {
+        private void add(ContactEntry entry) {
             // Remove it from the Cache if it's there
-            removeCache(entity);
+            removeCache(entry);
             
             // Add it to the active RouteTable if possible
-            boolean success = addActive(entity);
+            boolean success = addActive(entry);
             
             // Add the Contact back to the Cache if it was not 
             // possible to add it to the active RouteTable
             if (!success) {
-                addCache(entity);
+                addCache(entry);
             }
         }
         
         /**
-         * Adds the given {@link ContactEntity} to the {@link Bucket}'s active list.
+         * Adds the given {@link ContactEntry} to the {@link Bucket}'s active list.
          */
-        private boolean addActive(ContactEntity entity) {
-            KUID contactId = entity.getId();
+        private boolean addActive(ContactEntry entry) {
+            KUID contactId = entry.getId();
             
             // Make sure Bucket does not contain the Contact!
             assert (!contains(contactId));
                 
             if (hasOrMakeSpace()) {
-                active.put(contactId, entity);
+                active.put(contactId, entry);
                 
-                Contact contact = entity.getContact();
+                Contact contact = entry.getContact();
                 counter.add(contact.getRemoteAddress());
                 touch();
                 return true;
@@ -825,26 +826,26 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
         
         /**
-         * Adds the {@link ContactEntity} to the {@link Bucket}'s cache list.
+         * Adds the {@link ContactEntry} to the {@link Bucket}'s cache list.
          */
-        private ContactEntity addCache(ContactEntity entity) {
-            Contact contact = entity.getContact();
+        private ContactEntry addCache(ContactEntry entry) {
+            Contact contact = entry.getContact();
             KUID contactId = contact.getId();
             
             // Make sure Bucket does not contain the Contact!
             assert (!contains(contactId));
             
             if (!isCacheFull()) {
-                cached.put(contactId, entity);
-                return entity;
+                cached.put(contactId, entry);
+                return entry;
             }
             
-            ContactEntity lrs = getLeastRecentlySeenCachedContact();
-            if (lrs.isDead() || (!lrs.hasBeenActiveRecently() && !entity.isDead())) {
-                ContactEntity removed = cached.remove(lrs.getId());
+            ContactEntry lrs = getLeastRecentlySeenCachedContact();
+            if (lrs.isDead() || (!lrs.hasBeenActiveRecently() && !entry.isDead())) {
+                ContactEntry removed = cached.remove(lrs.getId());
                 assert (lrs == removed);
                 
-                cached.put(contactId, entity);
+                cached.put(contactId, entry);
                 return removed;
             }
             
@@ -852,26 +853,26 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
         
         /**
-         * Returns the least recently seen {@link ContactEntity} in 
+         * Returns the least recently seen {@link ContactEntry} in 
          * the {@link Bucket}'s cache list.
          */
-        private ContactEntity getLeastRecentlySeenCachedContact() {
+        private ContactEntry getLeastRecentlySeenCachedContact() {
             return ContactUtils.getLeastRecentlySeen(cached.values());
         }
         
         /**
-         * Returns the least recently seen {@link ContactEntity} in 
+         * Returns the least recently seen {@link ContactEntry} in 
          * the {@link Bucket}'s active list.
          */
-        private ContactEntity getLeastRecentlySeenActiveContact() {
+        private ContactEntry getLeastRecentlySeenActiveContact() {
             return ContactUtils.getLeastRecentlySeen(active.values());
         }
         
         /**
-         * Returns the most recently seen {@link ContactEntity} in 
+         * Returns the most recently seen {@link ContactEntry} in 
          * the {@link Bucket}'s cache list.
          */
-        private ContactEntity getMostRecentlySeenCachedContact() {
+        private ContactEntry getMostRecentlySeenCachedContact() {
             return ContactUtils.getMostRecentlySeen(cached.values());
         }
         
@@ -881,7 +882,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
          */
         private boolean hasOrMakeSpace() {
             if (isActiveFull()) {
-                for (ContactEntity current : getActive()) {
+                for (ContactEntry current : getActive()) {
                     if (current.isDead()) {
                         removeActive(current);
                         break;
@@ -895,31 +896,31 @@ public class DefaultRouteTable extends AbstractRouteTable {
         /**
          * Removes the given {@link Identifier} from the {@link Bucket}.
          */
-        private ContactEntity remove(Identifier identifer) {
-            ContactEntity entity = removeActive(identifer);
-            if (entity == null) {
-                entity = removeCache(identifer);
+        private ContactEntry remove(Identifier identifer) {
+            ContactEntry entry = removeActive(identifer);
+            if (entry == null) {
+                entry = removeCache(identifer);
             }
-            return entity;
+            return entry;
         }
         
         /**
          * Removes the given {@link Identifier} from the {@link Bucket}'s active list.
          */
-        private ContactEntity removeActive(Identifier identifier) {
-            ContactEntity entity = active.remove(identifier.getId());
+        private ContactEntry removeActive(Identifier identifier) {
+            ContactEntry entry = active.remove(identifier.getId());
             
-            Contact contact = entity.getContact();
+            Contact contact = entry.getContact();
             SocketAddress address = contact.getRemoteAddress();
             counter.remove(address);
             
-            return entity;
+            return entry;
         }
         
         /**
          * Removes the given {@link Identifier} from the {@link Bucket}'s cache list.
          */
-        private ContactEntity removeCache(Identifier identifier) {
+        private ContactEntry removeCache(Identifier identifier) {
             return cached.remove(identifier.getId());
         }
         
@@ -933,22 +934,22 @@ public class DefaultRouteTable extends AbstractRouteTable {
             DefaultBucket left = new DefaultBucket(bucketId, depth+1);
             DefaultBucket right = new DefaultBucket(bucketId.set(depth), depth+1);
             
-            for (ContactEntity entity : active.values()) {
-                KUID contactId = entity.getId();
+            for (ContactEntry entry : active.values()) {
+                KUID contactId = entry.getId();
                 
                 if (!contactId.isBitSet(depth)) {
-                    left.add(entity);
+                    left.add(entry);
                 } else {
-                    right.add(entity);
+                    right.add(entry);
                 }
             }
             
-            for (ContactEntity entity : cached.values()) {
-                KUID contactId = entity.getId();
+            for (ContactEntry entry : cached.values()) {
+                KUID contactId = entry.getId();
                 if (!contactId.isBitSet(depth)) {
-                    left.add(entity);
+                    left.add(entry);
                 } else {
-                    right.add(entity);
+                    right.add(entry);
                 }
             }
             

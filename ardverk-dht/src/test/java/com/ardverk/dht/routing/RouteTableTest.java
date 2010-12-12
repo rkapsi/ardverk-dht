@@ -49,8 +49,8 @@ public class RouteTableTest {
         TestCase.assertEquals(localhost, routeTable.get(localhost.getId()));
         TestCase.assertSame(localhost, routeTable.get(localhost.getId()));
         
-        ContactEntity[] active = routeTable.getActiveContacts();
-        ContactEntity[] cached = routeTable.getCachedContacts();
+        ContactEntry[] active = routeTable.getActiveContacts();
+        ContactEntry[] cached = routeTable.getCachedContacts();
         
         TestCase.assertEquals(1, active.length);
         TestCase.assertEquals(0, cached.length);

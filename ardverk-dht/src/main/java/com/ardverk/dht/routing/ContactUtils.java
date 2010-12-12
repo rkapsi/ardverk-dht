@@ -29,10 +29,10 @@ public class ContactUtils {
 
     private ContactUtils() {}
       
-    private static final Comparator<ContactEntity> HEALTH_ASCENDING 
-        = new Comparator<ContactEntity>() {
+    private static final Comparator<ContactEntry> HEALTH_ASCENDING 
+        = new Comparator<ContactEntry>() {
             @Override
-            public int compare(ContactEntity o1, ContactEntity o2) {
+            public int compare(ContactEntry o1, ContactEntry o2) {
                 int e1 = o1.getErrorCount();
                 int e2 = o2.getErrorCount();
                 
@@ -52,8 +52,8 @@ public class ContactUtils {
             }
         };
         
-    private static final Comparator<ContactEntity> HEALTH_DESCENDING 
-        = new ReverseComparator<ContactEntity>(HEALTH_ASCENDING);
+    private static final Comparator<ContactEntry> HEALTH_DESCENDING 
+        = new ReverseComparator<ContactEntry>(HEALTH_ASCENDING);
     
     public static long getAdaptiveTimeout(Contact contact, 
             long defaultValue, TimeUnit unit) {
@@ -65,58 +65,58 @@ public class ContactUtils {
         return Math.min((long)(rtt * 1.5f), defaultValue);
     }
     
-    public static ContactEntity[] byHealth(ContactEntity[] entities) {
-        return byHealth(entities, true);
+    public static ContactEntry[] byHealth(ContactEntry[] entries) {
+        return byHealth(entries, true);
     }
     
-    public static ContactEntity[] byHealth(ContactEntity[] entities, boolean ascending) {
-        Arrays.sort(entities, ascending ? HEALTH_ASCENDING : HEALTH_DESCENDING);
-        return entities;
-    }
-    
-    /**
-     * Turns the given array of {@link ContactEntity}s into an array of {@link Contact}s.
-     */
-    public static Contact[] toContacts(ContactEntity[] entities) {
-        return toContacts(entities, 0, entities.length);
+    public static ContactEntry[] byHealth(ContactEntry[] entries, boolean ascending) {
+        Arrays.sort(entries, ascending ? HEALTH_ASCENDING : HEALTH_DESCENDING);
+        return entries;
     }
     
     /**
-     * Turns the given array of {@link ContactEntity}s into an array of {@link Contact}s.
+     * Turns the given array of {@link ContactEntry}s into an array of {@link Contact}s.
      */
-    public static Contact[] toContacts(ContactEntity[] entities, int offset, int length) {
+    public static Contact[] toContacts(ContactEntry[] entries) {
+        return toContacts(entries, 0, entries.length);
+    }
+    
+    /**
+     * Turns the given array of {@link ContactEntry}s into an array of {@link Contact}s.
+     */
+    public static Contact[] toContacts(ContactEntry[] entries, int offset, int length) {
         Contact[] contacts = new Contact[length];
         for (int i = 0; i < length; i++) {
-            contacts[i] = entities[offset + i].getContact();
+            contacts[i] = entries[offset + i].getContact();
         }
         return contacts;
     }
     
     /**
-     * Returns the least recently seen {@link ContactEntity} in the 
+     * Returns the least recently seen {@link ContactEntry} in the 
      * given {@link Collection}.
      */
-    public static ContactEntity getLeastRecentlySeen(
-            Collection<? extends ContactEntity> entities) {
-        ContactEntity lrs = null;
-        for (ContactEntity entity : entities) {
-            if (lrs == null || entity.getTimeStamp() < lrs.getTimeStamp()) {
-                lrs = entity;
+    public static ContactEntry getLeastRecentlySeen(
+            Collection<? extends ContactEntry> entries) {
+        ContactEntry lrs = null;
+        for (ContactEntry entry : entries) {
+            if (lrs == null || entry.getTimeStamp() < lrs.getTimeStamp()) {
+                lrs = entry;
             }
         }
         return lrs;
     }
     
     /**
-     * Returns the most recently seen {@link ContactEntity} in the 
+     * Returns the most recently seen {@link ContactEntry} in the 
      * given {@link Collection}.
      */
-    public static ContactEntity getMostRecentlySeen(
-            Collection<? extends ContactEntity> entities) {
-        ContactEntity mrs = null;
-        for (ContactEntity entity : entities) {
-            if (mrs == null || entity.getTimeStamp() >= mrs.getTimeStamp()) {
-                mrs = entity;
+    public static ContactEntry getMostRecentlySeen(
+            Collection<? extends ContactEntry> entries) {
+        ContactEntry mrs = null;
+        for (ContactEntry entry : entries) {
+            if (mrs == null || entry.getTimeStamp() >= mrs.getTimeStamp()) {
+                mrs = entry;
             }
         }
         return mrs;

@@ -52,29 +52,29 @@ public interface Bucket extends Identifier, Longevity {
     public boolean isCacheEmpty();
     
     /**
-     * Returns all active {@link ContactEntity}ies.
+     * Returns all active {@link ContactEntry}ies.
      */
-    public ContactEntity[] getActive();
+    public ContactEntry[] getActive();
     
     /**
-     * Returns all cached {@link ContactEntity}ies.
+     * Returns all cached {@link ContactEntry}ies.
      */
-    public ContactEntity[] getCached();
+    public ContactEntry[] getCached();
     
     /**
-     * Returns a {@link ContactEntity} for the given {@link KUID}.
+     * Returns a {@link ContactEntry} for the given {@link KUID}.
      */
-    public ContactEntity get(KUID contactId);
+    public ContactEntry get(KUID contactId);
     
     /**
-     * Returns an active {@link ContactEntity} for the given {@link KUID}.
+     * Returns an active {@link ContactEntry} for the given {@link KUID}.
      */
-    public ContactEntity getActive(KUID contactId);
+    public ContactEntry getActive(KUID contactId);
     
     /**
-     * Returns a cached {@link ContactEntity} for the given {@link KUID}.
+     * Returns a cached {@link ContactEntry} for the given {@link KUID}.
      */
-    public ContactEntity getCached(KUID contactId);
+    public ContactEntry getCached(KUID contactId);
     
     /**
      * Returns true if the {@link Bucket} contains a 
