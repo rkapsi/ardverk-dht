@@ -44,54 +44,113 @@ import com.ardverk.dht.storage.Database;
 
 public interface DHT {
     
+    /**
+     * 
+     */
     public Contact getLocalhost();
     
+    /**
+     * Returns the {@link DHT}'s {@link RouteTable}.
+     */
     public RouteTable getRouteTable();
     
+    /**
+     * Returns the {@link DHT}'s {@link Database}.
+     */
     public Database getDatabase();
     
+    /**
+     * Returns the {@link DHT}'s {@link MessageDispatcher}.
+     */
     public MessageDispatcher getMessageDispatcher();
     
+    /**
+     * 
+     */
     public ArdverkFuture<BootstrapEntity> bootstrap(
             String host, int port, BootstrapConfig config);
     
+    /**
+     * 
+     */
     public ArdverkFuture<BootstrapEntity> bootstrap(
             InetAddress address, int port, BootstrapConfig config);
     
+    /**
+     * 
+     */
     public ArdverkFuture<BootstrapEntity> bootstrap(
             SocketAddress address, BootstrapConfig config);
     
+    /**
+     * 
+     */
     public ArdverkFuture<BootstrapEntity> bootstrap(
             Contact contact, BootstrapConfig config);
     
+    /**
+     * 
+     */
     public ArdverkFuture<RefreshEntity> refresh(RefreshConfig config);
     
+    /**
+     * 
+     */
     public ArdverkFuture<PingEntity> ping(
             String host, int port, PingConfig config);
     
+    /**
+     * 
+     */
     public ArdverkFuture<PingEntity> ping(
             InetAddress address, int port, PingConfig config);
     
+    /**
+     * 
+     */
     public ArdverkFuture<PingEntity> ping(
             SocketAddress address, PingConfig config);
     
+    /**
+     * 
+     */
     public ArdverkFuture<PingEntity> ping(
             Contact dst, PingConfig config);
     
+    /**
+     * 
+     */
     public ArdverkFuture<NodeEntity> lookup(
             KUID lookupId, LookupConfig config);
     
+    /**
+     * 
+     */
     public ArdverkFuture<NodeEntity> lookup(
             Contact[] contacts, KUID lookupId, LookupConfig config);
     
+    /**
+     * 
+     */
     public ArdverkFuture<ValueEntity> get(
             KUID key, GetConfig config);
     
+    /**
+     * 
+     */
     public ArdverkFuture<ValueEntity> get(
             Contact[] contacts, KUID key, GetConfig config);
     
+    /**
+     * 
+     */
     public ArdverkFuture<StoreEntity> put(
             KUID key, byte[] value, PutConfig config);
+    
+    /**
+     * Removes the given {@link KUID} from the DHT.
+     */
+    public ArdverkFuture<StoreEntity> remove(KUID key, PutConfig config);
     
     public ArdverkFuture<StoreEntity> store(
             Contact[] dst, KUID key, byte[] value, StoreConfig config);

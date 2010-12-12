@@ -183,25 +183,9 @@ public class ArdverkDHT extends AbstractDHT {
 
     @Override
     public ArdverkFuture<PingEntity> ping(
-            InetAddress address, int port, PingConfig config) {
-        AsyncProcess<PingEntity> process 
-            = new PingResponseHandler(messageDispatcher, address, port, config);
-        return submit(process, config);
-    }
-
-    @Override
-    public ArdverkFuture<PingEntity> ping(
             SocketAddress dst, PingConfig config) {
         AsyncProcess<PingEntity> process 
             = new PingResponseHandler(messageDispatcher, dst, config);
-        return submit(process, config);
-    }
-
-    @Override
-    public ArdverkFuture<PingEntity> ping(
-            String address, int port, PingConfig config) {
-        AsyncProcess<PingEntity> process 
-            = new PingResponseHandler(messageDispatcher, address, port, config);
         return submit(process, config);
     }
 
@@ -232,16 +216,14 @@ public class ArdverkDHT extends AbstractDHT {
     }
     
     @Override
+    public ArdverkFuture<StoreEntity> remove(KUID key, PutConfig config) {
+        return storeManager.remove(key, config);
+    }
+
+    @Override
     public ArdverkFuture<StoreEntity> store(
             Contact[] dst, KUID key, byte[] value, StoreConfig config) {
         return storeManager.put(dst, key, value, config);
-    }
-    
-    /**
-     * Removes the given {@link KUID} from the DHT.
-     */
-    public ArdverkFuture<StoreEntity> remove(KUID key, PutConfig config) {
-        return storeManager.put(key, new byte[0], config);
     }
     
     /**

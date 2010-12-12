@@ -17,6 +17,8 @@
 package com.ardverk.dht;
 
 import java.io.Closeable;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncProcess;
@@ -25,7 +27,9 @@ import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.config.Config;
 import com.ardverk.dht.config.GetConfig;
 import com.ardverk.dht.config.LookupConfig;
+import com.ardverk.dht.config.PingConfig;
 import com.ardverk.dht.entity.NodeEntity;
+import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.routing.Contact;
 
@@ -36,6 +40,18 @@ abstract class AbstractDHT implements DHT, Closeable {
     @Override
     public void close() {
         futureManager.close();
+    }
+    
+    @Override
+    public ArdverkFuture<PingEntity> ping(InetAddress address, 
+            int port, PingConfig config) {
+        return ping(new InetSocketAddress(address, port), config);
+    }
+    
+    @Override
+    public ArdverkFuture<PingEntity> ping(String address, 
+            int port, PingConfig config) {
+        return ping(new InetSocketAddress(address, port), config);
     }
     
     @Override

@@ -17,8 +17,6 @@
 package com.ardverk.dht.io;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 
@@ -41,16 +39,6 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
     private final PingConfig config;
     
     private final PingSender sender;
-    
-    public PingResponseHandler(MessageDispatcher messageDispatcher, 
-            String address, int port, PingConfig config) {
-        this(messageDispatcher, new InetSocketAddress(address, port), config);
-    }
-    
-    public PingResponseHandler(MessageDispatcher messageDispatcher, 
-            InetAddress address, int port, PingConfig config) {
-        this(messageDispatcher, new InetSocketAddress(address, port), config);
-    }
     
     public PingResponseHandler(MessageDispatcher messageDispatcher, 
             SocketAddress address, PingConfig config) {
