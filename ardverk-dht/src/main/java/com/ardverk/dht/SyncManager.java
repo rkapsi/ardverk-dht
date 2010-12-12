@@ -216,11 +216,12 @@ public class SyncManager {
         Contact[] contacts = routeTable.select(localhost.getId());
         assert (localhost.equals(contacts[0]));
         
+        // TODO: What's better?
         //Contact[] dst = new Contact[contacts.length-1];
         //System.arraycopy(contacts, 1, dst, 0, dst.length);
+        //return storeManager.store(dst, tuple, storeConfig);
         
-        Contact[] dst = contacts;
-        return storeManager.store(dst, tuple, storeConfig);
+        return storeManager.store(contacts, tuple, storeConfig);
     }
     
     private PingFuture ping(Map<ContactKey, ArdverkFuture<PingEntity>> futures, 
