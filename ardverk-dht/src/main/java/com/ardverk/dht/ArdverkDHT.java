@@ -28,7 +28,7 @@ import com.ardverk.dht.config.GetConfig;
 import com.ardverk.dht.config.LookupConfig;
 import com.ardverk.dht.config.PingConfig;
 import com.ardverk.dht.config.PutConfig;
-import com.ardverk.dht.config.RefreshConfig;
+import com.ardverk.dht.config.QuickenConfig;
 import com.ardverk.dht.config.StoreConfig;
 import com.ardverk.dht.config.SyncConfig;
 import com.ardverk.dht.entity.BootstrapEntity;
@@ -176,7 +176,7 @@ public class ArdverkDHT extends AbstractDHT {
     }
     
     @Override
-    public ArdverkFuture<RefreshEntity> quicken(RefreshConfig config) {
+    public ArdverkFuture<RefreshEntity> quicken(QuickenConfig config) {
         return quickenManager.quicken(config);
     }
 

@@ -29,7 +29,7 @@ import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.concurrent.ArdverkValueFuture;
 import com.ardverk.dht.config.LookupConfig;
 import com.ardverk.dht.config.PingConfig;
-import com.ardverk.dht.config.RefreshConfig;
+import com.ardverk.dht.config.QuickenConfig;
 import com.ardverk.dht.entity.DefaultRefreshEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
@@ -51,7 +51,7 @@ public class QuickenManager {
     }
     
     @SuppressWarnings("unchecked")
-    public ArdverkFuture<RefreshEntity> quicken(RefreshConfig config) {
+    public ArdverkFuture<RefreshEntity> quicken(QuickenConfig config) {
         
         long startTime = System.currentTimeMillis();
         

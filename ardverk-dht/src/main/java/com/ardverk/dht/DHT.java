@@ -29,7 +29,7 @@ import com.ardverk.dht.config.GetConfig;
 import com.ardverk.dht.config.LookupConfig;
 import com.ardverk.dht.config.PingConfig;
 import com.ardverk.dht.config.PutConfig;
-import com.ardverk.dht.config.RefreshConfig;
+import com.ardverk.dht.config.QuickenConfig;
 import com.ardverk.dht.config.StoreConfig;
 import com.ardverk.dht.entity.BootstrapEntity;
 import com.ardverk.dht.entity.NodeEntity;
@@ -93,7 +93,7 @@ public interface DHT {
     /**
      * 
      */
-    public ArdverkFuture<RefreshEntity> quicken(RefreshConfig config);
+    public ArdverkFuture<RefreshEntity> quicken(QuickenConfig config);
     
     /**
      * Sends a PING to the given host.

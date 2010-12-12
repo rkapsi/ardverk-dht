@@ -18,7 +18,7 @@ package com.ardverk.dht.config;
 
 import java.util.concurrent.TimeUnit;
 
-public interface RefreshConfig extends Config {
+public interface QuickenConfig extends Config {
 
     /**
      * Returns the {@link PingConfig} that's used for refreshing.

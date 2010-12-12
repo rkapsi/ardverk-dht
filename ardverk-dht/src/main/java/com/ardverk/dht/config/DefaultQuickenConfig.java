@@ -22,7 +22,7 @@ import org.ardverk.utils.TimeUtils;
 
 import com.ardverk.dht.QueueKey;
 
-public class DefaultRefreshConfig extends AbstractConfig implements RefreshConfig {
+public class DefaultQuickenConfig extends AbstractConfig implements QuickenConfig {
 
     private volatile PingConfig pingConfig = new DefaultPingConfig();
 
