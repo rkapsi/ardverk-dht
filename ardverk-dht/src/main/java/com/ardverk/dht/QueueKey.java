@@ -17,27 +17,32 @@
 package com.ardverk.dht;
 
 /**
- * 
+ * The {@link QueueKey} controls how a particular operation should
+ * be executed.
  */
 public enum QueueKey {
     
     /**
-     * 
+     * The {@link #SERIAL} {@link QueueKey} executions enqueued operations
+     * in a serial fashion.
      */
     SERIAL,
     
     /**
-     * 
+     * The {@link #PARALLEL} {@link QueueKey} executions enqueued operations
+     * in a parallel fashion.
      */
     PARALLEL;
     
     /**
-     * 
+     * The default {@link QueueKey} that should be used unless there
+     * is a reason not to use this {@link QueueKey}.
      */
     public static final QueueKey DEFAULT = QueueKey.PARALLEL;
     
     /**
-     * 
+     * The {@link QueueKey} that should be used for backend and possibly 
+     * for other low priority operations.
      */
     public static final QueueKey BACKEND = QueueKey.SERIAL;
 }
