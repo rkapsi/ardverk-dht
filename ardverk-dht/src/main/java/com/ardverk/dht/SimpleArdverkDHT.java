@@ -16,22 +16,17 @@
 
 package com.ardverk.dht;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.concurrent.TimeUnit;
 
-import org.ardverk.concurrent.AsyncProcess;
-import org.ardverk.io.IoUtils;
 import org.ardverk.net.NetworkUtils;
 
 import com.ardverk.dht.codec.DefaultMessageCodec;
 import com.ardverk.dht.codec.MessageCodec;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.config.BootstrapConfig;
-import com.ardverk.dht.config.Config;
 import com.ardverk.dht.config.DefaultBootstrapConfig;
 import com.ardverk.dht.config.DefaultGetConfig;
 import com.ardverk.dht.config.DefaultLookupConfig;
@@ -62,35 +57,25 @@ import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
 import com.ardverk.dht.storage.DefaultDatabase;
 
-public class SimpleArdverkDHT implements DHT, Closeable {
+public class SimpleArdverkDHT extends ArdverkDHT {
     
-    private final SimpleConfig config;
-    
-    private final ArdverkDHT dht;
-    
-    public SimpleArdverkDHT(SimpleConfig config, int port) throws IOException {
-        this(config, new DatagramTransport(port));
+    public static SimpleArdverkDHT create(
+            SimpleConfig config, int port) throws IOException {
+        return create(config, new DatagramTransport(port));
     }
     
-    public SimpleArdverkDHT(SimpleConfig config, 
+    public static SimpleArdverkDHT create(SimpleConfig config, 
             String address, int port) throws IOException {
-        this(config, new DatagramTransport(address, port));
+        return create(config, new DatagramTransport(address, port));
     }
     
-    public SimpleArdverkDHT(SimpleConfig config, 
-            InetAddress address, int port) throws IOException {
-        this(config, new DatagramTransport(address, port));
-    }
-    
-    public SimpleArdverkDHT(SimpleConfig config, 
+    public static SimpleArdverkDHT create(SimpleConfig config, 
             SocketAddress address) throws IOException {
-        this(config, new DatagramTransport(address));
+        return create(config, new DatagramTransport(address));
     }
     
-    public SimpleArdverkDHT(SimpleConfig config, 
+    public static SimpleArdverkDHT create(SimpleConfig config, 
             Transport transport) throws IOException {
-        this.config = config;
-        
         int keySize = config.getKeySize();
         SocketAddress address = config.getAddress(transport);
         
@@ -107,58 +92,19 @@ public class SimpleArdverkDHT implements DHT, Closeable {
         Database database = new DefaultDatabase();
         RouteTable routeTable = new DefaultRouteTable(localhost);
         
-        dht = new ArdverkDHT(codec, messageFactory, routeTable, database);
+        return new SimpleArdverkDHT(config, transport, 
+                codec, messageFactory, routeTable, database);
+    }
+    
+    private final SimpleConfig config;
+    
+    public SimpleArdverkDHT(SimpleConfig config, Transport transport, 
+            MessageCodec codec, MessageFactory messageFactory,
+            RouteTable routeTable, Database database) throws IOException {
+        super(codec, messageFactory, routeTable, database);
+        
+        this.config = config;
         bind(transport);
-    }
-    
-    public ArdverkDHT getArdverkDHT() {
-        return dht;
-    }
-
-    @Override
-    public void close() {
-        IoUtils.close(dht);
-    }
-    
-    @Override
-    public <V> ArdverkFuture<V> submit(AsyncProcess<V> process, Config config) {
-        return dht.submit(process, config);
-    }
-
-    @Override
-    public <V> ArdverkFuture<V> submit(QueueKey queueKey,
-            AsyncProcess<V> process, long timeout, TimeUnit unit) {
-        return dht.submit(queueKey, process, timeout, unit);
-    }
-
-    @Override
-    public Contact getLocalhost() {
-        return dht.getLocalhost();
-    }
-
-    @Override
-    public RouteTable getRouteTable() {
-        return dht.getRouteTable();
-    }
-
-    @Override
-    public Database getDatabase() {
-        return dht.getDatabase();
-    }
-    
-    @Override
-    public void bind(Transport t) throws IOException {
-        dht.bind(t);
-    }
-
-    @Override
-    public void unbind() {
-        dht.unbind();
-    }
-
-    @Override
-    public boolean isBound() {
-        return dht.isBound();
     }
 
     public ArdverkFuture<PingEntity> ping(String host, int port) {
@@ -177,63 +123,20 @@ public class SimpleArdverkDHT implements DHT, Closeable {
         return ping(dst, config.getPingConfig());
     }
     
-    @Override
-    public ArdverkFuture<PingEntity> ping(String host, int port, PingConfig config) {
-        return dht.ping(host, port, config);
-    }
-
-    @Override
-    public ArdverkFuture<PingEntity> ping(InetAddress address, int port,
-            PingConfig config) {
-        return dht.ping(address, port, config);
-    }
-
-    @Override
-    public ArdverkFuture<PingEntity> ping(SocketAddress address,
-            PingConfig config) {
-        return dht.ping(address, config);
-    }
-
-    @Override
-    public ArdverkFuture<PingEntity> ping(Contact dst, PingConfig config) {
-        return dht.ping(dst, config);
-    }
-
     public ArdverkFuture<NodeEntity> lookup(KUID lookupId) {
         return lookup(lookupId, config.getLookupConfig());
-    }
-    
-    @Override
-    public ArdverkFuture<NodeEntity> lookup(KUID lookupId, LookupConfig config) {
-        return dht.lookup(lookupId, config);
     }
 
     public ArdverkFuture<ValueEntity> get(KUID key) {
         return get(key, config.getGetConfig());
     }
-    
-    @Override
-    public ArdverkFuture<ValueEntity> get(KUID key, GetConfig config) {
-        return dht.get(key, config);
-    }
 
     public ArdverkFuture<StoreEntity> put(KUID key, byte[] value) {
         return put(key, value, config.getPutConfig());
     }
-    
-    @Override
-    public ArdverkFuture<StoreEntity> put(KUID key, byte[] value,
-            PutConfig config) {
-        return dht.put(key, value, config);
-    }
 
     public ArdverkFuture<StoreEntity> remove(KUID key) {
         return remove(key, config.getPutConfig());
-    }
-    
-    @Override
-    public ArdverkFuture<StoreEntity> remove(KUID key, PutConfig config) {
-        return dht.remove(key, config);
     }
     
     public ArdverkFuture<BootstrapEntity> bootstrap(String host, int port) {
@@ -250,49 +153,15 @@ public class SimpleArdverkDHT implements DHT, Closeable {
     }
 
     public ArdverkFuture<BootstrapEntity> bootstrap(Contact contact) {
-        return dht.bootstrap(contact, config.getBootstrapConfig());
-    }
-    
-    @Override
-    public ArdverkFuture<BootstrapEntity> bootstrap(String host, int port,
-            BootstrapConfig config) {
-        return dht.bootstrap(host, port, config);
-    }
-
-    @Override
-    public ArdverkFuture<BootstrapEntity> bootstrap(InetAddress address,
-            int port, BootstrapConfig config) {
-        return dht.bootstrap(address, port, config);
-    }
-
-    @Override
-    public ArdverkFuture<BootstrapEntity> bootstrap(SocketAddress address,
-            BootstrapConfig config) {
-        return dht.bootstrap(address, config);
-    }
-
-    @Override
-    public ArdverkFuture<BootstrapEntity> bootstrap(Contact contact,
-            BootstrapConfig config) {
-        return dht.bootstrap(contact, config);
+        return bootstrap(contact, config.getBootstrapConfig());
     }
 
     public ArdverkFuture<QuickenEntity> quicken() {
         return quicken(config.getQuickenConfig());
     }
     
-    @Override
-    public ArdverkFuture<QuickenEntity> quicken(QuickenConfig config) {
-        return dht.quicken(config);
-    }
-    
     public ArdverkFuture<SyncEntity> sync() {
         return sync(config.getSyncConfig());
-    }
-    
-    @Override
-    public ArdverkFuture<SyncEntity> sync(SyncConfig config) {
-        return dht.sync(config);
     }
     
     public static class SimpleConfig {
