@@ -93,7 +93,7 @@ public interface DHT {
     /**
      * 
      */
-    public ArdverkFuture<RefreshEntity> refresh(RefreshConfig config);
+    public ArdverkFuture<RefreshEntity> quicken(RefreshConfig config);
     
     /**
      * Sends a PING to the given host.

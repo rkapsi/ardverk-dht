@@ -52,7 +52,7 @@ public class ArdverkDHT extends AbstractDHT {
     
     private final BootstrapManager bootstrapManager;
     
-    private final RouteTableManager routeTableManager;
+    private final QuickenManager quickenManager;
     
     private final StoreManager storeManager;
     
@@ -80,7 +80,7 @@ public class ArdverkDHT extends AbstractDHT {
                 routeTable, database);
         
         bootstrapManager = new BootstrapManager(this);
-        routeTableManager = new RouteTableManager(this, routeTable);
+        quickenManager = new QuickenManager(this, routeTable);
         storeManager = new StoreManager(this, routeTable, 
                 messageDispatcher);
         syncManager = new SyncManager(this, 
@@ -135,8 +135,8 @@ public class ArdverkDHT extends AbstractDHT {
         return bootstrapManager;
     }
 
-    public RouteTableManager getRouteTableManager() {
-        return routeTableManager;
+    public QuickenManager getQuickenManager() {
+        return quickenManager;
     }
 
     public StoreManager getStoreManager() {
@@ -176,8 +176,8 @@ public class ArdverkDHT extends AbstractDHT {
     }
     
     @Override
-    public ArdverkFuture<RefreshEntity> refresh(RefreshConfig config) {
-        return routeTableManager.refresh(config);
+    public ArdverkFuture<RefreshEntity> quicken(RefreshConfig config) {
+        return quickenManager.quicken(config);
     }
 
     @Override

@@ -39,19 +39,19 @@ import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.utils.IdentifierUtils;
 
-public class RouteTableManager {
+public class QuickenManager {
 
     private final DHT dht;
     
     private final RouteTable routeTable;
     
-    RouteTableManager(DHT dht, RouteTable routeTable) {
+    QuickenManager(DHT dht, RouteTable routeTable) {
         this.dht = dht;
         this.routeTable = routeTable;
     }
     
     @SuppressWarnings("unchecked")
-    public ArdverkFuture<RefreshEntity> refresh(RefreshConfig config) {
+    public ArdverkFuture<RefreshEntity> quicken(RefreshConfig config) {
         
         long startTime = System.currentTimeMillis();
         

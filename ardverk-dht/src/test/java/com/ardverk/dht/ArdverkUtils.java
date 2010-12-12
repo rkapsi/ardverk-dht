@@ -155,7 +155,7 @@ public class ArdverkUtils {
             //config.setBucketTimeout(1L, TimeUnit.MINUTES);
             
             ArdverkFuture<RefreshEntity> future 
-                = dhts.get(offset + i).refresh(config);
+                = dhts.get(offset + i).quicken(config);
             futures.add(future);
             future.get();
         }
