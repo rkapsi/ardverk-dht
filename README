@@ -1,3 +1,10 @@
-The Ardverk Distributed Hash Table (DHT)
+Ardverk-DHT 
 
-Copyright (c) 2009-2010 Roger Kapsi. All rights reserved.
+The Ardverk Distributed Hash Table (DHT) is an implementation of the Kademlia
+algorithm. It's a highly scalable and fault tolerant key-value store.
+
+
+Contributing
+
+Before your code can be accepted you have to sign the contributor license agreement.
+Please contact the author(s) for further information.
