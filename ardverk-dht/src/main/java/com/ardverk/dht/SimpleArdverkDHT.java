@@ -52,7 +52,6 @@ import com.ardverk.dht.entity.QuickenEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.entity.SyncEntity;
 import com.ardverk.dht.entity.ValueEntity;
-import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.io.transport.DatagramTransport;
 import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.message.DefaultMessageFactory;
@@ -118,7 +117,7 @@ public class SimpleArdverkDHT implements DHT, Closeable {
         RouteTable routeTable = new DefaultRouteTable(localhost);
         
         dht = new ArdverkDHT(codec, messageFactory, routeTable, database);
-        dht.getMessageDispatcher().bind(transport);
+        dht.bind(transport);
     }
     
     public ArdverkDHT getArdverkDHT() {
@@ -155,10 +154,20 @@ public class SimpleArdverkDHT implements DHT, Closeable {
     public Database getDatabase() {
         return dht.getDatabase();
     }
+    
+    @Override
+    public void bind(Transport t) throws IOException {
+        dht.bind(t);
+    }
 
     @Override
-    public MessageDispatcher getMessageDispatcher() {
-        return dht.getMessageDispatcher();
+    public void unbind() {
+        dht.unbind();
+    }
+
+    @Override
+    public boolean isBound() {
+        return dht.isBound();
     }
 
     public ArdverkFuture<PingEntity> ping(String host, int port) {

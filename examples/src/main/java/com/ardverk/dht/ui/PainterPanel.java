@@ -29,6 +29,7 @@ import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+import com.ardverk.dht.ArdverkDHT;
 import com.ardverk.dht.DHT;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.io.MessageListener;
@@ -94,14 +95,14 @@ public class PainterPanel extends JPanel {
     public void start() {
         if (!isRunning()) {
             timer.start();
-            dht.getMessageDispatcher().addMessageListener(listener);
+            ((ArdverkDHT)dht).getMessageDispatcher().addMessageListener(listener);
         }
     }
     
     public void stop() {
         if (isRunning()) {
             timer.stop();
-            dht.getMessageDispatcher().removeMessageListener(listener);
+            ((ArdverkDHT)dht).getMessageDispatcher().removeMessageListener(listener);
         }
     }
     

@@ -32,6 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.ardverk.collection.FixedSizeHashSet;
 import org.ardverk.concurrent.ExecutorUtils;
+import org.ardverk.io.Bindable;
 import org.ardverk.io.IoUtils;
 import org.ardverk.lang.Arguments;
 import org.ardverk.lang.NullArgumentException;
@@ -53,7 +54,8 @@ import com.ardverk.dht.routing.Contact;
 /**
  * 
  */
-public abstract class MessageDispatcher implements Closeable {
+public abstract class MessageDispatcher 
+        implements Bindable<Transport>, Closeable {
     
     private static final Logger LOG 
         = LoggerUtils.getLogger(MessageDispatcher.class);
@@ -97,15 +99,18 @@ public abstract class MessageDispatcher implements Closeable {
     }
     
     /**
-     * 
+     * Returns the {@link Transport}
      */
+    public synchronized Transport getTransport() {
+        return transport;
+    }
+    
+    @Override
     public synchronized boolean isBound() {
         return transport != null;
     }
     
-    /**
-     * 
-     */
+    @Override
     public synchronized void bind(Transport transport) throws IOException {
         if (transport == null) {
             throw new NullArgumentException("transport");
@@ -119,37 +124,24 @@ public abstract class MessageDispatcher implements Closeable {
         this.transport = transport;
     }
     
-    /**
-     * 
-     */
-    public synchronized Transport unbind() {
-        return unbind(false);
+    @Override
+    public synchronized void unbind() {
+        unbind(false);
     }
     
     /**
-     * 
+     * Unbinds the {@link Transport} and closes it optionally.
      */
-    private synchronized Transport unbind(boolean close) {
-        Transport copy = this.transport;
-        
+    private synchronized void unbind(boolean close) {
         if (transport != null) {
-            transport.unbind();
+            IoUtils.unbind(transport);
             
-            if (close && transport instanceof Closeable) {
-                IoUtils.close((Closeable)transport);
+            if (close) {
+                IoUtils.close(transport);
             }
             
             transport = null;
         }
-        
-        return copy;
-    }
-    
-    /**
-     * Returns the {@link Transport}
-     */
-    public synchronized Transport getTransport() {
-        return transport;
     }
     
     @Override

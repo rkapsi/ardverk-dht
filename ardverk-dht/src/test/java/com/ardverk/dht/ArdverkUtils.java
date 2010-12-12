@@ -74,7 +74,7 @@ public class ArdverkUtils {
         
         Transport transport = new DatagramTransport(
                 NetworkUtils.getPort(address));
-        dht.getMessageDispatcher().bind(transport);
+        dht.bind(transport);
         
         return dht;
     }

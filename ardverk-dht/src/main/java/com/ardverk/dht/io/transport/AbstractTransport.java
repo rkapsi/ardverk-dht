@@ -22,6 +22,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.ardverk.lang.NullArgumentException;
 
+/**
+ * An abstract implementation of {@link Transport}.
+ */
 public abstract class AbstractTransport implements Transport {
     
     private final AtomicReference<TransportCallback> callbackRef 

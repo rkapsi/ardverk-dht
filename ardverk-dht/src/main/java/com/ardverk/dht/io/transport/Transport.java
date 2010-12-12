@@ -19,36 +19,27 @@ package com.ardverk.dht.io.transport;
 import java.io.IOException;
 import java.net.SocketAddress;
 
-/**
- * 
- */
-public interface Transport {
+import org.ardverk.io.Bindable;
 
+/**
+ * The {@link Transport} provides a generic interface for the DHT to 
+ * send and receive messages over UDP or any other transport layer.
+ */
+public interface Transport extends Bindable<TransportCallback> {
+
+    /**
+     * Returns the local {@link SocketAddress}
+     */
     public SocketAddress getSocketAddress();
     
     /**
-     * 
-     */
-    public void bind(TransportCallback callback) throws IOException;
-    
-    /**
-     * 
-     */
-    public void unbind();
-    
-    /**
-     * 
-     */
-    public boolean isBound();
-    
-    /**
-     * 
+     * Sends a message to the given {@link SocketAddress}.
      */
     public void send(SocketAddress dst, byte[] message)
             throws IOException;
 
     /**
-     * 
+     * Sends a message to the given {@link SocketAddress}.
      */
     public void send(SocketAddress dst, byte[] message, int offset,
             int length) throws IOException;

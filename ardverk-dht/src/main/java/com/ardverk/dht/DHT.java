@@ -16,14 +16,17 @@
 
 package com.ardverk.dht;
 
+import org.ardverk.io.Bindable;
+
 import com.ardverk.dht.concurrent.ArdverkFutureService;
-import com.ardverk.dht.io.MessageDispatcher;
+import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
 
 public interface DHT extends ArdverkService, BootstrapService, 
-        QuickenService, SyncService, ArdverkFutureService {
+        QuickenService, SyncService, ArdverkFutureService, 
+        Bindable<Transport> {
     
     /**
      * Returns the localhost {@link Contact}.
@@ -41,9 +44,4 @@ public interface DHT extends ArdverkService, BootstrapService,
      * Returns the {@link DHT}'s {@link Database}.
      */
     public Database getDatabase();
-    
-    /**
-     * Returns the {@link DHT}'s {@link MessageDispatcher}.
-     */
-    public MessageDispatcher getMessageDispatcher();
 }

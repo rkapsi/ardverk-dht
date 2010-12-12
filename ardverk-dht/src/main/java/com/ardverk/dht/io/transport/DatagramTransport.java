@@ -33,6 +33,9 @@ import org.slf4j.Logger;
 
 import com.ardverk.dht.logging.LoggerUtils;
 
+/**
+ * An implementation of {@link Transport} that uses {@link DatagramSocket}s.
+ */
 public class DatagramTransport extends AbstractTransport implements Closeable {
 
     private static final Logger LOG 

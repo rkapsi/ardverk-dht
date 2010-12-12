@@ -16,6 +16,7 @@
 
 package com.ardverk.dht;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketAddress;
 
@@ -38,6 +39,7 @@ import com.ardverk.dht.entity.SyncEntity;
 import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.io.DefaultMessageDispatcher;
 import com.ardverk.dht.io.MessageDispatcher;
+import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
@@ -126,7 +128,6 @@ public class ArdverkDHT extends AbstractDHT {
         return database;
     }
     
-    @Override
     public MessageDispatcher getMessageDispatcher() {
         return messageDispatcher;
     }
@@ -153,6 +154,21 @@ public class ArdverkDHT extends AbstractDHT {
     
     public PingManager getPingManager() {
         return pingManager;
+    }
+    
+    @Override
+    public void bind(Transport transport) throws IOException {
+        messageDispatcher.bind(transport);
+    }
+
+    @Override
+    public void unbind() {
+        messageDispatcher.unbind();
+    }
+
+    @Override
+    public boolean isBound() {
+        return messageDispatcher.isBound();
     }
 
     @Override
