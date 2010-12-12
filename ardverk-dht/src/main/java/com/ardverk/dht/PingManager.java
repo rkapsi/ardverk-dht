@@ -21,6 +21,7 @@ import java.net.SocketAddress;
 import org.ardverk.concurrent.AsyncProcess;
 
 import com.ardverk.dht.concurrent.ArdverkFuture;
+import com.ardverk.dht.concurrent.ArdverkFutureService;
 import com.ardverk.dht.config.PingConfig;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.io.MessageDispatcher;
@@ -29,25 +30,26 @@ import com.ardverk.dht.routing.Contact;
 
 public class PingManager {
 
-    private final DHT dht;
+    private final ArdverkFutureService futureService;
     
     private final MessageDispatcher messageDispatcher;
     
-    PingManager(DHT dht, MessageDispatcher messageDispatcher) {
-        this.dht = dht;
+    PingManager(ArdverkFutureService futureService, 
+            MessageDispatcher messageDispatcher) {
+        this.futureService = futureService;
         this.messageDispatcher = messageDispatcher;
     }
     
     public ArdverkFuture<PingEntity> ping(Contact contact, PingConfig config) {
         AsyncProcess<PingEntity> process 
             = new PingResponseHandler(messageDispatcher, contact, config);
-        return dht.submit(process, config);
+        return futureService.submit(process, config);
     }
     
     public ArdverkFuture<PingEntity> ping(
             SocketAddress dst, PingConfig config) {
         AsyncProcess<PingEntity> process 
             = new PingResponseHandler(messageDispatcher, dst, config);
-        return dht.submit(process, config);
+        return futureService.submit(process, config);
     }
 }

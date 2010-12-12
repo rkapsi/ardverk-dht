@@ -78,15 +78,15 @@ public class ArdverkDHT extends AbstractDHT {
                 messageFactory, codec, storeForward, 
                 routeTable, database);
         
+        pingManager = new PingManager(this, messageDispatcher);
         bootstrapManager = new BootstrapManager(this);
         quickenManager = new QuickenManager(this, routeTable);
         storeManager = new StoreManager(this, routeTable, 
                 messageDispatcher);
-        syncManager = new SyncManager(this, 
+        syncManager = new SyncManager(pingManager, 
                 storeManager, routeTable, database);
         lookupManager = new LookupManager(this, 
                 messageDispatcher, routeTable);
-        pingManager = new PingManager(this, messageDispatcher);
         
         routeTable.bind(new RouteTable.ContactPinger() {
             @Override

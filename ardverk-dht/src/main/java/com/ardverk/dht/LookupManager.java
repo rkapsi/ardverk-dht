@@ -19,6 +19,7 @@ package com.ardverk.dht;
 import org.ardverk.concurrent.AsyncProcess;
 
 import com.ardverk.dht.concurrent.ArdverkFuture;
+import com.ardverk.dht.concurrent.ArdverkFutureService;
 import com.ardverk.dht.config.GetConfig;
 import com.ardverk.dht.config.LookupConfig;
 import com.ardverk.dht.entity.NodeEntity;
@@ -31,15 +32,16 @@ import com.ardverk.dht.routing.RouteTable;
 
 public class LookupManager {
 
-    private final DHT dht;
+    private final ArdverkFutureService futureService;
     
     private final MessageDispatcher messageDispatcher;
     
     private final RouteTable routeTable;
     
-    LookupManager(DHT dht, MessageDispatcher messageDispatcher, 
+    LookupManager(ArdverkFutureService futureService, 
+            MessageDispatcher messageDispatcher, 
             RouteTable routeTable) {
-        this.dht = dht;
+        this.futureService = futureService;
         this.messageDispatcher = messageDispatcher;
         this.routeTable = routeTable;
     }
@@ -55,7 +57,7 @@ public class LookupManager {
         AsyncProcess<NodeEntity> process 
             = new NodeResponseHandler(messageDispatcher, 
                     contacts, routeTable, lookupId, config);
-        return dht.submit(process, config);
+        return futureService.submit(process, config);
     }
     
     public ArdverkFuture<ValueEntity> get(KUID key, GetConfig config) {
@@ -68,6 +70,6 @@ public class LookupManager {
         AsyncProcess<ValueEntity> process
             = new ValueResponseHandler(messageDispatcher, contacts, 
                     routeTable, key, config);
-        return dht.submit(process, config);
+        return futureService.submit(process, config);
     }
 }

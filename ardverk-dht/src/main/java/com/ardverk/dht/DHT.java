@@ -18,13 +18,10 @@ package com.ardverk.dht;
 
 import java.net.InetAddress;
 import java.net.SocketAddress;
-import java.util.concurrent.TimeUnit;
-
-import org.ardverk.concurrent.AsyncProcess;
 
 import com.ardverk.dht.concurrent.ArdverkFuture;
+import com.ardverk.dht.concurrent.ArdverkFutureService;
 import com.ardverk.dht.config.BootstrapConfig;
-import com.ardverk.dht.config.Config;
 import com.ardverk.dht.config.GetConfig;
 import com.ardverk.dht.config.LookupConfig;
 import com.ardverk.dht.config.PingConfig;
@@ -42,7 +39,7 @@ import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
 
-public interface DHT {
+public interface DHT extends ArdverkFutureService {
     
     /**
      * Returns the localhost {@link Contact}.
@@ -150,16 +147,4 @@ public interface DHT {
      */
     public ArdverkFuture<StoreEntity> store(Contact[] dst, 
             KUID key, byte[] value, StoreConfig config);
-    
-    /**
-     * Submits the given {@link AsyncProcess} for execution.
-     */
-    public <V> ArdverkFuture<V> submit(
-            AsyncProcess<V> process, Config config);
-    
-    /**
-     * Submits the given {@link AsyncProcess} for execution.
-     */
-    public <V> ArdverkFuture<V> submit(QueueKey queueKey, 
-            AsyncProcess<V> process, long timeout, TimeUnit unit);
 }

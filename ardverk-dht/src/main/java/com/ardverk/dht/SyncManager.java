@@ -51,7 +51,7 @@ public class SyncManager {
         SKIP_VALUE;
     }
     
-    private final DHT dht;
+    private final PingManager pingManager;
     
     private final StoreManager storeManager;
     
@@ -59,9 +59,9 @@ public class SyncManager {
     
     private final Database database;
     
-    SyncManager(DHT dht, StoreManager storeManager, 
+    SyncManager(PingManager pingManager, StoreManager storeManager, 
             RouteTable routeTable, Database database) {
-        this.dht = dht;
+        this.pingManager = pingManager;
         this.storeManager = storeManager;
         this.routeTable = routeTable;
         this.database = database;
@@ -236,7 +236,7 @@ public class SyncManager {
             
             ArdverkFuture<PingEntity> future = futures.get(key);
             if (future == null) {
-                future = dht.ping(contact, pingConfig);
+                future = pingManager.ping(contact, pingConfig);
                 futures.put(key, future);
             }
             
