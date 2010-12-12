@@ -1,6 +1,5 @@
 package com.ardverk.dht.routing;
 
-import org.ardverk.lang.NullArgumentException;
 import org.ardverk.net.NetworkUtils;
 
 import com.ardverk.dht.KUID;
@@ -108,12 +107,8 @@ class ContactEntity implements Identifier, Longevity {
         return (System.currentTimeMillis() - getTimeStamp()) < timeout;
     }
     
-    public boolean same(Contact other) {
-        if (other == null) {
-            throw new NullArgumentException("other");
-        }
-        
-        return contact != null && contact.equals(other);
+    public boolean isSameContact(Contact other) {
+        return contact.equals(other);
     }
     
     public static class Update {

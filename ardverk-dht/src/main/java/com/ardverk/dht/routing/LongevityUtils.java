@@ -6,6 +6,10 @@ import java.util.Comparator;
 import org.ardverk.utils.LongComparator;
 import org.ardverk.utils.ReverseComparator;
 
+/**
+ * This class provides various utility methods to work 
+ * with {@link Longevity} objects.
+ */
 public class LongevityUtils {
     
     public static final Comparator<Longevity> TIMESTAMP_ASCENDING 

@@ -183,7 +183,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
             ContactEntity entity, Contact contact) {
         
         // Make sure neither is the localhost!
-        assert (!entity.same(localhost) 
+        assert (!entity.isSameContact(localhost) 
                 && !contact.equals(localhost));
         
         // Make sure non-ACTIVE contacts can never 
