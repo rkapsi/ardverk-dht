@@ -22,6 +22,7 @@ import org.ardverk.concurrent.AsyncProcess;
 import org.ardverk.concurrent.FutureUtils;
 import org.ardverk.concurrent.NopAsyncProcess;
 import org.ardverk.concurrent.ValueReference;
+import org.ardverk.lang.Bytes;
 
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.config.PutConfig;
@@ -31,7 +32,6 @@ import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.io.StoreResponseHandler;
-import com.ardverk.dht.lang.Bytes;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.DefaultValueTuple;
