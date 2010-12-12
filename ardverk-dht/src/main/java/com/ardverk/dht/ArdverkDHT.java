@@ -1,3 +1,19 @@
+/*
+ * Copyright 2010 Roger Kapsi
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.ardverk.dht;
 
 import java.net.InetAddress;
@@ -222,7 +238,14 @@ public class ArdverkDHT extends AbstractDHT {
     }
     
     /**
-     * 
+     * Removes the given {@link KUID} from the DHT.
+     */
+    public ArdverkFuture<StoreEntity> remove(KUID key, PutConfig config) {
+        return storeManager.put(key, new byte[0], config);
+    }
+    
+    /**
+     * Synchronizes this {@link Contact}'s values with the k-closest.
      */
     public ArdverkFuture<SyncEntity> sync(SyncConfig config) {
         return syncManager.sync(config);
