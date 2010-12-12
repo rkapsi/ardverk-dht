@@ -20,13 +20,13 @@ import java.util.concurrent.TimeUnit;
 
 import com.ardverk.dht.concurrent.ArdverkFuture;
 
-public class DefaultRefreshEntity extends AbstractEntity implements RefreshEntity {
+public class DefaultQuickenEntity extends AbstractEntity implements QuickenEntity {
 
     private final ArdverkFuture<PingEntity>[] pingFutures;
     
     private final ArdverkFuture<NodeEntity>[] lookupFutures;
     
-    public DefaultRefreshEntity(ArdverkFuture<PingEntity>[] pingFutures, 
+    public DefaultQuickenEntity(ArdverkFuture<PingEntity>[] pingFutures, 
             ArdverkFuture<NodeEntity>[] lookupFutures, long time, TimeUnit unit) {
         super(time, unit);
         

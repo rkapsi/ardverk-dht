@@ -30,10 +30,10 @@ import com.ardverk.dht.concurrent.ArdverkValueFuture;
 import com.ardverk.dht.config.LookupConfig;
 import com.ardverk.dht.config.PingConfig;
 import com.ardverk.dht.config.QuickenConfig;
-import com.ardverk.dht.entity.DefaultRefreshEntity;
+import com.ardverk.dht.entity.DefaultQuickenEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
-import com.ardverk.dht.entity.RefreshEntity;
+import com.ardverk.dht.entity.QuickenEntity;
 import com.ardverk.dht.routing.Bucket;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
@@ -51,7 +51,7 @@ public class QuickenManager {
     }
     
     @SuppressWarnings("unchecked")
-    public ArdverkFuture<RefreshEntity> quicken(QuickenConfig config) {
+    public ArdverkFuture<QuickenEntity> quicken(QuickenConfig config) {
         
         long startTime = System.currentTimeMillis();
         
@@ -121,7 +121,7 @@ public class QuickenManager {
         return new RefreshFuture(startTime, pings, lookups);
     }
     
-    public static class RefreshFuture extends ArdverkValueFuture<RefreshEntity> {
+    public static class RefreshFuture extends ArdverkValueFuture<QuickenEntity> {
         
         private final AtomicInteger countdown = new AtomicInteger();
         
@@ -189,7 +189,7 @@ public class QuickenManager {
         
         private void complete() {
             long time = System.currentTimeMillis() - startTime;
-            setValue(new DefaultRefreshEntity(pingFutures, lookupFutures, 
+            setValue(new DefaultQuickenEntity(pingFutures, lookupFutures, 
                     time, TimeUnit.MILLISECONDS));
         }
     }

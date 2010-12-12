@@ -34,7 +34,7 @@ import com.ardverk.dht.config.SyncConfig;
 import com.ardverk.dht.entity.BootstrapEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
-import com.ardverk.dht.entity.RefreshEntity;
+import com.ardverk.dht.entity.QuickenEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.entity.SyncEntity;
 import com.ardverk.dht.entity.ValueEntity;
@@ -176,7 +176,7 @@ public class ArdverkDHT extends AbstractDHT {
     }
     
     @Override
-    public ArdverkFuture<RefreshEntity> quicken(QuickenConfig config) {
+    public ArdverkFuture<QuickenEntity> quicken(QuickenConfig config) {
         return quickenManager.quicken(config);
     }
 

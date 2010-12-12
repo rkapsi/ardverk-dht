@@ -32,9 +32,9 @@ import com.ardverk.dht.codec.MessageCodec;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.config.BootstrapConfig;
 import com.ardverk.dht.config.DefaultBootstrapConfig;
-import com.ardverk.dht.config.DefaultRefreshConfig;
+import com.ardverk.dht.config.DefaultQuickenConfig;
 import com.ardverk.dht.entity.BootstrapEntity;
-import com.ardverk.dht.entity.RefreshEntity;
+import com.ardverk.dht.entity.QuickenEntity;
 import com.ardverk.dht.io.transport.DatagramTransport;
 import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.message.DefaultMessageFactory;
@@ -136,25 +136,25 @@ public class ArdverkUtils {
         return futures;
     }
     
-    public static List<ArdverkFuture<RefreshEntity>> refresh(List<? extends DHT> dhts) 
+    public static List<ArdverkFuture<QuickenEntity>> refresh(List<? extends DHT> dhts) 
             throws InterruptedException, ExecutionException {
         return refresh(dhts, 0, dhts.size());
     }
     
-    public static List<ArdverkFuture<RefreshEntity>> refresh(List<? extends DHT> dhts, int offset, int length) 
+    public static List<ArdverkFuture<QuickenEntity>> refresh(List<? extends DHT> dhts, int offset, int length) 
             throws InterruptedException, ExecutionException {
         
-        List<ArdverkFuture<RefreshEntity>> futures 
-            = new ArrayList<ArdverkFuture<RefreshEntity>>();
+        List<ArdverkFuture<QuickenEntity>> futures 
+            = new ArrayList<ArdverkFuture<QuickenEntity>>();
         
-        DefaultRefreshConfig config = new DefaultRefreshConfig();
+        DefaultQuickenConfig config = new DefaultQuickenConfig();
         config.setQueueKey(QueueKey.BACKEND);
         
         for (int i = 0; i < length; i++) {
             config.setBucketTimeout(-1L, TimeUnit.MILLISECONDS);
             //config.setBucketTimeout(1L, TimeUnit.MINUTES);
             
-            ArdverkFuture<RefreshEntity> future 
+            ArdverkFuture<QuickenEntity> future 
                 = dhts.get(offset + i).quicken(config);
             futures.add(future);
             future.get();
