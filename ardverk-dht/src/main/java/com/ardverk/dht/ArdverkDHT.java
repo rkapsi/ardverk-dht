@@ -40,9 +40,7 @@ import com.ardverk.dht.entity.SyncEntity;
 import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.io.DefaultMessageDispatcher;
 import com.ardverk.dht.io.MessageDispatcher;
-import com.ardverk.dht.io.NodeResponseHandler;
 import com.ardverk.dht.io.PingResponseHandler;
-import com.ardverk.dht.io.ValueResponseHandler;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
@@ -59,6 +57,8 @@ public class ArdverkDHT extends AbstractDHT {
     private final StoreManager storeManager;
     
     private final SyncManager syncManager;
+    
+    private final LookupManager lookupManager;
     
     private final RouteTable routeTable;
     
@@ -85,6 +85,8 @@ public class ArdverkDHT extends AbstractDHT {
                 messageDispatcher);
         syncManager = new SyncManager(this, 
                 storeManager, routeTable, database);
+        lookupManager = new LookupManager(this, 
+                messageDispatcher, routeTable);
         
         routeTable.bind(new RouteTable.ContactPinger() {
             @Override
@@ -144,6 +146,10 @@ public class ArdverkDHT extends AbstractDHT {
     public SyncManager getSyncManager() {
         return syncManager;
     }
+    
+    public LookupManager getLookupManager() {
+        return lookupManager;
+    }
 
     @Override
     public ArdverkFuture<BootstrapEntity> bootstrap(
@@ -190,22 +196,15 @@ public class ArdverkDHT extends AbstractDHT {
     }
 
     @Override
-    public ArdverkFuture<NodeEntity> lookup(Contact[] contacts, 
-            KUID lookupId, LookupConfig config) {
-        
-        AsyncProcess<NodeEntity> process 
-            = new NodeResponseHandler(messageDispatcher, 
-                    contacts, routeTable, lookupId, config);
-        return submit(process, config);
+    public ArdverkFuture<NodeEntity> lookup(KUID lookupId, LookupConfig config) {
+        Contact[] contacts = getRouteTable().select(lookupId);
+        return lookupManager.lookup(contacts, lookupId, config);
     }
-
+    
     @Override
-    public ArdverkFuture<ValueEntity> get(Contact[] contacts, 
-            KUID key, GetConfig config) {
-        AsyncProcess<ValueEntity> process
-            = new ValueResponseHandler(messageDispatcher, contacts, 
-                    routeTable, key, config);
-        return submit(process, config);
+    public ArdverkFuture<ValueEntity> get(KUID key, GetConfig config) {
+        Contact[] contacts = getRouteTable().select(key);
+        return lookupManager.get(contacts, key, config);
     }
 
     @Override

@@ -25,14 +25,12 @@ import org.ardverk.concurrent.AsyncProcess;
 
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.config.Config;
-import com.ardverk.dht.config.GetConfig;
-import com.ardverk.dht.config.LookupConfig;
 import com.ardverk.dht.config.PingConfig;
-import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
-import com.ardverk.dht.entity.ValueEntity;
-import com.ardverk.dht.routing.Contact;
 
+/**
+ * An abstract implementation of {@link DHT}.
+ */
 abstract class AbstractDHT implements DHT, Closeable {
 
     private final FutureManager futureManager = new FutureManager();
@@ -55,18 +53,6 @@ abstract class AbstractDHT implements DHT, Closeable {
     }
     
     @Override
-    public ArdverkFuture<NodeEntity> lookup(KUID lookupId, LookupConfig config) {
-        Contact[] contacts = getRouteTable().select(lookupId);
-        return lookup(contacts, lookupId, config);
-    }
-    
-    @Override
-    public ArdverkFuture<ValueEntity> get(KUID key, GetConfig config) {
-        Contact[] contacts = getRouteTable().select(key);
-        return get(contacts, key, config);
-    }
-
-    @Override
     public <V> ArdverkFuture<V> submit(AsyncProcess<V> process, Config config) {
         QueueKey queueKey = config.getQueueKey();
         long timeout = config.getOperationTimeoutInMillis();
@@ -77,5 +63,10 @@ abstract class AbstractDHT implements DHT, Closeable {
     public <V> ArdverkFuture<V> submit(QueueKey queueKey,
             AsyncProcess<V> process, long timeout, TimeUnit unit) {
         return futureManager.submit(queueKey, process, timeout, unit);
+    }
+    
+    @Override
+    public String toString() {
+        return getRouteTable().getLocalhost().toString();
     }
 }

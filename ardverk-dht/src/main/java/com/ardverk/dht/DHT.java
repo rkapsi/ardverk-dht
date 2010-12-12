@@ -126,25 +126,13 @@ public interface DHT {
             KUID lookupId, LookupConfig config);
     
     /**
-     * 
-     */
-    public ArdverkFuture<NodeEntity> lookup(
-            Contact[] contacts, KUID lookupId, LookupConfig config);
-    
-    /**
-     * 
+     * Retrieves a key-value from the DHT.
      */
     public ArdverkFuture<ValueEntity> get(
             KUID key, GetConfig config);
     
     /**
-     * 
-     */
-    public ArdverkFuture<ValueEntity> get(
-            Contact[] contacts, KUID key, GetConfig config);
-    
-    /**
-     * 
+     * Stores the given key-value in the DHT.
      */
     public ArdverkFuture<StoreEntity> put(
             KUID key, byte[] value, PutConfig config);
@@ -154,8 +142,14 @@ public interface DHT {
      */
     public ArdverkFuture<StoreEntity> remove(KUID key, PutConfig config);
     
-    public ArdverkFuture<StoreEntity> store(
-            Contact[] dst, KUID key, byte[] value, StoreConfig config);
+    /**
+     * Sends a STORE request to the given list of {@link Contact}s.
+     * 
+     * NOTE: It's being assumed the {@link Contact}s are already sorted by
+     * their XOR distance to the given {@link KUID}.
+     */
+    public ArdverkFuture<StoreEntity> store(Contact[] dst, 
+            KUID key, byte[] value, StoreConfig config);
     
     /**
      * Submits the given {@link AsyncProcess} for execution.

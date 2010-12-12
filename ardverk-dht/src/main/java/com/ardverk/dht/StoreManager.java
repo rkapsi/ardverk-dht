@@ -16,7 +16,6 @@
 
 package com.ardverk.dht;
 
-
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.AsyncProcess;
