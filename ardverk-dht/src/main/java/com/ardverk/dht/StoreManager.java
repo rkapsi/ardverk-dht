@@ -36,8 +36,8 @@ public class StoreManager {
         this.messageDispatcher = messageDispatcher;
     }
     
-    public ArdverkFuture<StoreEntity> put(
-            final KUID key, final byte[] value, final PutConfig config) {
+    public ArdverkFuture<StoreEntity> put(final KUID key, final byte[] value, 
+            final PutConfig config) {
         
         final Object lock = new Object();
         synchronized (lock) {
