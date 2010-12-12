@@ -31,6 +31,7 @@ import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.io.StoreResponseHandler;
+import com.ardverk.dht.lang.Bytes;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.DefaultValueTuple;
@@ -38,8 +39,6 @@ import com.ardverk.dht.storage.ValueTuple;
 
 public class StoreManager {
 
-    private static final byte[] EMPTY = new byte[0];
-    
     private final DHT dht;
     
     private final RouteTable routeTable;
@@ -54,7 +53,7 @@ public class StoreManager {
     }
     
     public ArdverkFuture<StoreEntity> remove(KUID key, PutConfig config) {
-        return put(key, EMPTY, config);
+        return put(key, Bytes.EMPTY, config);
     }
     
     public ArdverkFuture<StoreEntity> put(final KUID key, final byte[] value, 
