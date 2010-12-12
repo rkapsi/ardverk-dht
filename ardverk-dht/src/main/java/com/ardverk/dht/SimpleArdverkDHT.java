@@ -63,61 +63,52 @@ import com.ardverk.dht.storage.Database;
 import com.ardverk.dht.storage.DefaultDatabase;
 
 public class SimpleArdverkDHT implements DHT, Closeable {
-
-    public static final int DEFAULT_KEY_SIZE = 20;
     
-    private volatile PingConfig pingConfig = new DefaultPingConfig();
-    
-    private volatile LookupConfig lookupConfig = new DefaultLookupConfig();
-    
-    private volatile GetConfig getConfig = new DefaultGetConfig();
-    
-    private volatile PutConfig putConfig = new DefaultPutConfig();
-    
-    private volatile BootstrapConfig bootstrapConfig = new DefaultBootstrapConfig();
-    
-    private volatile QuickenConfig quickenConfig = new DefaultQuickenConfig();
-    
-    private volatile SyncConfig syncConfig = new DefaultSyncConfig();
+    private final SimpleConfig config;
     
     private final ArdverkDHT dht;
     
-    public SimpleArdverkDHT(int port) throws IOException {
-        this(new DatagramTransport(port));
+    public SimpleArdverkDHT(SimpleConfig config, int port) throws IOException {
+        this(config, new DatagramTransport(port));
     }
     
-    public SimpleArdverkDHT(String address, int port) throws IOException {
-        this(new DatagramTransport(address, port));
+    public SimpleArdverkDHT(SimpleConfig config, 
+            String address, int port) throws IOException {
+        this(config, new DatagramTransport(address, port));
     }
     
-    public SimpleArdverkDHT(InetAddress address, int port) throws IOException {
-        this(new DatagramTransport(address, port));
+    public SimpleArdverkDHT(SimpleConfig config, 
+            InetAddress address, int port) throws IOException {
+        this(config, new DatagramTransport(address, port));
     }
     
-    public SimpleArdverkDHT(SocketAddress address) throws IOException {
-        this(new DatagramTransport(address));
+    public SimpleArdverkDHT(SimpleConfig config, 
+            SocketAddress address) throws IOException {
+        this(config, new DatagramTransport(address));
     }
     
-    public SimpleArdverkDHT(Transport transport) throws IOException {
-        this(transport, null, null);
-    }
-    
-    public SimpleArdverkDHT(Transport transport, 
-            String secretKey, String initVector) throws IOException {
-        Contact localhost = Contact.localhost(
-                KUID.createRandom(DEFAULT_KEY_SIZE), 
-                extract(transport.getSocketAddress()));
+    public SimpleArdverkDHT(SimpleConfig config, 
+            Transport transport) throws IOException {
+        this.config = config;
         
+        int keySize = config.getKeySize();
+        SocketAddress address = config.getAddress(transport);
+        
+        Contact localhost = Contact.localhost(
+                KUID.createRandom(keySize), address);
+        
+        String secretKey = config.getSecretKey();
+        String initVector = config.getInitVector();
         MessageCodec codec = new DefaultMessageCodec(secretKey, initVector);
         
-        MessageFactory messageFactory = new DefaultMessageFactory(
-                DEFAULT_KEY_SIZE, localhost);
+        MessageFactory messageFactory 
+            = new DefaultMessageFactory(keySize, localhost);
         
         Database database = new DefaultDatabase();
         RouteTable routeTable = new DefaultRouteTable(localhost);
         
         dht = new ArdverkDHT(codec, messageFactory, routeTable, database);
-        dht.bind(transport);
+        bind(transport);
     }
     
     public ArdverkDHT getArdverkDHT() {
@@ -171,19 +162,19 @@ public class SimpleArdverkDHT implements DHT, Closeable {
     }
 
     public ArdverkFuture<PingEntity> ping(String host, int port) {
-        return ping(host, port, pingConfig);
+        return ping(host, port, config.getPingConfig());
     }
 
     public ArdverkFuture<PingEntity> ping(InetAddress address, int port) {
-        return ping(address, port, pingConfig);
+        return ping(address, port, config.getPingConfig());
     }
 
     public ArdverkFuture<PingEntity> ping(SocketAddress address) {
-        return ping(address, pingConfig);
+        return ping(address, config.getPingConfig());
     }
     
     public ArdverkFuture<PingEntity> ping(Contact dst) {
-        return ping(dst, pingConfig);
+        return ping(dst, config.getPingConfig());
     }
     
     @Override
@@ -209,7 +200,7 @@ public class SimpleArdverkDHT implements DHT, Closeable {
     }
 
     public ArdverkFuture<NodeEntity> lookup(KUID lookupId) {
-        return lookup(lookupId, lookupConfig);
+        return lookup(lookupId, config.getLookupConfig());
     }
     
     @Override
@@ -218,7 +209,7 @@ public class SimpleArdverkDHT implements DHT, Closeable {
     }
 
     public ArdverkFuture<ValueEntity> get(KUID key) {
-        return get(key, getConfig);
+        return get(key, config.getGetConfig());
     }
     
     @Override
@@ -227,7 +218,7 @@ public class SimpleArdverkDHT implements DHT, Closeable {
     }
 
     public ArdverkFuture<StoreEntity> put(KUID key, byte[] value) {
-        return put(key, value, putConfig);
+        return put(key, value, config.getPutConfig());
     }
     
     @Override
@@ -237,7 +228,7 @@ public class SimpleArdverkDHT implements DHT, Closeable {
     }
 
     public ArdverkFuture<StoreEntity> remove(KUID key) {
-        return remove(key, putConfig);
+        return remove(key, config.getPutConfig());
     }
     
     @Override
@@ -246,20 +237,20 @@ public class SimpleArdverkDHT implements DHT, Closeable {
     }
     
     public ArdverkFuture<BootstrapEntity> bootstrap(String host, int port) {
-        return bootstrap(host, port, bootstrapConfig);
+        return bootstrap(host, port, config.getBootstrapConfig());
     }
 
-    public ArdverkFuture<BootstrapEntity> bootstrap(InetAddress address,
-            int port) {
-        return bootstrap(address, port, bootstrapConfig);
+    public ArdverkFuture<BootstrapEntity> bootstrap(
+            InetAddress address, int port) {
+        return bootstrap(address, port, config.getBootstrapConfig());
     }
 
     public ArdverkFuture<BootstrapEntity> bootstrap(SocketAddress address) {
-        return bootstrap(address, bootstrapConfig);
+        return bootstrap(address, config.getBootstrapConfig());
     }
 
     public ArdverkFuture<BootstrapEntity> bootstrap(Contact contact) {
-        return dht.bootstrap(contact, bootstrapConfig);
+        return dht.bootstrap(contact, config.getBootstrapConfig());
     }
     
     @Override
@@ -287,7 +278,7 @@ public class SimpleArdverkDHT implements DHT, Closeable {
     }
 
     public ArdverkFuture<QuickenEntity> quicken() {
-        return quicken(quickenConfig);
+        return quicken(config.getQuickenConfig());
     }
     
     @Override
@@ -296,7 +287,7 @@ public class SimpleArdverkDHT implements DHT, Closeable {
     }
     
     public ArdverkFuture<SyncEntity> sync() {
-        return sync(syncConfig);
+        return sync(config.getSyncConfig());
     }
     
     @Override
@@ -304,12 +295,139 @@ public class SimpleArdverkDHT implements DHT, Closeable {
         return dht.sync(config);
     }
     
-    private static SocketAddress extract(SocketAddress address) {
-        InetAddress addr = NetworkUtils.getAddress(address);
-        if (!NetworkUtils.isPrivateAddress(addr)) {
-            return address;
+    public static class SimpleConfig {
+        
+        private static final int DEFAULT_KEY_SIZE = 20;
+        
+        private final int keySize;
+        
+        private volatile PingConfig pingConfig = new DefaultPingConfig();
+        
+        private volatile LookupConfig lookupConfig = new DefaultLookupConfig();
+        
+        private volatile GetConfig getConfig = new DefaultGetConfig();
+        
+        private volatile PutConfig putConfig = new DefaultPutConfig();
+        
+        private volatile BootstrapConfig bootstrapConfig = new DefaultBootstrapConfig();
+        
+        private volatile QuickenConfig quickenConfig = new DefaultQuickenConfig();
+        
+        private volatile SyncConfig syncConfig = new DefaultSyncConfig();
+        
+        private volatile SocketAddress address = null;
+        
+        private volatile String secretKey = null;
+        
+        private volatile String initVector = null;
+        
+        public SimpleConfig() {
+            this(DEFAULT_KEY_SIZE);
         }
         
-        return new InetSocketAddress("localhost", NetworkUtils.getPort(address));
+        public SimpleConfig(int keySize) {
+            this.keySize = keySize;
+        }
+
+        public int getKeySize() {
+            return keySize;
+        }
+        
+        public PingConfig getPingConfig() {
+            return pingConfig;
+        }
+
+        public void setPingConfig(PingConfig pingConfig) {
+            this.pingConfig = pingConfig;
+        }
+
+        public LookupConfig getLookupConfig() {
+            return lookupConfig;
+        }
+
+        public void setLookupConfig(LookupConfig lookupConfig) {
+            this.lookupConfig = lookupConfig;
+        }
+
+        public GetConfig getGetConfig() {
+            return getConfig;
+        }
+
+        public void setGetConfig(GetConfig getConfig) {
+            this.getConfig = getConfig;
+        }
+
+        public PutConfig getPutConfig() {
+            return putConfig;
+        }
+
+        public void setPutConfig(PutConfig putConfig) {
+            this.putConfig = putConfig;
+        }
+
+        public BootstrapConfig getBootstrapConfig() {
+            return bootstrapConfig;
+        }
+
+        public void setBootstrapConfig(BootstrapConfig bootstrapConfig) {
+            this.bootstrapConfig = bootstrapConfig;
+        }
+
+        public QuickenConfig getQuickenConfig() {
+            return quickenConfig;
+        }
+
+        public void setQuickenConfig(QuickenConfig quickenConfig) {
+            this.quickenConfig = quickenConfig;
+        }
+
+        public SyncConfig getSyncConfig() {
+            return syncConfig;
+        }
+
+        public void setSyncConfig(SyncConfig syncConfig) {
+            this.syncConfig = syncConfig;
+        }
+
+        public String getSecretKey() {
+            return secretKey;
+        }
+
+        public void setSecretKey(String secretKey) {
+            this.secretKey = secretKey;
+        }
+
+        public String getInitVector() {
+            return initVector;
+        }
+
+        public void setInitVector(String initVector) {
+            this.initVector = initVector;
+        }
+
+        public SocketAddress getAddress() {
+            return address;
+        }
+
+        public void setAddress(SocketAddress address) {
+            this.address = address;
+        }
+        
+        SocketAddress getAddress(Transport transport) {
+            if (address != null) {
+                return address;
+            }
+            
+            return extract(transport.getSocketAddress());
+        }
+        
+        private static SocketAddress extract(SocketAddress address) {
+            InetAddress addr = NetworkUtils.getAddress(address);
+            if (!NetworkUtils.isPrivateAddress(addr)) {
+                return address;
+            }
+            
+            return new InetSocketAddress("localhost", NetworkUtils.getPort(address));
+        }
     }
 }
