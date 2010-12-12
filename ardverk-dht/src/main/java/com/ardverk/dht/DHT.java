@@ -45,7 +45,9 @@ import com.ardverk.dht.storage.Database;
 public interface DHT {
     
     /**
+     * Returns the localhost {@link Contact}.
      * 
+     * @see RouteTable#getLocalhost()
      */
     public Contact getLocalhost();
     
@@ -94,25 +96,25 @@ public interface DHT {
     public ArdverkFuture<RefreshEntity> refresh(RefreshConfig config);
     
     /**
-     * 
+     * Sends a PING to the given host.
      */
     public ArdverkFuture<PingEntity> ping(
             String host, int port, PingConfig config);
     
     /**
-     * 
+     * Sends a PING to the given host.
      */
     public ArdverkFuture<PingEntity> ping(
             InetAddress address, int port, PingConfig config);
     
     /**
-     * 
+     * Sends a PING to the given host.
      */
     public ArdverkFuture<PingEntity> ping(
             SocketAddress address, PingConfig config);
     
     /**
-     * 
+     * Sends a PING to the given host.
      */
     public ArdverkFuture<PingEntity> ping(
             Contact dst, PingConfig config);
@@ -155,9 +157,15 @@ public interface DHT {
     public ArdverkFuture<StoreEntity> store(
             Contact[] dst, KUID key, byte[] value, StoreConfig config);
     
+    /**
+     * Submits the given {@link AsyncProcess} for execution.
+     */
     public <V> ArdverkFuture<V> submit(
             AsyncProcess<V> process, Config config);
     
+    /**
+     * Submits the given {@link AsyncProcess} for execution.
+     */
     public <V> ArdverkFuture<V> submit(QueueKey queueKey, 
             AsyncProcess<V> process, long timeout, TimeUnit unit);
 }

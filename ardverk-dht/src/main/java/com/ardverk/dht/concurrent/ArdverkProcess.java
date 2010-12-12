@@ -14,16 +14,10 @@
  * limitations under the License.
  */
 
-package com.ardverk.dht.io;
+package com.ardverk.dht.concurrent;
 
-import com.ardverk.dht.concurrent.ArdverkProcess;
-import com.ardverk.dht.entity.Entity;
+import org.ardverk.concurrent.AsyncProcess;
 
-public interface ResponseHandler<V extends Entity> 
-        extends MessageCallback, ArdverkProcess<V> {
+public interface ArdverkProcess<V> extends AsyncProcess<V> {
 
-    /**
-     * Returns {@code true} if the {@link ResponseHandler} is open.
-     */
-    public boolean isOpen();
 }
