@@ -1,4 +1,5 @@
 import com.ardverk.dht.*;
+import com.ardverk.dht.SimpleArdverkDHT.SimpleConfig;
 import com.ardverk.dht.codec.*;
 import com.ardverk.dht.codec.bencode.*;
 import com.ardverk.dht.concurrent.*;
@@ -28,39 +29,108 @@ import java.security.*;
 
 // Make everything accessible!
 setAccessibility(true);
-print("\nHello, please type example(); and press Enter. For further instructions and examples see 'example.bsh' and www.beanshell.org.\n");
 
-java.util.List dhts = null;
-com.ardverk.dht.DHT current = null;
+// A global list of DHT instances and the currently
+// selected instance which is used by put(), get()...
+java.util.List dhts = new ArrayList();
+int current = 0;
 
-create(int count, int port) {
-	return ArdverkUtils.createDHTs(count, port);
+// Creates a KUID from a String
+kuid(String value) {
+	return KUID.create(hash(value));
 }
 
-dht(int index) {
-	return dhts.get(index);
+// Creates a SHA-1 from a String
+hash(String value) {
+	MessageDigest md = MessageDigestUtils.createSHA1();
+	md.update(StringUtils.getBytes(value));
+	return md.digest();
 }
 
-bootstrap() {
-	ArdverkUtils.bootstrap(dhts);
+// Creates a DHT that is bound to the given port
+createDHT(int port) {
+	
+	SECRET_KEY = "90fb237cbec71523ba9d883a8ec6ae9f";
+	INIT_VECTOR = "6fd7bda068bf2425980e5c9b1c9e2097";
+	
+	SimpleConfig config = new SimpleConfig();
+	config.setSecretKey(SECRET_KEY);
+	config.setInitVector(INIT_VECTOR);
+	return SimpleArdverkDHT.create(config, port);
 }
 
-refresh() {
-	ArdverkUtils.refresh(dhts);
+// Creates a list of DHTs
+createDHTs(int count, int port) {
+	java.util.List list = new ArrayList();
+	for (i = 0; i < count; i++) {
+		try {
+			list.add(createDHT(port+i));
+		} catch (IOException err) {
+			err.printStackTrace();
+		}
+	}
+	
+	dhts.addAll(list);
+	return list;
 }
 
+// Bootstraps a list of DHTs
+bootstrapAll() {
+	DHT first = dhts.get(0);
+	bootstrap(first, dhts);
+	
+	first.getRouteTable().clear();
+	first.bootstrap(dhts.get(1).getLocalhost()).get();
+}
+
+// Bootstraps a list of DHTs
+bootstrap(DHT root, java.util.List dhts) {
+	for (DHT dht : dhts) {
+		if (dht != root) {
+			dht.bootstrap(root.getLocalhost()).get();
+		}
+	}
+}
+
+// Calls quicken() on a list of DHTs
+quicken() {
+	for (DHT dht : dhts) {
+		dht.quicken().get();
+	}
+}
+
+// Calls sync() on a list of DHTs
+sync() {
+	for (DHT dht : dhts) {
+		dht.sync().get();
+	}
+}
+
+// Creates a UI for a DHT
+ui(DHT dht) {
+	PainterFrame frame = new PainterFrame(dht);
+	
+	Contact localhost = dht.getLocalhost();
+	frame.setTitle(localhost.getId() + ":" + localhost.getSocketAddress().getPort());
+	frame.setVisible(true);
+	frame.start();
+	return frame;
+}
+
+// Stores the given key-value
 put(String keyValue) {
 	put(keyValue, keyValue);
 }
 
+// Stores the given key-value
 put(String key, String value) {
-	put(current, key, value);
+	put(dhts.get(current), key, value);
 }
 
+// Stores the given key-value
 put(DHT dht, String key, String value) {
 	ArdverkFuture future = dht.put(
-		kuid(key), StringUtils.getBytes(value), 
-		new DefaultPutConfig());
+		kuid(key), StringUtils.getBytes(value));
 		
 	StoreEntity entity = future.get();
 	for (StoreResponse response : entity.getStoreResponses()) {
@@ -68,12 +138,14 @@ put(DHT dht, String key, String value) {
 	}
 }
 
+// Retrieves the given key-value
 get(String key) {
-	return get(current, key);
+	return get(dhts.get(current), key);
 }
 
+// Retrieves the given key-value
 get(DHT dht, String key) {
-	ArdverkFuture future = dht.get(kuid(key), new DefaultGetConfig());
+	ArdverkFuture future = dht.get(kuid(key));
 	
 	ValueEntity entity = future.get();
 	byte[] value = entity.getValue();
@@ -87,50 +159,37 @@ get(DHT dht, String key) {
 	return StringUtils.toString(value);
 }
 
-kuid(String value) {
-	return KUID.create(hash(value));
-}
-
-hash(String value) {
-	MessageDigest md = MessageDigestUtils.createSHA1();
-	md.update(StringUtils.getBytes(value));
-	return md.digest();
-}
-
-createUI() {
-	return createUI(current);
-}
-
-createUI(DHT dht) {
-	PainterFrame frame = new PainterFrame(dht);
-	frame.setTitle(dht.getLocalhost().getId().toString());
-	frame.setVisible(true);
-	frame.start();
-	return frame;
-}
-
+// Closes all DHTs
 close() {
 	IoUtils.closeAll(dhts);
+	dhts.clear();
+	current = 0;
 }
 
+// Quit
 quit() {
 	close();
 	System.exit(0);
 }
 
-example() {
+//
+// --- EXAMPLES ---
+//
+
+print("\nHello, please type init(); and press Enter. For further instructions and examples see 'example.bsh' and www.beanshell.org.\n");
+
+init() {
 	INSTANCE_COUNT = 256;
 	INITIAL_PORT = 2000;
 
 	print("Creating DHTs...");
-	dhts = create(INSTANCE_COUNT, INITIAL_PORT);
-	current = dht(0);
-
+	createDHTs(INSTANCE_COUNT, INITIAL_PORT);
+	
 	print("Creating UI for the first DHT instance...");
-	frame = createUI();
+	ui(dhts.get(current));
 
 	print("Bootstrapping all DHTs...");
-	bootstrap();
+	bootstrapAll();
 
 	print("\nStoring a Key-Value...");
 	put("Hello", "World");
@@ -138,11 +197,11 @@ example() {
 	print("\nGetting a Key-Value...");
 	get("Hello");
 	
-	print("\nTry also storeLoop(count);...");
+	print("\nTry also store(count);...");
 }
 
-storeLoop(int count) {
-	for(int i = 0; i < count; i++) {
+store(int count) {
+	for(i = 0; i < count; i++) {
 		String key = "Key-" + i;
 		String value1 = "Value-" + i;
 		put(key, value1);
@@ -153,39 +212,3 @@ storeLoop(int count) {
 		}
 	}
 }
-
-sync() {
-	for (DHT dht : dhts) {
-		dht.sync(new DefaultSyncConfig()).get();
-	}
-}
-
-java.util.List nu = null;
-forward(int count, int port) {
-	nu = create(count, port);
-	nu.get(0).ping("localhost", 2000, new DefaultPingConfig());
-	createUI(nu.get(0));
-	ArdverkUtils.bootstrap(nu);
-}
-
-node(String hex) {
-	KUID id = KUID.createWithHexString(hex);
-	if (dhts != null) {
-		for (DHT dht : dhts) {
-			if (dht.getLocalhost().getId().equals(id)) {
-				return dht;
-			}
-		}
-	}
-	
-	if (nu != null) {
-		for (DHT dht : nu) {
-			if (dht.getLocalhost().getId().equals(id)) {
-				return dht;
-			}
-		}
-	}
-	
-	return null;
-}
-
