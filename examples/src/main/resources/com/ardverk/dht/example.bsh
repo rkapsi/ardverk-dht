@@ -132,7 +132,7 @@ put(DHT dht, String key, String value) {
 	ArdverkFuture future = dht.put(
 		kuid(key), StringUtils.getBytes(value));
 		
-	StoreEntity entity = future.get();
+	PutEntity entity = future.get();
 	for (StoreResponse response : entity.getStoreResponses()) {
 		print("PUT: " + response.getContact().getId() + " -> " + response.getCondition());
 	}
