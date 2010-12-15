@@ -29,7 +29,8 @@ public class DefaultValueEntity extends AbstractLookupEntity implements ValueEnt
     private final ValueTuple[] values;
     
     public DefaultValueEntity(Outcome outcome, ValueTuple[] values) {
-        super(outcome.getLookupId(), outcome.getTimeInMillis(), TimeUnit.MILLISECONDS);
+        super(outcome.getLookupId(), 
+                outcome.getTimeInMillis(), TimeUnit.MILLISECONDS);
         
         this.outcome = outcome;
         this.values = values;

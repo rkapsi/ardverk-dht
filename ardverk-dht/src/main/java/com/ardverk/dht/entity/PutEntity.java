@@ -16,9 +16,13 @@
 
 package com.ardverk.dht.entity;
 
-public interface PutEntity extends Entity {
+import com.ardverk.dht.message.StoreResponse;
+
+public interface PutEntity extends LookupEntity {
 
     public NodeEntity getNodeEntity();
     
     public StoreEntity getStoreEntity();
+    
+    public StoreResponse[] getStoreResponses();
 }
