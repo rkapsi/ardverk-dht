@@ -27,8 +27,9 @@ import org.ardverk.lang.Bytes;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.config.PutConfig;
 import com.ardverk.dht.config.StoreConfig;
-import com.ardverk.dht.entity.DefaultNodeStoreEntity;
+import com.ardverk.dht.entity.DefaultPutEntity;
 import com.ardverk.dht.entity.NodeEntity;
+import com.ardverk.dht.entity.PutEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.io.StoreResponseHandler;
@@ -52,11 +53,11 @@ public class StoreManager {
         this.messageDispatcher = messageDispatcher;
     }
     
-    public ArdverkFuture<StoreEntity> remove(KUID key, PutConfig config) {
+    public ArdverkFuture<PutEntity> remove(KUID key, PutConfig config) {
         return put(key, Bytes.EMPTY, config);
     }
     
-    public ArdverkFuture<StoreEntity> put(final KUID key, final byte[] value, 
+    public ArdverkFuture<PutEntity> put(final KUID key, final byte[] value, 
             final PutConfig config) {
         
         final Object lock = new Object();
@@ -64,8 +65,8 @@ public class StoreManager {
             
             // This is the ArdverkFuture we're going to return to the caller
             // of this method (in most cases the user).
-            AsyncProcess<StoreEntity> process = NopAsyncProcess.create();
-            final ArdverkFuture<StoreEntity> userFuture 
+            AsyncProcess<PutEntity> process = NopAsyncProcess.create();
+            final ArdverkFuture<PutEntity> userFuture 
                 = dht.submit(process, config);
             
             // This will get initialized once we've found the k-closest
@@ -118,7 +119,7 @@ public class StoreManager {
                         }
                         
                         private void handleStoreEntity(StoreEntity storeEntity) {
-                            userFuture.setValue(new DefaultNodeStoreEntity(
+                            userFuture.setValue(new DefaultPutEntity(
                                     nodeEntity, storeEntity));
                         }
                     });
@@ -133,9 +134,9 @@ public class StoreManager {
                 }
             });
             
-            userFuture.addAsyncFutureListener(new AsyncFutureListener<StoreEntity>() {
+            userFuture.addAsyncFutureListener(new AsyncFutureListener<PutEntity>() {
                 @Override
-                public void operationComplete(AsyncFuture<StoreEntity> future) {
+                public void operationComplete(AsyncFuture<PutEntity> future) {
                     synchronized (lock) {
                         FutureUtils.cancel(lookupFuture, true);
                         FutureUtils.cancel(storeFutureRef, true);
@@ -145,11 +146,6 @@ public class StoreManager {
             
             return userFuture;
         }
-    }
-    
-    public ArdverkFuture<StoreEntity> put(Contact[] dst, 
-            KUID key, byte[] value, StoreConfig config) {
-        return store(dst, key, value, config);
     }
     
     public ArdverkFuture<StoreEntity> store(Contact[] dst, 

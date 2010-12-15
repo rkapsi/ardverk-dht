@@ -249,7 +249,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
      * Creates and returns the current lookup {@link Outcome}.
      */
     protected synchronized Outcome createOutcome() {
-        if (startTime == -1L) {
+        if (startTime < 0) {
             throw new IllegalStateException("startTime=" + startTime);
         }
         

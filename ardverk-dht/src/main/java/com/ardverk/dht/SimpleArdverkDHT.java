@@ -43,8 +43,8 @@ import com.ardverk.dht.config.SyncConfig;
 import com.ardverk.dht.entity.BootstrapEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
+import com.ardverk.dht.entity.PutEntity;
 import com.ardverk.dht.entity.QuickenEntity;
-import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.entity.SyncEntity;
 import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.io.transport.DatagramTransport;
@@ -100,7 +100,13 @@ public class SimpleArdverkDHT extends ArdverkDHT {
         
         String secretKey = config.getSecretKey();
         String initVector = config.getInitVector();
-        MessageCodec codec = new DefaultMessageCodec(secretKey, initVector);
+        
+        MessageCodec codec = null;
+        if (secretKey != null && initVector != null) {
+            codec = new DefaultMessageCodec(secretKey, initVector);
+        } else {
+            codec = new DefaultMessageCodec();
+        }
         
         MessageFactory messageFactory 
             = new DefaultMessageFactory(keySize, localhost);
@@ -122,7 +128,7 @@ public class SimpleArdverkDHT extends ArdverkDHT {
         this.config = config;
         bind(transport);
     }
-
+    
     public ArdverkFuture<PingEntity> ping(String host, int port) {
         return ping(host, port, config.getPingConfig());
     }
@@ -147,11 +153,11 @@ public class SimpleArdverkDHT extends ArdverkDHT {
         return get(key, config.getGetConfig());
     }
 
-    public ArdverkFuture<StoreEntity> put(KUID key, byte[] value) {
+    public ArdverkFuture<PutEntity> put(KUID key, byte[] value) {
         return put(key, value, config.getPutConfig());
     }
 
-    public ArdverkFuture<StoreEntity> remove(KUID key) {
+    public ArdverkFuture<PutEntity> remove(KUID key) {
         return remove(key, config.getPutConfig());
     }
     

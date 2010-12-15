@@ -33,6 +33,7 @@ import com.ardverk.dht.config.SyncConfig;
 import com.ardverk.dht.entity.BootstrapEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
+import com.ardverk.dht.entity.PutEntity;
 import com.ardverk.dht.entity.QuickenEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.entity.SyncEntity;
@@ -216,12 +217,12 @@ public class ArdverkDHT extends AbstractDHT {
     }
 
     @Override
-    public ArdverkFuture<StoreEntity> put(KUID key, byte[] value, PutConfig config) {
+    public ArdverkFuture<PutEntity> put(KUID key, byte[] value, PutConfig config) {
         return storeManager.put(key, value, config);
     }
     
     @Override
-    public ArdverkFuture<StoreEntity> remove(KUID key, PutConfig config) {
+    public ArdverkFuture<PutEntity> remove(KUID key, PutConfig config) {
         return storeManager.remove(key, config);
     }
     

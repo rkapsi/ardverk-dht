@@ -26,7 +26,7 @@ import com.ardverk.dht.config.PingConfig;
 import com.ardverk.dht.config.PutConfig;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
-import com.ardverk.dht.entity.StoreEntity;
+import com.ardverk.dht.entity.PutEntity;
 import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.routing.Contact;
 
@@ -74,11 +74,11 @@ public interface ArdverkService {
     /**
      * Stores the given key-value in the DHT.
      */
-    public ArdverkFuture<StoreEntity> put(
+    public ArdverkFuture<PutEntity> put(
             KUID key, byte[] value, PutConfig config);
     
     /**
      * Removes the given {@link KUID} from the DHT.
      */
-    public ArdverkFuture<StoreEntity> remove(KUID key, PutConfig config);
+    public ArdverkFuture<PutEntity> remove(KUID key, PutConfig config);
 }

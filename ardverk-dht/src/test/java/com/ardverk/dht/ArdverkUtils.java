@@ -19,22 +19,33 @@ package com.ardverk.dht;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.concurrent.AsyncFuture;
+import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.io.IoUtils;
+import org.ardverk.security.MessageDigestUtils;
+import org.ardverk.utils.StringUtils;
 
 import com.ardverk.dht.SimpleArdverkDHT.SimpleConfig;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.config.BootstrapConfig;
 import com.ardverk.dht.config.DefaultBootstrapConfig;
+import com.ardverk.dht.config.DefaultLookupConfig;
 import com.ardverk.dht.config.DefaultQuickenConfig;
+import com.ardverk.dht.config.DefaultStoreConfig;
 import com.ardverk.dht.entity.BootstrapEntity;
+import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.QuickenEntity;
+import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.DefaultRouteTable;
+import com.ardverk.dht.storage.Database;
 
 public class ArdverkUtils {
 
@@ -135,5 +146,98 @@ public class ArdverkUtils {
             future.get();
         }
         return futures;
+    }
+    
+    private static ArdverkDHT get(List<ArdverkDHT> dhts, Contact contact) {
+        for (ArdverkDHT dht : dhts) {
+            if (dht.getLocalhost().equals(contact)) {
+                return dht;
+            }
+        }
+        
+        throw new IllegalStateException();
+    }
+    
+    public static void main(String[] args) 
+            throws IOException, InterruptedException, ExecutionException {
+        
+        final List<ArdverkDHT> dhts = createDHTs(256, 2000);
+        bootstrap(dhts);
+        
+        for (ArdverkDHT dht : dhts) {
+            Database database = dht.getDatabase();
+            database.getDatabaseConfig().setStoreForward(false);
+            database.getDatabaseConfig().setCheckBucket(false);
+        }
+        
+        final DefaultLookupConfig config = new DefaultLookupConfig();
+        config.setQueueKey(QueueKey.BACKEND);
+        
+        final DefaultStoreConfig storeConfig = new DefaultStoreConfig();
+        config.setQueueKey(QueueKey.BACKEND);
+        
+        int count = 5000;
+        final CountDownLatch latch = new CountDownLatch(count);
+        ArdverkFuture<NodeEntity> future = null;
+        for (int i = 0; i < count; i++) {
+            MessageDigest md = MessageDigestUtils.createSHA1();
+            md.update(StringUtils.getBytes("Hello-" + i));
+            
+            final KUID key = KUID.create(md.digest());
+            final byte[] value = StringUtils.getBytes("World-" + i);
+            
+            int rnd = (int)(dhts.size() * Math.random());
+            /*future = dhts.get(rnd).put(key, value, config);
+            
+            if (i % 500 == 0) {
+                System.out.println("INDEX: " + i);
+                future.get();
+            }*/
+            
+            final ArdverkDHT dht = dhts.get(rnd);
+            future = dht.lookup(key, config);
+            future.addAsyncFutureListener(new AsyncFutureListener<NodeEntity>() {
+                @Override
+                public void operationComplete(AsyncFuture<NodeEntity> future) {
+                    try {
+                        NodeEntity entity = future.get();
+                        ArdverkFuture<StoreEntity> bla 
+                            = dht.getStoreManager().store(
+                                    entity.getContacts(), key, value, storeConfig);
+                        bla.addAsyncFutureListener(new AsyncFutureListener<StoreEntity>() {
+                            @Override
+                            public void operationComplete(
+                                    AsyncFuture<StoreEntity> future) {
+                                latch.countDown();
+                            }
+                        });
+                    } catch (Exception err) {
+                        err.printStackTrace();
+                    }
+                }
+            });
+        }
+        
+        System.out.println("WAITING...");
+        latch.await();
+        
+        int min = Integer.MAX_VALUE;
+        int max = Integer.MIN_VALUE;
+        
+        for (ArdverkDHT dht : dhts) {
+            Database database = dht.getDatabase();
+            int size = database.size();
+            
+            if (size < min) {
+                min = size;
+            }
+            
+            if (max < size) {
+                max = size;
+            }
+        }
+        
+        System.out.println("MIN: " + min);
+        System.out.println("MAX: " + max);
     }
 }

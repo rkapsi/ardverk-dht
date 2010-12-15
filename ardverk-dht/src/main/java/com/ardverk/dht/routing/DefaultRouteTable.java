@@ -80,6 +80,9 @@ public class DefaultRouteTable extends AbstractRouteTable {
         init();
     }
     
+    /**
+     * Initializes the {@link DefaultRouteTable}.
+     */
     private synchronized void init() {
         consecutiveErrors = 0;
         
@@ -104,14 +107,34 @@ public class DefaultRouteTable extends AbstractRouteTable {
         return localhost;
     }
     
+    /**
+     * Returns {@code true} if the {@link ContactEntry} has the 
+     * same {@link KUID} as the localhost.
+     */
     private boolean isLocalhost(ContactEntry entry) {
         return isLocalhost(entry.getContact());
     }
     
+    /**
+     * Returns {@code true} if the {@link Contact} has the same 
+     * {@link KUID} as the localhost.
+     */
     private boolean isLocalhost(Contact contact) {
-        return localhost.getId().equals(contact.getId());
+        return isLocalhost(contact.getId());
     }
     
+    /**
+     * Returns {@code true} if the {@link KUID} is equal to localhost.
+     */
+    private boolean isLocalhost(KUID contactId) {
+        return localhost.getId().equals(contactId);
+    }
+    
+    /**
+     * Compares the localhost's {@link KUID} with the given {@link Contact}'s
+     * {@link KUID} and throws an {@link IllegalArgumentException} if the two
+     * have different lengths.
+     */
     private void checkKeyLength(Contact other) throws IllegalArgumentException {
         KUID contactId = localhost.getId();
         KUID otherId = other.getId();
@@ -503,6 +526,10 @@ public class DefaultRouteTable extends AbstractRouteTable {
         // This is possible for PINGs that failed (that means we
         // knew only the SocketAddress of the remote host).
         if (contactId == null) {
+            return;
+        }
+        
+        if (isLocalhost(contactId)) {
             return;
         }
         

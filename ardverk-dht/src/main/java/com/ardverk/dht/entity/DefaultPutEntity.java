@@ -18,16 +18,14 @@ package com.ardverk.dht.entity;
 
 import java.util.concurrent.TimeUnit;
 
-public class DefaultNodeStoreEntity extends DefaultStoreEntity 
-        implements NodeStoreEntity {
+public class DefaultPutEntity extends AbstractEntity implements PutEntity {
 
     private final NodeEntity nodeEntity;
     
     private final StoreEntity storeEntity;
     
-    public DefaultNodeStoreEntity(NodeEntity nodeEntity, StoreEntity storeEntity) {
-        super(storeEntity.getStoreResponses(), 
-                EntityUtils.getTimeInMillis(nodeEntity, storeEntity), 
+    public DefaultPutEntity(NodeEntity nodeEntity, StoreEntity storeEntity) {
+        super(EntityUtils.getTimeInMillis(nodeEntity, storeEntity), 
                 TimeUnit.MILLISECONDS);
         
         this.nodeEntity = nodeEntity;

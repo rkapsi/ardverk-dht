@@ -16,7 +16,9 @@
 
 package com.ardverk.dht.entity;
 
-public interface NodeStoreEntity extends StoreEntity {
+public interface PutEntity extends Entity {
 
     public NodeEntity getNodeEntity();
+    
+    public StoreEntity getStoreEntity();
 }

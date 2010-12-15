@@ -29,23 +29,19 @@ public class DefaultMessageCodec extends AbstractMessageCodec {
     private final MessageCodec codec;
     
     public DefaultMessageCodec() {
-        this(null, null);
+        this.codec = new DigestMessageCodec(
+                new CompressorMessageCodec(
+                    new BencodeMessageCodec()), 
+                    new MessageDigestCRC32());
     }
     
     public DefaultMessageCodec(String secretKey, String initVector) {
-        if (secretKey != null && initVector != null) {
-            this.codec = new DigestMessageCodec(
-                    new CipherMessageCodec(
-                        new CompressorMessageCodec(
-                            new BencodeMessageCodec()), 
-                            secretKey, initVector), 
-                            new MessageDigestCRC32());
-        } else {
-            this.codec = new DigestMessageCodec(
-                        new CompressorMessageCodec(
-                            new BencodeMessageCodec()), 
-                            new MessageDigestCRC32());
-        }
+        this.codec = new DigestMessageCodec(
+                new CipherMessageCodec(
+                    new CompressorMessageCodec(
+                        new BencodeMessageCodec()), 
+                        secretKey, initVector), 
+                        new MessageDigestCRC32());
     }
     
     @Override

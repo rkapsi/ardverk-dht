@@ -400,6 +400,8 @@ public class Contact implements Identifier, Longevity, Comparable<Contact>, Seri
     
     /**
      * Returns the {@link Contact}'s remove address.
+     * 
+     * NOTE: This is the address we're using to send messages.
      */
     public SocketAddress getRemoteAddress() {
         return remoteAddress;
