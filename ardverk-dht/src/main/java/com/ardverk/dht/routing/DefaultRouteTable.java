@@ -309,9 +309,10 @@ public class DefaultRouteTable extends AbstractRouteTable {
         return isOkayToAdd(bucket, contact.getRemoteAddress());
     }
     
-    private synchronized boolean isOkayToAdd(DefaultBucket bucket, SocketAddress remoteAddress) {
-        return bucket.getContactCount(remoteAddress) 
-                < config.getMaxContactsFromSameNetwork();
+    private synchronized boolean isOkayToAdd(DefaultBucket bucket, 
+            SocketAddress remoteAddress) {
+        int max = config.getMaxContactsFromSameNetwork();
+        return max < 0 || bucket.getContactCount(remoteAddress) < max;
     }
     
     private synchronized void addActive(DefaultBucket bucket, Contact contact) {
@@ -844,7 +845,12 @@ public class DefaultRouteTable extends AbstractRouteTable {
                 active.put(contactId, entry);
                 
                 Contact contact = entry.getContact();
-                counter.add(contact.getRemoteAddress());
+                
+                int max = config.getMaxContactsFromSameNetwork();
+                if (0 < max) {
+                    counter.add(contact.getRemoteAddress());
+                }
+                
                 touch();
                 return true;
             }
@@ -938,8 +944,11 @@ public class DefaultRouteTable extends AbstractRouteTable {
             ContactEntry entry = active.remove(identifier.getId());
             
             Contact contact = entry.getContact();
-            SocketAddress address = contact.getRemoteAddress();
-            counter.remove(address);
+            
+            int max = config.getMaxContactsFromSameNetwork();
+            if (0 < max) {
+                counter.remove(contact.getRemoteAddress());
+            }
             
             return entry;
         }

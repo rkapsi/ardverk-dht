@@ -43,7 +43,7 @@ public class RouteTableConfig {
     
     private volatile int maxConsecutiveErrors = 100;
 
-    private volatile int maxContactsFromSameNetwork = Integer.MAX_VALUE;
+    private volatile int maxContactsFromSameNetwork = -1;
     
     private volatile int tooManyErrorsCount = Integer.MAX_VALUE;
     
