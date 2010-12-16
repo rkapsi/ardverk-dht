@@ -12,6 +12,6 @@
 	<classpathentry kind="lib" path="examples/lib/main/java/bsh-2.0b4.jar"/>
 	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/bee-encode-0.2.jar"/>
 	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/patricia-trie-0.3.jar"/>
-	<classpathentry kind="lib" path="ardverk-dht/lib/main/java/ardverk-base-0.1.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ardverk-base"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

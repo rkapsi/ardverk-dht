@@ -24,13 +24,12 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.collection.IdentityHashSet;
 import org.ardverk.concurrent.AsyncFuture;
-import org.ardverk.concurrent.AsyncFutureGroup;
 import org.ardverk.concurrent.AsyncProcess;
 import org.ardverk.concurrent.AsyncProcessExecutorService;
 import org.ardverk.concurrent.ExecutorGroup;
 import org.ardverk.concurrent.ExecutorQueue;
 import org.ardverk.concurrent.ExecutorUtils;
-import org.ardverk.concurrent.Scheduler;
+import org.ardverk.concurrent.FutureUtils;
 
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.concurrent.ArdverkFutureTask;
@@ -40,13 +39,16 @@ import com.ardverk.dht.concurrent.ArdverkFutureTask;
  */
 public class FutureManager implements Closeable {
     
-    private static final AsyncProcessExecutorService EXECUTOR 
-        = ExecutorUtils.newCachedThreadPool("FutureManagerThread");
+    private static final AsyncProcessExecutorService CACHED_THREAD_EXECUTOR 
+        = ExecutorUtils.newCachedThreadPool("FutureManagerCachedThread");
+    
+    private static final AsyncProcessExecutorService SINGLE_THREAD_EXECUTOR
+        = ExecutorUtils.newSingleThreadExecutor("FutureManagerSingleThread");
     
     private static final int DEFAULT_CONCURRENCY_LEVEL = 4;
     
-    private final Map<QueueKey, ExecutorQueue<? extends Runnable>> executors 
-        = new EnumMap<QueueKey, ExecutorQueue<? extends Runnable>>(QueueKey.class);
+    private final Map<QueueKey, ExecutorGroup> executors 
+        = new EnumMap<QueueKey, ExecutorGroup>(QueueKey.class);
     
     private final Set<AsyncFuture<?>> futures 
         = new IdentityHashSet<AsyncFuture<?>>();
@@ -58,20 +60,8 @@ public class FutureManager implements Closeable {
     }
     
     public FutureManager(int concurrencyLevel) {
-        executors.put(QueueKey.PARALLEL, createExecutorGroup());
-        executors.put(QueueKey.SERIAL, createFutureGroup(concurrencyLevel));
-    }
-    
-    public static ExecutorGroup createExecutorGroup() {
-        return new ExecutorGroup(EXECUTOR);
-    }
-    
-    public static ExecutorGroup createExecutorGroup(Scheduler scheduler) {
-        return new ExecutorGroup(EXECUTOR, scheduler);
-    }
-    
-    public static AsyncFutureGroup createFutureGroup(int concurrencyLevel) {
-        return new AsyncFutureGroup(EXECUTOR, concurrencyLevel);
+        executors.put(QueueKey.PARALLEL, new ExecutorGroup(CACHED_THREAD_EXECUTOR));
+        executors.put(QueueKey.SERIAL, new ExecutorGroup(SINGLE_THREAD_EXECUTOR));
     }
     
     @Override
@@ -82,14 +72,11 @@ public class FutureManager implements Closeable {
         
         open = false;
         
-        for (AsyncFuture<?> future : futures) {
-            future.cancel(true);
-        }
-        
+        FutureUtils.cancelAll(futures, true);
         futures.clear();
         
-        for (ExecutorQueue<?> queue : executors.values()) {
-            queue.shutdown();
+        for (ExecutorGroup group : executors.values()) {
+            group.shutdown();
         }
     }
     
@@ -125,7 +112,6 @@ public class FutureManager implements Closeable {
         return future;
     }
     
-    @SuppressWarnings("unchecked")
     private ExecutorQueue<Runnable> getQueue(QueueKey queueKey) {
         return (ExecutorQueue<Runnable>)executors.get(queueKey);
     }
