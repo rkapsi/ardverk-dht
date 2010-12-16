@@ -42,7 +42,7 @@ public class DefaultLookupConfig extends DefaultConfig
         = TimeUtils.convert(10L, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
     
     public DefaultLookupConfig() {
-        this(DEFAULT_OPERATION_TIMEOUT, TimeUnit.MINUTES);
+        this(DEFAULT_OPERATION_TIMEOUT, TimeUnit.MILLISECONDS);
     }
     
     public DefaultLookupConfig(long timeout, TimeUnit unit) {
