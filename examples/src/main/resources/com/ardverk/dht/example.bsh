@@ -148,15 +148,15 @@ get(DHT dht, String key) {
 	ArdverkFuture future = dht.get(kuid(key));
 	
 	ValueEntity entity = future.get();
-	byte[] value = entity.getValue();
+	String value = StringUtils.toString(entity.getValue());
 	
 	print("GET: " + entity.getId() + " (" + key + ")" + " -> " 
-		+ StringUtils.toString(value)
+		+ value
 		+ "\n SENDER: " + entity.getSender().getId()
 		+ "\n CREATOR: " + entity.getCreator().getId()
 		+ "\n TIME: " + entity.getTimeInMillis() + "ms");
 		
-	return StringUtils.toString(value);
+	return value;
 }
 
 // Closes all DHTs
@@ -201,15 +201,25 @@ init() {
 }
 
 store(int count) {
+	store(count, false);
+}
+
+store(int count, boolean randomize) {
 	for(i = 0; i < count; i++) {
 		String key = "Key-" + i;
 		String value1 = "Value-" + i;
 		
-		int rnd = (int)(dhts.size() * Math.random());
-		put(dhts.get(rnd), key, value1);
+		int putIndex = current;
+		int getIndex = current;
 		
-		rnd = (int)(dhts.size() * Math.random());
-		String value2 = get(dhts.get(rnd), key);
+		if (randomize) {
+			putIndex = (int)(dhts.size() * Math.random());
+			getIndex = (int)(dhts.size() * Math.random());
+		}
+		
+		put(dhts.get(putIndex), key, value1);
+		
+		String value2 = get(dhts.get(getIndex), key);
 		if (!value1.equals(value2)) {
 			throw new IllegalStateException(value1 + ", " + value2);
 		}

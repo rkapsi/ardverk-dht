@@ -34,7 +34,7 @@ import com.ardverk.dht.message.ValueResponse;
 
 class PainterUtils {
 
-    private static int MAX_SIZE = 256;
+    private static int MAX_SIZE = 2048;
     
     public static final int SCALE = 10;
 
