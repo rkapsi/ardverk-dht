@@ -29,6 +29,7 @@ import java.util.concurrent.Future;
 import org.ardverk.concurrent.ExecutorGroup;
 import org.ardverk.concurrent.ExecutorUtils;
 import org.ardverk.lang.Arguments;
+import org.ardverk.net.NetworkUtils;
 import org.slf4j.Logger;
 
 import com.ardverk.dht.logging.LoggerUtils;
@@ -173,7 +174,8 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
             throws IOException {
         
         final DatagramPacket packet = new DatagramPacket(
-                message, offset, length, dst);
+                message, offset, length, 
+                NetworkUtils.getResolved(dst));
         
         final DatagramSocket socket = this.socket;
         

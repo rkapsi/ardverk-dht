@@ -32,6 +32,11 @@ public class DefaultConfig extends AbstractConfig {
     @Override
     public void setOperationTimeout(long timeout, TimeUnit unit) {
         this.operationTimeoutInMillis = unit.toMillis(timeout);
+        
+        if (operationTimeoutInMillis >= 300000) {
+            throw new IllegalArgumentException("operationTimeoutInMillis: " 
+                    + operationTimeoutInMillis + ", " + timeout + ", " + unit);
+        }
     }
     
     @Override

@@ -25,7 +25,7 @@ import java.math.BigDecimal;
 import com.ardverk.dht.KUID;
 
 abstract class AbstractPainter implements Painter {
-
+    
     protected final KUID localhostId;
     
     private final BigDecimal maxId;

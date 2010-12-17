@@ -81,6 +81,7 @@ public class SquashPainter extends AbstractPainter {
     public void handleEvent(EventType type, KUID contactId, Message message) {
         if (contactId != null) {
             nodes.add(new Node(type, contactId, message));
+            PainterUtils.adjustSize(nodes);
         }
     }
     

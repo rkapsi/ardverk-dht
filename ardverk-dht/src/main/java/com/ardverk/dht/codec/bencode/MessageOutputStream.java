@@ -82,6 +82,7 @@ class MessageOutputStream extends BencodingOutputStream {
     }
     
     public void writeSocketAddress(SocketAddress sa) throws IOException {
+        //InetSocketAddress isa = NetworkUtils.getResolved(sa);
         InetSocketAddress isa = (InetSocketAddress)sa;
         writeString(isa.getHostName() + ":" + isa.getPort());
     }

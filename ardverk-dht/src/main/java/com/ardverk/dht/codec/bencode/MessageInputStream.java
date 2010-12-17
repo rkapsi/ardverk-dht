@@ -21,10 +21,10 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
 import org.ardverk.coding.BencodingInputStream;
+import org.ardverk.net.NetworkUtils;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.lang.IntegerValue;
@@ -106,9 +106,11 @@ class MessageInputStream extends BencodingInputStream {
     public SocketAddress readSocketAddress() throws IOException {
         String value = readString();
         int p = value.indexOf(':');
-        return new InetSocketAddress(
-                value.substring(0, p), 
-                Integer.parseInt(value.substring(++p)));
+        
+        String host = value.substring(0, p);
+        int port = Integer.parseInt(value.substring(++p));
+        
+        return NetworkUtils.createUnresolved(host, port);
     }
     
     public Contact readContact(Contact.Type type, SocketAddress src) throws IOException {

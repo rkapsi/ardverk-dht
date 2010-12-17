@@ -19,6 +19,7 @@ package com.ardverk.dht.ui;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Stroke;
+import java.util.List;
 
 import com.ardverk.dht.message.Message;
 import com.ardverk.dht.message.NodeRequest;
@@ -33,6 +34,8 @@ import com.ardverk.dht.message.ValueResponse;
 
 class PainterUtils {
 
+    private static int MAX_SIZE = 256;
+    
     public static final int SCALE = 10;
 
     public static final Stroke DEFAULT_STROKE = new BasicStroke(1.0f);
@@ -101,6 +104,12 @@ class PainterUtils {
             return new BasicStroke(1.0f, BasicStroke.CAP_ROUND, 
                 BasicStroke.JOIN_ROUND, 10.0f, 
                 new float[]{ 2f, 4f }, dash_phase);
+        }
+    }
+    
+    public static void adjustSize(List<?> nodes) {
+        while (!nodes.isEmpty() && nodes.size() >= MAX_SIZE) {
+            nodes.remove(0);
         }
     }
 }
