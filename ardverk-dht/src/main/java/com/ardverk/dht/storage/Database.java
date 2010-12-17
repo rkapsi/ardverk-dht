@@ -17,6 +17,7 @@
 package com.ardverk.dht.storage;
 
 import com.ardverk.dht.KUID;
+import com.ardverk.dht.lang.IntegerValue;
 import com.ardverk.dht.lang.StringValue;
 
 
@@ -25,13 +26,7 @@ public interface Database {
     /**
      * Returned by {@link Database#store(ValueTuple)}.
      */
-    public static interface Condition extends StringValue {
-        
-        /**
-         * Returns {@code true} if a {@link ValueTuple} was stored 
-         * successfully in the {@link Database}.
-         */
-        public boolean isSuccess();
+    public static interface Condition extends IntegerValue, StringValue {
     }
     
     public DatabaseConfig getDatabaseConfig();

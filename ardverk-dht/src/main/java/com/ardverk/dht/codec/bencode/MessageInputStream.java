@@ -135,8 +135,9 @@ class MessageInputStream extends BencodingInputStream {
     }
     
     public Condition readCondition() throws IOException {
+        int code = readInt();
         String value = readString();
-        return DefaultCondition.valueOf(value);
+        return DefaultCondition.valueOf(code, value);
     }
     
     public ValueTuple readValueTuple(Contact contact, 

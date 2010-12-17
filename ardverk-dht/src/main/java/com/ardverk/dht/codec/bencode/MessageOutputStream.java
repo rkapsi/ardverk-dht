@@ -106,6 +106,7 @@ class MessageOutputStream extends BencodingOutputStream {
     }
     
     public void writeCondition(Condition condition) throws IOException {
+        writeInt(condition.intValue());
         writeString(condition.stringValue());
     }
     

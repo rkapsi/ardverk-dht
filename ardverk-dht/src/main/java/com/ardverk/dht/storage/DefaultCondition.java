@@ -18,17 +18,63 @@ package com.ardverk.dht.storage;
 
 import com.ardverk.dht.storage.Database.Condition;
 
-public enum DefaultCondition implements Condition {
-    SUCCESS,
-    FAILURE;
+public class DefaultCondition implements Condition {
+    
+    public static final DefaultCondition SUCCESS 
+        = new DefaultCondition(100, "SUCCESS");
+    
+    public static final DefaultCondition FAILURE 
+        = new DefaultCondition(200, "FAILURE");
 
+    public static Condition valueOf(int code, String message) {
+        switch (code) {
+            case 100:
+                return SUCCESS;
+            case 200:
+                return FAILURE;
+        }
+        
+        return new DefaultCondition(code, message);
+    }
+    
+    private final int code;
+    
+    private final String message;
+    
+    private DefaultCondition(int code, String message) {
+        this.code = code;
+        this.message = message;
+    }
+    
     @Override
-    public boolean isSuccess() {
-        return this == SUCCESS;
+    public int intValue() {
+        return code;
     }
     
     @Override
     public String stringValue() {
-        return name();
+        return message;
+    }
+    
+    @Override
+    public int hashCode() {
+        return 31*code + message.hashCode();
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        } else if (!(o instanceof Condition)) {
+            return false;
+        }
+        
+        Condition other = (Condition)o;
+        return code == other.intValue();
+    }
+    
+    @Override
+    public String toString() {
+        return code + ", " + message;
     }
 }
