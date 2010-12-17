@@ -17,11 +17,9 @@
 package com.ardverk.dht.storage;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.ardverk.collection.FixedSizeHashMap;
 import org.ardverk.lang.Arguments;
 
 import com.ardverk.dht.KUID;
@@ -30,8 +28,7 @@ import com.ardverk.dht.utils.XorComparator;
 public class DefaultDatabase extends AbstractDatabase {
 
     private final Map<KUID, ValueTuple> database 
-        //= new ConcurrentHashMap<KUID, ValueTuple>();
-        = Collections.synchronizedMap(new FixedSizeHashMap<KUID, ValueTuple>(8));
+        = new ConcurrentHashMap<KUID, ValueTuple>();
     
     private final DatabaseConfig config;
     

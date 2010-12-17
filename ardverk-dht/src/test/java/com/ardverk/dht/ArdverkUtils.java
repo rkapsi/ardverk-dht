@@ -23,6 +23,7 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -144,14 +145,14 @@ public class ArdverkUtils {
         return futures;
     }
     
-    private static ArdverkDHT get(List<ArdverkDHT> dhts, Contact contact) {
+    public static ArdverkDHT get(List<ArdverkDHT> dhts, Contact contact) {
         for (ArdverkDHT dht : dhts) {
             if (dht.getLocalhost().equals(contact)) {
                 return dht;
             }
         }
         
-        throw new IllegalStateException();
+        throw new NoSuchElementException("contact=" + contact);
     }
     
     public static void main(String[] args) 
