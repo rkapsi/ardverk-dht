@@ -25,16 +25,16 @@ import java.util.Random;
 import org.ardverk.coding.CodingUtils;
 import org.ardverk.io.Writable;
 import org.ardverk.lang.Arguments;
-import org.ardverk.security.SecurityUtils;
 import org.ardverk.utils.ByteArrayComparator;
+
+import com.ardverk.dht.security.SecurityUtils;
 
 public final class MessageId implements Writable, Serializable, 
         Comparable<MessageId>, Cloneable {
 
     private static final long serialVersionUID = 6653397095695641792L;
     
-    private static final Random GENERATOR 
-        = SecurityUtils.createSecureRandom();
+    private static final Random GENERATOR = SecurityUtils.createRandom();
     
     public static MessageId createRandom(int length) {
         byte[] key = new byte[length];
