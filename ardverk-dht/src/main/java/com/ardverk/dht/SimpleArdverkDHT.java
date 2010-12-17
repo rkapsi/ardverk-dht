@@ -23,8 +23,8 @@ import java.net.SocketAddress;
 
 import org.ardverk.net.NetworkUtils;
 
+import com.ardverk.dht.codec.DefaultMessageCodec;
 import com.ardverk.dht.codec.MessageCodec;
-import com.ardverk.dht.codec.bencode.BencodeMessageCodec;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.config.BootstrapConfig;
 import com.ardverk.dht.config.DefaultBootstrapConfig;
@@ -102,12 +102,12 @@ public class SimpleArdverkDHT extends ArdverkDHT {
         String initVector = config.getInitVector();
         
         MessageCodec codec = null;
-        /*if (secretKey != null && initVector != null) {
+        if (secretKey != null && initVector != null) {
             codec = new DefaultMessageCodec(secretKey, initVector);
         } else {
             codec = new DefaultMessageCodec();
-        }*/
-        codec = new BencodeMessageCodec();
+        }
+        //codec = new BencodeMessageCodec();
         
         MessageFactory messageFactory 
             = new DefaultMessageFactory(keySize, localhost);

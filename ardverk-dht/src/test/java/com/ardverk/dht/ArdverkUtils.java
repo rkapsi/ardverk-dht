@@ -210,10 +210,12 @@ public class ArdverkUtils {
         
         int min = Integer.MAX_VALUE;
         int max = Integer.MIN_VALUE;
+        int total = 0;
         
         for (ArdverkDHT dht : dhts) {
             Database database = dht.getDatabase();
             int size = database.size();
+            total += size;
             
             if (size < min) {
                 min = size;
@@ -226,5 +228,6 @@ public class ArdverkUtils {
         
         System.out.println("MIN: " + min);
         System.out.println("MAX: " + max);
+        System.out.println("TOTAL: " + total);
     }
 }
