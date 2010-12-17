@@ -52,7 +52,8 @@ import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
 
 /**
- * 
+ * The {@link MessageDispatcher} is responsible for sending messages over
+ * a given {@link Transport} and keeping track of the messages.
  */
 public abstract class MessageDispatcher 
         implements Bindable<Transport>, Closeable {
@@ -80,6 +81,8 @@ public abstract class MessageDispatcher
     private final MessageEntityManager entityManager 
         = new MessageEntityManager();
         
+    private final ScheduledExecutorService executor;
+    
     private final MessageFactory factory;
     
     private final MessageCodec codec;
@@ -89,9 +92,20 @@ public abstract class MessageDispatcher
     private Transport transport = null;
     
     /**
-     * 
+     * Creates a {@link MessageDispatcher}.
      */
     public MessageDispatcher(MessageFactory factory, MessageCodec codec) {
+        this(EXECUTOR, factory, codec);
+    }
+    
+    /**
+     * Creates a {@link MessageDispatcher} with a custom 
+     * {@link ScheduledExecutorService} that is used to
+     * keep for timing out requests.
+     */
+    public MessageDispatcher(ScheduledExecutorService executor, 
+            MessageFactory factory, MessageCodec codec) {
+        this.executor = Arguments.notNull(executor, "executor");
         this.factory = Arguments.notNull(factory, "factory");
         this.codec = Arguments.notNull(codec, "codec");
         
@@ -381,7 +395,10 @@ public abstract class MessageDispatcher
     }
     
     /**
-     * 
+     * The {@link MessageEntityManager} keeps track of {@link RequestEntity}s
+     * and their {@link MessageCallback}s. It's also responsible for timing
+     * out {@link RequestMessage} for which we haven't received any responses
+     * within a defined time frame.
      */
     private class MessageEntityManager implements Closeable {
         
@@ -390,6 +407,7 @@ public abstract class MessageDispatcher
         
         private boolean open = true;
         
+        @Override
         public void close() {
             synchronized (callbacks) {
                 if (!open) {
@@ -407,7 +425,7 @@ public abstract class MessageDispatcher
         }
         
         /**
-         * 
+         * Adds a {@link RequestEntity} and its {@link MessageCallback}.
          */
         public void add(MessageCallback callback, RequestEntity entity, 
                 long timeout, TimeUnit unit) {
@@ -441,7 +459,7 @@ public abstract class MessageDispatcher
                 };
                 
                 ScheduledFuture<?> future 
-                    = EXECUTOR.schedule(task, timeout, unit);
+                    = executor.schedule(task, timeout, unit);
                 
                 MessageEntity messageEntity = new MessageEntity(
                         future, callback, entity);
@@ -450,7 +468,7 @@ public abstract class MessageDispatcher
         }
         
         /**
-         * 
+         * Returns a {@link MessageEntity} for the given {@link ResponseMessage}.
          */
         public MessageEntity get(ResponseMessage message) {
             return callbacks.remove(message.getMessageId());
@@ -458,7 +476,8 @@ public abstract class MessageDispatcher
     }
 
     /**
-     * 
+     * A {@link MessageEntity} represents a {@link RequestMessage} we've sent 
+     * and provides the infrastructure to process the {@link ResponseMessage}.
      */
     private class MessageEntity {
         
@@ -482,7 +501,7 @@ public abstract class MessageDispatcher
         }
 
         /**
-         * 
+         * Cancels the {@link MessageEntity}.
          */
         public boolean cancel() {
             future.cancel(true);
@@ -490,7 +509,8 @@ public abstract class MessageDispatcher
         }
         
         /**
-         * 
+         * Returns the amount of time that has passed ever since
+         * this {@link MessageEntity} was created.
          */
         public long getTime(TimeUnit unit) {
             long time = System.currentTimeMillis() - creationTime;
@@ -498,7 +518,7 @@ public abstract class MessageDispatcher
         }
         
         /**
-         * 
+         * Called if a {@link ResponseMessage} was received.
          */
         public void handleResponse(ResponseMessage response) throws IOException {
             if (cancel()) {
@@ -515,7 +535,8 @@ public abstract class MessageDispatcher
         }
 
         /**
-         * 
+         * Called if a timeout occurred (i.e. we didn't receive a 
+         * {@link ResponseMessage} within in the predefined time).
          */
         public void handleTimeout() throws IOException {
             if (cancel()) {
@@ -527,6 +548,10 @@ public abstract class MessageDispatcher
         }
     }
     
+    /**
+     * The {@link ResponseChecker} makes sure {@link ResponseMessage}s fulfill
+     * certain requirements before they're considered for further processing.
+     */
     private static class ResponseChecker {
         
         private static final Logger LOG 
@@ -537,15 +562,14 @@ public abstract class MessageDispatcher
         private final Set<MessageId> history;
         
         public ResponseChecker(MessageFactory factory, int historySize) {
-            if (factory == null) {
-                throw new NullArgumentException("factory");
-            }
-            
-            this.factory = factory;
+            this.factory = Arguments.notNull(factory, "factory");
             this.history = Collections.synchronizedSet(
                     new FixedSizeHashSet<MessageId>(historySize));
         }
         
+        /**
+         * Returns {@code true} if the {@link ResponseMessage} is OK.
+         */
         public boolean check(ResponseMessage response) {
             MessageId messageId = response.getMessageId();
             if (!history.add(messageId)) {
