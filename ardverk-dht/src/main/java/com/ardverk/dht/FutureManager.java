@@ -59,7 +59,7 @@ public class FutureManager implements Closeable {
         futures.clear();
     }
     
-    public synchronized <T> ArdverkFuture<T> submit(QueueKey queueKey, 
+    public synchronized <T> ArdverkFuture<T> submit(ExecutorKey executorKey, 
             AsyncProcess<T> process, long timeout, TimeUnit unit) {
         
         if (!open) {
@@ -69,14 +69,14 @@ public class FutureManager implements Closeable {
         ManagedFuture<T> future 
             = new ManagedFuture<T>(process, timeout, unit);
         
-        getExecutor(queueKey).execute(future);
+        getExecutor(executorKey).execute(future);
         futures.add(future);
         
         return future;
     }
     
-    private Executor getExecutor(QueueKey queueKey) {
-        switch (queueKey) {
+    private Executor getExecutor(ExecutorKey executorKey) {
+        switch (executorKey) {
             case PARALLEL:
                 return CACHED_THREAD_EXECUTOR;
             default:

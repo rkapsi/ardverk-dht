@@ -18,23 +18,23 @@ package com.ardverk.dht.config;
 
 import java.util.concurrent.TimeUnit;
 
-import com.ardverk.dht.QueueKey;
+import com.ardverk.dht.ExecutorKey;
 import com.ardverk.dht.routing.Contact;
 
 public abstract class AbstractConfig implements Config {
 
     private volatile double adaptiveTimeoutMultiplier = -1;
     
-    private volatile QueueKey queueKey = QueueKey.DEFAULT;
+    private volatile ExecutorKey executorKey = ExecutorKey.DEFAULT;
     
     @Override
-    public QueueKey getQueueKey() {
-        return queueKey;
+    public ExecutorKey getExecutorKey() {
+        return executorKey;
     }
 
     @Override
-    public void setQueueKey(QueueKey queueKey) {
-        this.queueKey = queueKey;
+    public void setExecutorKey(ExecutorKey executorKey) {
+        this.executorKey = executorKey;
     }
 
     @Override

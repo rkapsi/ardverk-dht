@@ -54,15 +54,15 @@ abstract class AbstractDHT implements DHT, Closeable {
     
     @Override
     public <V> ArdverkFuture<V> submit(AsyncProcess<V> process, Config config) {
-        QueueKey queueKey = config.getQueueKey();
+        ExecutorKey executorKey = config.getExecutorKey();
         long timeout = config.getOperationTimeoutInMillis();
-        return submit(queueKey, process, timeout, TimeUnit.MILLISECONDS);
+        return submit(executorKey, process, timeout, TimeUnit.MILLISECONDS);
     }
 
     @Override
-    public <V> ArdverkFuture<V> submit(QueueKey queueKey,
+    public <V> ArdverkFuture<V> submit(ExecutorKey executorKey,
             AsyncProcess<V> process, long timeout, TimeUnit unit) {
-        return futureManager.submit(queueKey, process, timeout, unit);
+        return futureManager.submit(executorKey, process, timeout, unit);
     }
     
     @Override

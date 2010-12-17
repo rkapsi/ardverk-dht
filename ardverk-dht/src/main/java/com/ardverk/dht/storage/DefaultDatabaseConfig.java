@@ -16,7 +16,7 @@
 
 package com.ardverk.dht.storage;
 
-import com.ardverk.dht.QueueKey;
+import com.ardverk.dht.ExecutorKey;
 import com.ardverk.dht.config.DefaultStoreConfig;
 import com.ardverk.dht.config.StoreConfig;
 
@@ -30,7 +30,7 @@ public class DefaultDatabaseConfig implements DatabaseConfig {
     
     // INIT
     {
-        storeConfig.setQueueKey(QueueKey.BACKEND);
+        storeConfig.setExecutorKey(ExecutorKey.BACKEND);
     }
 
     @Override

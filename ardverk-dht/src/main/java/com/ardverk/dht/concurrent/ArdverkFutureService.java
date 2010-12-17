@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncProcess;
 
-import com.ardverk.dht.QueueKey;
+import com.ardverk.dht.ExecutorKey;
 import com.ardverk.dht.config.Config;
 
 public interface ArdverkFutureService {
@@ -34,6 +34,6 @@ public interface ArdverkFutureService {
     /**
      * Submits the given {@link AsyncProcess} for execution.
      */
-    public <V> ArdverkFuture<V> submit(QueueKey queueKey, 
+    public <V> ArdverkFuture<V> submit(ExecutorKey executorKey, 
             AsyncProcess<V> process, long timeout, TimeUnit unit);
 }

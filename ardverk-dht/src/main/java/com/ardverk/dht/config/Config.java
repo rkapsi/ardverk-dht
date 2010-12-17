@@ -18,20 +18,20 @@ package com.ardverk.dht.config;
 
 import java.util.concurrent.TimeUnit;
 
-import com.ardverk.dht.QueueKey;
+import com.ardverk.dht.ExecutorKey;
 import com.ardverk.dht.routing.Contact;
 
 public interface Config {
     
     /**
-     * Returns the {@link QueueKey}.
+     * Returns the {@link ExecutorKey}.
      */
-    public QueueKey getQueueKey();
+    public ExecutorKey getExecutorKey();
     
     /**
-     * Sets the {@link QueueKey}.
+     * Sets the {@link ExecutorKey}.
      */
-    public void setQueueKey(QueueKey queueKey);
+    public void setExecutorKey(ExecutorKey executorKey);
     
     /**
      * Sets the timeout for the operation

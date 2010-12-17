@@ -18,7 +18,7 @@ package com.ardverk.dht.config;
 
 import java.util.concurrent.TimeUnit;
 
-import com.ardverk.dht.QueueKey;
+import com.ardverk.dht.ExecutorKey;
 
 public class DefaultBootstrapConfig extends AbstractConfig 
         implements BootstrapConfig {
@@ -28,10 +28,10 @@ public class DefaultBootstrapConfig extends AbstractConfig
     private volatile LookupConfig lookupConfig = new DefaultLookupConfig();
     
     @Override
-    public void setQueueKey(QueueKey queueKey) {
-        super.setQueueKey(queueKey);
-        pingConfig.setQueueKey(queueKey);
-        lookupConfig.setQueueKey(queueKey);
+    public void setExecutorKey(ExecutorKey executorKey) {
+        super.setExecutorKey(executorKey);
+        pingConfig.setExecutorKey(executorKey);
+        lookupConfig.setExecutorKey(executorKey);
     }
 
     @Override

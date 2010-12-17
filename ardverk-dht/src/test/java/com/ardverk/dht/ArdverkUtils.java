@@ -106,7 +106,7 @@ public class ArdverkUtils {
             = new ArrayList<ArdverkFuture<BootstrapEntity>>();
         
         BootstrapConfig config = new DefaultBootstrapConfig();
-        config.setQueueKey(QueueKey.BACKEND);
+        config.setExecutorKey(ExecutorKey.BACKEND);
         
         for (int i = 0; i < length; i++) {
             ArdverkFuture<BootstrapEntity> future 
@@ -130,7 +130,7 @@ public class ArdverkUtils {
             = new ArrayList<ArdverkFuture<QuickenEntity>>();
         
         DefaultQuickenConfig config = new DefaultQuickenConfig();
-        config.setQueueKey(QueueKey.BACKEND);
+        config.setExecutorKey(ExecutorKey.BACKEND);
         
         for (int i = 0; i < length; i++) {
             config.setBucketTimeout(-1L, TimeUnit.MILLISECONDS);
@@ -178,7 +178,7 @@ public class ArdverkUtils {
         }
         
         final DefaultPutConfig putConfig = new DefaultPutConfig();
-        putConfig.setQueueKey(QueueKey.BACKEND);
+        putConfig.setExecutorKey(ExecutorKey.BACKEND);
         
         int count = 30000;
         ArdverkFuture<PutEntity> future = null;

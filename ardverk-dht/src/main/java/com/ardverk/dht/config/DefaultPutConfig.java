@@ -18,7 +18,7 @@ package com.ardverk.dht.config;
 
 import java.util.concurrent.TimeUnit;
 
-import com.ardverk.dht.QueueKey;
+import com.ardverk.dht.ExecutorKey;
 
 public class DefaultPutConfig extends AbstractConfig implements PutConfig {
 
@@ -27,10 +27,10 @@ public class DefaultPutConfig extends AbstractConfig implements PutConfig {
     private volatile StoreConfig storeConfig = new DefaultStoreConfig();
     
     @Override
-    public void setQueueKey(QueueKey queueKey) {
-        super.setQueueKey(queueKey);
-        lookupConfig.setQueueKey(queueKey);
-        storeConfig.setQueueKey(queueKey);
+    public void setExecutorKey(ExecutorKey executorKey) {
+        super.setExecutorKey(executorKey);
+        lookupConfig.setExecutorKey(executorKey);
+        storeConfig.setExecutorKey(executorKey);
     }
     
     @Override

@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.utils.TimeUtils;
 
-import com.ardverk.dht.QueueKey;
+import com.ardverk.dht.ExecutorKey;
 
 public class DefaultQuickenConfig extends AbstractConfig implements QuickenConfig {
 
@@ -37,10 +37,10 @@ public class DefaultQuickenConfig extends AbstractConfig implements QuickenConfi
         = TimeUtils.convert(5L, TimeUnit.MINUTES, TimeUnit.MILLISECONDS);
     
     @Override
-    public void setQueueKey(QueueKey queueKey) {
-        super.setQueueKey(queueKey);
-        pingConfig.setQueueKey(queueKey);
-        lookupConfig.setQueueKey(queueKey);
+    public void setExecutorKey(ExecutorKey executorKey) {
+        super.setExecutorKey(executorKey);
+        pingConfig.setExecutorKey(executorKey);
+        lookupConfig.setExecutorKey(executorKey);
     }
     
     @Override

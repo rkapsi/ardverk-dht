@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 import org.ardverk.net.NetworkMask;
 import org.ardverk.utils.TimeUtils;
 
-import com.ardverk.dht.QueueKey;
+import com.ardverk.dht.ExecutorKey;
 import com.ardverk.dht.config.DefaultPingConfig;
 import com.ardverk.dht.config.PingConfig;
 
@@ -56,7 +56,7 @@ public class RouteTableConfig {
     
     // INIT
     {
-        pingConfig.setQueueKey(QueueKey.BACKEND);
+        pingConfig.setExecutorKey(ExecutorKey.BACKEND);
     }
     
     public RouteTableConfig() {
