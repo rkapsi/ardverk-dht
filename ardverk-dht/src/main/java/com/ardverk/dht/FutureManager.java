@@ -37,8 +37,7 @@ import com.ardverk.dht.concurrent.ArdverkFutureTask;
 public class FutureManager implements Closeable {
     
     private static final AsyncProcessExecutorService CACHED_THREAD_EXECUTOR 
-        //= ExecutorUtils.newCachedThreadPool("FutureManagerCachedThread");
-        = ExecutorUtils.newFixedThreadPool(16, "FutureManagerCachedThread");
+        = ExecutorUtils.newCachedThreadPool("FutureManagerCachedThread");
     
     private static final AsyncProcessExecutorService SINGLE_THREAD_EXECUTOR
         = ExecutorUtils.newSingleThreadExecutor("FutureManagerSingleThread");
