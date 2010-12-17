@@ -33,9 +33,9 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.ardverk.coding.CodingUtils;
-import org.ardverk.security.SecurityUtils;
 
 import com.ardverk.dht.message.Message;
+import com.ardverk.dht.security.SecurityUtils;
 
 /**
  * 

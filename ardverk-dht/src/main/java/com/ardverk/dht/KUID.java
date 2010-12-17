@@ -28,11 +28,11 @@ import org.ardverk.coding.CodingUtils;
 import org.ardverk.collection.Key;
 import org.ardverk.collection.KeyAnalyzer;
 import org.ardverk.io.Writable;
-import org.ardverk.security.SecurityUtils;
 
 import com.ardverk.dht.lang.Identifier;
 import com.ardverk.dht.lang.Negation;
 import com.ardverk.dht.lang.Xor;
+import com.ardverk.dht.security.SecurityUtils;
 
 /**
  * Kademlia Unique Identifier ({@link KUID}) 

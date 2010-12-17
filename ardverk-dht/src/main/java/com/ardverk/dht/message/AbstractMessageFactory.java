@@ -17,32 +17,20 @@
 package com.ardverk.dht.message;
 
 import java.net.SocketAddress;
-import java.util.Random;
 
 import org.ardverk.lang.Arguments;
 
 public abstract class AbstractMessageFactory implements MessageFactory {
     
-    private static final Random GENERATOR = new Random();
-    
-    private final Random generator;
-    
     private final int length;
     
     public AbstractMessageFactory(int length) {
-        this(GENERATOR, length);
-    }
-    
-    public AbstractMessageFactory(Random generator, int length) {
-        this.generator = Arguments.notNull(generator, "generator");
         this.length = Arguments.notNegative(length, "length");
     }
     
     @Override
     public MessageId createMessageId(SocketAddress dst) {
-        byte[] messageId = new byte[length];
-        generator.nextBytes(messageId);
-        return MessageId.create(messageId);
+        return MessageId.createRandom(length);
     }
 
     @Override

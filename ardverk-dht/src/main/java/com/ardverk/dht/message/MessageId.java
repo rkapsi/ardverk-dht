@@ -19,13 +19,12 @@ package com.ardverk.dht.message;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Random;
 
 import org.ardverk.coding.CodingUtils;
 import org.ardverk.io.Writable;
-import org.ardverk.lang.NullArgumentException;
+import org.ardverk.lang.Arguments;
 import org.ardverk.security.SecurityUtils;
 import org.ardverk.utils.ByteArrayComparator;
 
@@ -57,12 +56,8 @@ public final class MessageId implements Writable, Serializable,
         return new MessageId(copy);
     }
     
-    public static MessageId create(BigInteger key) {
-        return create(key.toByteArray());
-    }
-    
-    public static MessageId create(String key, int radix) {
-        return create(new BigInteger(key, radix));
+    public static MessageId create(String key) {
+        return create(CodingUtils.decodeBase16(key));
     }
     
     private final byte[] messageId;
@@ -70,11 +65,7 @@ public final class MessageId implements Writable, Serializable,
     private final int hashCode;
     
     private MessageId(byte[] messageId) {
-        if (messageId == null) {
-            throw new NullArgumentException("messageId");
-        }
-        
-        this.messageId = messageId;
+        this.messageId = Arguments.notNull(messageId, "messageId");
         this.hashCode = Arrays.hashCode(messageId);
     }
     
