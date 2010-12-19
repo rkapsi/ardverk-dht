@@ -27,18 +27,18 @@ import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.NodeRequest;
 import com.ardverk.dht.message.NodeResponse;
 import com.ardverk.dht.message.ResponseMessage;
-import com.ardverk.dht.routing.IContact;
+import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 
 public class NodeResponseHandler extends LookupResponseHandler<NodeEntity> {
     
     public NodeResponseHandler(MessageDispatcher messageDispatcher,
-            IContact[] contacts, RouteTable routeTable, KUID lookupId, LookupConfig config) {
+            Contact[] contacts, RouteTable routeTable, KUID lookupId, LookupConfig config) {
         super(messageDispatcher, contacts, routeTable, lookupId, config);
     }
     
     @Override
-    protected void lookup(IContact dst, KUID lookupId, 
+    protected void lookup(Contact dst, KUID lookupId, 
             long timeout, TimeUnit unit) throws IOException {
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
@@ -48,7 +48,7 @@ public class NodeResponseHandler extends LookupResponseHandler<NodeEntity> {
 
     @Override
     protected void complete(Outcome outcome) {
-        IContact[] contacts = outcome.getContacts();
+        Contact[] contacts = outcome.getContacts();
         
         if (contacts.length == 0) {
             setException(new NoSuchNodeException(outcome));                
@@ -62,8 +62,8 @@ public class NodeResponseHandler extends LookupResponseHandler<NodeEntity> {
             ResponseMessage response, long time, TimeUnit unit)
             throws IOException {
         
-        IContact src = response.getContact();
-        IContact[] contacts = ((NodeResponse)response).getContacts();
+        Contact src = response.getContact();
+        Contact[] contacts = ((NodeResponse)response).getContacts();
         processContacts(src, contacts, time, unit);
     }
 }

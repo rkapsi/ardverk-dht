@@ -16,11 +16,11 @@
 
 package com.ardverk.dht.entity;
 
-import com.ardverk.dht.routing.IContact;
+import com.ardverk.dht.routing.Contact;
 
 public interface NodeEntity extends LookupEntity {
     
     public int getHop();
     
-    public IContact[] getContacts();
+    public Contact[] getContacts();
 }

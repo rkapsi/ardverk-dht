@@ -23,30 +23,30 @@ import java.util.concurrent.TimeUnit;
 
 import com.ardverk.dht.lang.Identifier;
 
-public interface IContact extends Identifier, Longevity, 
-        Comparable<IContact>, Serializable {
+public interface Contact extends Identifier, Longevity, 
+        Comparable<Contact>, Serializable {
 
     /**
-     * 
+     * The type of the {@link Contact}.
      */
     public static enum Type {
         /**
-         * {@link IContact}s that were returned in FIND_NODE responses
+         * {@link Contact}s that were returned in FIND_NODE responses
          */
         UNKNOWN(0, false),
         
         /**
-         * {@link IContact}s that sent us a request
+         * {@link Contact}s that sent us a request
          */
         UNSOLICITED(1, true),
         
         /**
-         * {@link IContact}s that sent us a response
+         * {@link Contact}s that sent us a response
          */
         SOLICITED(2, true),
         
         /**
-         * {@link IContact}s that have been created by the local user.
+         * {@link Contact}s that have been created by the local user.
          */
         AUTHORITATIVE(3, true);
         
@@ -73,71 +73,71 @@ public interface IContact extends Identifier, Longevity,
     }
     
     /**
-     * Returns the {@link Type} of the {@link IContact}
+     * Returns the {@link Type} of the {@link Contact}
      */
     public Type getType();
     
     /**
-     * Returns {@code true} if the {@link IContact} is of the given {@link Type}
+     * Returns {@code true} if the {@link Contact} is of the given {@link Type}
      */
     public boolean isType(Type type);
     
     /**
-     * Returns {@code true} if this is a an authoritative {@link IContact}.
+     * Returns {@code true} if this is a an authoritative {@link Contact}.
      */
     public boolean isAuthoritative();
     
     /**
-     * Returns {@code true} if this {@link IContact} was discovered 
+     * Returns {@code true} if this {@link Contact} was discovered 
      * through solicited communication.
      */
     public boolean isSolicited();
     
     /**
-     * Returns {@code true} if this {@link IContact} was discovered 
+     * Returns {@code true} if this {@link Contact} was discovered 
      * through unsolicited communication.
      */
     public boolean isUnsolicited();
     
     /**
-     * Returns true if the {@link IContact} is considered active.
+     * Returns true if the {@link Contact} is considered active.
      * 
      * @see Type
      */
     public boolean isActive();
     
     /**
-     * Returns the {@link IContact}'s instance ID
+     * Returns the {@link Contact}'s instance ID
      */
     public int getInstanceId();
     
     /**
-     * Returns the {@link IContact}'s address as reported by 
+     * Returns the {@link Contact}'s address as reported by 
      * the {@link Socket}.
      */
     public SocketAddress getSocketAddress();
     
     /**
-     * Returns the {@link IContact}'s address as reported by 
-     * the remote {@link IContact}.
+     * Returns the {@link Contact}'s address as reported by 
+     * the remote {@link Contact}.
      */
     public SocketAddress getContactAddress();
     
     /**
-     * Returns the {@link IContact}'s remove address.
+     * Returns the {@link Contact}'s remove address.
      * 
      * NOTE: This is the address we're using to send messages.
      */
     public SocketAddress getRemoteAddress();
     
     /**
-     * Returns the {@link IContact}'s Round-Trip-Time (RTT) or a negative 
+     * Returns the {@link Contact}'s Round-Trip-Time (RTT) or a negative 
      * value if the RTT is unknown.
      */
     public long getRoundTripTime(TimeUnit unit);
     
     /**
-     * Returns the {@link IContact}'s Round-Trip-Time (RTT) in milliseconds
+     * Returns the {@link Contact}'s Round-Trip-Time (RTT) in milliseconds
      * or a negative value if the RTT is unknown.
      */
     public long getRoundTripTimeInMillis();
@@ -145,23 +145,23 @@ public interface IContact extends Identifier, Longevity,
     /**
      * 
      */
-    public IContact setRoundTripTime(long rtt, TimeUnit unit);
+    public Contact setRoundTripTime(long rtt, TimeUnit unit);
     
     /**
      * Returns the amount of time in the given {@link TimeUnit} that 
-     * has passed since we had IContact with this {@link IContact}.
+     * has passed since we had IContact with this {@link Contact}.
      */
     public long getTimeSinceLastContact(TimeUnit unit);
     
     /**
      * Returns the amount of time in milliseconds that has passed since 
-     * we had IContact with this {@link IContact}.
+     * we had IContact with this {@link Contact}.
      */
     public long getTimeSinceLastContactInMillis();
     
     /**
      * Returns {@code true} if we haven't had any contact with this
-     * {@link IContact} for the given period of time.
+     * {@link Contact} for the given period of time.
      * 
      * @see #getTimeSinceLastContact(TimeUnit)
      * @see #getTimeSinceLastContactInMillis()
@@ -169,13 +169,13 @@ public interface IContact extends Identifier, Longevity,
     public boolean isTimeout(long timeout, TimeUnit unit);
     
     /**
-     * Returns the adaptive timeout for this {@link IContact}.
+     * Returns the adaptive timeout for this {@link Contact}.
      */
     public long getAdaptiveTimeout(double multiplier, 
             long defaultTimeout, TimeUnit unit);
     
     /**
-     * Merges this with the other {@link IContact}.
+     * Merges this with the other {@link Contact}.
      */
-    public IContact merge(IContact other);
+    public Contact merge(Contact other);
 }

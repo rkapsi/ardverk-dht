@@ -32,7 +32,7 @@ import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.config.DefaultLookupConfig;
 import com.ardverk.dht.config.LookupConfig;
 import com.ardverk.dht.entity.NodeEntity;
-import com.ardverk.dht.routing.IContact;
+import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.utils.XorComparator;
 
 public class NodeResponseHandlerTest {
@@ -62,7 +62,7 @@ public class NodeResponseHandlerTest {
             NodeEntity entity = future.get();
             TestCase.assertEquals(lookupId, entity.getId());
             
-            IContact[] contacts = entity.getContacts();
+            Contact[] contacts = entity.getContacts();
             
             // The Contacts in the response should be in the same order
             // as our DHT instances!

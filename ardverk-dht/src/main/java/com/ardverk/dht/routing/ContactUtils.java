@@ -75,17 +75,17 @@ public class ContactUtils {
     }
     
     /**
-     * Turns the given array of {@link ContactEntry}s into an array of {@link IContact}s.
+     * Turns the given array of {@link ContactEntry}s into an array of {@link Contact}s.
      */
-    public static IContact[] toContacts(ContactEntry[] entries) {
+    public static Contact[] toContacts(ContactEntry[] entries) {
         return toContacts(entries, 0, entries.length);
     }
     
     /**
-     * Turns the given array of {@link ContactEntry}s into an array of {@link IContact}s.
+     * Turns the given array of {@link ContactEntry}s into an array of {@link Contact}s.
      */
-    public static IContact[] toContacts(ContactEntry[] entries, int offset, int length) {
-        IContact[] contacts = new IContact[length];
+    public static Contact[] toContacts(ContactEntry[] entries, int offset, int length) {
+        Contact[] contacts = new Contact[length];
         for (int i = 0; i < length; i++) {
             contacts[i] = entries[offset + i].getContact();
         }

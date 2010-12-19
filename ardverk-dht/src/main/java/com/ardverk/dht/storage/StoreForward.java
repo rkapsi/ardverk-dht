@@ -22,7 +22,7 @@ import com.ardverk.dht.KUID;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.config.StoreConfig;
 import com.ardverk.dht.entity.StoreEntity;
-import com.ardverk.dht.routing.IContact;
+import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.utils.IdentifierUtils;
 
@@ -51,19 +51,19 @@ public class StoreForward {
         return callback != null;
     }
     
-    public void handleRequest(IContact contact) {
+    public void handleRequest(Contact contact) {
         handleContact(contact);
     }
     
-    public void handleResponse(IContact contact) {
+    public void handleResponse(Contact contact) {
         handleContact(contact);
     }
     
-    public void handleLateResponse(IContact contact) {
+    public void handleLateResponse(Contact contact) {
         handleContact(contact);
     }
     
-    private void handleContact(IContact contact) {
+    private void handleContact(Contact contact) {
         DatabaseConfig config = database.getDatabaseConfig();
         if (!config.isStoreForward()) {
             return;
@@ -77,11 +77,11 @@ public class StoreForward {
         StoreConfig storeConfig = config.getStoreConfig();
         
         KUID contactId = contact.getId();
-        IContact existing = routeTable.get(contactId);
+        Contact existing = routeTable.get(contactId);
         
         for (ValueTuple tuple : database.values()) {
             KUID valueId = tuple.getId();
-            IContact[] contacts = routeTable.select(valueId);
+            Contact[] contacts = routeTable.select(valueId);
             
             // Check if the Contact is closer to the value than
             // the furthest of the current Contacts.
@@ -101,15 +101,15 @@ public class StoreForward {
     }
     
     /**
-     * Returns {@code true} if the new {@link IContact} is closer to
+     * Returns {@code true} if the new {@link Contact} is closer to
      * the given {@link KUID} than the furthest of our current k-closest
-     * {@link IContact}s.
+     * {@link Contact}s.
      */
     private boolean isCloserThanFurthest(KUID valueId, 
-            IContact contact, IContact[] contacts) {
+            Contact contact, Contact[] contacts) {
         
         if (contacts.length >= routeTable.getK()) {
-            IContact furthest = CollectionUtils.last(contacts);
+            Contact furthest = CollectionUtils.last(contacts);
             
             if (!IdentifierUtils.isCloserTo(contact, valueId, furthest) 
                     && !furthest.equals(contact)) {
@@ -121,20 +121,20 @@ public class StoreForward {
     
     /**
      * Returns {@code true} if we're responsible for store-forwarding
-     * a value to the given {@link IContact}.
+     * a value to the given {@link Contact}.
      */
-    private boolean isResponsible(IContact contact, 
-            IContact existing, IContact[] contacts) {
+    private boolean isResponsible(Contact contact, 
+            Contact existing, Contact[] contacts) {
         
         if (0 < contacts.length && isNewOrHasChanged(contact, existing)) {
-            IContact localhost = routeTable.getLocalhost();
-            IContact first = CollectionUtils.first(contacts);
+            Contact localhost = routeTable.getLocalhost();
+            Contact first = CollectionUtils.first(contacts);
             if (first.equals(localhost)) {
                 return true;
             }
             
             if (1 < contacts.length && first.equals(contact)) {
-                IContact second = CollectionUtils.nth(contacts, 1);
+                Contact second = CollectionUtils.nth(contacts, 1);
                 if (second.equals(localhost)) {
                     return true;
                 }
@@ -144,10 +144,10 @@ public class StoreForward {
     }
     
     /**
-     * Returns {@code true} if the given {@link IContact} is either new
+     * Returns {@code true} if the given {@link Contact} is either new
      * or if has changed (i.e. its instance ID has changed).
      */
-    private static boolean isNewOrHasChanged(IContact contact, IContact existing) {
+    private static boolean isNewOrHasChanged(Contact contact, Contact existing) {
         if (existing != null) {
             return contact.getInstanceId() != existing.getInstanceId();
         }
@@ -164,9 +164,9 @@ public class StoreForward {
         
         /**
          * Called by the {@link StoreForward} service for each {@link ValueTuple}
-         * that needs to be sent to the given {@link IContact}.
+         * that needs to be sent to the given {@link Contact}.
          */
-        public ArdverkFuture<StoreEntity> store(IContact dst, 
+        public ArdverkFuture<StoreEntity> store(Contact dst, 
                 ValueTuple valueTuple, StoreConfig config);
     }
 }

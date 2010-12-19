@@ -33,7 +33,7 @@ import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.message.StoreRequest;
 import com.ardverk.dht.message.StoreResponse;
-import com.ardverk.dht.routing.IContact;
+import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.storage.ValueTuple;
 
 public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
@@ -43,7 +43,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     private final List<StoreResponse> responses 
         = new ArrayList<StoreResponse>();
 
-    private final Iterator<IContact> contacts;
+    private final Iterator<Contact> contacts;
     
     private final int k;
     
@@ -55,7 +55,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     
     public StoreResponseHandler(
             MessageDispatcher messageDispatcher, 
-            IContact[] contacts, int k,
+            Contact[] contacts, int k,
             ValueTuple tuple, StoreConfig config) {
         super(messageDispatcher);
         
@@ -82,7 +82,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
                     break;
                 }
                 
-                IContact contact = contacts.next();
+                Contact contact = contacts.next();
                 store(contact);
                 
                 counter.increment();
@@ -117,7 +117,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
         }
     }
     
-    private synchronized void store(IContact dst) throws IOException {
+    private synchronized void store(Contact dst) throws IOException {
         MessageFactory factory = messageDispatcher.getMessageFactory();
         StoreRequest request = factory.createStoreRequest(dst, tuple);
         

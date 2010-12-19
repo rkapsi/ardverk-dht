@@ -19,23 +19,23 @@ package com.ardverk.dht.storage;
 import org.ardverk.lang.Arguments;
 
 import com.ardverk.dht.KUID;
-import com.ardverk.dht.routing.IContact;
+import com.ardverk.dht.routing.Contact;
 
 public class DefaultValueTuple extends AbstractValueTuple {
     
-    private final IContact sender;
+    private final Contact sender;
     
-    private final IContact creator;
+    private final Contact creator;
     
     private final KUID key;
     
     private final byte[] value;
     
-    public DefaultValueTuple(IContact contact, KUID key, byte[] value) {
+    public DefaultValueTuple(Contact contact, KUID key, byte[] value) {
         this (contact, contact, key, value);
     }
     
-    public DefaultValueTuple(IContact sender, IContact creator, 
+    public DefaultValueTuple(Contact sender, Contact creator, 
             KUID key, byte[] value) {
         
         this.sender = Arguments.notNull(sender, "sender");
@@ -47,12 +47,12 @@ public class DefaultValueTuple extends AbstractValueTuple {
     }
 
     @Override
-    public IContact getSender() {
+    public Contact getSender() {
         return sender;
     }
     
     @Override
-    public IContact getCreator() {
+    public Contact getCreator() {
         return creator;
     }
     
@@ -72,10 +72,10 @@ public class DefaultValueTuple extends AbstractValueTuple {
     }
     
     /**
-     * To save memory we're trying to re-use the {@link IContact}
+     * To save memory we're trying to re-use the {@link Contact}
      * instance if sender and creator are the same.
      */
-    private static IContact pickCreator(IContact sender, IContact creator) {
+    private static Contact pickCreator(Contact sender, Contact creator) {
         if (creator == null || sender.equals(creator)) {
             return sender;
         }

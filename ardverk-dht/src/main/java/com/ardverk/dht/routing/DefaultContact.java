@@ -35,21 +35,21 @@ public class DefaultContact extends AbstractContact {
     private static final long serialVersionUID = 298059770472298142L;
 
     /**
-     * Creates and returns a localhost {@link IContact}.
+     * Creates and returns a localhost {@link Contact}.
      */
-    public static IContact localhost(KUID contactId, String address, int port) {
+    public static Contact localhost(KUID contactId, String address, int port) {
         return localhost(contactId, new InetSocketAddress(address, port));
     }
     
     /**
-     * Creates and returns a localhost {@link IContact}.
+     * Creates and returns a localhost {@link Contact}.
      */
-    public static IContact localhost(KUID contactId, InetAddress address, int port) {
+    public static Contact localhost(KUID contactId, InetAddress address, int port) {
         return localhost(contactId, new InetSocketAddress(address, port));
     }
     
     /**
-     * Creates and returns a localhost {@link IContact}.
+     * Creates and returns a localhost {@link Contact}.
      */
     public static DefaultContact localhost(KUID contactId, SocketAddress address) {
         return new DefaultContact(Type.AUTHORITATIVE, contactId, 0, address);
@@ -72,7 +72,7 @@ public class DefaultContact extends AbstractContact {
     private final SocketAddress remoteAddress;
     
     /**
-     * Creates a {@link IContact}
+     * Creates a {@link Contact}
      */
     public DefaultContact(Type type, 
             KUID contactId, 
@@ -83,7 +83,7 @@ public class DefaultContact extends AbstractContact {
     }
     
     /**
-     * Creates a {@link IContact}
+     * Creates a {@link Contact}
      */
     public DefaultContact(Type type, 
             KUID contactId, 
@@ -94,7 +94,7 @@ public class DefaultContact extends AbstractContact {
     }
     
     /**
-     * Creates a {@link IContact}
+     * Creates a {@link Contact}
      */
     public DefaultContact(Type type, 
             KUID contactId, 
@@ -106,7 +106,7 @@ public class DefaultContact extends AbstractContact {
     }
     
     /**
-     * Creates a {@link IContact}
+     * Creates a {@link Contact}
      */
     public DefaultContact(Type type, 
             KUID contactId, 
@@ -184,7 +184,7 @@ public class DefaultContact extends AbstractContact {
     /**
      * 
      */
-    protected DefaultContact(DefaultContact existing, IContact o) {
+    protected DefaultContact(DefaultContact existing, Contact o) {
         super(existing);
         
         if (!existing.equals(o)) {
@@ -224,8 +224,8 @@ public class DefaultContact extends AbstractContact {
     }
     
     /**
-     * Returns {@code true} if this is a better {@link IContact} than
-     * the other given {@link IContact}.
+     * Returns {@code true} if this is a better {@link Contact} than
+     * the other given {@link Contact}.
      */
     private boolean isBetter(DefaultContact other) {
         // Everything is a better than an *UNKNOWN* Contact even
@@ -235,7 +235,7 @@ public class DefaultContact extends AbstractContact {
     
     /**
      * Returns {@code true} if this is a better or a equally good 
-     * {@link IContact} than the other given {@link IContact}.
+     * {@link Contact} than the other given {@link Contact}.
      */
     private boolean isBetterOrEqual(DefaultContact other) {
         return type.isBetterOrEqual(other.type);
@@ -263,9 +263,9 @@ public class DefaultContact extends AbstractContact {
     }
     
     /**
-     * Sets the {@link IContact}'s instance ID and returns a new {@link IContact}.
+     * Sets the {@link Contact}'s instance ID and returns a new {@link Contact}.
      */
-    public IContact setInstanceId(int instanceId) {
+    public Contact setInstanceId(int instanceId) {
         return this.instanceId != instanceId ? new DefaultContact(this, instanceId) : this;
     }
     
@@ -275,9 +275,9 @@ public class DefaultContact extends AbstractContact {
     }
     
     /**
-     * Sets the {@link IContact}'s address as reported by the {@link Socket}.
+     * Sets the {@link Contact}'s address as reported by the {@link Socket}.
      */
-    public IContact setSocketAddress(SocketAddress address) {
+    public Contact setSocketAddress(SocketAddress address) {
         return new DefaultContact(this, address, contactAddress);
     }
     
@@ -287,10 +287,10 @@ public class DefaultContact extends AbstractContact {
     }
     
     /**
-     * Sets the {@link IContact}'s address as reported by the 
-     * remote {@link IContact}.
+     * Sets the {@link Contact}'s address as reported by the 
+     * remote {@link Contact}.
      */
-    public IContact setContactAddress(SocketAddress address) {
+    public Contact setContactAddress(SocketAddress address) {
         return new DefaultContact(this, socketAddress, address);
     }
     
@@ -305,7 +305,7 @@ public class DefaultContact extends AbstractContact {
     }
     
     /**
-     * Changes the {@link IContact}'s Round-Trip-Time (RTT)
+     * Changes the {@link Contact}'s Round-Trip-Time (RTT)
      */
     public DefaultContact setRoundTripTime(long rtt, TimeUnit unit) {
         return new DefaultContact(this, rtt, unit);
@@ -317,7 +317,7 @@ public class DefaultContact extends AbstractContact {
     }
     
     @Override
-    public IContact merge(IContact other) {
+    public Contact merge(Contact other) {
         return other != this ? new DefaultContact(this, other) : this;
     }
     

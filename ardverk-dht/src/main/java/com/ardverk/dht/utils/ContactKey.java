@@ -19,7 +19,7 @@ package com.ardverk.dht.utils;
 import java.net.SocketAddress;
 
 import com.ardverk.dht.KUID;
-import com.ardverk.dht.routing.IContact;
+import com.ardverk.dht.routing.Contact;
 
 /**
  * The {@link ContactKey} can be used to keep track of certain operations
@@ -31,7 +31,7 @@ public class ContactKey {
     
     private final SocketAddress address;
     
-    public ContactKey(IContact contact) {
+    public ContactKey(Contact contact) {
         this(contact.getId(), contact.getRemoteAddress());
     }
     

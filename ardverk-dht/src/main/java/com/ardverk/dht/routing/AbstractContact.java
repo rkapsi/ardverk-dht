@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.lang.Identifier;
 
-abstract class AbstractContact implements IContact {
+abstract class AbstractContact implements Contact {
     
     private static final long serialVersionUID = 9018341814707545676L;
     
@@ -84,16 +84,16 @@ abstract class AbstractContact implements IContact {
     public boolean equals(Object o) {
         if (o == this) {
             return true;
-        } else if (!(o instanceof IContact)) {
+        } else if (!(o instanceof Contact)) {
             return false;
         }
         
-        IContact other = (IContact)o;
+        Contact other = (Contact)o;
         return contactId.equals(other.getId());
     }
     
     @Override
-    public int compareTo(IContact o) {
+    public int compareTo(Contact o) {
         return contactId.compareTo(o.getId());
     }
 }

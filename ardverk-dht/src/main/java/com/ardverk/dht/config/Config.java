@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.ardverk.dht.ExecutorKey;
 import com.ardverk.dht.routing.DefaultContact;
-import com.ardverk.dht.routing.IContact;
+import com.ardverk.dht.routing.Contact;
 
 public interface Config {
     
@@ -50,7 +50,7 @@ public interface Config {
     public long getOperationTimeoutInMillis();
     
     /**
-     * The RTT multiplier is used multiply a {@link IContact}'s RTT
+     * The RTT multiplier is used multiply a {@link Contact}'s RTT
      * by some number.
      * 
      * @see #getAdaptiveTimeout(DefaultContact, long, TimeUnit)
@@ -63,8 +63,8 @@ public interface Config {
     public double getRoundTripTimeMultiplier();
     
     /**
-     * Returns an <tt>adaptive</tt> timeout for the given {@link IContact}
+     * Returns an <tt>adaptive</tt> timeout for the given {@link Contact}
      * which is ideally less than the given default timeout.
      */
-    public long getAdaptiveTimeout(IContact dst, long defaultTimeout, TimeUnit unit);
+    public long getAdaptiveTimeout(Contact dst, long defaultTimeout, TimeUnit unit);
 }

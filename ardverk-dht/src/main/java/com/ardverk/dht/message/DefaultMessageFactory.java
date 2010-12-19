@@ -21,22 +21,22 @@ import java.net.SocketAddress;
 import org.ardverk.lang.Arguments;
 
 import com.ardverk.dht.KUID;
-import com.ardverk.dht.routing.IContact;
+import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.storage.Database.Condition;
 import com.ardverk.dht.storage.ValueTuple;
 
 public class DefaultMessageFactory extends AbstractMessageFactory {
 
-    private final IContact localhost;
+    private final Contact localhost;
     
-    public DefaultMessageFactory(int length, IContact localhost) {
+    public DefaultMessageFactory(int length, Contact localhost) {
         super(length);
         
         this.localhost = Arguments.notNull(localhost, "localhost");
     }
     
     @Override
-    public PingRequest createPingRequest(IContact dst) {
+    public PingRequest createPingRequest(Contact dst) {
         return createPingRequest(dst.getRemoteAddress());
     }
 
@@ -48,29 +48,29 @@ public class DefaultMessageFactory extends AbstractMessageFactory {
 
     @Override
     public PingResponse createPingResponse(PingRequest request) {
-        IContact dst = request.getContact();
+        Contact dst = request.getContact();
         SocketAddress address = dst.getRemoteAddress();
         MessageId messageId = request.getMessageId();
         return new DefaultPingResponse(messageId, localhost, address);
     }
 
     @Override
-    public NodeRequest createNodeRequest(IContact dst, KUID key) {
+    public NodeRequest createNodeRequest(Contact dst, KUID key) {
         SocketAddress address = dst.getRemoteAddress();
         MessageId messageId = createMessageId(address);
         return new DefaultNodeRequest(messageId, localhost, address, key);
     }
 
     @Override
-    public NodeResponse createNodeResponse(LookupRequest request, IContact[] contacts) {
-        IContact dst = request.getContact();
+    public NodeResponse createNodeResponse(LookupRequest request, Contact[] contacts) {
+        Contact dst = request.getContact();
         SocketAddress address = dst.getRemoteAddress();
         MessageId messageId = request.getMessageId();
         return new DefaultNodeResponse(messageId, localhost, address, contacts);
     }
 
     @Override
-    public ValueRequest createValueRequest(IContact dst, KUID key) {
+    public ValueRequest createValueRequest(Contact dst, KUID key) {
         SocketAddress address = dst.getRemoteAddress();
         MessageId messageId = createMessageId(address);
         return new DefaultValueRequest(messageId, localhost, address, key);
@@ -78,7 +78,7 @@ public class DefaultMessageFactory extends AbstractMessageFactory {
 
     @Override
     public ValueResponse createValueResponse(LookupRequest request, ValueTuple tuple) {
-        IContact dst = request.getContact();
+        Contact dst = request.getContact();
         SocketAddress address = dst.getRemoteAddress();
         MessageId messageId = request.getMessageId();
         
@@ -86,7 +86,7 @@ public class DefaultMessageFactory extends AbstractMessageFactory {
     }
 
     @Override
-    public StoreRequest createStoreRequest(IContact dst, ValueTuple tuple) {
+    public StoreRequest createStoreRequest(Contact dst, ValueTuple tuple) {
         SocketAddress address = dst.getRemoteAddress();
         MessageId messageId = createMessageId(address);
         return new DefaultStoreRequest(messageId, localhost, address, tuple);
@@ -94,7 +94,7 @@ public class DefaultMessageFactory extends AbstractMessageFactory {
 
     @Override
     public StoreResponse createStoreResponse(StoreRequest request, Condition condition) {
-        IContact dst = request.getContact();
+        Contact dst = request.getContact();
         SocketAddress address = dst.getRemoteAddress();
         MessageId messageId = request.getMessageId();
         return new DefaultStoreResponse(messageId, localhost, address, condition);

@@ -30,23 +30,23 @@ public interface Bucket extends Identifier, Longevity {
     public int getDepth();
     
     /**
-     * Returns the number of active {@link IContact}s in the {@link Bucket}.
+     * Returns the number of active {@link Contact}s in the {@link Bucket}.
      */
     public int getActiveCount();
     
     /**
-     * Returns true if there are no active {@link IContact}s 
+     * Returns true if there are no active {@link Contact}s 
      * in the {@link Bucket}.
      */
     public boolean isActiveEmpty();
     
     /**
-     * Returns the number of cached {@link IContact}s in the {@link Bucket}.
+     * Returns the number of cached {@link Contact}s in the {@link Bucket}.
      */
     public int getCachedCount();
     
     /**
-     * Returns true if there are no cached {@link IContact}s 
+     * Returns true if there are no cached {@link Contact}s 
      * in the {@link Bucket}.
      */
     public boolean isCacheEmpty();
@@ -78,19 +78,19 @@ public interface Bucket extends Identifier, Longevity {
     
     /**
      * Returns true if the {@link Bucket} contains a 
-     * {@link IContact} with the given {@link KUID}.
+     * {@link Contact} with the given {@link KUID}.
      */
     public boolean contains(KUID contactId);
     
     /**
      * Returns true if the {@link Bucket} contains an active 
-     * {@link IContact} with the given {@link KUID}.
+     * {@link Contact} with the given {@link KUID}.
      */
     public boolean containsActive(KUID contactId);
     
     /**
      * Returns true if the {@link Bucket} contains a cached 
-     * {@link IContact} with the given {@link KUID}.
+     * {@link Contact} with the given {@link KUID}.
      */
     public boolean containsCached(KUID contactId);
 }

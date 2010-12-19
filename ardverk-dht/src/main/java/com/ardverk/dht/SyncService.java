@@ -19,12 +19,12 @@ package com.ardverk.dht;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.config.SyncConfig;
 import com.ardverk.dht.entity.SyncEntity;
-import com.ardverk.dht.routing.IContact;
+import com.ardverk.dht.routing.Contact;
 
 public interface SyncService {
 
     /**
-     * Synchronizes this {@link IContact}'s values with the k-closest.
+     * Synchronizes this {@link Contact}'s values with the k-closest.
      */
     public ArdverkFuture<SyncEntity> sync(SyncConfig config);
 }

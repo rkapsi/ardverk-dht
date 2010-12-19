@@ -21,14 +21,14 @@ import java.net.SocketAddress;
 import org.ardverk.lang.Arguments;
 
 import com.ardverk.dht.KUID;
-import com.ardverk.dht.routing.IContact;
+import com.ardverk.dht.routing.Contact;
 
 public class DefaultNodeRequest extends AbstractLookupRequest 
         implements NodeRequest {
     
     private final KUID lookupId;
     
-    public DefaultNodeRequest(MessageId messageId, IContact contact, 
+    public DefaultNodeRequest(MessageId messageId, Contact contact, 
             SocketAddress address, KUID lookupId) {
         super(messageId, contact, address);
         

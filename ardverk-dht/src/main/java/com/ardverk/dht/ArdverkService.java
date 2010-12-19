@@ -28,7 +28,7 @@ import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.PutEntity;
 import com.ardverk.dht.entity.ValueEntity;
-import com.ardverk.dht.routing.IContact;
+import com.ardverk.dht.routing.Contact;
 
 /**
  * The {@link ArdverkService} defines the basic operations of a DHT.
@@ -57,7 +57,7 @@ public interface ArdverkService {
      * Sends a PING to the given host.
      */
     public ArdverkFuture<PingEntity> ping(
-            IContact dst, PingConfig config);
+            Contact dst, PingConfig config);
     
     /**
      * Performs a FIND_NODE lookup in the DHT.

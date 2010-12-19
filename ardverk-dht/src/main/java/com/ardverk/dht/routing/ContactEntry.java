@@ -25,7 +25,7 @@ import com.ardverk.dht.lang.Identifier;
 
 /**
  * The {@link DefaultRouteTable} uses internally {@link ContactEntry}s 
- * instead of {@link IContact}s directly.
+ * instead of {@link Contact}s directly.
  * 
  * <p>NOTE: This class is <b>NOT</b> Thread-safe! All read/write operations
  * must be done while a lock on the {@link DefaultRouteTable} instance
@@ -37,13 +37,13 @@ public class ContactEntry implements Identifier, Longevity {
     
     private final RouteTableConfig config;
     
-    private IContact contact;
+    private Contact contact;
     
     private int errorCount = 0;
     
     private long errorTimeStamp;
     
-    ContactEntry(RouteTableConfig config, IContact contact) {
+    ContactEntry(RouteTableConfig config, Contact contact) {
         this.config = config;
         this.contact = contact;
     }
@@ -64,17 +64,17 @@ public class ContactEntry implements Identifier, Longevity {
     }
     
     /**
-     * Returns the {@link ContactEntry}'s {@link IContact}.
+     * Returns the {@link ContactEntry}'s {@link Contact}.
      */
-    public IContact getContact() {
+    public Contact getContact() {
         return contact;
     }
     
     /**
-     * Updates the current {@link IContact} with the given {@link IContact}.
+     * Updates the current {@link Contact} with the given {@link Contact}.
      */
-    public Update update(IContact other) {
-        IContact previous = contact;
+    public Update update(Contact other) {
+        Contact previous = contact;
         contact = previous.merge(other);
         
         if (other.isActive()) {
@@ -102,7 +102,7 @@ public class ContactEntry implements Identifier, Longevity {
     
     /**
      * Increments the error count, sets the error time stamp and
-     * returns {@code true} if the {@link IContact} is considered
+     * returns {@code true} if the {@link Contact} is considered
      * dead.
      */
     public boolean error() {
@@ -134,7 +134,7 @@ public class ContactEntry implements Identifier, Longevity {
     }
     
     /**
-     * Returns {@code true} if the {@link IContact} is not dead
+     * Returns {@code true} if the {@link Contact} is not dead
      * and active.
      * 
      * @see #isDead()
@@ -145,7 +145,7 @@ public class ContactEntry implements Identifier, Longevity {
     }
     
     /**
-     * Returns {@code true} if the {@link IContact} is not dead
+     * Returns {@code true} if the {@link Contact} is not dead
      * but unsolicited.
      * 
      * @see #isDead()
@@ -156,7 +156,7 @@ public class ContactEntry implements Identifier, Longevity {
     }
     
     /**
-     * Returns {@code true} if the {@link IContact} has been recently active as 
+     * Returns {@code true} if the {@link Contact} has been recently active as 
      * defined in {@link RouteTableConfig#getHasBeenActiveTimeoutInMillis()}.
      */
     public boolean hasBeenActiveRecently() {
@@ -165,20 +165,20 @@ public class ContactEntry implements Identifier, Longevity {
     }
     
     /**
-     * Returns {@code true} if both {@link IContact}s are equal as defined in
+     * Returns {@code true} if both {@link Contact}s are equal as defined in
      * {@link DefaultContact#equals(Object)}.
      */
-    public boolean isSameContact(IContact other) {
+    public boolean isSameContact(Contact other) {
         return contact.equals(other);
     }
     
     /**
-     * Returns {@code true} if both {@link IContact}s have the same
+     * Returns {@code true} if both {@link Contact}s have the same
      * remote {@link SocketAddress}.
      * 
      * @see DefaultContact#getRemoteAddress()
      */
-    public boolean isSameRemoteAddress(IContact contact) {
+    public boolean isSameRemoteAddress(Contact contact) {
         return NetworkUtils.isSameAddress(
                 this.contact.getRemoteAddress(), 
                 contact.getRemoteAddress());
@@ -186,27 +186,27 @@ public class ContactEntry implements Identifier, Longevity {
     
     public static class Update {
         
-        private final IContact previous;
+        private final Contact previous;
         
-        private final IContact other;
+        private final Contact other;
         
-        private final IContact merged;
+        private final Contact merged;
 
-        private Update(IContact previous, IContact other, IContact merged) {
+        private Update(Contact previous, Contact other, Contact merged) {
             this.previous = previous;
             this.other = other;
             this.merged = merged;
         }
 
-        public IContact getPrevious() {
+        public Contact getPrevious() {
             return previous;
         }
 
-        public IContact getOther() {
+        public Contact getOther() {
             return other;
         }
 
-        public IContact getMerged() {
+        public Contact getMerged() {
             return merged;
         }
     }

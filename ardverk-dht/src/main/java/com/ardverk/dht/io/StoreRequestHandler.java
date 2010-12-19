@@ -26,7 +26,7 @@ import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.message.StoreRequest;
-import com.ardverk.dht.routing.IContact;
+import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
 import com.ardverk.dht.storage.Database.Condition;
@@ -59,8 +59,8 @@ public class StoreRequestHandler extends AbstractRequestHandler {
         DatabaseConfig config = database.getDatabaseConfig();
         if (config.isCheckBucket()) {
             KUID valueId = tuple.getId();
-            IContact[] contacts = routeTable.select(valueId);
-            IContact localhost = routeTable.getLocalhost();
+            Contact[] contacts = routeTable.select(valueId);
+            Contact localhost = routeTable.getLocalhost();
             
             if (!ArrayUtils.contains(localhost, contacts)) {
                 condition = DefaultCondition.FAILURE;

@@ -48,8 +48,8 @@ import com.ardverk.dht.message.StoreResponse;
 import com.ardverk.dht.message.ValueRequest;
 import com.ardverk.dht.message.ValueResponse;
 import com.ardverk.dht.routing.DefaultContact;
-import com.ardverk.dht.routing.IContact;
-import com.ardverk.dht.routing.IContact.Type;
+import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.Contact.Type;
 import com.ardverk.dht.storage.Database.Condition;
 import com.ardverk.dht.storage.DefaultCondition;
 import com.ardverk.dht.storage.DefaultValueTuple;
@@ -119,7 +119,7 @@ class MessageInputStream extends BencodingInputStream {
         int instanceId = readInt();
         SocketAddress address = readSocketAddress();
         
-        if (type == IContact.Type.UNKNOWN) {
+        if (type == Contact.Type.UNKNOWN) {
             src = address;
         }
         
@@ -160,7 +160,7 @@ class MessageInputStream extends BencodingInputStream {
         OpCode opcode = readEnum(OpCode.class);
         MessageId messageId = readMessageId();
         DefaultContact contact = readContact(opcode.isRequest() 
-                ? IContact.Type.UNSOLICITED : IContact.Type.SOLICITED, src);
+                ? Contact.Type.UNSOLICITED : Contact.Type.SOLICITED, src);
         SocketAddress address = readSocketAddress();
         
         switch (opcode) {
@@ -204,7 +204,7 @@ class MessageInputStream extends BencodingInputStream {
     private NodeResponse readNodeResponse(MessageId messageId, 
             DefaultContact contact, SocketAddress address) throws IOException {
         
-        DefaultContact[] contacts = readContacts(IContact.Type.UNKNOWN, address);
+        DefaultContact[] contacts = readContacts(Contact.Type.UNKNOWN, address);
         return new DefaultNodeResponse(messageId, contact, address, contacts);
     }
     

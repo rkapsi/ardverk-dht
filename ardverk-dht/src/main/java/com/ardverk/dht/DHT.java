@@ -20,7 +20,7 @@ import org.ardverk.io.Bindable;
 
 import com.ardverk.dht.concurrent.ArdverkFutureService;
 import com.ardverk.dht.io.transport.Transport;
-import com.ardverk.dht.routing.IContact;
+import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
 
@@ -29,11 +29,11 @@ public interface DHT extends ArdverkService, BootstrapService,
         Bindable<Transport> {
     
     /**
-     * Returns the localhost {@link IContact}.
+     * Returns the localhost {@link Contact}.
      * 
      * @see RouteTable#getLocalhost()
      */
-    public IContact getLocalhost();
+    public Contact getLocalhost();
     
     /**
      * Returns the {@link DHT}'s {@link RouteTable}.

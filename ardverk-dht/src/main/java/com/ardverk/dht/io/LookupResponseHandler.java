@@ -37,7 +37,7 @@ import com.ardverk.dht.entity.LookupEntity;
 import com.ardverk.dht.logging.LoggerUtils;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.DefaultContact;
-import com.ardverk.dht.routing.IContact;
+import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.utils.SchedulingUtils;
 import com.ardverk.dht.utils.XorComparator;
@@ -59,7 +59,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     private ScheduledFuture<?> boostFuture;
     
     public LookupResponseHandler(MessageDispatcher messageDispatcher, 
-            IContact[] contacts, RouteTable routeTable, KUID lookupId, 
+            Contact[] contacts, RouteTable routeTable, KUID lookupId, 
             LookupConfig config) {
         super(messageDispatcher);
         
@@ -122,7 +122,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
                     
                     if (boostTimeout >= 0L && getLastResponseTimeInMillis() >= boostTimeout) {
                         try {
-                            IContact contact = lookupManager.next();
+                            Contact contact = lookupManager.next();
                             
                             lookup(contact);
                             lookupCounter.increment(true);
@@ -146,7 +146,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
                     break;
                 }
                 
-                IContact contact = lookupManager.next();
+                Contact contact = lookupManager.next();
                 
                 lookup(contact);
                 lookupCounter.increment();
@@ -157,9 +157,9 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     }
     
     /**
-     * Sends a lookup request to the given {@link IContact}.
+     * Sends a lookup request to the given {@link Contact}.
      */
-    private void lookup(IContact dst) throws IOException {
+    private void lookup(Contact dst) throws IOException {
         long defaultTimeout = config.getLookupTimeoutInMillis();
         long adaptiveTimeout = config.getAdaptiveTimeout(
                 dst, defaultTimeout, TimeUnit.MILLISECONDS);
@@ -190,9 +190,9 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     }
     
     /**
-     * Sends a lookup request to the given {@link IContact}.
+     * Sends a lookup request to the given {@link Contact}.
      */
-    protected abstract void lookup(IContact dst, KUID lookupId, 
+    protected abstract void lookup(Contact dst, KUID lookupId, 
             long timeout, TimeUnit unit) throws IOException;
     
     /**
@@ -219,11 +219,11 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
             ResponseMessage response, long time, TimeUnit unit) throws IOException;
 
     /**
-     * Adds the given {@link IContact}s to the lookup's internal processing
+     * Adds the given {@link Contact}s to the lookup's internal processing
      * queue.
      */
-    protected synchronized void processContacts(IContact src, 
-            IContact[] contacts, long time, TimeUnit unit) throws IOException {
+    protected synchronized void processContacts(Contact src, 
+            Contact[] contacts, long time, TimeUnit unit) throws IOException {
         lookupManager.handleResponse(src, contacts, time, unit);
     }
 
@@ -255,7 +255,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         }
         
         final long time = System.currentTimeMillis() - startTime;
-        final IContact[] contacts = lookupManager.getContacts();
+        final Contact[] contacts = lookupManager.getContacts();
         final int hop = lookupManager.getHop();
         final int timeouts = lookupManager.getErrorCount();
         
@@ -267,7 +267,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
             }
 
             @Override
-            public IContact[] getContacts() {
+            public Contact[] getContacts() {
                 return contacts;
             }
 
@@ -299,9 +299,9 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         public abstract KUID getLookupId();
         
         /**
-         * Returns the {@link IContact}s that have been found.
+         * Returns the {@link Contact}s that have been found.
          */
-        public abstract IContact[] getContacts();
+        public abstract Contact[] getContacts();
         
         /**
          * Returns the number of hops the lookup has taken.
@@ -342,17 +342,17 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         /**
          * A {@link Set} of all responses
          */
-        private final NavigableSet<IContact> responses;
+        private final NavigableSet<Contact> responses;
         
         /**
          * A {@link Set} of the k-closest responses
          */
-        private final NavigableSet<IContact> closest;
+        private final NavigableSet<Contact> closest;
         
         /**
-         * A {@link Set} of {@link IContact}s to query
+         * A {@link Set} of {@link Contact}s to query
          */
-        private final NavigableSet<IContact> query;
+        private final NavigableSet<Contact> query;
         
         /**
          * A history of all {@link KUID}s that were added to the 
@@ -365,27 +365,27 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         
         private int timeouts = 0;
         
-        public LookupManager(IContact[] contacts, RouteTable routeTable, KUID lookupId) {
+        public LookupManager(Contact[] contacts, RouteTable routeTable, KUID lookupId) {
             this.routeTable = Arguments.notNull(routeTable, "routeTable");
             this.lookupId = Arguments.notNull(lookupId, "lookupId");
             
-            IContact localhost = routeTable.getLocalhost();
+            Contact localhost = routeTable.getLocalhost();
             KUID contactId = localhost.getId();
             
             XorComparator comparator = new XorComparator(lookupId);
-            this.responses = new TreeSet<IContact>(comparator);
-            this.closest = new TreeSet<IContact>(comparator);
-            this.query = new TreeSet<IContact>(comparator);
+            this.responses = new TreeSet<Contact>(comparator);
+            this.closest = new TreeSet<Contact>(comparator);
+            this.query = new TreeSet<Contact>(comparator);
             
             history.put(contactId, 0);
             
             addToResponses(localhost);
-            for (IContact contact : contacts) {
+            for (Contact contact : contacts) {
                 addToQuery(contact, 1);
             }
         }
         
-        public void handleResponse(IContact src, IContact[] contacts, 
+        public void handleResponse(Contact src, Contact[] contacts, 
                 long time, TimeUnit unit) {
             
             boolean success = addToResponses(src);
@@ -393,7 +393,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
                 return;
             }
             
-            for (IContact contact : contacts) {
+            for (Contact contact : contacts) {
                 if (addToQuery(contact, currentHop+1)) {
                     routeTable.add(contact);
                 }
@@ -404,7 +404,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
             timeouts++;
         }
         
-        public IContact[] getContacts() {
+        public Contact[] getContacts() {
             return responses.toArray(new DefaultContact[0]);
         }
         
@@ -416,7 +416,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
             return timeouts;
         }
         
-        private boolean addToResponses(IContact contact) {
+        private boolean addToResponses(Contact contact) {
             if (responses.add(contact)) {
                 closest.add(contact);
                 
@@ -432,7 +432,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
             return false;
         }
         
-        private boolean addToQuery(IContact contact, int hop) {
+        private boolean addToQuery(Contact contact, int hop) {
             KUID contactId = contact.getId();
             if (!history.containsKey(contactId)) { 
                 history.put(contactId, hop);
@@ -443,9 +443,9 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
             return false;
         }
         
-        private boolean isCloserThanClosest(IContact other) {
+        private boolean isCloserThanClosest(Contact other) {
             if (!closest.isEmpty()) {
-                IContact contact = closest.last();
+                Contact contact = closest.last();
                 KUID contactId = contact.getId();
                 KUID otherId = other.getId();
                 return otherId.isCloserTo(lookupId, contactId);
@@ -461,7 +461,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         public boolean hasNext(boolean force) {
             if (!query.isEmpty()) {
                 
-                IContact contact = query.first();
+                Contact contact = query.first();
                 if (force || exhaustive
                         || closest.size() < routeTable.getK() 
                         || isCloserThanClosest(contact)) {
@@ -472,8 +472,8 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
             return false;
         }
         
-        public IContact next() {
-            IContact contact = null;
+        public Contact next() {
+            Contact contact = null;
             
             if (randomize && !query.isEmpty()) {
                 
@@ -492,7 +492,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
                 // above.
                 
                 int index = 0;
-                for (IContact c : query) {
+                for (Contact c : query) {
                     
                     if (index >= routeTable.getK()) {
                         break;

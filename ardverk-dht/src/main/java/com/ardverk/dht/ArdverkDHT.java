@@ -42,7 +42,7 @@ import com.ardverk.dht.io.DefaultMessageDispatcher;
 import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.message.MessageFactory;
-import com.ardverk.dht.routing.IContact;
+import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
 import com.ardverk.dht.storage.StoreForward;
@@ -93,7 +93,7 @@ public class ArdverkDHT extends AbstractDHT {
         
         routeTable.bind(new RouteTable.ContactPinger() {
             @Override
-            public ArdverkFuture<PingEntity> ping(IContact contact,
+            public ArdverkFuture<PingEntity> ping(Contact contact,
                     PingConfig config) {
                 return ArdverkDHT.this.ping(contact, config);
             }
@@ -101,9 +101,9 @@ public class ArdverkDHT extends AbstractDHT {
         
         storeForward.bind(new StoreForward.Callback() {
             @Override
-            public ArdverkFuture<StoreEntity> store(IContact dst, 
+            public ArdverkFuture<StoreEntity> store(Contact dst, 
                     ValueTuple valueTuple, StoreConfig config) {
-                return storeManager.store(new IContact[] { dst }, valueTuple, config);
+                return storeManager.store(new Contact[] { dst }, valueTuple, config);
             }
         });
     }
@@ -115,7 +115,7 @@ public class ArdverkDHT extends AbstractDHT {
     }
     
     @Override
-    public IContact getLocalhost() {
+    public Contact getLocalhost() {
         return routeTable.getLocalhost();
     }
     
@@ -192,12 +192,12 @@ public class ArdverkDHT extends AbstractDHT {
     
     @Override
     public ArdverkFuture<BootstrapEntity> bootstrap(
-            IContact contact, BootstrapConfig config) {
+            Contact contact, BootstrapConfig config) {
         return bootstrapManager.bootstrap(contact, config);
     }
 
     @Override
-    public ArdverkFuture<PingEntity> ping(IContact contact, PingConfig config) {
+    public ArdverkFuture<PingEntity> ping(Contact contact, PingConfig config) {
         return pingManager.ping(contact, config);
     }
 

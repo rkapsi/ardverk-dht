@@ -25,7 +25,7 @@ import junit.framework.TestCase;
 import org.junit.Test;
 
 import com.ardverk.dht.KUID;
-import com.ardverk.dht.routing.IContact.Type;
+import com.ardverk.dht.routing.Contact.Type;
 
 public class RouteTableTest {
 
@@ -66,7 +66,7 @@ public class RouteTableTest {
         
         routeTable.addRouteTableListener(new RouteTableAdapter() {
             @Override
-            public void handleContactAdded(Bucket bucket, IContact contact) {
+            public void handleContactAdded(Bucket bucket, Contact contact) {
                 TestCase.fail("Shouldn't have been called.");
             }
         });
@@ -85,7 +85,7 @@ public class RouteTableTest {
         final CountDownLatch latch = new CountDownLatch(1);
         routeTable.addRouteTableListener(new RouteTableAdapter() {
             @Override
-            public void handleContactAdded(Bucket bucket, IContact contact) {
+            public void handleContactAdded(Bucket bucket, Contact contact) {
                 latch.countDown();
             }
         });
@@ -144,7 +144,7 @@ public class RouteTableTest {
             routeTable.add(contact);
         }
         
-        IContact[] contacts = routeTable.select(localhost.getId());
+        Contact[] contacts = routeTable.select(localhost.getId());
         TestCase.assertEquals(routeTable.getK(), contacts.length);
         
         TestCase.assertEquals(localhost, contacts[0]);

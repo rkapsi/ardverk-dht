@@ -19,7 +19,7 @@ package com.ardverk.dht.storage;
 import java.util.concurrent.TimeUnit;
 
 import com.ardverk.dht.lang.Identifier;
-import com.ardverk.dht.routing.IContact;
+import com.ardverk.dht.routing.Contact;
 
 public interface ValueTuple extends Identifier {
 
@@ -41,12 +41,12 @@ public interface ValueTuple extends Identifier {
     /**
      * Returns the sender of the {@link ValueTuple}.
      */
-    public IContact getSender();
+    public Contact getSender();
     
     /**
      * Returns the creator of the {@link ValueTuple}.
      */
-    public IContact getCreator();
+    public Contact getCreator();
     
     /**
      * Returns the {@link Value} of the {@link ValueTuple}.

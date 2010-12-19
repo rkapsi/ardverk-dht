@@ -25,7 +25,7 @@ import org.ardverk.lang.Arguments;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
-import com.ardverk.dht.routing.IContact;
+import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.StoreForward;
 
@@ -42,7 +42,7 @@ public class DefaultMessageHandler implements MessageCallback {
     }
     
     public void handleRequest(RequestMessage request) throws IOException {
-        IContact src = request.getContact();
+        Contact src = request.getContact();
         storeForward.handleRequest(src);
         routeTable.add(src);
     }
@@ -51,14 +51,14 @@ public class DefaultMessageHandler implements MessageCallback {
     public void handleResponse(RequestEntity entity, 
             ResponseMessage response, long time, TimeUnit unit) throws IOException {
         
-        IContact src = response.getContact();
-        IContact rtt = src.setRoundTripTime(time, unit);
+        Contact src = response.getContact();
+        Contact rtt = src.setRoundTripTime(time, unit);
         storeForward.handleResponse(rtt);
         routeTable.add(rtt);
     }
     
     public void handleLateResponse(ResponseMessage response) throws IOException {
-        IContact src = response.getContact();
+        Contact src = response.getContact();
         storeForward.handleLateResponse(src);
         routeTable.add(src);
     }

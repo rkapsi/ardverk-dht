@@ -35,7 +35,7 @@ import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.QuickenEntity;
 import com.ardverk.dht.routing.Bucket;
-import com.ardverk.dht.routing.IContact;
+import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.utils.IdentifierUtils;
 
@@ -63,15 +63,15 @@ public class QuickenManager {
         synchronized (routeTable) {
             int pingCount = (int)(routeTable.getK() * config.getPingCount());
             
-            IContact localhost = dht.getLocalhost();
+            Contact localhost = dht.getLocalhost();
             KUID localhostId = localhost.getId();
 
             if (0 < pingCount) {
                 PingConfig pingConfig = config.getPingConfig();
                 long contactTimeout = config.getContactTimeoutInMillis();
                 
-                IContact[] contacts = routeTable.select(localhostId, pingCount);
-                for (IContact contact : contacts) {
+                Contact[] contacts = routeTable.select(localhostId, pingCount);
+                for (Contact contact : contacts) {
                     // Don't send PINGs to the localhost!
                     if (contact.equals(localhost)) {
                         continue;
