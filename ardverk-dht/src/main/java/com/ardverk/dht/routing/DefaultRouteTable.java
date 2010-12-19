@@ -57,21 +57,21 @@ public class DefaultRouteTable extends AbstractRouteTable {
     
     private final RouteTableConfig config;
     
-    private final Contact localhost;
+    private final Localhost localhost;
     
     private final Trie<KUID, DefaultBucket> buckets;
     
     private int consecutiveErrors = 0;
     
-    public DefaultRouteTable(Contact localhost) {
+    public DefaultRouteTable(Localhost localhost) {
         this(new RouteTableConfig(), localhost);
     }
     
-    public DefaultRouteTable(int k, Contact localhost) {
+    public DefaultRouteTable(int k, Localhost localhost) {
         this(new RouteTableConfig(k), localhost);
     }
     
-    public DefaultRouteTable(RouteTableConfig config, Contact localhost) {
+    public DefaultRouteTable(RouteTableConfig config, Localhost localhost) {
         this.config = Arguments.notNull(config, "config");
         this.localhost = Arguments.notNull(localhost, "localhost");
         
@@ -103,12 +103,12 @@ public class DefaultRouteTable extends AbstractRouteTable {
     }
     
     @Override
-    public Contact getLocalhost() {
+    public Localhost getLocalhost() {
         return localhost;
     }
     
     /**
-     * Returns {@code true} if the {@link KUID} is equal to localhost.
+     * Returns {@code true} if the {@link Identifier} is equal to localhost.
      */
     private boolean isLocalhost(Identifier identifier) {
         return localhost.getId().equals(identifier.getId());
@@ -144,6 +144,12 @@ public class DefaultRouteTable extends AbstractRouteTable {
         // the exact same KUID as the localhost Contact!
         if (isLocalhost(contact)) {
             return;
+        }
+        
+        // Nobody and nothing can add a Contact that is 
+        // an instance of Localhost.
+        if (contact instanceof Localhost) {
+            throw new IllegalArgumentException("contact=" + contact);
         }
         
         // Reset the consecutive errors counter every time

@@ -26,6 +26,7 @@ import com.ardverk.dht.concurrent.ArdverkProcess;
 import com.ardverk.dht.config.Config;
 import com.ardverk.dht.config.PingConfig;
 import com.ardverk.dht.entity.PingEntity;
+import com.ardverk.dht.routing.Localhost;
 
 /**
  * An abstract implementation of {@link DHT}.
@@ -37,6 +38,11 @@ abstract class AbstractDHT implements DHT, Closeable {
     @Override
     public void close() {
         futureManager.close();
+    }
+    
+    @Override
+    public Localhost getLocalhost() {
+        return getRouteTable().getLocalhost();
     }
     
     @Override
@@ -66,6 +72,6 @@ abstract class AbstractDHT implements DHT, Closeable {
     
     @Override
     public String toString() {
-        return getRouteTable().getLocalhost().toString();
+        return getLocalhost().toString();
     }
 }

@@ -115,11 +115,6 @@ public class ArdverkDHT extends AbstractDHT {
     }
     
     @Override
-    public Contact getLocalhost() {
-        return routeTable.getLocalhost();
-    }
-    
-    @Override
     public RouteTable getRouteTable() {
         return routeTable;
     }

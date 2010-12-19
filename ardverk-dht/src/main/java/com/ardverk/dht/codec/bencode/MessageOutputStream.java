@@ -37,7 +37,6 @@ import com.ardverk.dht.message.StoreRequest;
 import com.ardverk.dht.message.StoreResponse;
 import com.ardverk.dht.message.ValueRequest;
 import com.ardverk.dht.message.ValueResponse;
-import com.ardverk.dht.routing.DefaultContact;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.storage.Database.Condition;
 import com.ardverk.dht.storage.ValueTuple;
@@ -58,8 +57,8 @@ class MessageOutputStream extends BencodingOutputStream {
             writeKUID((KUID)obj);
         } else if (obj instanceof MessageId) {
             writeMessageId((MessageId)obj);
-        } else if (obj instanceof DefaultContact) {
-            writeContact((DefaultContact)obj);
+        } else if (obj instanceof Contact) {
+            writeContact((Contact)obj);
         } else if (obj instanceof Message) {
             writeMessage((Message)obj);
         } else {

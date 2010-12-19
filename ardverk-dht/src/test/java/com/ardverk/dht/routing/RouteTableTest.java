@@ -37,7 +37,7 @@ public class RouteTableTest {
     
     @Test
     public void initialState() {
-        DefaultContact localhost = createLocalhost();
+        Localhost localhost = createLocalhost();
         DefaultRouteTable routeTable = createRouteTable(localhost);
         
         TestCase.assertEquals(1, routeTable.size());
@@ -61,7 +61,7 @@ public class RouteTableTest {
     
     @Test
     public void addLocalhost() {
-        DefaultContact localhost = createLocalhost();
+        Localhost localhost = createLocalhost();
         DefaultRouteTable routeTable = createRouteTable(localhost);
         
         routeTable.addRouteTableListener(new RouteTableAdapter() {
@@ -90,7 +90,7 @@ public class RouteTableTest {
             }
         });
         
-        DefaultContact contact = createContact();
+        Contact contact = createContact();
         routeTable.add(contact);
         
         if (!latch.await(1L, TimeUnit.SECONDS)) {
@@ -107,7 +107,7 @@ public class RouteTableTest {
         final DefaultRouteTable routeTable = createRouteTable();
         
         while (routeTable.size() < routeTable.getK()) {
-            DefaultContact contact = createContact();
+            Contact contact = createContact();
             routeTable.add(contact);
         }
         
@@ -123,7 +123,7 @@ public class RouteTableTest {
             }
         });
         
-        DefaultContact contact = createContact();
+        Contact contact = createContact();
         routeTable.add(contact);
         
         if (!latch.await(1L, TimeUnit.SECONDS)) {
@@ -136,11 +136,11 @@ public class RouteTableTest {
     
     @Test
     public void select() {
-        DefaultContact localhost = createLocalhost();
+        Localhost localhost = createLocalhost();
         DefaultRouteTable routeTable = createRouteTable(localhost);
         
         while (routeTable.size() < routeTable.getK()) {
-            DefaultContact contact = createContact();
+            Contact contact = createContact();
             routeTable.add(contact);
         }
         
@@ -151,36 +151,35 @@ public class RouteTableTest {
     }
     
     private static DefaultRouteTable createRouteTable() {
-        DefaultContact localhost = createLocalhost();
+        Localhost localhost = createLocalhost();
         return createRouteTable(localhost);
     }
     
-    private static DefaultRouteTable createRouteTable(DefaultContact localhost) {
+    private static DefaultRouteTable createRouteTable(Localhost localhost) {
         return new DefaultRouteTable(K, localhost);
     }
     
-    private static DefaultContact createLocalhost() {
+    private static Localhost createLocalhost() {
         return createLocalhost(DEFAULT_PORT);
     }
     
-    private static DefaultContact createLocalhost(int port) {
+    private static Localhost createLocalhost(int port) {
         return createLocalhost(KUID.createRandom(ID_SIZE), port);
     }
     
-    private static DefaultContact createLocalhost(KUID contactId, int port) {
-        return DefaultContact.localhost(contactId, 
-                new InetSocketAddress("localhost", port));
+    private static Localhost createLocalhost(KUID contactId, int port) {
+        return new Localhost(contactId, port);
     }
     
-    private static DefaultContact createContact() {
+    private static Contact createContact() {
         return createContact(DEFAULT_PORT);
     }
     
-    private static DefaultContact createContact(int port) {
+    private static Contact createContact(int port) {
         return createContact(KUID.createRandom(ID_SIZE), port);
     }
     
-    private static DefaultContact createContact(KUID contactId, int port) {
+    private static Contact createContact(KUID contactId, int port) {
         return new DefaultContact(Type.SOLICITED, contactId, 
                 0, new InetSocketAddress("localhost", port));
     }

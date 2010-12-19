@@ -45,9 +45,9 @@ public interface RouteTable extends IoErrorCallback {
     public boolean isBound();
     
     /**
-     * Returns the localhost {@link Contact}.
+     * Returns the localhost {@link Localhost}.
      */
-    public Contact getLocalhost();
+    public Localhost getLocalhost();
     
     /**
      * Adds the given {@link Contact} to the {@link RouteTable}.

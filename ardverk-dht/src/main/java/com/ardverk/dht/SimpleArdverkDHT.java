@@ -51,8 +51,9 @@ import com.ardverk.dht.io.transport.DatagramTransport;
 import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.message.DefaultMessageFactory;
 import com.ardverk.dht.message.MessageFactory;
-import com.ardverk.dht.routing.DefaultContact;
+import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.DefaultRouteTable;
+import com.ardverk.dht.routing.Localhost;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
 import com.ardverk.dht.storage.DefaultDatabase;
@@ -95,7 +96,7 @@ public class SimpleArdverkDHT extends ArdverkDHT {
         int keySize = config.getKeySize();
         SocketAddress address = config.getAddress(transport);
         
-        DefaultContact localhost = DefaultContact.localhost(
+        Localhost localhost = new Localhost(
                 KUID.createRandom(keySize), address);
         
         String secretKey = config.getSecretKey();
@@ -142,7 +143,7 @@ public class SimpleArdverkDHT extends ArdverkDHT {
         return ping(address, config.getPingConfig());
     }
     
-    public ArdverkFuture<PingEntity> ping(DefaultContact dst) {
+    public ArdverkFuture<PingEntity> ping(Contact dst) {
         return ping(dst, config.getPingConfig());
     }
     
@@ -175,7 +176,7 @@ public class SimpleArdverkDHT extends ArdverkDHT {
         return bootstrap(address, config.getBootstrapConfig());
     }
 
-    public ArdverkFuture<BootstrapEntity> bootstrap(DefaultContact contact) {
+    public ArdverkFuture<BootstrapEntity> bootstrap(Contact contact) {
         return bootstrap(contact, config.getBootstrapConfig());
     }
 

@@ -19,7 +19,6 @@ package com.ardverk.dht.config;
 import java.util.concurrent.TimeUnit;
 
 import com.ardverk.dht.ExecutorKey;
-import com.ardverk.dht.routing.DefaultContact;
 import com.ardverk.dht.routing.Contact;
 
 public interface Config {
@@ -53,12 +52,12 @@ public interface Config {
      * The RTT multiplier is used multiply a {@link Contact}'s RTT
      * by some number.
      * 
-     * @see #getAdaptiveTimeout(DefaultContact, long, TimeUnit)
+     * @see #getAdaptiveTimeout(Contact, long, TimeUnit)
      */
     public void setRountTripTimeMultiplier(double multiplier);
     
     /**
-     * @see #getAdaptiveTimeout(DefaultContact, long, TimeUnit)
+     * @see #getAdaptiveTimeout(Contact, long, TimeUnit)
      */
     public double getRoundTripTimeMultiplier();
     

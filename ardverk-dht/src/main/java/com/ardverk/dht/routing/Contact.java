@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 import com.ardverk.dht.lang.Identifier;
 
 public interface Contact extends Identifier, Longevity, 
-        Comparable<Contact>, Serializable {
+        Comparable<Contact>, RoundTripTime, Serializable {
 
     /**
      * The type of the {@link Contact}.
@@ -131,23 +131,6 @@ public interface Contact extends Identifier, Longevity,
     public SocketAddress getRemoteAddress();
     
     /**
-     * Returns the {@link Contact}'s Round-Trip-Time (RTT) or a negative 
-     * value if the RTT is unknown.
-     */
-    public long getRoundTripTime(TimeUnit unit);
-    
-    /**
-     * Returns the {@link Contact}'s Round-Trip-Time (RTT) in milliseconds
-     * or a negative value if the RTT is unknown.
-     */
-    public long getRoundTripTimeInMillis();
-    
-    /**
-     * 
-     */
-    public Contact setRoundTripTime(long rtt, TimeUnit unit);
-    
-    /**
      * Returns the amount of time in the given {@link TimeUnit} that 
      * has passed since we had IContact with this {@link Contact}.
      */
@@ -167,12 +150,6 @@ public interface Contact extends Identifier, Longevity,
      * @see #getTimeSinceLastContactInMillis()
      */
     public boolean isTimeout(long timeout, TimeUnit unit);
-    
-    /**
-     * Returns the adaptive timeout for this {@link Contact}.
-     */
-    public long getAdaptiveTimeout(double multiplier, 
-            long defaultTimeout, TimeUnit unit);
     
     /**
      * Merges this with the other {@link Contact}.

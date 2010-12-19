@@ -17,8 +17,6 @@
 package com.ardverk.dht.routing;
 
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 
@@ -33,35 +31,12 @@ import com.ardverk.dht.KUID;
 public class DefaultContact extends AbstractContact {
     
     private static final long serialVersionUID = 298059770472298142L;
-
-    /**
-     * Creates and returns a localhost {@link Contact}.
-     */
-    public static Contact localhost(KUID contactId, String address, int port) {
-        return localhost(contactId, new InetSocketAddress(address, port));
-    }
-    
-    /**
-     * Creates and returns a localhost {@link Contact}.
-     */
-    public static Contact localhost(KUID contactId, InetAddress address, int port) {
-        return localhost(contactId, new InetSocketAddress(address, port));
-    }
-    
-    /**
-     * Creates and returns a localhost {@link Contact}.
-     */
-    public static DefaultContact localhost(KUID contactId, SocketAddress address) {
-        return new DefaultContact(Type.AUTHORITATIVE, contactId, 0, address);
-    }
     
     private final Type type;
     
     private final long creationTime;
     
     private final long timeStamp;
-    
-    private final long rtt;
     
     private final int instanceId;
     
@@ -88,17 +63,6 @@ public class DefaultContact extends AbstractContact {
     public DefaultContact(Type type, 
             KUID contactId, 
             int instanceId, 
-            SocketAddress address, 
-            long rtt, TimeUnit unit) {
-        this(type, contactId, instanceId, address, address, rtt, unit);
-    }
-    
-    /**
-     * Creates a {@link Contact}
-     */
-    public DefaultContact(Type type, 
-            KUID contactId, 
-            int instanceId, 
             SocketAddress socketAddress, 
             SocketAddress contactAddress) {
         this(type, contactId, instanceId, socketAddress, 
@@ -114,7 +78,7 @@ public class DefaultContact extends AbstractContact {
             SocketAddress socketAddress, 
             SocketAddress contactAddress,
             long rtt, TimeUnit unit) {
-        super(contactId);
+        super(contactId, rtt, unit);
         
         if (contactAddress == null) {
             contactAddress = socketAddress;
@@ -123,7 +87,6 @@ public class DefaultContact extends AbstractContact {
         this.type = Arguments.notNull(type, "type");
         this.creationTime = System.currentTimeMillis();
         this.timeStamp = creationTime;
-        this.rtt = unit.toMillis(rtt);
         
         this.instanceId = instanceId;
         this.socketAddress = Arguments.notNull(socketAddress, "socketAddress");
@@ -134,92 +97,29 @@ public class DefaultContact extends AbstractContact {
     /**
      * 
      */
-    protected DefaultContact(DefaultContact existing, int instanceId) {
-        super(existing);
+    private DefaultContact(DefaultContact existing, Contact other) {
+        super(existing, pickRTT(existing, other), TimeUnit.MILLISECONDS);
         
-        this.creationTime = existing.creationTime;
-        this.timeStamp = existing.timeStamp;
-        this.rtt = existing.rtt;
-        
-        this.instanceId = instanceId;
-        this.socketAddress = existing.socketAddress;
-        this.contactAddress = existing.contactAddress;
-        this.remoteAddress = existing.remoteAddress;
-        
-        this.type = existing.type;
-    }
-    
-    protected DefaultContact(DefaultContact existing, long rtt, TimeUnit unit) {
-        super(existing);
-        
-        this.creationTime = existing.creationTime;
-        this.timeStamp = existing.timeStamp;
-        this.rtt = unit.toMillis(rtt);
-        
-        this.instanceId = existing.instanceId;
-        this.socketAddress = existing.socketAddress;
-        this.contactAddress = existing.contactAddress;
-        this.remoteAddress = existing.remoteAddress;
-        
-        this.type = existing.type;
-    }
-    
-    protected DefaultContact(DefaultContact existing, 
-            SocketAddress socketAddress, 
-            SocketAddress contactAddress) {
-        super(existing);
-        
-        this.creationTime = existing.creationTime;
-        this.timeStamp = existing.timeStamp;
-        this.rtt = existing.rtt;
-        
-        this.instanceId = existing.instanceId;
-        this.socketAddress = Arguments.notNull(socketAddress, "socketAddress");
-        this.contactAddress = Arguments.notNull(contactAddress, "contactAddress");
-        this.remoteAddress = combine(socketAddress, contactAddress);
-        
-        this.type = existing.type;
-    }
-    
-    /**
-     * 
-     */
-    protected DefaultContact(DefaultContact existing, Contact o) {
-        super(existing);
-        
-        if (!existing.equals(o)) {
-            throw new IllegalArgumentException(existing + " vs. " + o);
-        }
-        
-        DefaultContact other = (DefaultContact)o;
-        
-        // 2nd argument must be newer
-        if (other.creationTime < existing.creationTime) {
-            throw new IllegalArgumentException();
-        }
-        
-        this.creationTime = existing.creationTime;
+        this.creationTime = existing.getCreationTime();
         
         if (other.isActive()) {
-            this.timeStamp = other.timeStamp;
+            this.timeStamp = other.getTimeStamp();
         } else {
-            this.timeStamp = existing.timeStamp;
+            this.timeStamp = existing.getTimeStamp();
         }
         
-        this.rtt = other.rtt >= 0L ? other.rtt : existing.rtt;
-        
         if (existing.isBetter(other)) {
-            this.instanceId = existing.instanceId;
-            this.socketAddress = existing.socketAddress;
-            this.contactAddress = existing.contactAddress;
-            this.remoteAddress = existing.remoteAddress;
-            this.type = existing.type;
+            this.instanceId = existing.getInstanceId();
+            this.socketAddress = existing.getSocketAddress();
+            this.contactAddress = existing.getContactAddress();
+            this.remoteAddress = existing.getRemoteAddress();
+            this.type = existing.getType();
         } else {
-            this.instanceId = other.instanceId;
-            this.socketAddress = other.socketAddress;
-            this.contactAddress = other.contactAddress;
-            this.remoteAddress = other.remoteAddress;
-            this.type = other.type;
+            this.instanceId = other.getInstanceId();
+            this.socketAddress = other.getSocketAddress();
+            this.contactAddress = other.getContactAddress();
+            this.remoteAddress = other.getRemoteAddress();
+            this.type = other.getType();
         }
     }
     
@@ -227,7 +127,7 @@ public class DefaultContact extends AbstractContact {
      * Returns {@code true} if this is a better {@link Contact} than
      * the other given {@link Contact}.
      */
-    private boolean isBetter(DefaultContact other) {
+    private boolean isBetter(Contact other) {
         // Everything is a better than an *UNKNOWN* Contact even
         // if the other Contact is *UNKNOWN* too.
         return type != Type.UNKNOWN && isBetterOrEqual(other);
@@ -237,8 +137,8 @@ public class DefaultContact extends AbstractContact {
      * Returns {@code true} if this is a better or a equally good 
      * {@link Contact} than the other given {@link Contact}.
      */
-    private boolean isBetterOrEqual(DefaultContact other) {
-        return type.isBetterOrEqual(other.type);
+    private boolean isBetterOrEqual(Contact other) {
+        return type.isBetterOrEqual(other.getType());
     }
     
     @Override
@@ -252,21 +152,8 @@ public class DefaultContact extends AbstractContact {
     }
     
     @Override
-    public long getTimeSinceLastContact(TimeUnit unit) {
-        long time = System.currentTimeMillis() - timeStamp;
-        return unit.convert(time, TimeUnit.MILLISECONDS);
-    }
-    
-    @Override
     public int getInstanceId() {
         return instanceId;
-    }
-    
-    /**
-     * Sets the {@link Contact}'s instance ID and returns a new {@link Contact}.
-     */
-    public Contact setInstanceId(int instanceId) {
-        return this.instanceId != instanceId ? new DefaultContact(this, instanceId) : this;
     }
     
     @Override
@@ -274,64 +161,32 @@ public class DefaultContact extends AbstractContact {
         return socketAddress;
     }
     
-    /**
-     * Sets the {@link Contact}'s address as reported by the {@link Socket}.
-     */
-    public Contact setSocketAddress(SocketAddress address) {
-        return new DefaultContact(this, address, contactAddress);
-    }
-    
     @Override
     public SocketAddress getContactAddress() {
         return contactAddress;
-    }
-    
-    /**
-     * Sets the {@link Contact}'s address as reported by the 
-     * remote {@link Contact}.
-     */
-    public Contact setContactAddress(SocketAddress address) {
-        return new DefaultContact(this, socketAddress, address);
     }
     
     @Override
     public SocketAddress getRemoteAddress() {
         return remoteAddress;
     }
-    
+
     @Override
     public Type getType() {
         return type;
     }
     
-    /**
-     * Changes the {@link Contact}'s Round-Trip-Time (RTT)
-     */
-    public DefaultContact setRoundTripTime(long rtt, TimeUnit unit) {
-        return new DefaultContact(this, rtt, unit);
-    }
-    
-    @Override
-    public long getRoundTripTime(TimeUnit unit) {
-        return unit.convert(rtt, TimeUnit.MILLISECONDS);
-    }
-    
     @Override
     public Contact merge(Contact other) {
-        return other != this ? new DefaultContact(this, other) : this;
-    }
-    
-    @Override
-    public String toString() {
-        StringBuilder buffer = new StringBuilder();
+        if (!getId().equals(other.getId())) {
+            throw new IllegalArgumentException("other=" + other);
+        }
         
-        buffer.append("Type=").append(type)
-            .append(", contactId=").append(contactId)
-            .append(", instanceId=").append(instanceId)
-            .append(", socketAddress=").append(socketAddress)
-            .append(", contactAddress=").append(contactAddress)
-            .append(", rtt=").append(rtt);
-        return buffer.toString();
+        if (other.getCreationTime() < getCreationTime()) {
+            throw new IllegalArgumentException();
+        }
+        
+        return other != this ? new DefaultContact(this, other) : this;
     }
     
     /**
@@ -343,5 +198,13 @@ public class DefaultContact extends AbstractContact {
         String host = NetworkUtils.getHostName(socketAddress);
         int port = NetworkUtils.getPort(contactAddress);
         return NetworkUtils.createUnresolved(host, port);
+    }
+    
+    /**
+     * Picks and returns the RTT for the given two {@link Contact}s.
+     */
+    private static long pickRTT(Contact existing, Contact other) {
+        long otherRTT = other.getRoundTripTimeInMillis();
+        return otherRTT >= 0L ? otherRTT : existing.getRoundTripTimeInMillis();
     }
 }

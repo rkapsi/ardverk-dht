@@ -26,6 +26,7 @@ import com.ardverk.dht.KUID;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.RoundTripTime;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.StoreForward;
 
@@ -52,9 +53,13 @@ public class DefaultMessageHandler implements MessageCallback {
             ResponseMessage response, long time, TimeUnit unit) throws IOException {
         
         Contact src = response.getContact();
-        Contact rtt = src.setRoundTripTime(time, unit);
-        storeForward.handleResponse(rtt);
-        routeTable.add(rtt);
+        
+        if (src instanceof RoundTripTime) {
+            ((RoundTripTime)src).setRoundTripTime(time, unit);
+        }
+        
+        storeForward.handleResponse(src);
+        routeTable.add(src);
     }
     
     public void handleLateResponse(ResponseMessage response) throws IOException {

@@ -36,7 +36,6 @@ import com.ardverk.dht.config.LookupConfig;
 import com.ardverk.dht.entity.LookupEntity;
 import com.ardverk.dht.logging.LoggerUtils;
 import com.ardverk.dht.message.ResponseMessage;
-import com.ardverk.dht.routing.DefaultContact;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.utils.SchedulingUtils;
@@ -405,7 +404,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         }
         
         public Contact[] getContacts() {
-            return responses.toArray(new DefaultContact[0]);
+            return responses.toArray(new Contact[0]);
         }
         
         public int getHop() {
