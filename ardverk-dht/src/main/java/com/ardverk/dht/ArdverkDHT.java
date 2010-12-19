@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketAddress;
 
+import com.ardverk.dht.codec.DefaultMessageCodec;
 import com.ardverk.dht.codec.MessageCodec;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.config.BootstrapConfig;
@@ -41,10 +42,14 @@ import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.io.DefaultMessageDispatcher;
 import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.io.transport.Transport;
+import com.ardverk.dht.message.DefaultMessageFactory;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.DefaultRouteTable;
+import com.ardverk.dht.routing.Localhost;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
+import com.ardverk.dht.storage.DefaultDatabase;
 import com.ardverk.dht.storage.StoreForward;
 import com.ardverk.dht.storage.ValueTuple;
 
@@ -67,6 +72,28 @@ public class ArdverkDHT extends AbstractDHT {
     private final Database database;
     
     private final MessageDispatcher messageDispatcher;
+    
+    public ArdverkDHT(int keySize) {
+        this(new Localhost(keySize));
+    }
+    
+    public ArdverkDHT(Localhost localhost) {
+        this(new DefaultRouteTable(localhost));
+    }
+    
+    public ArdverkDHT(RouteTable routeTable) {
+        this(routeTable, new DefaultDatabase());
+    }
+    
+    public ArdverkDHT(RouteTable routeTable, Database database) {
+        this(new DefaultMessageCodec(), routeTable, database);
+    }
+    
+    public ArdverkDHT(MessageCodec codec, 
+            RouteTable routeTable, Database database) {
+        this(codec, new DefaultMessageFactory(
+                routeTable.getLocalhost()), routeTable, database);
+    }
     
     public ArdverkDHT(MessageCodec codec, MessageFactory messageFactory, 
             RouteTable routeTable, Database database) {
@@ -154,12 +181,16 @@ public class ArdverkDHT extends AbstractDHT {
     
     @Override
     public void bind(Transport transport) throws IOException {
+        Localhost localhost = getLocalhost();
+        localhost.bind(transport);
+        
         messageDispatcher.bind(transport);
     }
 
     @Override
     public void unbind() {
         messageDispatcher.unbind();
+        getLocalhost().unbind();
     }
 
     @Override

@@ -36,6 +36,7 @@ public class DefaultPingEntity extends AbstractEntity implements PingEntity {
         return response.getContact();
     }
     
+    @Override
     public PingResponse getPingResponse() {
         return response;
     }

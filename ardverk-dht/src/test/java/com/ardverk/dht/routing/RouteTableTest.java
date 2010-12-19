@@ -160,15 +160,11 @@ public class RouteTableTest {
     }
     
     private static Localhost createLocalhost() {
-        return createLocalhost(DEFAULT_PORT);
+        return createLocalhost(ID_SIZE);
     }
     
-    private static Localhost createLocalhost(int port) {
-        return createLocalhost(KUID.createRandom(ID_SIZE), port);
-    }
-    
-    private static Localhost createLocalhost(KUID contactId, int port) {
-        return new Localhost(contactId, port);
+    private static Localhost createLocalhost(int keySize) {
+        return new Localhost(keySize);
     }
     
     private static Contact createContact() {

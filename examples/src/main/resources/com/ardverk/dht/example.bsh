@@ -56,7 +56,11 @@ createDHT(int port) {
 	SimpleConfig config = new SimpleConfig();
 	config.setSecretKey(SECRET_KEY);
 	config.setInitVector(INIT_VECTOR);
-	return SimpleArdverkDHT.create(config, port);
+	
+	DHT dht = SimpleArdverkDHT.create(config);
+	dht.bind(port);
+	
+	return dht;
 }
 
 // Creates a list of DHTs

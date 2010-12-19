@@ -16,16 +16,15 @@
 
 package com.ardverk.dht.routing;
 
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.net.NetworkUtils;
+import org.ardverk.io.Bindable;
 
 import com.ardverk.dht.KUID;
+import com.ardverk.dht.io.transport.Transport;
 
-public class Localhost extends AbstractContact {
+public class Localhost extends AbstractContact implements Bindable<Transport> {
     
     private static final long serialVersionUID = 1919885060478043754L;
 
@@ -33,27 +32,16 @@ public class Localhost extends AbstractContact {
     
     private volatile int instanceId = 0;
     
-    private volatile SocketAddress socketAddress;
+    private volatile Transport transport;
     
     private volatile SocketAddress contactAddress;
     
-    public Localhost(KUID contactId, int port) {
-        this(contactId, new InetSocketAddress(port));
+    public Localhost(int keySize) {
+        this(KUID.createRandom(keySize));
     }
     
-    public Localhost(KUID contactId, String host, int port) {
-        this(contactId, NetworkUtils.createUnresolved(host, port));
-    }
-    
-    public Localhost(KUID contactId, InetAddress address, int port) {
-        this(contactId, NetworkUtils.createResolved(address, port));
-    }
-    
-    public Localhost(KUID contactId, SocketAddress address) {
+    public Localhost(KUID contactId) {
         super(contactId);
-        
-        this.socketAddress = address;
-        this.contactAddress = address;
     }
     
     @Override
@@ -76,15 +64,47 @@ public class Localhost extends AbstractContact {
         return instanceId;
     }
     
+    /**
+     * Sets the instance ID to the given number.
+     */
     public void setInstanceId(int instanceId) {
         this.instanceId = instanceId;
     }
 
+    /**
+     * Binds the {@link Localhost} to the given {@link Transport}.
+     */
     @Override
-    public SocketAddress getSocketAddress() {
-        return socketAddress;
+    public synchronized void bind(Transport transport) {
+        this.transport = transport;
+        
+        SocketAddress bindaddr = transport.getSocketAddress();
+        this.contactAddress = bindaddr;
+    }
+    
+    /**
+     * Unbinds the {@link Localhost} from a {@link Transport}.
+     */
+    @Override
+    public synchronized void unbind() {
+        this.transport = null;
+        this.contactAddress = null;
     }
 
+    /**
+     * Returns true if the {@link Localhost} is bound to a {@link Transport}.
+     */
+    @Override
+    public synchronized boolean isBound() {
+        return transport != null;
+    }
+
+    @Override
+    public SocketAddress getSocketAddress() {
+        Transport transport = this.transport;
+        return transport != null ? transport.getSocketAddress() : null;
+    }
+    
     @Override
     public SocketAddress getContactAddress() {
         return contactAddress;

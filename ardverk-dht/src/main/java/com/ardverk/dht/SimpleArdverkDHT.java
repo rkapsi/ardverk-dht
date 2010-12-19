@@ -18,10 +18,7 @@ package com.ardverk.dht;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-
-import org.ardverk.net.NetworkUtils;
 
 import com.ardverk.dht.codec.DefaultMessageCodec;
 import com.ardverk.dht.codec.MessageCodec;
@@ -48,7 +45,6 @@ import com.ardverk.dht.entity.QuickenEntity;
 import com.ardverk.dht.entity.SyncEntity;
 import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.io.transport.DatagramTransport;
-import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.message.DefaultMessageFactory;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.routing.Contact;
@@ -58,46 +54,15 @@ import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
 import com.ardverk.dht.storage.DefaultDatabase;
 
-public class SimpleArdverkDHT extends ArdverkDHT {
-    
-    public static SimpleArdverkDHT create(int port) throws IOException {
-        return create(new SimpleConfig(), port);
-    }
-    
-    public static SimpleArdverkDHT create(
-            SimpleConfig config, int port) throws IOException {
-        return create(config, new DatagramTransport(port));
-    }
-    
-    public static SimpleArdverkDHT create(String address, int port) throws IOException {
-        return create(new SimpleConfig(), address, port);
-    }
-    
-    public static SimpleArdverkDHT create(SimpleConfig config, 
-            String address, int port) throws IOException {
-        return create(config, new DatagramTransport(address, port));
-    }
-    
-    public static SimpleArdverkDHT create(SocketAddress address) throws IOException {
-        return create(new SimpleConfig(), address);
-    }
-    
-    public static SimpleArdverkDHT create(SimpleConfig config, 
-            SocketAddress address) throws IOException {
-        return create(config, new DatagramTransport(address));
-    }
-    
-    public static SimpleArdverkDHT create(Transport transport) throws IOException {
-        return create(new SimpleConfig(), transport);
-    }
-    
-    public static SimpleArdverkDHT create(SimpleConfig config, 
-            Transport transport) throws IOException {
-        int keySize = config.getKeySize();
-        SocketAddress address = config.getAddress(transport);
+public class SimpleArdverkDHT extends ArdverkDHT implements SimpleDHT {
         
-        Localhost localhost = new Localhost(
-                KUID.createRandom(keySize), address);
+    public static SimpleArdverkDHT create() {
+        return create(new SimpleConfig());
+    }
+    
+    public static SimpleArdverkDHT create(SimpleConfig config) {
+        int keySize = config.getKeySize();
+        Localhost localhost = new Localhost(keySize);
         
         String secretKey = config.getSecretKey();
         String initVector = config.getInitVector();
@@ -108,7 +73,6 @@ public class SimpleArdverkDHT extends ArdverkDHT {
         } else {
             codec = new DefaultMessageCodec();
         }
-        //codec = new BencodeMessageCodec();
         
         MessageFactory messageFactory 
             = new DefaultMessageFactory(keySize, localhost);
@@ -116,74 +80,107 @@ public class SimpleArdverkDHT extends ArdverkDHT {
         Database database = new DefaultDatabase();
         RouteTable routeTable = new DefaultRouteTable(localhost);
         
-        return new SimpleArdverkDHT(config, transport, 
-                codec, messageFactory, routeTable, database);
+        return new SimpleArdverkDHT(config, codec, 
+                messageFactory, routeTable, database);
     }
     
     private final SimpleConfig config;
     
-    public SimpleArdverkDHT(SimpleConfig config, Transport transport, 
-            MessageCodec codec, MessageFactory messageFactory,
-            RouteTable routeTable, Database database) throws IOException {
+    public SimpleArdverkDHT(SimpleConfig config, MessageCodec codec, 
+            MessageFactory messageFactory, RouteTable routeTable, 
+            Database database) {
         super(codec, messageFactory, routeTable, database);
         
         this.config = config;
-        bind(transport);
     }
     
+    @Override
+    public void bind(int port) throws IOException {
+        bind(new DatagramTransport(port));
+    }
+    
+    @Override
+    public void bind(String host, int port) throws IOException {
+        bind(new DatagramTransport(host, port));
+    }
+    
+    @Override
+    public void bind(InetAddress bindaddr, int port) throws IOException {
+        bind(new DatagramTransport(bindaddr, port));
+    }
+    
+    @Override
+    public void bind(SocketAddress address) throws IOException {
+        bind(new DatagramTransport(address));
+    }
+    
+    @Override
     public ArdverkFuture<PingEntity> ping(String host, int port) {
         return ping(host, port, config.getPingConfig());
     }
 
+    @Override
     public ArdverkFuture<PingEntity> ping(InetAddress address, int port) {
         return ping(address, port, config.getPingConfig());
     }
 
+    @Override
     public ArdverkFuture<PingEntity> ping(SocketAddress address) {
         return ping(address, config.getPingConfig());
     }
     
+    @Override
     public ArdverkFuture<PingEntity> ping(Contact dst) {
         return ping(dst, config.getPingConfig());
     }
     
+    @Override
     public ArdverkFuture<NodeEntity> lookup(KUID lookupId) {
         return lookup(lookupId, config.getLookupConfig());
     }
 
+    @Override
     public ArdverkFuture<ValueEntity> get(KUID key) {
         return get(key, config.getGetConfig());
     }
 
+    @Override
     public ArdverkFuture<PutEntity> put(KUID key, byte[] value) {
         return put(key, value, config.getPutConfig());
     }
 
+    @Override
     public ArdverkFuture<PutEntity> remove(KUID key) {
         return remove(key, config.getPutConfig());
     }
     
+    @Override
     public ArdverkFuture<BootstrapEntity> bootstrap(String host, int port) {
         return bootstrap(host, port, config.getBootstrapConfig());
     }
 
+    @Override
     public ArdverkFuture<BootstrapEntity> bootstrap(
             InetAddress address, int port) {
         return bootstrap(address, port, config.getBootstrapConfig());
     }
 
+    @Override
     public ArdverkFuture<BootstrapEntity> bootstrap(SocketAddress address) {
         return bootstrap(address, config.getBootstrapConfig());
     }
 
+    @Override
     public ArdverkFuture<BootstrapEntity> bootstrap(Contact contact) {
         return bootstrap(contact, config.getBootstrapConfig());
     }
 
+    @Override
     public ArdverkFuture<QuickenEntity> quicken() {
         return quicken(config.getQuickenConfig());
     }
     
+    @Override
     public ArdverkFuture<SyncEntity> sync() {
         return sync(config.getSyncConfig());
     }
@@ -207,8 +204,6 @@ public class SimpleArdverkDHT extends ArdverkDHT {
         private volatile QuickenConfig quickenConfig = new DefaultQuickenConfig();
         
         private volatile SyncConfig syncConfig = new DefaultSyncConfig();
-        
-        private volatile SocketAddress address = null;
         
         private volatile String secretKey = null;
         
@@ -296,31 +291,6 @@ public class SimpleArdverkDHT extends ArdverkDHT {
 
         public void setInitVector(String initVector) {
             this.initVector = initVector;
-        }
-
-        public SocketAddress getAddress() {
-            return address;
-        }
-
-        public void setAddress(SocketAddress address) {
-            this.address = address;
-        }
-        
-        SocketAddress getAddress(Transport transport) {
-            if (address != null) {
-                return address;
-            }
-            
-            return extract(transport.getSocketAddress());
-        }
-        
-        private static SocketAddress extract(SocketAddress address) {
-            InetAddress addr = NetworkUtils.getAddress(address);
-            if (!NetworkUtils.isPrivateAddress(addr)) {
-                return address;
-            }
-            
-            return new InetSocketAddress("localhost", NetworkUtils.getPort(address));
         }
     }
 }

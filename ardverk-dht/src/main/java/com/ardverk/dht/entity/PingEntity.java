@@ -16,6 +16,7 @@
 
 package com.ardverk.dht.entity;
 
+import com.ardverk.dht.message.PingResponse;
 import com.ardverk.dht.routing.Contact;
 
 public interface PingEntity extends Entity {
@@ -24,4 +25,9 @@ public interface PingEntity extends Entity {
      * Returns the remote {@link Contact}
      */
     public Contact getContact();
+    
+    /**
+     * Returns the {@link PingResponse}.
+     */
+    public PingResponse getPingResponse();
 }

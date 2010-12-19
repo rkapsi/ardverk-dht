@@ -22,16 +22,20 @@ import org.ardverk.lang.Arguments;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.Localhost;
 import com.ardverk.dht.storage.Database.Condition;
 import com.ardverk.dht.storage.ValueTuple;
 
 public class DefaultMessageFactory extends AbstractMessageFactory {
 
-    private final Contact localhost;
+    private final Localhost localhost;
     
-    public DefaultMessageFactory(int length, Contact localhost) {
+    public DefaultMessageFactory(Localhost localhost) {
+        this(localhost.getId().length(), localhost);
+    }
+    
+    public DefaultMessageFactory(int length, Localhost localhost) {
         super(length);
-        
         this.localhost = Arguments.notNull(localhost, "localhost");
     }
     

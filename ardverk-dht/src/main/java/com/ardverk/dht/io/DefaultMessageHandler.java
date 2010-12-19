@@ -26,6 +26,7 @@ import com.ardverk.dht.KUID;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.Localhost;
 import com.ardverk.dht.routing.RoundTripTime;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.StoreForward;
@@ -56,6 +57,14 @@ public class DefaultMessageHandler implements MessageCallback {
         
         if (src instanceof RoundTripTime) {
             ((RoundTripTime)src).setRoundTripTime(time, unit);
+        }
+        
+        SocketAddress address = response.getAddress();
+        Localhost localhost = routeTable.getLocalhost();
+        
+        SocketAddress current = localhost.getContactAddress();
+        if (current == null || !current.equals(address)) {
+            localhost.setContactAddress(address);
         }
         
         storeForward.handleResponse(src);

@@ -40,8 +40,8 @@ import com.ardverk.dht.config.DefaultQuickenConfig;
 import com.ardverk.dht.entity.BootstrapEntity;
 import com.ardverk.dht.entity.PutEntity;
 import com.ardverk.dht.entity.QuickenEntity;
-import com.ardverk.dht.routing.DefaultRouteTable;
 import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.DefaultRouteTable;
 import com.ardverk.dht.storage.Database;
 
 public class ArdverkUtils {
@@ -59,7 +59,11 @@ public class ArdverkUtils {
         SimpleConfig config = new SimpleConfig();
         config.setSecretKey(SECRET_KEY);
         config.setInitVector(INIT_VECTOR);
-        return SimpleArdverkDHT.create(config, address);
+        
+        SimpleArdverkDHT dht = SimpleArdverkDHT.create(config);
+        dht.bind(address);
+        
+        return dht;
     }
     
     public static List<ArdverkDHT> createDHTs(int count, int port) throws IOException {
