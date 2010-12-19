@@ -31,12 +31,14 @@ import org.ardverk.io.IoUtils;
 import org.ardverk.security.MessageDigestUtils;
 import org.ardverk.utils.StringUtils;
 
-import com.ardverk.dht.SimpleArdverkDHT.SimpleConfig;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.config.BootstrapConfig;
 import com.ardverk.dht.config.DefaultBootstrapConfig;
 import com.ardverk.dht.config.DefaultPutConfig;
 import com.ardverk.dht.config.DefaultQuickenConfig;
+import com.ardverk.dht.easy.EasyFactory;
+import com.ardverk.dht.easy.EasyDHT;
+import com.ardverk.dht.easy.EasyConfig;
 import com.ardverk.dht.entity.BootstrapEntity;
 import com.ardverk.dht.entity.PutEntity;
 import com.ardverk.dht.entity.QuickenEntity;
@@ -51,23 +53,23 @@ public class ArdverkUtils {
     
     private ArdverkUtils() {}
     
-    public static ArdverkDHT createDHT(int port) throws IOException {
+    public static EasyDHT createDHT(int port) throws IOException {
         return createDHT(new InetSocketAddress("localhost", port));
     }
     
-    public static ArdverkDHT createDHT(SocketAddress address) throws IOException {
-        SimpleConfig config = new SimpleConfig();
+    public static EasyDHT createDHT(SocketAddress address) throws IOException {
+        EasyConfig config = new EasyConfig();
         config.setSecretKey(SECRET_KEY);
         config.setInitVector(INIT_VECTOR);
         
-        SimpleArdverkDHT dht = SimpleArdverkDHT.create(config);
+        EasyDHT dht = EasyFactory.create(config);
         dht.bind(address);
         
         return dht;
     }
     
-    public static List<ArdverkDHT> createDHTs(int count, int port) throws IOException {
-        List<ArdverkDHT> dhts = new ArrayList<ArdverkDHT>(count);
+    public static List<EasyDHT> createDHTs(int count, int port) throws IOException {
+        List<EasyDHT> dhts = new ArrayList<EasyDHT>(count);
         
         try {
             for (int i = 0; i < count; i++) {
@@ -164,7 +166,7 @@ public class ArdverkUtils {
         
         System.setProperty("networkaddress.cache.ttl", "0");
         
-        final List<ArdverkDHT> dhts = createDHTs(256, 2000);
+        final List<EasyDHT> dhts = createDHTs(256, 2000);
         bootstrap(dhts);
         
         /*DHT x = dhts.get(0);
@@ -176,7 +178,7 @@ public class ArdverkUtils {
         frame.setVisible(true);
         frame.start();*/
         
-        for (ArdverkDHT dht : dhts) {
+        for (EasyDHT dht : dhts) {
             Database database = dht.getDatabase();
             database.getDatabaseConfig().setStoreForward(false);
             database.getDatabaseConfig().setCheckBucket(false);
@@ -217,7 +219,7 @@ public class ArdverkUtils {
         int max = Integer.MIN_VALUE;
         int total = 0;
         
-        for (ArdverkDHT dht : dhts) {
+        for (EasyDHT dht : dhts) {
             Database database = dht.getDatabase();
             int size = database.size();
             total += size;

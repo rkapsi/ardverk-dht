@@ -25,12 +25,12 @@ import junit.framework.TestCase;
 import org.ardverk.io.IoUtils;
 import org.junit.Test;
 
-import com.ardverk.dht.ArdverkDHT;
 import com.ardverk.dht.ArdverkUtils;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.config.DefaultLookupConfig;
 import com.ardverk.dht.config.LookupConfig;
+import com.ardverk.dht.easy.EasyDHT;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.utils.XorComparator;
@@ -39,7 +39,7 @@ public class NodeResponseHandlerTest {
     
     @Test
     public void lookup() throws Exception {
-        List<ArdverkDHT> dhts = ArdverkUtils.createDHTs(256, 2000);
+        List<EasyDHT> dhts = ArdverkUtils.createDHTs(256, 2000);
         try {
             ArdverkUtils.bootstrap(dhts);
             
@@ -48,11 +48,11 @@ public class NodeResponseHandlerTest {
             // Sort the DHTs by their XOR distance to the given lookupId.
             TreeSet<KUID> expected = new TreeSet<KUID>(
                     new XorComparator(lookupId));
-            for (ArdverkDHT dht : dhts) {
+            for (EasyDHT dht : dhts) {
                 expected.add(dht.getLocalhost().getId());
             }
             
-            ArdverkDHT first = dhts.get(0);
+            EasyDHT first = dhts.get(0);
             
             LookupConfig config = new DefaultLookupConfig();
             config.setLookupTimeout(20L, TimeUnit.SECONDS);
