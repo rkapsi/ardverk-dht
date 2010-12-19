@@ -20,7 +20,7 @@ import java.net.SocketAddress;
 
 import org.ardverk.lang.Arguments;
 
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.IContact;
 
 public abstract class AbstractMessage implements Message {
 
@@ -28,12 +28,12 @@ public abstract class AbstractMessage implements Message {
     
     private final MessageId messageId;
     
-    private final Contact contact;
+    private final IContact contact;
     
     private final SocketAddress address;
     
     public AbstractMessage(MessageId messageId, 
-            Contact contact, SocketAddress address) {
+            IContact contact, SocketAddress address) {
         
         this.messageId = Arguments.notNull(messageId, "messageId");
         this.contact = Arguments.notNull(contact, "contact");
@@ -53,7 +53,7 @@ public abstract class AbstractMessage implements Message {
     }
 
     @Override
-    public Contact getContact() {
+    public IContact getContact() {
         return contact;
     }
     

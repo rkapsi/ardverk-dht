@@ -40,8 +40,8 @@ import com.ardverk.dht.config.DefaultQuickenConfig;
 import com.ardverk.dht.entity.BootstrapEntity;
 import com.ardverk.dht.entity.PutEntity;
 import com.ardverk.dht.entity.QuickenEntity;
-import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.DefaultRouteTable;
+import com.ardverk.dht.routing.IContact;
 import com.ardverk.dht.storage.Database;
 
 public class ArdverkUtils {
@@ -99,7 +99,7 @@ public class ArdverkUtils {
         return futures2;
     }
     
-    public static List<ArdverkFuture<BootstrapEntity>> bootstrap(Contact from, 
+    public static List<ArdverkFuture<BootstrapEntity>> bootstrap(IContact from, 
             List<? extends DHT> dhts, int offset, int length) 
                 throws InterruptedException, ExecutionException {
         
@@ -145,7 +145,7 @@ public class ArdverkUtils {
         return futures;
     }
     
-    public static ArdverkDHT get(List<ArdverkDHT> dhts, Contact contact) {
+    public static ArdverkDHT get(List<ArdverkDHT> dhts, IContact contact) {
         for (ArdverkDHT dht : dhts) {
             if (dht.getLocalhost().equals(contact)) {
                 return dht;

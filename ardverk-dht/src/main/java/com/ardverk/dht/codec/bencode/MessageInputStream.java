@@ -47,8 +47,9 @@ import com.ardverk.dht.message.StoreRequest;
 import com.ardverk.dht.message.StoreResponse;
 import com.ardverk.dht.message.ValueRequest;
 import com.ardverk.dht.message.ValueResponse;
-import com.ardverk.dht.routing.Contact;
-import com.ardverk.dht.routing.Contact.Type;
+import com.ardverk.dht.routing.DefaultContact;
+import com.ardverk.dht.routing.IContact;
+import com.ardverk.dht.routing.IContact.Type;
 import com.ardverk.dht.storage.Database.Condition;
 import com.ardverk.dht.storage.DefaultCondition;
 import com.ardverk.dht.storage.DefaultValueTuple;
@@ -113,21 +114,21 @@ class MessageInputStream extends BencodingInputStream {
         return NetworkUtils.createUnresolved(host, port);
     }
     
-    public Contact readContact(Contact.Type type, SocketAddress src) throws IOException {
+    public DefaultContact readContact(Contact.Type type, SocketAddress src) throws IOException {
         KUID contactId = readKUID();
         int instanceId = readInt();
         SocketAddress address = readSocketAddress();
         
-        if (type == Contact.Type.UNKNOWN) {
+        if (type == IContact.Type.UNKNOWN) {
             src = address;
         }
         
-        return new Contact(type, contactId, 
+        return new DefaultContact(type, contactId, 
                 instanceId, src, address);
     }
     
-    public Contact[] readContacts(Contact.Type type, SocketAddress src) throws IOException {
-        Contact[] contacts = new Contact[readInt()];
+    public DefaultContact[] readContacts(Contact.Type type, SocketAddress src) throws IOException {
+        DefaultContact[] contacts = new DefaultContact[readInt()];
         for (int i = 0; i < contacts.length; i++) {
             contacts[i] = readContact(type, src);
         }
@@ -140,9 +141,9 @@ class MessageInputStream extends BencodingInputStream {
         return DefaultCondition.valueOf(code, value);
     }
     
-    public ValueTuple readValueTuple(Contact contact, 
+    public ValueTuple readValueTuple(DefaultContact contact, 
             SocketAddress address) throws IOException {
-        Contact creator = readContact(Type.UNKNOWN, address);
+        DefaultContact creator = readContact(Type.UNKNOWN, address);
         
         KUID key = readKUID();
         byte[] value = readBytes();
@@ -158,8 +159,8 @@ class MessageInputStream extends BencodingInputStream {
         
         OpCode opcode = readEnum(OpCode.class);
         MessageId messageId = readMessageId();
-        Contact contact = readContact(opcode.isRequest() 
-                ? Contact.Type.UNSOLICITED : Contact.Type.SOLICITED, src);
+        DefaultContact contact = readContact(opcode.isRequest() 
+                ? IContact.Type.UNSOLICITED : IContact.Type.SOLICITED, src);
         SocketAddress address = readSocketAddress();
         
         switch (opcode) {
@@ -185,51 +186,51 @@ class MessageInputStream extends BencodingInputStream {
     }
     
     private PingRequest readPingRequest(MessageId messageId, 
-            Contact contact, SocketAddress address) throws IOException {
+            DefaultContact contact, SocketAddress address) throws IOException {
         return new DefaultPingRequest(messageId, contact, address);
     }
     
     private PingResponse readPingResponse(MessageId messageId, 
-            Contact contact, SocketAddress address) throws IOException {
+            DefaultContact contact, SocketAddress address) throws IOException {
         return new DefaultPingResponse(messageId, contact, address);
     }
     
     private NodeRequest readNodeRequest(MessageId messageId, 
-            Contact contact, SocketAddress address) throws IOException {
+            DefaultContact contact, SocketAddress address) throws IOException {
         KUID key = readKUID();
         return new DefaultNodeRequest(messageId, contact, address, key);
     }
     
     private NodeResponse readNodeResponse(MessageId messageId, 
-            Contact contact, SocketAddress address) throws IOException {
+            DefaultContact contact, SocketAddress address) throws IOException {
         
-        Contact[] contacts = readContacts(Contact.Type.UNKNOWN, address);
+        DefaultContact[] contacts = readContacts(IContact.Type.UNKNOWN, address);
         return new DefaultNodeResponse(messageId, contact, address, contacts);
     }
     
     private ValueRequest readValueRequest(MessageId messageId, 
-            Contact contact, SocketAddress address) throws IOException {
+            DefaultContact contact, SocketAddress address) throws IOException {
         
         KUID key = readKUID();
         return new DefaultValueRequest(messageId, contact, address, key);
     }
     
     private ValueResponse readValueResponse(MessageId messageId, 
-            Contact contact, SocketAddress address) throws IOException {
+            DefaultContact contact, SocketAddress address) throws IOException {
         
         ValueTuple value = readValueTuple(contact, address);
         return new DefaultValueResponse(messageId, contact, address, value);
     }
     
     private StoreRequest readStoreRequest(MessageId messageId, 
-            Contact contact, SocketAddress address) throws IOException {
+            DefaultContact contact, SocketAddress address) throws IOException {
         
         ValueTuple value = readValueTuple(contact, address);
         return new DefaultStoreRequest(messageId, contact, address, value);
     }
     
     private StoreResponse readStoreResponse(MessageId messageId, 
-            Contact contact, SocketAddress address) throws IOException {
+            DefaultContact contact, SocketAddress address) throws IOException {
         Condition condition = readCondition();
         return new DefaultStoreResponse(messageId, contact, address, condition);
     }

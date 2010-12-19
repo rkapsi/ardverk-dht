@@ -33,7 +33,7 @@ import com.ardverk.dht.entity.PutEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.io.StoreResponseHandler;
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.IContact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.DefaultValueTuple;
 import com.ardverk.dht.storage.ValueTuple;
@@ -97,7 +97,7 @@ public class StoreManager {
                 }
                 
                 private void handleNodeEntity(final NodeEntity nodeEntity) {
-                    Contact[] contacts = nodeEntity.getContacts();
+                    IContact[] contacts = nodeEntity.getContacts();
                     ArdverkFuture<StoreEntity> storeFuture 
                         = storeFutureRef.make(store(contacts, 
                                 key, value, config.getStoreConfig()));
@@ -148,10 +148,10 @@ public class StoreManager {
         }
     }
     
-    public ArdverkFuture<StoreEntity> store(Contact[] dst, 
+    public ArdverkFuture<StoreEntity> store(IContact[] dst, 
             KUID key, byte[] value, StoreConfig config) {
         
-        Contact localhost = dht.getLocalhost();
+        IContact localhost = dht.getLocalhost();
         ValueTuple valueTuple = new DefaultValueTuple(
                 localhost, key, value);
         
@@ -159,12 +159,12 @@ public class StoreManager {
     }
     
     /**
-     * Sends a STORE request to the given list of {@link Contact}s.
+     * Sends a STORE request to the given list of {@link IContact}s.
      * 
-     * NOTE: It's being assumed the {@link Contact}s are already sorted by
+     * NOTE: It's being assumed the {@link IContact}s are already sorted by
      * their XOR distance to the given {@link KUID}.
      */
-    public ArdverkFuture<StoreEntity> store(Contact[] dst, 
+    public ArdverkFuture<StoreEntity> store(IContact[] dst, 
             ValueTuple valueTuple, StoreConfig config) {
         
         int k = routeTable.getK();

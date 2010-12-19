@@ -18,12 +18,12 @@ package com.ardverk.dht.message;
 
 import java.net.SocketAddress;
 
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.IContact;
 
 abstract class AbstractLookupRequest extends AbstractRequestMessage 
         implements LookupRequest {
     
-    public AbstractLookupRequest(MessageId messageId, Contact contact, 
+    public AbstractLookupRequest(MessageId messageId, IContact contact, 
             SocketAddress address) {
         super(messageId, contact, address);
     }

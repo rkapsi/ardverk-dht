@@ -22,7 +22,7 @@ import java.net.SocketAddress;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.config.BootstrapConfig;
 import com.ardverk.dht.entity.BootstrapEntity;
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.IContact;
 
 public interface BootstrapService {
 
@@ -48,5 +48,5 @@ public interface BootstrapService {
      * 
      */
     public ArdverkFuture<BootstrapEntity> bootstrap(
-            Contact contact, BootstrapConfig config);
+            IContact contact, BootstrapConfig config);
 }

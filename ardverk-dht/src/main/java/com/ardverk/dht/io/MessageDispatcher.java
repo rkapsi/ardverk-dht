@@ -49,7 +49,7 @@ import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.MessageId;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.IContact;
 
 /**
  * The {@link MessageDispatcher} is responsible for sending messages over
@@ -213,18 +213,18 @@ public abstract class MessageDispatcher
     }
     
     /**
-     * Sends a {@link ResponseMessage} to the given {@link Contact}.
+     * Sends a {@link ResponseMessage} to the given {@link IContact}.
      */
-    public void send(Contact dst, ResponseMessage message) throws IOException {
+    public void send(IContact dst, ResponseMessage message) throws IOException {
         send(message);
         fireMessageSent(dst, message);
     }
     
     /**
-     * Sends a {@link RequestMessage} to the given {@link Contact}.
+     * Sends a {@link RequestMessage} to the given {@link IContact}.
      */
     public void send(MessageCallback callback, 
-            Contact dst, RequestMessage message, 
+            IContact dst, RequestMessage message, 
             long timeout, TimeUnit unit) throws IOException {
         
         KUID contactId = dst.getId();
@@ -232,7 +232,7 @@ public abstract class MessageDispatcher
     }
     
     /**
-     * Sends a {@link RequestMessage} to the a {@link Contact} with the 
+     * Sends a {@link RequestMessage} to the a {@link IContact} with the 
      * given {@link KUID}.
      * 
      * NOTE: The destination {@link SocketAddress} is encoded in the 
@@ -355,7 +355,7 @@ public abstract class MessageDispatcher
     /**
      * Fires a message sent event.
      */
-    protected void fireMessageSent(Contact dst, Message message) {
+    protected void fireMessageSent(IContact dst, Message message) {
         fireMessageSent(dst.getId(), message);
     }
     
@@ -579,7 +579,7 @@ public abstract class MessageDispatcher
                 return false;
             }
             
-            Contact contact = response.getContact();
+            IContact contact = response.getContact();
             if (!factory.isFor(messageId, contact.getRemoteAddress())) {
                 if (LOG.isErrorEnabled()) {
                     LOG.error("Wrong MessageId signature: " + response);

@@ -38,7 +38,7 @@ import com.ardverk.dht.entity.DefaultSyncEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.entity.SyncEntity;
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.IContact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
 import com.ardverk.dht.storage.ValueTuple;
@@ -81,7 +81,7 @@ public class SyncManager {
             final List<ArdverkFuture<StoreEntity>> storeFutures 
                 = new ArrayList<ArdverkFuture<StoreEntity>>();
             
-            Contact localhost = routeTable.getLocalhost();
+            IContact localhost = routeTable.getLocalhost();
             PingConfig pingConfig = syncConfig.getPingConfig();
             
             final ArdverkFuture<SyncEntity> userFuture 
@@ -95,7 +95,7 @@ public class SyncManager {
             
             for (final ValueTuple tuple : database.values()) {
                 KUID valueId = tuple.getId();
-                Contact[] contacts = routeTable.select(valueId);
+                IContact[] contacts = routeTable.select(valueId);
                 
                 // Skip all values for which we're not in the k-closest.
                 // This can happen in caching scenarios!
@@ -212,8 +212,8 @@ public class SyncManager {
     }
     
     private ArdverkFuture<StoreEntity> store(ValueTuple tuple, StoreConfig storeConfig) {
-        Contact localhost = routeTable.getLocalhost();
-        Contact[] contacts = routeTable.select(localhost.getId());
+        IContact localhost = routeTable.getLocalhost();
+        IContact[] contacts = routeTable.select(localhost.getId());
         assert (localhost.equals(contacts[0]));
         
         // TODO: What's better?
@@ -225,13 +225,13 @@ public class SyncManager {
     }
     
     private PingFuture ping(Map<ContactKey, ArdverkFuture<PingEntity>> futures, 
-            Contact[] contacts, int toIndex, PingConfig pingConfig) {
+            IContact[] contacts, int toIndex, PingConfig pingConfig) {
         
         List<ArdverkFuture<PingEntity>> pingFutures 
             = new ArrayList<ArdverkFuture<PingEntity>>(toIndex);
         
         for (int i = 0; i < toIndex; i++) {
-            Contact contact = contacts[i];
+            IContact contact = contacts[i];
             final ContactKey key = new ContactKey(contact);
             
             ArdverkFuture<PingEntity> future = futures.get(key);

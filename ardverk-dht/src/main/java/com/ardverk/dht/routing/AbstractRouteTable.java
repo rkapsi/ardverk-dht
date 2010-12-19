@@ -55,7 +55,7 @@ public abstract class AbstractRouteTable implements RouteTable {
         return pingerRef.get() != null;
     }
 
-    protected ArdverkFuture<PingEntity> ping(Contact contact, 
+    protected ArdverkFuture<PingEntity> ping(IContact contact, 
             PingConfig config) {
         ContactPinger pinger = pingerRef.get();
         
@@ -75,7 +75,7 @@ public abstract class AbstractRouteTable implements RouteTable {
     }
     
     @Override
-    public Contact[] select(KUID contactId) {
+    public IContact[] select(KUID contactId) {
         return select(contactId, getK());
     }
     
@@ -111,7 +111,7 @@ public abstract class AbstractRouteTable implements RouteTable {
         }
     }
     
-    protected void fireContactAdded(final Bucket bucket, final Contact contact) {
+    protected void fireContactAdded(final Bucket bucket, final IContact contact) {
         if (!listeners.isEmpty()) {
             Runnable event = new Runnable() {
                 @Override
@@ -127,7 +127,7 @@ public abstract class AbstractRouteTable implements RouteTable {
     }
     
     protected void fireContactReplaced(final Bucket bucket, 
-            final Contact existing, final Contact contact) {
+            final IContact existing, final IContact contact) {
         
         if (!listeners.isEmpty()) {
             Runnable event = new Runnable() {
@@ -144,7 +144,7 @@ public abstract class AbstractRouteTable implements RouteTable {
     }
     
     protected void fireContactChanged(final Bucket bucket, 
-            final Contact existing, final Contact contact) {
+            final IContact existing, final IContact contact) {
         
         if (!listeners.isEmpty()) {
             Runnable event = new Runnable() {
@@ -160,7 +160,7 @@ public abstract class AbstractRouteTable implements RouteTable {
         }
     }
     
-    protected void fireContactCollision(final Contact existing, final Contact contact) {
+    protected void fireContactCollision(final IContact existing, final IContact contact) {
         if (!listeners.isEmpty()) {
             Runnable event = new Runnable() {
                 @Override
@@ -175,7 +175,7 @@ public abstract class AbstractRouteTable implements RouteTable {
         }
     }
     
-    protected void fireContactRemoved(final Bucket bucket, final Contact contact) {
+    protected void fireContactRemoved(final Bucket bucket, final IContact contact) {
         if (!listeners.isEmpty()) {
             Runnable event = new Runnable() {
                 @Override

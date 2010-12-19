@@ -20,22 +20,22 @@ import java.net.SocketAddress;
 
 import org.ardverk.lang.Arguments;
 
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.IContact;
 
 public class DefaultNodeResponse extends AbstractLookupResponse 
         implements NodeResponse {
 
-    private final Contact[] contacts;
+    private final IContact[] contacts;
     
-    public DefaultNodeResponse(MessageId messageId, Contact contact, 
-            SocketAddress address, Contact[] contacts) {
+    public DefaultNodeResponse(MessageId messageId, IContact contact, 
+            SocketAddress address, IContact[] contacts) {
         super(messageId, contact, address);
         
         this.contacts = Arguments.notNull(contacts, "contacts");
     }
 
     @Override
-    public Contact[] getContacts() {
+    public IContact[] getContacts() {
         return contacts;
     }
 }

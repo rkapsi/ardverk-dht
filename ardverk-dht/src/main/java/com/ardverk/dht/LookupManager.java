@@ -26,7 +26,7 @@ import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.io.NodeResponseHandler;
 import com.ardverk.dht.io.ValueResponseHandler;
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.IContact;
 import com.ardverk.dht.routing.RouteTable;
 
 public class LookupManager {
@@ -46,11 +46,11 @@ public class LookupManager {
     }
     
     public ArdverkFuture<NodeEntity> lookup(KUID lookupId, LookupConfig config) {
-        Contact[] contacts = routeTable.select(lookupId);
+        IContact[] contacts = routeTable.select(lookupId);
         return lookup(contacts, lookupId, config);
     }
     
-    public ArdverkFuture<NodeEntity> lookup(Contact[] contacts, 
+    public ArdverkFuture<NodeEntity> lookup(IContact[] contacts, 
             KUID lookupId, LookupConfig config) {
         
         ArdverkProcess<NodeEntity> process 
@@ -60,11 +60,11 @@ public class LookupManager {
     }
     
     public ArdverkFuture<ValueEntity> get(KUID key, GetConfig config) {
-        Contact[] contacts = routeTable.select(key);
+        IContact[] contacts = routeTable.select(key);
         return get(contacts, key, config);
     }
     
-    public ArdverkFuture<ValueEntity> get(Contact[] contacts, 
+    public ArdverkFuture<ValueEntity> get(IContact[] contacts, 
             KUID key, GetConfig config) {
         ArdverkProcess<ValueEntity> process
             = new ValueResponseHandler(messageDispatcher, contacts, 

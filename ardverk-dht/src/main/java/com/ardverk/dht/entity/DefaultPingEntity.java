@@ -19,7 +19,7 @@ package com.ardverk.dht.entity;
 import java.util.concurrent.TimeUnit;
 
 import com.ardverk.dht.message.PingResponse;
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.IContact;
 
 public class DefaultPingEntity extends AbstractEntity implements PingEntity {
     
@@ -32,7 +32,7 @@ public class DefaultPingEntity extends AbstractEntity implements PingEntity {
     }
     
     @Override
-    public Contact getContact() {
+    public IContact getContact() {
         return response.getContact();
     }
     

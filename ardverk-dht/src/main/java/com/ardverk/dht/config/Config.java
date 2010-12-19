@@ -19,7 +19,8 @@ package com.ardverk.dht.config;
 import java.util.concurrent.TimeUnit;
 
 import com.ardverk.dht.ExecutorKey;
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.DefaultContact;
+import com.ardverk.dht.routing.IContact;
 
 public interface Config {
     
@@ -49,21 +50,21 @@ public interface Config {
     public long getOperationTimeoutInMillis();
     
     /**
-     * The RTT multiplier is used multiply a {@link Contact}'s RTT
+     * The RTT multiplier is used multiply a {@link IContact}'s RTT
      * by some number.
      * 
-     * @see #getAdaptiveTimeout(Contact, long, TimeUnit)
+     * @see #getAdaptiveTimeout(DefaultContact, long, TimeUnit)
      */
     public void setRountTripTimeMultiplier(double multiplier);
     
     /**
-     * @see #getAdaptiveTimeout(Contact, long, TimeUnit)
+     * @see #getAdaptiveTimeout(DefaultContact, long, TimeUnit)
      */
     public double getRoundTripTimeMultiplier();
     
     /**
-     * Returns an <tt>adaptive</tt> timeout for the given {@link Contact}
+     * Returns an <tt>adaptive</tt> timeout for the given {@link IContact}
      * which is ideally less than the given default timeout.
      */
-    public long getAdaptiveTimeout(Contact dst, long defaultTimeout, TimeUnit unit);
+    public long getAdaptiveTimeout(IContact dst, long defaultTimeout, TimeUnit unit);
 }

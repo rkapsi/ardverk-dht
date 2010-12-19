@@ -19,7 +19,7 @@ package com.ardverk.dht.entity;
 import java.util.concurrent.TimeUnit;
 
 import com.ardverk.dht.io.LookupResponseHandler.Outcome;
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.IContact;
 import com.ardverk.dht.storage.ValueTuple;
 
 public class DefaultValueEntity extends AbstractLookupEntity implements ValueEntity {
@@ -37,12 +37,12 @@ public class DefaultValueEntity extends AbstractLookupEntity implements ValueEnt
     }
     
     @Override
-    public Contact getSender() {
+    public IContact getSender() {
         return getValueTuple().getSender();
     }
     
     @Override
-    public Contact getCreator() {
+    public IContact getCreator() {
         return getValueTuple().getCreator();
     }
 

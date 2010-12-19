@@ -32,7 +32,7 @@ import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.PingRequest;
 import com.ardverk.dht.message.PingResponse;
 import com.ardverk.dht.message.ResponseMessage;
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.IContact;
 
 public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
     
@@ -49,7 +49,7 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
     }
     
     public PingResponseHandler(MessageDispatcher messageDispatcher, 
-            Contact contact, PingConfig config) {
+            IContact contact, PingConfig config) {
         super(messageDispatcher);
         
         sender = new ContactPingSender(contact);
@@ -109,9 +109,9 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
     
     private class ContactPingSender implements PingSender {
         
-        private final Contact contact;
+        private final IContact contact;
         
-        public ContactPingSender(Contact contact) {
+        public ContactPingSender(IContact contact) {
             this.contact = Arguments.notNull(contact, "contact");
         }
         

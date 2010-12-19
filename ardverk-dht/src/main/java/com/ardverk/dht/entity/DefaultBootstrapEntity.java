@@ -18,7 +18,7 @@ package com.ardverk.dht.entity;
 
 import java.util.concurrent.TimeUnit;
 
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.IContact;
 
 public class DefaultBootstrapEntity extends AbstractEntity 
         implements BootstrapEntity {
@@ -50,9 +50,9 @@ public class DefaultBootstrapEntity extends AbstractEntity
     public String toString() {
         StringBuilder buffer = new StringBuilder();
         buffer.append("PONG: ").append(pingEntity.getContact()).append("\n");
-        Contact[] contacts = nodeEntity.getContacts();
+        IContact[] contacts = nodeEntity.getContacts();
         buffer.append("CONTACTS ").append(contacts.length).append("\n");
-        for (Contact contact : contacts) {
+        for (IContact contact : contacts) {
             buffer.append(" ").append(contact);
         }
         return buffer.toString();

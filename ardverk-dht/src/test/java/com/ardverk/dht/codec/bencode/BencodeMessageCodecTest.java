@@ -27,8 +27,9 @@ import com.ardverk.dht.message.DefaultPingRequest;
 import com.ardverk.dht.message.Message;
 import com.ardverk.dht.message.MessageId;
 import com.ardverk.dht.message.PingRequest;
-import com.ardverk.dht.routing.Contact;
-import com.ardverk.dht.routing.Contact.Type;
+import com.ardverk.dht.routing.DefaultContact;
+import com.ardverk.dht.routing.IContact;
+import com.ardverk.dht.routing.IContact.Type;
 
 public class BencodeMessageCodecTest {
 
@@ -40,7 +41,7 @@ public class BencodeMessageCodecTest {
         MessageId messageId = MessageId.createRandom(20);
         KUID contactId = KUID.createRandom(20);
         
-        Contact contact = new Contact(Type.SOLICITED, 
+        IContact contact = new DefaultContact(Type.SOLICITED, 
                 contactId, 0, 
                 new InetSocketAddress("localhost", 6666));
         

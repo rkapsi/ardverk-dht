@@ -25,7 +25,7 @@ import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.message.ValueRequest;
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.IContact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
 import com.ardverk.dht.storage.ValueTuple;
@@ -60,7 +60,7 @@ public class ValueRequestHandler extends AbstractRequestHandler {
             response = factory.createValueResponse(request, value);
         } else {
             KUID primaryKey = key.getId();
-            Contact[] contacts = routeTable.select(primaryKey);
+            IContact[] contacts = routeTable.select(primaryKey);
             response = factory.createNodeResponse(request, contacts);
         }
         

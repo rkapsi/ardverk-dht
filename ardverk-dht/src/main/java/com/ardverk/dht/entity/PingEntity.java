@@ -16,12 +16,12 @@
 
 package com.ardverk.dht.entity;
 
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.IContact;
 
 public interface PingEntity extends Entity {
     
     /**
-     * Returns the remote {@link Contact}
+     * Returns the remote {@link IContact}
      */
-    public Contact getContact();
+    public IContact getContact();
 }

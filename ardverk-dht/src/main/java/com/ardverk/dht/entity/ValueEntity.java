@@ -16,14 +16,14 @@
 
 package com.ardverk.dht.entity;
 
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.IContact;
 import com.ardverk.dht.storage.ValueTuple;
 
 public interface ValueEntity extends LookupEntity {
     
-    public Contact getSender();
+    public IContact getSender();
     
-    public Contact getCreator();
+    public IContact getCreator();
     
     public byte[] getValue();
     

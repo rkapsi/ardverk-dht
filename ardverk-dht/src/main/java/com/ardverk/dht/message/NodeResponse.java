@@ -16,7 +16,7 @@
 
 package com.ardverk.dht.message;
 
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.IContact;
 
 /**
  * 
@@ -26,5 +26,5 @@ public interface NodeResponse extends LookupResponse {
     /**
      * 
      */
-    public Contact[] getContacts();
+    public IContact[] getContacts();
 }

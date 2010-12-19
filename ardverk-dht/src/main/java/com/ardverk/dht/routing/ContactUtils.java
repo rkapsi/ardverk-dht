@@ -55,7 +55,7 @@ public class ContactUtils {
     private static final Comparator<ContactEntry> HEALTH_DESCENDING 
         = new ReverseComparator<ContactEntry>(HEALTH_ASCENDING);
     
-    public static long getAdaptiveTimeout(Contact contact, 
+    public static long getAdaptiveTimeout(DefaultContact contact, 
             long defaultValue, TimeUnit unit) {
         long rtt = contact.getRoundTripTime(unit);
         if (rtt < 0) {
@@ -75,17 +75,17 @@ public class ContactUtils {
     }
     
     /**
-     * Turns the given array of {@link ContactEntry}s into an array of {@link Contact}s.
+     * Turns the given array of {@link ContactEntry}s into an array of {@link IContact}s.
      */
-    public static Contact[] toContacts(ContactEntry[] entries) {
+    public static IContact[] toContacts(ContactEntry[] entries) {
         return toContacts(entries, 0, entries.length);
     }
     
     /**
-     * Turns the given array of {@link ContactEntry}s into an array of {@link Contact}s.
+     * Turns the given array of {@link ContactEntry}s into an array of {@link IContact}s.
      */
-    public static Contact[] toContacts(ContactEntry[] entries, int offset, int length) {
-        Contact[] contacts = new Contact[length];
+    public static IContact[] toContacts(ContactEntry[] entries, int offset, int length) {
+        IContact[] contacts = new IContact[length];
         for (int i = 0; i < length; i++) {
             contacts[i] = entries[offset + i].getContact();
         }

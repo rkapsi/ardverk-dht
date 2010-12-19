@@ -30,7 +30,7 @@ import com.ardverk.dht.message.NodeResponse;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.message.ValueRequest;
 import com.ardverk.dht.message.ValueResponse;
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.IContact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.ValueTuple;
 
@@ -41,7 +41,7 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     private final KUID key;
     
     public ValueResponseHandler(MessageDispatcher messageDispatcher,
-            Contact[] contacts, RouteTable routeTable, KUID key, GetConfig config) {
+            IContact[] contacts, RouteTable routeTable, KUID key, GetConfig config) {
         super(messageDispatcher, contacts, routeTable, key, config);
         
         tuples = new FixedSizeArrayList<ValueTuple>(config.getR());
@@ -63,8 +63,8 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     private synchronized void processNodeResponse(NodeResponse response, 
             long time, TimeUnit unit) throws IOException {
         
-        Contact src = response.getContact();
-        Contact[] contacts = response.getContacts();
+        IContact src = response.getContact();
+        IContact[] contacts = response.getContacts();
         processContacts(src, contacts, time, unit);
     }
     
@@ -82,7 +82,7 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     }
     
     @Override
-    protected void lookup(Contact dst, KUID lookupId, 
+    protected void lookup(IContact dst, KUID lookupId, 
             long timeout, TimeUnit unit) throws IOException {
         
         assert (lookupId.equals(key));

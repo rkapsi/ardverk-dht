@@ -18,7 +18,7 @@ package com.ardverk.dht.config;
 
 import java.util.concurrent.TimeUnit;
 
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.IContact;
 
 /**
  * The {@link LookupConfig} is providing configuration data
@@ -38,12 +38,12 @@ public interface LookupConfig extends Config {
 
     /**
      * Returns {@code true} if the lookup process should pick a 
-     * {@link Contact} by random out of the set of the k-closest.
+     * {@link IContact} by random out of the set of the k-closest.
      */
     public boolean isRandomize();
 
     /**
-     * Sets whether or not the lookup process should pick {@link Contact}s
+     * Sets whether or not the lookup process should pick {@link IContact}s
      * by random.
      */
     public void setRandomize(boolean randomize);

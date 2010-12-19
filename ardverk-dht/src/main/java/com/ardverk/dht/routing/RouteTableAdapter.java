@@ -23,24 +23,24 @@ public class RouteTableAdapter implements RouteTableListener {
     }
 
     @Override
-    public void handleContactAdded(Bucket bucket, Contact contact) {
+    public void handleContactAdded(Bucket bucket, IContact contact) {
     }
 
     @Override
-    public void handleContactReplaced(Bucket bucket, Contact existing,
-            Contact contact) {
+    public void handleContactReplaced(Bucket bucket, IContact existing,
+            IContact contact) {
     }
 
     @Override
-    public void handleContactChanged(Bucket bucket, Contact existing,
-            Contact contact) {
+    public void handleContactChanged(Bucket bucket, IContact existing,
+            IContact contact) {
     }
 
     @Override
-    public void handleContactRemoved(Bucket bucket, Contact contact) {
+    public void handleContactRemoved(Bucket bucket, IContact contact) {
     }
 
     @Override
-    public void handleContactCollision(Contact existing, Contact contact) {
+    public void handleContactCollision(IContact existing, IContact contact) {
     }
 }

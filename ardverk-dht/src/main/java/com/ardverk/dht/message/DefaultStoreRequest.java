@@ -20,7 +20,7 @@ import java.net.SocketAddress;
 
 import org.ardverk.lang.Arguments;
 
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.IContact;
 import com.ardverk.dht.storage.ValueTuple;
 
 public class DefaultStoreRequest extends AbstractRequestMessage 
@@ -28,7 +28,7 @@ public class DefaultStoreRequest extends AbstractRequestMessage
 
     private final ValueTuple tuple;
     
-    public DefaultStoreRequest(MessageId messageId, Contact contact, 
+    public DefaultStoreRequest(MessageId messageId, IContact contact, 
             SocketAddress address, ValueTuple tuple) {
         super(messageId, contact, address);
         

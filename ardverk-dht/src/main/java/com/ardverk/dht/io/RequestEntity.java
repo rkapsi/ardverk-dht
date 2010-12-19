@@ -30,7 +30,7 @@ import com.ardverk.dht.message.StoreRequest;
 import com.ardverk.dht.message.StoreResponse;
 import com.ardverk.dht.message.ValueRequest;
 import com.ardverk.dht.message.ValueResponse;
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.IContact;
 
 public class RequestEntity {
 
@@ -68,14 +68,14 @@ public class RequestEntity {
     }
     
     /**
-     * Checks the {@link Contact}'s {@link KUID}
+     * Checks the {@link IContact}'s {@link KUID}
      */
     private boolean checkContactId(ResponseMessage response) {
         if (contactId == null) {
             return (response instanceof PingResponse);
         }
         
-        Contact contact = response.getContact();
+        IContact contact = response.getContact();
         KUID otherId = contact.getId();
         
         return contactId.equals(otherId);

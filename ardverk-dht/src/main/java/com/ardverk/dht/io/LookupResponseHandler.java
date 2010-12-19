@@ -36,7 +36,8 @@ import com.ardverk.dht.config.LookupConfig;
 import com.ardverk.dht.entity.LookupEntity;
 import com.ardverk.dht.logging.LoggerUtils;
 import com.ardverk.dht.message.ResponseMessage;
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.DefaultContact;
+import com.ardverk.dht.routing.IContact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.utils.SchedulingUtils;
 import com.ardverk.dht.utils.XorComparator;
@@ -58,7 +59,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     private ScheduledFuture<?> boostFuture;
     
     public LookupResponseHandler(MessageDispatcher messageDispatcher, 
-            Contact[] contacts, RouteTable routeTable, KUID lookupId, 
+            IContact[] contacts, RouteTable routeTable, KUID lookupId, 
             LookupConfig config) {
         super(messageDispatcher);
         
@@ -121,7 +122,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
                     
                     if (boostTimeout >= 0L && getLastResponseTimeInMillis() >= boostTimeout) {
                         try {
-                            Contact contact = lookupManager.next();
+                            IContact contact = lookupManager.next();
                             
                             lookup(contact);
                             lookupCounter.increment(true);
@@ -145,7 +146,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
                     break;
                 }
                 
-                Contact contact = lookupManager.next();
+                IContact contact = lookupManager.next();
                 
                 lookup(contact);
                 lookupCounter.increment();
@@ -156,9 +157,9 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     }
     
     /**
-     * Sends a lookup request to the given {@link Contact}.
+     * Sends a lookup request to the given {@link IContact}.
      */
-    private void lookup(Contact dst) throws IOException {
+    private void lookup(IContact dst) throws IOException {
         long defaultTimeout = config.getLookupTimeoutInMillis();
         long adaptiveTimeout = config.getAdaptiveTimeout(
                 dst, defaultTimeout, TimeUnit.MILLISECONDS);
@@ -189,9 +190,9 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
     }
     
     /**
-     * Sends a lookup request to the given {@link Contact}.
+     * Sends a lookup request to the given {@link IContact}.
      */
-    protected abstract void lookup(Contact dst, KUID lookupId, 
+    protected abstract void lookup(IContact dst, KUID lookupId, 
             long timeout, TimeUnit unit) throws IOException;
     
     /**
@@ -218,11 +219,11 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
             ResponseMessage response, long time, TimeUnit unit) throws IOException;
 
     /**
-     * Adds the given {@link Contact}s to the lookup's internal processing
+     * Adds the given {@link IContact}s to the lookup's internal processing
      * queue.
      */
-    protected synchronized void processContacts(Contact src, 
-            Contact[] contacts, long time, TimeUnit unit) throws IOException {
+    protected synchronized void processContacts(IContact src, 
+            IContact[] contacts, long time, TimeUnit unit) throws IOException {
         lookupManager.handleResponse(src, contacts, time, unit);
     }
 
@@ -254,7 +255,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         }
         
         final long time = System.currentTimeMillis() - startTime;
-        final Contact[] contacts = lookupManager.getContacts();
+        final IContact[] contacts = lookupManager.getContacts();
         final int hop = lookupManager.getHop();
         final int timeouts = lookupManager.getErrorCount();
         
@@ -266,7 +267,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
             }
 
             @Override
-            public Contact[] getContacts() {
+            public IContact[] getContacts() {
                 return contacts;
             }
 
@@ -298,9 +299,9 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         public abstract KUID getLookupId();
         
         /**
-         * Returns the {@link Contact}s that have been found.
+         * Returns the {@link IContact}s that have been found.
          */
-        public abstract Contact[] getContacts();
+        public abstract IContact[] getContacts();
         
         /**
          * Returns the number of hops the lookup has taken.
@@ -341,17 +342,17 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         /**
          * A {@link Set} of all responses
          */
-        private final NavigableSet<Contact> responses;
+        private final NavigableSet<IContact> responses;
         
         /**
          * A {@link Set} of the k-closest responses
          */
-        private final NavigableSet<Contact> closest;
+        private final NavigableSet<IContact> closest;
         
         /**
-         * A {@link Set} of {@link Contact}s to query
+         * A {@link Set} of {@link IContact}s to query
          */
-        private final NavigableSet<Contact> query;
+        private final NavigableSet<IContact> query;
         
         /**
          * A history of all {@link KUID}s that were added to the 
@@ -364,27 +365,27 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         
         private int timeouts = 0;
         
-        public LookupManager(Contact[] contacts, RouteTable routeTable, KUID lookupId) {
+        public LookupManager(IContact[] contacts, RouteTable routeTable, KUID lookupId) {
             this.routeTable = Arguments.notNull(routeTable, "routeTable");
             this.lookupId = Arguments.notNull(lookupId, "lookupId");
             
-            Contact localhost = routeTable.getLocalhost();
+            IContact localhost = routeTable.getLocalhost();
             KUID contactId = localhost.getId();
             
             XorComparator comparator = new XorComparator(lookupId);
-            this.responses = new TreeSet<Contact>(comparator);
-            this.closest = new TreeSet<Contact>(comparator);
-            this.query = new TreeSet<Contact>(comparator);
+            this.responses = new TreeSet<IContact>(comparator);
+            this.closest = new TreeSet<IContact>(comparator);
+            this.query = new TreeSet<IContact>(comparator);
             
             history.put(contactId, 0);
             
             addToResponses(localhost);
-            for (Contact contact : contacts) {
+            for (IContact contact : contacts) {
                 addToQuery(contact, 1);
             }
         }
         
-        public void handleResponse(Contact src, Contact[] contacts, 
+        public void handleResponse(IContact src, IContact[] contacts, 
                 long time, TimeUnit unit) {
             
             boolean success = addToResponses(src);
@@ -392,7 +393,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
                 return;
             }
             
-            for (Contact contact : contacts) {
+            for (IContact contact : contacts) {
                 if (addToQuery(contact, currentHop+1)) {
                     routeTable.add(contact);
                 }
@@ -403,8 +404,8 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
             timeouts++;
         }
         
-        public Contact[] getContacts() {
-            return responses.toArray(new Contact[0]);
+        public IContact[] getContacts() {
+            return responses.toArray(new DefaultContact[0]);
         }
         
         public int getHop() {
@@ -415,7 +416,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
             return timeouts;
         }
         
-        private boolean addToResponses(Contact contact) {
+        private boolean addToResponses(IContact contact) {
             if (responses.add(contact)) {
                 closest.add(contact);
                 
@@ -431,7 +432,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
             return false;
         }
         
-        private boolean addToQuery(Contact contact, int hop) {
+        private boolean addToQuery(IContact contact, int hop) {
             KUID contactId = contact.getId();
             if (!history.containsKey(contactId)) { 
                 history.put(contactId, hop);
@@ -442,9 +443,9 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
             return false;
         }
         
-        private boolean isCloserThanClosest(Contact other) {
+        private boolean isCloserThanClosest(IContact other) {
             if (!closest.isEmpty()) {
-                Contact contact = closest.last();
+                IContact contact = closest.last();
                 KUID contactId = contact.getId();
                 KUID otherId = other.getId();
                 return otherId.isCloserTo(lookupId, contactId);
@@ -460,7 +461,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
         public boolean hasNext(boolean force) {
             if (!query.isEmpty()) {
                 
-                Contact contact = query.first();
+                IContact contact = query.first();
                 if (force || exhaustive
                         || closest.size() < routeTable.getK() 
                         || isCloserThanClosest(contact)) {
@@ -471,8 +472,8 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
             return false;
         }
         
-        public Contact next() {
-            Contact contact = null;
+        public IContact next() {
+            IContact contact = null;
             
             if (randomize && !query.isEmpty()) {
                 
@@ -491,7 +492,7 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
                 // above.
                 
                 int index = 0;
-                for (Contact c : query) {
+                for (IContact c : query) {
                     
                     if (index >= routeTable.getK()) {
                         break;

@@ -25,7 +25,7 @@ import junit.framework.TestCase;
 import org.junit.Test;
 
 import com.ardverk.dht.KUID;
-import com.ardverk.dht.routing.Contact.Type;
+import com.ardverk.dht.routing.IContact.Type;
 
 public class RouteTableTest {
 
@@ -37,7 +37,7 @@ public class RouteTableTest {
     
     @Test
     public void initialState() {
-        Contact localhost = createLocalhost();
+        DefaultContact localhost = createLocalhost();
         DefaultRouteTable routeTable = createRouteTable(localhost);
         
         TestCase.assertEquals(1, routeTable.size());
@@ -61,12 +61,12 @@ public class RouteTableTest {
     
     @Test
     public void addLocalhost() {
-        Contact localhost = createLocalhost();
+        DefaultContact localhost = createLocalhost();
         DefaultRouteTable routeTable = createRouteTable(localhost);
         
         routeTable.addRouteTableListener(new RouteTableAdapter() {
             @Override
-            public void handleContactAdded(Bucket bucket, Contact contact) {
+            public void handleContactAdded(Bucket bucket, IContact contact) {
                 TestCase.fail("Shouldn't have been called.");
             }
         });
@@ -85,12 +85,12 @@ public class RouteTableTest {
         final CountDownLatch latch = new CountDownLatch(1);
         routeTable.addRouteTableListener(new RouteTableAdapter() {
             @Override
-            public void handleContactAdded(Bucket bucket, Contact contact) {
+            public void handleContactAdded(Bucket bucket, IContact contact) {
                 latch.countDown();
             }
         });
         
-        Contact contact = createContact();
+        DefaultContact contact = createContact();
         routeTable.add(contact);
         
         if (!latch.await(1L, TimeUnit.SECONDS)) {
@@ -107,7 +107,7 @@ public class RouteTableTest {
         final DefaultRouteTable routeTable = createRouteTable();
         
         while (routeTable.size() < routeTable.getK()) {
-            Contact contact = createContact();
+            DefaultContact contact = createContact();
             routeTable.add(contact);
         }
         
@@ -123,7 +123,7 @@ public class RouteTableTest {
             }
         });
         
-        Contact contact = createContact();
+        DefaultContact contact = createContact();
         routeTable.add(contact);
         
         if (!latch.await(1L, TimeUnit.SECONDS)) {
@@ -136,52 +136,52 @@ public class RouteTableTest {
     
     @Test
     public void select() {
-        Contact localhost = createLocalhost();
+        DefaultContact localhost = createLocalhost();
         DefaultRouteTable routeTable = createRouteTable(localhost);
         
         while (routeTable.size() < routeTable.getK()) {
-            Contact contact = createContact();
+            DefaultContact contact = createContact();
             routeTable.add(contact);
         }
         
-        Contact[] contacts = routeTable.select(localhost.getId());
+        IContact[] contacts = routeTable.select(localhost.getId());
         TestCase.assertEquals(routeTable.getK(), contacts.length);
         
         TestCase.assertEquals(localhost, contacts[0]);
     }
     
     private static DefaultRouteTable createRouteTable() {
-        Contact localhost = createLocalhost();
+        DefaultContact localhost = createLocalhost();
         return createRouteTable(localhost);
     }
     
-    private static DefaultRouteTable createRouteTable(Contact localhost) {
+    private static DefaultRouteTable createRouteTable(DefaultContact localhost) {
         return new DefaultRouteTable(K, localhost);
     }
     
-    private static Contact createLocalhost() {
+    private static DefaultContact createLocalhost() {
         return createLocalhost(DEFAULT_PORT);
     }
     
-    private static Contact createLocalhost(int port) {
+    private static DefaultContact createLocalhost(int port) {
         return createLocalhost(KUID.createRandom(ID_SIZE), port);
     }
     
-    private static Contact createLocalhost(KUID contactId, int port) {
-        return Contact.localhost(contactId, 
+    private static DefaultContact createLocalhost(KUID contactId, int port) {
+        return DefaultContact.localhost(contactId, 
                 new InetSocketAddress("localhost", port));
     }
     
-    private static Contact createContact() {
+    private static DefaultContact createContact() {
         return createContact(DEFAULT_PORT);
     }
     
-    private static Contact createContact(int port) {
+    private static DefaultContact createContact(int port) {
         return createContact(KUID.createRandom(ID_SIZE), port);
     }
     
-    private static Contact createContact(KUID contactId, int port) {
-        return new Contact(Type.SOLICITED, contactId, 
+    private static DefaultContact createContact(KUID contactId, int port) {
+        return new DefaultContact(Type.SOLICITED, contactId, 
                 0, new InetSocketAddress("localhost", port));
     }
 }

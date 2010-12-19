@@ -33,7 +33,7 @@ import com.ardverk.dht.entity.BootstrapEntity;
 import com.ardverk.dht.entity.DefaultBootstrapEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.IContact;
 
 public class BootstrapManager {
 
@@ -54,7 +54,7 @@ public class BootstrapManager {
     }
     
     public ArdverkFuture<BootstrapEntity> bootstrap(
-            Contact contact, BootstrapConfig config) {
+            IContact contact, BootstrapConfig config) {
         return bootstrap(contact.getContactAddress(), config);
     }
     
@@ -101,10 +101,10 @@ public class BootstrapManager {
             }
             
             private void handlePingEntity(final PingEntity pingEntity) {
-                Contact[] contacts = new Contact[] { pingEntity.getContact() };
+                IContact[] contacts = new IContact[] { pingEntity.getContact() };
                 LookupManager lookupManager = dht.getLookupManager();
                 
-                Contact localhost = dht.getLocalhost();
+                IContact localhost = dht.getLocalhost();
                 KUID localhostId = localhost.getId();
                 AsyncFuture<NodeEntity> lookupFuture 
                     = lookupFutureRef.make(

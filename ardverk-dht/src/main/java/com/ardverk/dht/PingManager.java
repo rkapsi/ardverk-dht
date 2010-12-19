@@ -25,7 +25,7 @@ import com.ardverk.dht.config.PingConfig;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.io.PingResponseHandler;
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.IContact;
 
 public class PingManager {
 
@@ -39,7 +39,7 @@ public class PingManager {
         this.messageDispatcher = messageDispatcher;
     }
     
-    public ArdverkFuture<PingEntity> ping(Contact contact, PingConfig config) {
+    public ArdverkFuture<PingEntity> ping(IContact contact, PingConfig config) {
         ArdverkProcess<PingEntity> process 
             = new PingResponseHandler(messageDispatcher, contact, config);
         return futureService.submit(process, config);

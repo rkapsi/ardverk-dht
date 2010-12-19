@@ -18,7 +18,7 @@ package com.ardverk.dht.message;
 
 import java.net.SocketAddress;
 
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.IContact;
 
 /**
  * 
@@ -31,9 +31,9 @@ public interface Message {
     public MessageId getMessageId();
     
     /**
-     * Returns the sender's {@link Contact} information.
+     * Returns the sender's {@link IContact} information.
      */
-    public Contact getContact();
+    public IContact getContact();
     
     /**
      * Returns the receiver's {@link SocketAddress}.

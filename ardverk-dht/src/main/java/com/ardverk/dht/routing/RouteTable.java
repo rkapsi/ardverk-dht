@@ -45,31 +45,31 @@ public interface RouteTable extends IoErrorCallback {
     public boolean isBound();
     
     /**
-     * Returns the localhost {@link Contact}.
+     * Returns the localhost {@link IContact}.
      */
-    public Contact getLocalhost();
+    public IContact getLocalhost();
     
     /**
-     * Adds the given {@link Contact} to the {@link RouteTable}.
+     * Adds the given {@link IContact} to the {@link RouteTable}.
      */
-    public void add(Contact contact);
+    public void add(IContact contact);
     
     /**
-     * Returns a {@link Contact} for the given {@link KUID}.
+     * Returns a {@link IContact} for the given {@link KUID}.
      */
-    public Contact get(KUID contactId);
+    public IContact get(KUID contactId);
     
     /**
      * See {@link #select(KUID, int)}
      */
-    public Contact[] select(KUID contactId);
+    public IContact[] select(KUID contactId);
     
     /**
-     * Returns up to <tt>count</tt> number of {@link Contact}s that are
-     * XOR bit-wise closest to the given {@link KUID}. The {@link Contact}s
+     * Returns up to <tt>count</tt> number of {@link IContact}s that are
+     * XOR bit-wise closest to the given {@link KUID}. The {@link IContact}s
      * array is ordered by closeness.
      */
-    public Contact[] select(KUID contactId, int count);
+    public IContact[] select(KUID contactId, int count);
     
     /**
      * Returns all {@link Bucket}s.
@@ -77,12 +77,12 @@ public interface RouteTable extends IoErrorCallback {
     public Bucket[] getBuckets();
     
     /**
-     * Returns the number of active {@link Contact}s in the {@link RouteTable}.
+     * Returns the number of active {@link IContact}s in the {@link RouteTable}.
      */
     public int size();
     
     /**
-     * The {@link #prune()} operation removes all dead {@link Contact}s from
+     * The {@link #prune()} operation removes all dead {@link IContact}s from
      * the {@link RouteTable} and rebuilds it from the ground up.
      */
     public void prune();
@@ -104,13 +104,13 @@ public interface RouteTable extends IoErrorCallback {
     
     /**
      * A callback interface the {@link RouteTable} uses to send 
-     * ping requests to {@link Contact}s.
+     * ping requests to {@link IContact}s.
      */
     public static interface ContactPinger {
 
         /**
-         * Sends a ping to the given {@link Contact}.
+         * Sends a ping to the given {@link IContact}.
          */
-        public ArdverkFuture<PingEntity> ping(Contact contact, PingConfig config);
+        public ArdverkFuture<PingEntity> ping(IContact contact, PingConfig config);
     }
 }

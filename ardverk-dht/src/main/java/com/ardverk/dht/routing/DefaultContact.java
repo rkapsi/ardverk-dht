@@ -16,7 +16,6 @@
 
 package com.ardverk.dht.routing;
 
-import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -24,95 +23,45 @@ import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.lang.Arguments;
-import org.ardverk.lang.NullArgumentException;
 import org.ardverk.net.NetworkUtils;
 
 import com.ardverk.dht.KUID;
-import com.ardverk.dht.lang.Identifier;
 
 /**
  * 
  */
-public class Contact implements Identifier, Longevity, Comparable<Contact>, Serializable {
+public class DefaultContact extends AbstractContact {
     
     private static final long serialVersionUID = 298059770472298142L;
 
     /**
-     * 
+     * Creates and returns a localhost {@link IContact}.
      */
-    public static enum Type {
-        /**
-         * {@link Contact}s that were returned in FIND_NODE responses
-         */
-        UNKNOWN(0, false),
-        
-        /**
-         * {@link Contact}s that sent us a request
-         */
-        UNSOLICITED(1, true),
-        
-        /**
-         * {@link Contact}s that sent us a response
-         */
-        SOLICITED(2, true),
-        
-        /**
-         * {@link Contact}s that have been created by the local user.
-         */
-        AUTHORITATIVE(3, true);
-        
-        private final int priority;
-        
-        private final boolean active;
-        
-        private Type(int priority, boolean active) {
-            this.priority = priority;
-            this.active = active;
-        }
-        
-        public boolean isActive() {
-            return active;
-        }
-        
-        public int getPriority() {
-            return priority;
-        }
-        
-        public boolean isBetterOrEqual(Type other) {
-            return priority >= other.priority;
-        }
-    }
-    
-    /**
-     * Creates and returns a localhost {@link Contact}.
-     */
-    public static Contact localhost(KUID contactId, String address, int port) {
+    public static IContact localhost(KUID contactId, String address, int port) {
         return localhost(contactId, new InetSocketAddress(address, port));
     }
     
     /**
-     * Creates and returns a localhost {@link Contact}.
+     * Creates and returns a localhost {@link IContact}.
      */
-    public static Contact localhost(KUID contactId, InetAddress address, int port) {
+    public static IContact localhost(KUID contactId, InetAddress address, int port) {
         return localhost(contactId, new InetSocketAddress(address, port));
     }
     
     /**
-     * Creates and returns a localhost {@link Contact}.
+     * Creates and returns a localhost {@link IContact}.
      */
-    public static Contact localhost(KUID contactId, SocketAddress address) {
-        return new Contact(Type.AUTHORITATIVE, contactId, 0, address);
+    public static DefaultContact localhost(KUID contactId, SocketAddress address) {
+        return new DefaultContact(Type.AUTHORITATIVE, contactId, 0, address);
     }
+    
+    private final Type type;
     
     private final long creationTime;
     
     private final long timeStamp;
     
     private final long rtt;
-    
-    private final Type type;
-    
-    private final KUID contactId;
     
     private final int instanceId;
     
@@ -123,9 +72,9 @@ public class Contact implements Identifier, Longevity, Comparable<Contact>, Seri
     private final SocketAddress remoteAddress;
     
     /**
-     * Creates a {@link Contact}
+     * Creates a {@link IContact}
      */
-    public Contact(Type type, 
+    public DefaultContact(Type type, 
             KUID contactId, 
             int instanceId, 
             SocketAddress address) {
@@ -134,9 +83,9 @@ public class Contact implements Identifier, Longevity, Comparable<Contact>, Seri
     }
     
     /**
-     * Creates a {@link Contact}
+     * Creates a {@link IContact}
      */
-    public Contact(Type type, 
+    public DefaultContact(Type type, 
             KUID contactId, 
             int instanceId, 
             SocketAddress address, 
@@ -145,9 +94,9 @@ public class Contact implements Identifier, Longevity, Comparable<Contact>, Seri
     }
     
     /**
-     * Creates a {@link Contact}
+     * Creates a {@link IContact}
      */
-    public Contact(Type type, 
+    public DefaultContact(Type type, 
             KUID contactId, 
             int instanceId, 
             SocketAddress socketAddress, 
@@ -157,14 +106,15 @@ public class Contact implements Identifier, Longevity, Comparable<Contact>, Seri
     }
     
     /**
-     * Creates a {@link Contact}
+     * Creates a {@link IContact}
      */
-    public Contact(Type type, 
+    public DefaultContact(Type type, 
             KUID contactId, 
             int instanceId, 
             SocketAddress socketAddress, 
             SocketAddress contactAddress,
             long rtt, TimeUnit unit) {
+        super(contactId);
         
         if (contactAddress == null) {
             contactAddress = socketAddress;
@@ -175,7 +125,6 @@ public class Contact implements Identifier, Longevity, Comparable<Contact>, Seri
         this.timeStamp = creationTime;
         this.rtt = unit.toMillis(rtt);
         
-        this.contactId = Arguments.notNull(contactId, "contactId");
         this.instanceId = instanceId;
         this.socketAddress = Arguments.notNull(socketAddress, "socketAddress");
         this.contactAddress = Arguments.notNull(contactAddress, "contactAddress");
@@ -185,16 +134,13 @@ public class Contact implements Identifier, Longevity, Comparable<Contact>, Seri
     /**
      * 
      */
-    protected Contact(Contact existing, int instanceId) {
-        if (existing == null) {
-            throw new NullArgumentException("existing");
-        }
+    protected DefaultContact(DefaultContact existing, int instanceId) {
+        super(existing);
         
         this.creationTime = existing.creationTime;
         this.timeStamp = existing.timeStamp;
         this.rtt = existing.rtt;
         
-        this.contactId = existing.contactId;
         this.instanceId = instanceId;
         this.socketAddress = existing.socketAddress;
         this.contactAddress = existing.contactAddress;
@@ -203,12 +149,13 @@ public class Contact implements Identifier, Longevity, Comparable<Contact>, Seri
         this.type = existing.type;
     }
     
-    protected Contact(Contact existing, long rtt, TimeUnit unit) {
+    protected DefaultContact(DefaultContact existing, long rtt, TimeUnit unit) {
+        super(existing);
+        
         this.creationTime = existing.creationTime;
         this.timeStamp = existing.timeStamp;
         this.rtt = unit.toMillis(rtt);
         
-        this.contactId = existing.contactId;
         this.instanceId = existing.instanceId;
         this.socketAddress = existing.socketAddress;
         this.contactAddress = existing.contactAddress;
@@ -217,15 +164,15 @@ public class Contact implements Identifier, Longevity, Comparable<Contact>, Seri
         this.type = existing.type;
     }
     
-    protected Contact(Contact existing, 
+    protected DefaultContact(DefaultContact existing, 
             SocketAddress socketAddress, 
             SocketAddress contactAddress) {
+        super(existing);
         
         this.creationTime = existing.creationTime;
         this.timeStamp = existing.timeStamp;
         this.rtt = existing.rtt;
         
-        this.contactId = existing.contactId;
         this.instanceId = existing.instanceId;
         this.socketAddress = Arguments.notNull(socketAddress, "socketAddress");
         this.contactAddress = Arguments.notNull(contactAddress, "contactAddress");
@@ -237,11 +184,14 @@ public class Contact implements Identifier, Longevity, Comparable<Contact>, Seri
     /**
      * 
      */
-    protected Contact(Contact existing, Contact other) {
+    protected DefaultContact(DefaultContact existing, IContact o) {
+        super(existing);
         
-        if (!existing.equals(other)) {
-            throw new IllegalArgumentException(existing + " vs. " + other);
+        if (!existing.equals(o)) {
+            throw new IllegalArgumentException(existing + " vs. " + o);
         }
+        
+        DefaultContact other = (DefaultContact)o;
         
         // 2nd argument must be newer
         if (other.creationTime < existing.creationTime) {
@@ -257,8 +207,6 @@ public class Contact implements Identifier, Longevity, Comparable<Contact>, Seri
         }
         
         this.rtt = other.rtt >= 0L ? other.rtt : existing.rtt;
-        
-        this.contactId = existing.contactId;
         
         if (existing.isBetter(other)) {
             this.instanceId = existing.instanceId;
@@ -276,10 +224,10 @@ public class Contact implements Identifier, Longevity, Comparable<Contact>, Seri
     }
     
     /**
-     * Returns {@code true} if this is a better {@link Contact} than
-     * the other given {@link Contact}.
+     * Returns {@code true} if this is a better {@link IContact} than
+     * the other given {@link IContact}.
      */
-    private boolean isBetter(Contact other) {
+    private boolean isBetter(DefaultContact other) {
         // Everything is a better than an *UNKNOWN* Contact even
         // if the other Contact is *UNKNOWN* too.
         return type != Type.UNKNOWN && isBetterOrEqual(other);
@@ -287,9 +235,9 @@ public class Contact implements Identifier, Longevity, Comparable<Contact>, Seri
     
     /**
      * Returns {@code true} if this is a better or a equally good 
-     * {@link Contact} than the other given {@link Contact}.
+     * {@link IContact} than the other given {@link IContact}.
      */
-    private boolean isBetterOrEqual(Contact other) {
+    private boolean isBetterOrEqual(DefaultContact other) {
         return type.isBetterOrEqual(other.type);
     }
     
@@ -303,206 +251,74 @@ public class Contact implements Identifier, Longevity, Comparable<Contact>, Seri
         return timeStamp;
     }
     
-    /**
-     * Returns the amount of time in the given {@link TimeUnit} that 
-     * has passed since we had contact with this {@link Contact}.
-     */
+    @Override
     public long getTimeSinceLastContact(TimeUnit unit) {
         long time = System.currentTimeMillis() - timeStamp;
         return unit.convert(time, TimeUnit.MILLISECONDS);
     }
     
-    /**
-     * Returns the amount of time in milliseconds that has passed since 
-     * we had contact with this {@link Contact}.
-     */
-    public long getTimeSinceLastContactInMillis() {
-        return getTimeSinceLastContact(TimeUnit.MILLISECONDS);
-    }
-    
-    /**
-     * Returns {@code true} if we haven't had any contact with this
-     * {@link Contact} for the given period of time.
-     * 
-     * @see #getTimeSinceLastContact(TimeUnit)
-     * @see #getTimeSinceLastContactInMillis()
-     */
-    public boolean isTimeout(long timeout, TimeUnit unit) {
-        return getTimeSinceLastContact(unit) >= timeout;
-    }
-    
-    /**
-     * Returns the adaptive timeout for this {@link Contact}.
-     */
-    public long getAdaptiveTimeout(double multiplier, 
-            long defaultTimeout, TimeUnit unit) {
-        
-        long rttInMillis = getRoundTripTimeInMillis();
-        if (0L < rttInMillis && 0d < multiplier) {
-            long timeout = (long)(rttInMillis * multiplier);
-            long adaptive = Math.min(timeout, 
-                    unit.toMillis(defaultTimeout));
-            return unit.convert(adaptive, TimeUnit.MILLISECONDS);
-        }
-        
-        return defaultTimeout;
-    }
-    
     @Override
-    public KUID getId() {
-        return contactId;
-    }
-    
-    /**
-     * Returns the {@link Contact}'s instance ID
-     */
     public int getInstanceId() {
         return instanceId;
     }
     
     /**
-     * Sets the {@link Contact}'s instance ID and returns a new {@link Contact}.
+     * Sets the {@link IContact}'s instance ID and returns a new {@link IContact}.
      */
-    public Contact setInstanceId(int instanceId) {
-        return this.instanceId != instanceId ? new Contact(this, instanceId) : this;
+    public IContact setInstanceId(int instanceId) {
+        return this.instanceId != instanceId ? new DefaultContact(this, instanceId) : this;
     }
     
-    /**
-     * Returns the {@link Contact}'s address as reported by 
-     * the {@link Socket}.
-     */
+    @Override
     public SocketAddress getSocketAddress() {
         return socketAddress;
     }
     
     /**
-     * Sets the {@link Contact}'s address as reported by the {@link Socket}.
+     * Sets the {@link IContact}'s address as reported by the {@link Socket}.
      */
-    public Contact setSocketAddress(SocketAddress address) {
-        return new Contact(this, address, contactAddress);
+    public IContact setSocketAddress(SocketAddress address) {
+        return new DefaultContact(this, address, contactAddress);
     }
     
-    /**
-     * Returns the {@link Contact}'s address as reported by 
-     * the remote {@link Contact}.
-     */
+    @Override
     public SocketAddress getContactAddress() {
         return contactAddress;
     }
     
     /**
-     * Sets the {@link Contact}'s address as reported by the 
-     * remote {@link Contact}.
+     * Sets the {@link IContact}'s address as reported by the 
+     * remote {@link IContact}.
      */
-    public Contact setContactAddress(SocketAddress address) {
-        return new Contact(this, socketAddress, address);
+    public IContact setContactAddress(SocketAddress address) {
+        return new DefaultContact(this, socketAddress, address);
     }
     
-    /**
-     * Returns the {@link Contact}'s remove address.
-     * 
-     * NOTE: This is the address we're using to send messages.
-     */
+    @Override
     public SocketAddress getRemoteAddress() {
         return remoteAddress;
     }
     
-    /**
-     * Returns the {@link Type} of the {@link Contact}
-     */
+    @Override
     public Type getType() {
         return type;
     }
     
     /**
-     * Returns {@code true} if the {@link Contact} is of the given {@link Type}
+     * Changes the {@link IContact}'s Round-Trip-Time (RTT)
      */
-    public boolean isType(Type type) {
-        return type == this.type;
+    public DefaultContact setRoundTripTime(long rtt, TimeUnit unit) {
+        return new DefaultContact(this, rtt, unit);
     }
     
-    /**
-     * Returns {@code true} if this is a an authoritative {@link Contact}.
-     */
-    public boolean isAuthoritative() {
-        return isType(Type.AUTHORITATIVE);
-    }
-    
-    /**
-     * Returns {@code true} if this {@link Contact} was discovered 
-     * through solicited communication.
-     */
-    public boolean isSolicited() {
-        return isType(Type.SOLICITED);
-    }
-    
-    /**
-     * Returns {@code true} if this {@link Contact} was discovered 
-     * through unsolicited communication.
-     */
-    public boolean isUnsolicited() {
-        return isType(Type.UNSOLICITED);
-    }
-    
-    /**
-     * Returns true if the {@link Contact} is considered active.
-     * 
-     * @see Type
-     */
-    public boolean isActive() {
-        return type.isActive();
-    }
-    
-    /**
-     * Changes the {@link Contact}'s Round-Trip-Time (RTT)
-     */
-    public Contact setRoundTripTime(long rtt, TimeUnit unit) {
-        return new Contact(this, rtt, unit);
-    }
-    
-    /**
-     * Returns the {@link Contact}'s Round-Trip-Time (RTT) or a negative 
-     * value if the RTT is unknown.
-     */
+    @Override
     public long getRoundTripTime(TimeUnit unit) {
         return unit.convert(rtt, TimeUnit.MILLISECONDS);
     }
     
-    /**
-     * Returns the {@link Contact}'s Round-Trip-Time (RTT) in milliseconds
-     * or a negative value if the RTT is unknown.
-     */
-    public long getRoundTripTimeInMillis() {
-        return getRoundTripTime(TimeUnit.MILLISECONDS);
-    }
-    
-    /**
-     * Merges this with the other {@link Contact}.
-     */
-    public Contact merge(Contact other) {
-        return other != this ? new Contact(this, other) : this;
-    }
-    
     @Override
-    public int hashCode() {
-        return contactId.hashCode();
-    }
-    
-    @Override
-    public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        } else if (!(o instanceof Contact)) {
-            return false;
-        }
-        
-        Contact other = (Contact)o;
-        return contactId.equals(other.contactId);
-    }
-    
-    @Override
-    public int compareTo(Contact o) {
-        return contactId.compareTo(o.contactId);
+    public IContact merge(IContact other) {
+        return other != this ? new DefaultContact(this, other) : this;
     }
     
     @Override

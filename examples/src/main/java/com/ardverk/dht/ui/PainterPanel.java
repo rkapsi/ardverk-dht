@@ -34,7 +34,7 @@ import com.ardverk.dht.DHT;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.io.MessageListener;
 import com.ardverk.dht.message.Message;
-import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.IContact;
 import com.ardverk.dht.ui.Painter.EventType;
 
 public class PainterPanel extends JPanel {
@@ -71,7 +71,7 @@ public class PainterPanel extends JPanel {
     public PainterPanel(DHT dht) {
         this.dht = dht;
         
-        Contact localhost = dht.getLocalhost();
+        IContact localhost = dht.getLocalhost();
         KUID localhostId = localhost.getId();
         
         painters.add(new JuicePainter(localhostId));
