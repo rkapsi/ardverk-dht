@@ -18,10 +18,9 @@ package com.ardverk.dht;
 
 import java.net.SocketAddress;
 
-import org.ardverk.concurrent.AsyncProcess;
-
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.concurrent.ArdverkFutureService;
+import com.ardverk.dht.concurrent.ArdverkProcess;
 import com.ardverk.dht.config.PingConfig;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.io.MessageDispatcher;
@@ -41,14 +40,14 @@ public class PingManager {
     }
     
     public ArdverkFuture<PingEntity> ping(Contact contact, PingConfig config) {
-        AsyncProcess<PingEntity> process 
+        ArdverkProcess<PingEntity> process 
             = new PingResponseHandler(messageDispatcher, contact, config);
         return futureService.submit(process, config);
     }
     
     public ArdverkFuture<PingEntity> ping(
             SocketAddress dst, PingConfig config) {
-        AsyncProcess<PingEntity> process 
+        ArdverkProcess<PingEntity> process 
             = new PingResponseHandler(messageDispatcher, dst, config);
         return futureService.submit(process, config);
     }

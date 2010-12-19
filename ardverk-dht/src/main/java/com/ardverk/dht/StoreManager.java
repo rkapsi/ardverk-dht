@@ -18,13 +18,13 @@ package com.ardverk.dht;
 
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
-import org.ardverk.concurrent.AsyncProcess;
 import org.ardverk.concurrent.FutureUtils;
-import org.ardverk.concurrent.NopAsyncProcess;
 import org.ardverk.concurrent.ValueReference;
 import org.ardverk.lang.Bytes;
 
 import com.ardverk.dht.concurrent.ArdverkFuture;
+import com.ardverk.dht.concurrent.ArdverkProcess;
+import com.ardverk.dht.concurrent.NopArdverkProcess;
 import com.ardverk.dht.config.PutConfig;
 import com.ardverk.dht.config.StoreConfig;
 import com.ardverk.dht.entity.DefaultPutEntity;
@@ -65,7 +65,7 @@ public class StoreManager {
             
             // This is the ArdverkFuture we're going to return to the caller
             // of this method (in most cases the user).
-            AsyncProcess<PutEntity> process = NopAsyncProcess.create();
+            ArdverkProcess<PutEntity> process = NopArdverkProcess.create();
             final ArdverkFuture<PutEntity> userFuture 
                 = dht.submit(process, config);
             
@@ -169,7 +169,7 @@ public class StoreManager {
         
         int k = routeTable.getK();
         
-        AsyncProcess<StoreEntity> process 
+        ArdverkProcess<StoreEntity> process 
             = new StoreResponseHandler(messageDispatcher, 
                 dst, k, valueTuple, config);
         

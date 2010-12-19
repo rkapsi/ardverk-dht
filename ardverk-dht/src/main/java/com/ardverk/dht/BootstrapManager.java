@@ -22,12 +22,12 @@ import java.net.SocketAddress;
 
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
-import org.ardverk.concurrent.AsyncProcess;
 import org.ardverk.concurrent.FutureUtils;
-import org.ardverk.concurrent.NopAsyncProcess;
 import org.ardverk.concurrent.ValueReference;
 
 import com.ardverk.dht.concurrent.ArdverkFuture;
+import com.ardverk.dht.concurrent.ArdverkProcess;
+import com.ardverk.dht.concurrent.NopArdverkProcess;
 import com.ardverk.dht.config.BootstrapConfig;
 import com.ardverk.dht.entity.BootstrapEntity;
 import com.ardverk.dht.entity.DefaultBootstrapEntity;
@@ -77,7 +77,7 @@ public class BootstrapManager {
         // Make sure we're holding the lock!
         assert (Thread.holdsLock(lock));
         
-        AsyncProcess<BootstrapEntity> process = NopAsyncProcess.create();
+        ArdverkProcess<BootstrapEntity> process = NopArdverkProcess.create();
         final ArdverkFuture<BootstrapEntity> userFuture 
             = dht.submit(process, config);
         

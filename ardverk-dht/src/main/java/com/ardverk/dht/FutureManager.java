@@ -30,9 +30,10 @@ import org.ardverk.concurrent.FutureUtils;
 
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.concurrent.ArdverkFutureTask;
+import com.ardverk.dht.concurrent.ArdverkProcess;
 
 /**
- * The {@link FutureManager} manages {@link AsyncFuture}s.
+ * The {@link FutureManager} manages {@link ArdverkFuture}s.
  */
 public class FutureManager implements Closeable {
     
@@ -59,8 +60,12 @@ public class FutureManager implements Closeable {
         futures.clear();
     }
     
+    /**
+     * Submits the given {@link ArdverkProcess} for execution and returns
+     * an {@link ArdverkFuture} for it.
+     */
     public synchronized <T> ArdverkFuture<T> submit(ExecutorKey executorKey, 
-            AsyncProcess<T> process, long timeout, TimeUnit unit) {
+            ArdverkProcess<T> process, long timeout, TimeUnit unit) {
         
         if (!open) {
             throw new IllegalStateException();
@@ -75,7 +80,10 @@ public class FutureManager implements Closeable {
         return future;
     }
     
-    private Executor getExecutor(ExecutorKey executorKey) {
+    /**
+     * Returns an {@link Executor} for the given {@link ExecutorKey}.
+     */
+    private static Executor getExecutor(ExecutorKey executorKey) {
         switch (executorKey) {
             case PARALLEL:
                 return CACHED_THREAD_EXECUTOR;
@@ -84,7 +92,10 @@ public class FutureManager implements Closeable {
         }
     }
     
-    private synchronized void complete(AsyncFuture<?> future) {
+    /**
+     * Callback for completed {@link ArdverkFuture}s.
+     */
+    private synchronized void complete(ArdverkFuture<?> future) {
         futures.remove(future);
     }
     

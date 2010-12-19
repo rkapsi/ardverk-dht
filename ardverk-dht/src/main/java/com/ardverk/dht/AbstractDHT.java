@@ -21,9 +21,9 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.concurrent.AsyncProcess;
 
 import com.ardverk.dht.concurrent.ArdverkFuture;
+import com.ardverk.dht.concurrent.ArdverkProcess;
 import com.ardverk.dht.config.Config;
 import com.ardverk.dht.config.PingConfig;
 import com.ardverk.dht.entity.PingEntity;
@@ -53,7 +53,7 @@ abstract class AbstractDHT implements DHT, Closeable {
     }
     
     @Override
-    public <V> ArdverkFuture<V> submit(AsyncProcess<V> process, Config config) {
+    public <V> ArdverkFuture<V> submit(ArdverkProcess<V> process, Config config) {
         ExecutorKey executorKey = config.getExecutorKey();
         long timeout = config.getOperationTimeoutInMillis();
         return submit(executorKey, process, timeout, TimeUnit.MILLISECONDS);
@@ -61,7 +61,7 @@ abstract class AbstractDHT implements DHT, Closeable {
 
     @Override
     public <V> ArdverkFuture<V> submit(ExecutorKey executorKey,
-            AsyncProcess<V> process, long timeout, TimeUnit unit) {
+            ArdverkProcess<V> process, long timeout, TimeUnit unit) {
         return futureManager.submit(executorKey, process, timeout, unit);
     }
     

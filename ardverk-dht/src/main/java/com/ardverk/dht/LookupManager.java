@@ -16,10 +16,9 @@
 
 package com.ardverk.dht;
 
-import org.ardverk.concurrent.AsyncProcess;
-
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.concurrent.ArdverkFutureService;
+import com.ardverk.dht.concurrent.ArdverkProcess;
 import com.ardverk.dht.config.GetConfig;
 import com.ardverk.dht.config.LookupConfig;
 import com.ardverk.dht.entity.NodeEntity;
@@ -54,7 +53,7 @@ public class LookupManager {
     public ArdverkFuture<NodeEntity> lookup(Contact[] contacts, 
             KUID lookupId, LookupConfig config) {
         
-        AsyncProcess<NodeEntity> process 
+        ArdverkProcess<NodeEntity> process 
             = new NodeResponseHandler(messageDispatcher, 
                     contacts, routeTable, lookupId, config);
         return futureService.submit(process, config);
@@ -67,7 +66,7 @@ public class LookupManager {
     
     public ArdverkFuture<ValueEntity> get(Contact[] contacts, 
             KUID key, GetConfig config) {
-        AsyncProcess<ValueEntity> process
+        ArdverkProcess<ValueEntity> process
             = new ValueResponseHandler(messageDispatcher, contacts, 
                     routeTable, key, config);
         return futureService.submit(process, config);

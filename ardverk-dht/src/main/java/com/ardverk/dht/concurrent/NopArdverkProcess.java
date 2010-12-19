@@ -16,24 +16,24 @@
 
 package com.ardverk.dht.concurrent;
 
-import java.util.concurrent.TimeUnit;
+import org.ardverk.concurrent.AsyncProcessFuture;
 
-import org.ardverk.concurrent.AsyncProcess;
+/**
+ * An implementation of {@link ArdverkProcess} that does nothing.
+ */
+public class NopArdverkProcess<V> implements ArdverkProcess<V> {
 
-import com.ardverk.dht.ExecutorKey;
-import com.ardverk.dht.config.Config;
-
-public interface ArdverkFutureService {
-
-    /**
-     * Submits the given {@link AsyncProcess} for execution.
-     */
-    public <V> ArdverkFuture<V> submit(
-            ArdverkProcess<V> process, Config config);
+    private static final ArdverkProcess<Object> NOP 
+        = new NopArdverkProcess<Object>();
     
-    /**
-     * Submits the given {@link AsyncProcess} for execution.
-     */
-    public <V> ArdverkFuture<V> submit(ExecutorKey executorKey, 
-            ArdverkProcess<V> process, long timeout, TimeUnit unit);
+    @SuppressWarnings("unchecked")
+    public static <V> ArdverkProcess<V> create() {
+        return (ArdverkProcess<V>)NOP;
+    }
+    
+    private NopArdverkProcess() {}
+    
+    @Override
+    public void start(AsyncProcessFuture<V> future) {
+    }
 }
