@@ -39,11 +39,15 @@ import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.entity.SyncEntity;
 import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.Localhost;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
 import com.ardverk.dht.storage.ValueTuple;
 import com.ardverk.dht.utils.ContactKey;
 
+/**
+ * The {@link SyncManager} manages the sync process.
+ */
 public class SyncManager {
     
     private static enum Sync {
@@ -81,7 +85,7 @@ public class SyncManager {
             final List<ArdverkFuture<StoreEntity>> storeFutures 
                 = new ArrayList<ArdverkFuture<StoreEntity>>();
             
-            Contact localhost = routeTable.getLocalhost();
+            Localhost localhost = routeTable.getLocalhost();
             PingConfig pingConfig = syncConfig.getPingConfig();
             
             final ArdverkFuture<SyncEntity> userFuture 
@@ -212,7 +216,7 @@ public class SyncManager {
     }
     
     private ArdverkFuture<StoreEntity> store(ValueTuple tuple, StoreConfig storeConfig) {
-        Contact localhost = routeTable.getLocalhost();
+        Localhost localhost = routeTable.getLocalhost();
         Contact[] contacts = routeTable.select(localhost.getId());
         assert (localhost.equals(contacts[0]));
         

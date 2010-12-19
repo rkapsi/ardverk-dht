@@ -53,6 +53,9 @@ import com.ardverk.dht.storage.DefaultDatabase;
 import com.ardverk.dht.storage.StoreForward;
 import com.ardverk.dht.storage.ValueTuple;
 
+/**
+ * The Ardverk Distributed Hash Table (DHT).
+ */
 public class ArdverkDHT extends AbstractDHT {
     
     private final BootstrapManager bootstrapManager;
@@ -151,30 +154,51 @@ public class ArdverkDHT extends AbstractDHT {
         return database;
     }
     
+    /**
+     * Returns the {@link MessageDispatcher}.
+     */
     public MessageDispatcher getMessageDispatcher() {
         return messageDispatcher;
     }
     
+    /**
+     * Returns the {@link BootstrapManager}.
+     */
     public BootstrapManager getBootstrapManager() {
         return bootstrapManager;
     }
 
+    /**
+     * Returns the {@link QuickenManager}.
+     */
     public QuickenManager getQuickenManager() {
         return quickenManager;
     }
 
+    /**
+     * Returns the {@link StoreManager}.
+     */
     public StoreManager getStoreManager() {
         return storeManager;
     }
     
+    /**
+     * Returns the {@link SyncManager}.
+     */
     public SyncManager getSyncManager() {
         return syncManager;
     }
     
+    /**
+     * Returns the {@link LookupManager}.
+     */
     public LookupManager getLookupManager() {
         return lookupManager;
     }
     
+    /**
+     * Returns the {@link PingManager}.
+     */
     public PingManager getPingManager() {
         return pingManager;
     }

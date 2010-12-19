@@ -27,6 +27,9 @@ import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.io.PingResponseHandler;
 import com.ardverk.dht.routing.Contact;
 
+/**
+ * The {@link PingManager} manages PINGs.
+ */
 public class PingManager {
 
     private final ArdverkFutureService futureService;

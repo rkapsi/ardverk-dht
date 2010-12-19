@@ -29,6 +29,9 @@ import com.ardverk.dht.io.ValueResponseHandler;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 
+/**
+ * The {@link LookupManager} manages FIND_NODE and FIND_VALUE lookups.
+ */
 public class LookupManager {
 
     private final ArdverkFutureService futureService;

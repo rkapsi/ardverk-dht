@@ -38,6 +38,9 @@ import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.DefaultValueTuple;
 import com.ardverk.dht.storage.ValueTuple;
 
+/**
+ * The {@link StoreManager} manages STORE operations.
+ */
 public class StoreManager {
     
     private final DHT dht;

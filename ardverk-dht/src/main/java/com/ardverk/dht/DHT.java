@@ -25,6 +25,9 @@ import com.ardverk.dht.routing.Localhost;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
 
+/**
+ * The default interface for a DHT.
+ */
 public interface DHT extends ArdverkService, BootstrapService, 
         QuickenService, SyncService, ArdverkFutureService, 
         Bindable<Transport> {

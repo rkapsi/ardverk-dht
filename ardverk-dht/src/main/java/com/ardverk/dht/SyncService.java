@@ -21,6 +21,10 @@ import com.ardverk.dht.config.SyncConfig;
 import com.ardverk.dht.entity.SyncEntity;
 import com.ardverk.dht.routing.Contact;
 
+/**
+ * The {@link SyncService} provides methods to sync one DHT's values with
+ * everyone else's in the same bucket.
+ */
 public interface SyncService {
 
     /**

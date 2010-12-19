@@ -24,28 +24,31 @@ import com.ardverk.dht.config.BootstrapConfig;
 import com.ardverk.dht.entity.BootstrapEntity;
 import com.ardverk.dht.routing.Contact;
 
+/**
+ * The {@link BootstrapService} provides an interface to bootstrap a {@link DHT}.
+ */
 public interface BootstrapService {
 
     /**
-     * 
+     * Bootstraps the DHT from the given hostname and port.
      */
     public ArdverkFuture<BootstrapEntity> bootstrap(
             String host, int port, BootstrapConfig config);
     
     /**
-     * 
+     * Bootstraps the DHT from the given {@link InetAddress} and port.
      */
     public ArdverkFuture<BootstrapEntity> bootstrap(
             InetAddress address, int port, BootstrapConfig config);
     
     /**
-     * 
+     * Bootstraps the DHT from the given {@link SocketAddress}.
      */
     public ArdverkFuture<BootstrapEntity> bootstrap(
             SocketAddress address, BootstrapConfig config);
     
     /**
-     * 
+     * Bootstraps the DHT from the given {@link Contact}.
      */
     public ArdverkFuture<BootstrapEntity> bootstrap(
             Contact contact, BootstrapConfig config);

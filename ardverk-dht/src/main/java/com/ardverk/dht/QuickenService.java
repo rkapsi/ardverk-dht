@@ -21,6 +21,9 @@ import com.ardverk.dht.config.QuickenConfig;
 import com.ardverk.dht.entity.QuickenEntity;
 import com.ardverk.dht.routing.RouteTable;
 
+/**
+ * The {@link QuickenService} provides methods to keep the DHT fresh.
+ */
 public interface QuickenService {
 
     /**
