@@ -24,13 +24,29 @@ import org.ardverk.io.Bindable;
 
 import com.ardverk.dht.io.transport.Transport;
 
+/**
+ * The {@link NetworkService} binds the {@link DHT} 
+ * to a {@link Transport} layer.
+ */
 public interface NetworkService extends Bindable<Transport> {
 
+    /**
+     * Binds the {@link DHT} to the given port.
+     */
     public void bind(int port) throws IOException;
     
+    /**
+     * Binds the {@link DHT} to the given host-port.
+     */
     public void bind(String host, int port) throws IOException;
     
+    /**
+     * Binds the {@link DHT} to the given {@link InetAddress} and port.
+     */
     public void bind(InetAddress bindaddr, int port) throws IOException;
     
+    /**
+     * Binds the {@link DHT} to the given {@link SocketAddress}.
+     */
     public void bind(SocketAddress address) throws IOException;
 }
