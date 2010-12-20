@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 
 import com.ardverk.dht.codec.MessageCodec;
 import com.ardverk.dht.logging.LoggerUtils;
+import com.ardverk.dht.message.Message;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.NodeRequest;
 import com.ardverk.dht.message.PingRequest;
@@ -34,6 +35,9 @@ import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
 import com.ardverk.dht.storage.StoreForward;
 
+/**
+ * A default implementation of {@link MessageDispatcher}.
+ */
 public class DefaultMessageDispatcher extends MessageDispatcher {
 
     private static final Logger LOG 
@@ -61,22 +65,42 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
         store = new StoreRequestHandler(this, routeTable, database);
     }
     
+    /**
+     * Returns the {@link DefaultMessageHandler} which is called for 
+     * every incoming {@link Message}.
+     */
     public DefaultMessageHandler getDefaultHandler() {
         return defaultHandler;
     }
     
+    /**
+     * Returns the {@link PingRequestHandler} which is called for
+     * every incoming {@link PingRequest}.
+     */
     public PingRequestHandler getPingRequestHandler() {
         return ping;
     }
 
+    /**
+     * Returns the {@link NodeRequestHandler} which is called for every
+     * incoming {@link NodeRequest}.
+     */
     public NodeRequestHandler getNodeRequestHandler() {
         return node;
     }
     
+    /**
+     * Returns the {@link ValueRequestHandler} which is called for every
+     * incoming {@link ValueRequest}.
+     */
     public ValueRequestHandler getValueRequestHandler() {
         return value;
     }
 
+    /**
+     * Returns the {@link StoreRequestHandler} which is called for every
+     * incoming {@link StoreRequest}.
+     */
     public StoreRequestHandler getStoreRequestHandler() {
         return store;
     }

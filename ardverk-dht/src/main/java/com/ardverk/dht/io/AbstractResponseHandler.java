@@ -17,6 +17,7 @@
 package com.ardverk.dht.io;
 
 import java.io.IOException;
+import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -24,7 +25,7 @@ import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.AsyncProcessFuture;
 import org.ardverk.lang.Arguments;
-import org.ardverk.lang.NullArgumentException;
+import org.ardverk.utils.TimeUtils;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.entity.Entity;
@@ -48,41 +49,49 @@ public abstract class AbstractResponseHandler<V extends Entity>
     }
     
     /**
-     * 
+     * Returns the mount of time that has passed since the last message
+     * has been sent or -1 if no messages have been sent yet.
      */
     public long getLastSendTime(TimeUnit unit) {
-        return convertTime(lastSendTime, unit);
+        return convertTimeMillisTo(lastSendTime, unit);
     }
     
+    /**
+     * Returns the amount of time that has passed in milliseconds
+     * since the last message has been sent or -1 if no messages
+     * have been sent yet.
+     */
     public long getLastSendTimeInMillis() {
         return getLastSendTime(TimeUnit.MILLISECONDS);
     }
     
     /**
-     * 
+     * Returns the mount of time that has passed since the last message
+     * has been received or -1 if no messages have been received yet.
      */
     public long getLastResponseTime(TimeUnit unit) {
-        return convertTime(lastResponseTime, unit);
+        return convertTimeMillisTo(lastResponseTime, unit);
     }
     
+    /**
+     * Returns the amount of time that has passed in milliseconds
+     * since the last message has been received or -1 if no messages
+     * have been received yet.
+     */
     public long getLastResponseTimeInMillis() {
         return getLastResponseTime(TimeUnit.MILLISECONDS);
     }
     
     /**
-     * 
+     * Converts a time from milliseconds to the given {@link TimeUnit}.
      */
-    private static long convertTime(long timeInMillis, TimeUnit unit) {
-        if (unit == null) {
-            throw new NullArgumentException("unit");
-        }
-        
+    private static long convertTimeMillisTo(long timeInMillis, TimeUnit unit) {
         if (timeInMillis == -1L) {
             return -1L;
         }
         
         long time = System.currentTimeMillis() - timeInMillis;
-        return unit.convert(time, TimeUnit.MILLISECONDS);
+        return TimeUtils.convert(time, TimeUnit.MILLISECONDS, unit);
     }
     
     @Override
@@ -92,7 +101,11 @@ public abstract class AbstractResponseHandler<V extends Entity>
     }
 
     /**
+     * Returns {@code true} if the underlying {@link AsyncFuture} is
+     * done.
      * 
+     * NOTE: This method is throwing an {@link IllegalStateException}
+     * if the {@link AbstractRequestHandler} isn't initialized yet.
      */
     protected boolean isDone() {
         AsyncFuture<V> future = this.future;
@@ -103,7 +116,10 @@ public abstract class AbstractResponseHandler<V extends Entity>
     }
 
     /**
+     * Sets the value of the underlying {@link AsyncFuture}.
      * 
+     * NOTE: This method is throwing an {@link IllegalStateException}
+     * if the {@link AbstractRequestHandler} isn't initialized yet.
      */
     protected void setValue(V value) {
         AsyncFuture<V> future = this.future;
@@ -118,7 +134,10 @@ public abstract class AbstractResponseHandler<V extends Entity>
     }
     
     /**
+     * Sets the exception of the underlying {@link AsyncFuture}.
      * 
+     * NOTE: This method is throwing an {@link IllegalStateException}
+     * if the {@link AbstractRequestHandler} isn't initialized yet.
      */
     protected void setException(Throwable t) {
         AsyncFuture<V> future = this.future;
@@ -133,7 +152,7 @@ public abstract class AbstractResponseHandler<V extends Entity>
     }
     
     /**
-     * 
+     * Sends a {@link RequestMessage} to the given {@link Contact}.
      */
     public void send(Contact dst, RequestMessage message, 
             long timeout, TimeUnit unit) throws IOException {
@@ -142,11 +161,12 @@ public abstract class AbstractResponseHandler<V extends Entity>
         send(contactId, message, timeout, unit);
     }
     
-    public void send(RequestMessage message, 
-            long timeout, TimeUnit unit) throws IOException {
-        send((KUID)null, message, timeout, unit);
-    }
-    
+    /**
+     * Sends a {@link RequestMessage} to the given {@link KUID}.
+     * 
+     * NOTE: The receiver's {@link SocketAddress} is encoded in 
+     * the {@link RequestMessage}.
+     */
     public void send(KUID contactId, RequestMessage message, 
             long timeout, TimeUnit unit) throws IOException {
         
@@ -177,11 +197,18 @@ public abstract class AbstractResponseHandler<V extends Entity>
         }
     }
     
-    protected void done() {
-    }
-    
+    /**
+     * Called by {@link #start(AsyncProcessFuture)}.
+     * 
+     * NOTE: A lock on the given {@link AsyncFuture} is being held.
+     */
     protected abstract void go(AsyncFuture<V> future) throws Exception;
     
+    /**
+     * Called when the underlying {@link AsyncFuture} is done.
+     */
+    protected void done() {
+    }
     
     @Override
     public void handleResponse(RequestEntity entity,
@@ -200,6 +227,9 @@ public abstract class AbstractResponseHandler<V extends Entity>
         }
     }
     
+    /**
+     * @see #handleResponse(RequestEntity, ResponseMessage, long, TimeUnit).
+     */
     protected abstract void processResponse(RequestEntity entity,
             ResponseMessage response, long time, TimeUnit unit)
             throws IOException;
@@ -219,6 +249,9 @@ public abstract class AbstractResponseHandler<V extends Entity>
         }
     }
     
+    /**
+     * @see #handleTimeout(RequestEntity, long, TimeUnit)
+     */
     protected abstract void processTimeout(RequestEntity entity, 
             long time, TimeUnit unit) throws IOException;
 
@@ -235,7 +268,9 @@ public abstract class AbstractResponseHandler<V extends Entity>
         }
     }
     
+    /**
+     * @see #handleException(RequestEntity, Throwable)
+     */
     protected void processException(RequestEntity entity, Throwable exception) {
-        
     }
 }

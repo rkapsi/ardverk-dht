@@ -60,12 +60,7 @@ public class DefaultMessageHandler implements MessageCallback {
         }
         
         SocketAddress address = response.getAddress();
-        Localhost localhost = routeTable.getLocalhost();
-        
-        SocketAddress current = localhost.getContactAddress();
-        if (current == null || !current.equals(address)) {
-            localhost.setContactAddress(address);
-        }
+        updateContactAddress(address);
         
         storeForward.handleResponse(src);
         routeTable.add(src);
@@ -90,5 +85,20 @@ public class DefaultMessageHandler implements MessageCallback {
     @Override
     public void handleException(RequestEntity entity, Throwable exception) {
         // Do nothing!
+    }
+    
+    /**
+     * Each message contains the receiver's (our) {@link SocketAddress}.
+     * We're using it to update our {@link Localhost}'s contact address.
+     */
+    private void updateContactAddress(SocketAddress address) {
+        if (address != null) {
+            Localhost localhost = routeTable.getLocalhost();
+            SocketAddress current = localhost.getContactAddress();
+            
+            if (current == null || !current.equals(address)) {
+                localhost.setContactAddress(address);
+            }
+        }
     }
 }
