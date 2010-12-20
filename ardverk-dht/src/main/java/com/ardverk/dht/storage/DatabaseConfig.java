@@ -19,7 +19,8 @@ package com.ardverk.dht.storage;
 import com.ardverk.dht.config.StoreConfig;
 
 /**
- * 
+ * The {@link DatabaseConfig} defines a few basic settings that are 
+ * needed by the DHT.
  */
 public interface DatabaseConfig {
 
