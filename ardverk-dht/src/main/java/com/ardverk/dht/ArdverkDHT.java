@@ -211,9 +211,7 @@ public class ArdverkDHT extends AbstractDHT {
 
     @Override
     public void bind(Transport transport) throws IOException {
-        Localhost localhost = getLocalhost();
-        localhost.bind(transport);
-        
+        getLocalhost().bind(transport);
         messageDispatcher.bind(transport);
     }
 
