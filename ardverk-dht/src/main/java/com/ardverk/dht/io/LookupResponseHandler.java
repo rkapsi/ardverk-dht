@@ -41,7 +41,11 @@ import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.utils.SchedulingUtils;
 import com.ardverk.dht.utils.XorComparator;
 
-public abstract class LookupResponseHandler<T extends LookupEntity> 
+/**
+ * The {@link LookupResponseHandler} implements the base logic for the 
+ * FIND_NODE and FIND_VALUE logic.
+ */
+abstract class LookupResponseHandler<T extends LookupEntity> 
         extends AbstractResponseHandler<T> {
     
     private static final Logger LOG 
@@ -253,13 +257,13 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
             throw new IllegalStateException("startTime=" + startTime);
         }
         
-        final long time = System.currentTimeMillis() - startTime;
-        final Contact[] contacts = lookupManager.getContacts();
-        final int hop = lookupManager.getHop();
-        final int timeouts = lookupManager.getErrorCount();
-        
         return new Outcome() {
 
+            private final long time = System.currentTimeMillis() - startTime;
+            private final Contact[] contacts = lookupManager.getContacts();
+            private final int hop = lookupManager.getHop();
+            private final int timeouts = lookupManager.getErrorCount();
+            
             @Override
             public KUID getLookupId() {
                 return lookupManager.lookupId;
@@ -285,44 +289,6 @@ public abstract class LookupResponseHandler<T extends LookupEntity>
                 return unit.convert(time, TimeUnit.MILLISECONDS);
             }
         };
-    }
-    
-    /**
-     * The {@link Outcome} is a snapshot of the current lookup process.
-     */
-    public static abstract class Outcome {
-        
-        /**
-         * Returns the lookup {@link KUID}.
-         */
-        public abstract KUID getLookupId();
-        
-        /**
-         * Returns the {@link Contact}s that have been found.
-         */
-        public abstract Contact[] getContacts();
-        
-        /**
-         * Returns the number of hops the lookup has taken.
-         */
-        public abstract int getHop();
-        
-        /**
-         * Returns the number of errors that have been occurred.
-         */
-        public abstract int getErrorCount();
-        
-        /**
-         * Returns the lookup time in the given {@link TimeUnit}.
-         */
-        public abstract long getTime(TimeUnit unit);
-        
-        /**
-         * Returns the lookup time in milliseconds.
-         */
-        public long getTimeInMillis() {
-            return getTime(TimeUnit.MILLISECONDS);
-        }
     }
     
     /**

@@ -20,7 +20,13 @@ import java.io.IOException;
 
 import com.ardverk.dht.message.RequestMessage;
 
+/**
+ * Classes that process {@link RequestMessage}s may implement this interface.
+ */
 public interface RequestHandler {
     
+    /**
+     * Called for every {@link RequestMessage} we're receiving.
+     */
     public void handleRequest(RequestMessage request) throws IOException;
 }

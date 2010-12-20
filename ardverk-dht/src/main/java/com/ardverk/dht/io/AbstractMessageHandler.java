@@ -20,7 +20,10 @@ import org.ardverk.lang.Arguments;
 
 import com.ardverk.dht.message.MessageFactory;
 
-public abstract class AbstractMessageHandler {
+/**
+ * An abstract base class for different types of message handlers.
+ */
+abstract class AbstractMessageHandler {
 
     protected final MessageDispatcher messageDispatcher;
     

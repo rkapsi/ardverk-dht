@@ -17,7 +17,8 @@
 package com.ardverk.dht.io;
 
 /**
- * A counter that keeps track of in parallel running processes
+ * A counter that keeps track of in parallel running processes and is
+ * limiting the number of concurrently active processes.
  */
 class ProcessCounter {
     

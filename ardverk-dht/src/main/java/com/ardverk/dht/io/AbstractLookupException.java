@@ -18,7 +18,6 @@ package com.ardverk.dht.io;
 
 import java.util.concurrent.TimeUnit;
 
-import com.ardverk.dht.io.LookupResponseHandler.Outcome;
 import com.ardverk.dht.lang.ArdverkException;
 
 abstract class AbstractLookupException extends ArdverkException {
@@ -32,6 +31,10 @@ abstract class AbstractLookupException extends ArdverkException {
         this.outcome = outcome;
     }
 
+    /**
+     * Returns the {@link Outcome} as it was at the point of time when
+     * the {@link AbstractLookupException} occurred.
+     */
     public Outcome getOutcome() {
         return outcome;
     }

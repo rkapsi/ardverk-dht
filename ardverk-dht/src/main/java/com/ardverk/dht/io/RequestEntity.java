@@ -19,6 +19,7 @@ package com.ardverk.dht.io;
 import java.net.SocketAddress;
 
 import com.ardverk.dht.KUID;
+import com.ardverk.dht.lang.Identifier;
 import com.ardverk.dht.message.MessageId;
 import com.ardverk.dht.message.NodeRequest;
 import com.ardverk.dht.message.NodeResponse;
@@ -32,30 +33,46 @@ import com.ardverk.dht.message.ValueRequest;
 import com.ardverk.dht.message.ValueResponse;
 import com.ardverk.dht.routing.Contact;
 
-public class RequestEntity {
+/**
+ * The {@link RequestEntity} holds the necessary information to
+ * verify and validate a {@link ResponseMessage} that we're receiving 
+ * in response for a {@link RequestMessage}.
+ */
+public class RequestEntity implements Identifier {
 
     private final KUID contactId;
     
     private final RequestMessage request;
     
     public RequestEntity(KUID contactId, RequestMessage request) {
-        
         this.contactId = contactId;
         this.request = request;
     }
 
-    public KUID getContactId() {
+    @Override
+    public KUID getId() {
         return contactId;
     }
     
+    /**
+     * Returns the remove host's {@link SocketAddress}.
+     */
     public SocketAddress getAddress() {
         return request.getAddress();
     }
 
+    /**
+     * Returns the {@link RequestMessage} we sent to the remote host.
+     */
     public RequestMessage getRequest() {
         return request;
     }
     
+    /**
+     * Returns the {@link RequestMessage}'s {@link MessageId}.
+     * 
+     * @see RequestMessage#getMessageId()
+     */
     MessageId getMessageId() {
         return request.getMessageId();
     }

@@ -36,6 +36,9 @@ import com.ardverk.dht.message.StoreResponse;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.storage.ValueTuple;
 
+/**
+ * The {@link StoreResponseHandler} manages the STORE process.
+ */
 public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     
     private final ProcessCounter counter;

@@ -16,8 +16,13 @@
 
 package com.ardverk.dht.io;
 
-import com.ardverk.dht.io.LookupResponseHandler.Outcome;
+import com.ardverk.dht.routing.Contact;
 
+/**
+ * The {@link NoSuchNodeException} is thrown if no {@link Contact}s
+ * were found (not necessarily if a specific {@link Contact} wasn't
+ * found).
+ */
 public class NoSuchNodeException extends AbstractLookupException {
     
     private static final long serialVersionUID = -2301202118771105303L;

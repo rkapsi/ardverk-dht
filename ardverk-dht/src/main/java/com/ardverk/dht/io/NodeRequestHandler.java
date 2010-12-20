@@ -28,6 +28,9 @@ import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 
+/**
+ * The {@link NodeRequestHandler} handles {@link NodeRequest} (FIND_NODE) messages. 
+ */
 public class NodeRequestHandler extends AbstractRequestHandler {
     
     private final RouteTable routeTable;

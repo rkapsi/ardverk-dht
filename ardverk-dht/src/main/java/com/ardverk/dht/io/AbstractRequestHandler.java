@@ -22,7 +22,10 @@ import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
 
-public abstract class AbstractRequestHandler 
+/**
+ * An abstract base class for {@link RequestHandler}s.
+ */
+abstract class AbstractRequestHandler 
         extends AbstractMessageHandler implements RequestHandler {
 
     public AbstractRequestHandler(MessageDispatcher messageDispatcher) {

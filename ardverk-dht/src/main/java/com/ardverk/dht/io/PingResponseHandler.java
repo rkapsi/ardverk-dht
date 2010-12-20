@@ -22,7 +22,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.lang.Arguments;
-import org.ardverk.net.NetworkUtils;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.config.PingConfig;
@@ -34,6 +33,9 @@ import com.ardverk.dht.message.PingResponse;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
 
+/**
+ * The {@link PingResponseHandler} manages the PING process.
+ */
 public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
     
     private final PingConfig config;
@@ -73,10 +75,16 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
         setException(new PingTimeoutException(entity, time, unit));
     }
     
+    /**
+     * An interface that hides the complexity of sending a PING.
+     */
     private interface PingSender {
         public void ping() throws IOException;
     }
     
+    /**
+     * The {@link SocketAddressPingSender} sends a PING to a {@link SocketAddress}.
+     */
     private class SocketAddressPingSender implements PingSender {
         
         private final KUID contactId;
@@ -89,12 +97,8 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
         
         public SocketAddressPingSender(KUID contactId, 
                 SocketAddress address) {
-            if (!NetworkUtils.isValidPort(address)) {
-                throw new IllegalArgumentException("address=" + address);
-            }
-            
             this.contactId = contactId;
-            this.address = address;
+            this.address = Arguments.notNull(address, "address");
         }
     
         @Override
@@ -107,6 +111,9 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
         }
     }
     
+    /**
+     * The {@link ContactPingSender} sends a PING to a {@link Contact}.
+     */
     private class ContactPingSender implements PingSender {
         
         private final Contact contact;

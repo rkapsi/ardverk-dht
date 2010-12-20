@@ -34,6 +34,9 @@ import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.ValueTuple;
 
+/**
+ * The {@link ValueResponseHandler} manages a FIND_VALUE lookup process.
+ */
 public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     
     private final FixedSizeArrayList<ValueTuple> tuples;

@@ -16,8 +16,9 @@
 
 package com.ardverk.dht.io;
 
-import com.ardverk.dht.io.LookupResponseHandler.Outcome;
-
+/**
+ * The {@link NoSuchValueException} is thrown if a value wasn't found.
+ */
 public class NoSuchValueException extends AbstractLookupException {
     
     private static final long serialVersionUID = -2753236114164880872L;

@@ -22,24 +22,25 @@ import java.util.concurrent.TimeUnit;
 import com.ardverk.dht.message.ResponseMessage;
 
 /**
- * 
+ * The {@link MessageCallback} is called by the {@link MessageDispatcher}
+ * for {@link ResponseMessage}s.
  */
 public interface MessageCallback {
 
     /**
-     * 
+     * Called for a {@link ResponseMessage}.
      */
     public void handleResponse(RequestEntity entity, ResponseMessage response, 
             long time, TimeUnit unit) throws IOException;
     
     /**
-     * 
+     * Called if a timeout occurred.
      */
     public void handleTimeout(RequestEntity entity, 
             long time, TimeUnit unit) throws IOException;
     
     /**
-     * 
+     * Called if an {@link Exception} occurred.
      */
     public void handleException(RequestEntity entity, Throwable exception);
 }

@@ -30,6 +30,9 @@ import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
 import com.ardverk.dht.storage.ValueTuple;
 
+/**
+ * The {@link ValueRequestHandler} handles {@link ValueRequest} (FIND_VALUE) messages. 
+ */
 public class ValueRequestHandler extends AbstractRequestHandler {
 
     private final RouteTable routeTable;
@@ -50,8 +53,8 @@ public class ValueRequestHandler extends AbstractRequestHandler {
     public void handleRequest(RequestMessage message) throws IOException {
         ValueRequest request = (ValueRequest)message;
         
-        KUID key = request.getKey();
-        ValueTuple value = database.get(key);
+        KUID valueId = request.getKey();
+        ValueTuple value = database.get(valueId);
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
         ResponseMessage response = null;
@@ -59,8 +62,7 @@ public class ValueRequestHandler extends AbstractRequestHandler {
         if (value != null) {
             response = factory.createValueResponse(request, value);
         } else {
-            KUID primaryKey = key.getId();
-            Contact[] contacts = routeTable.select(primaryKey);
+            Contact[] contacts = routeTable.select(valueId);
             response = factory.createNodeResponse(request, contacts);
         }
         

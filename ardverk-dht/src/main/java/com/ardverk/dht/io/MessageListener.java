@@ -20,17 +20,18 @@ import com.ardverk.dht.KUID;
 import com.ardverk.dht.message.Message;
 
 /**
- * 
+ * The {@link MessageListener} can be used to listen for all incoming
+ * and outgoing {@link Message}s.
  */
 public interface MessageListener {
     
     /**
-     * 
+     * Called for every {@link Message} that was sent.
      */
     public void handleMessageSent(KUID contactId, Message message);
     
     /**
-     * 
+     * Called for every {@link Message} that was received.
      */
     public void handleMessageReceived(Message message);
 }

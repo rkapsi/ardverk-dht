@@ -33,7 +33,10 @@ import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
 
-public abstract class AbstractResponseHandler<V extends Entity> 
+/**
+ * An abstract base class for {@link ResponseHandler}s.
+ */
+abstract class AbstractResponseHandler<V extends Entity> 
         extends AbstractMessageHandler implements ResponseHandler<V> {
     
     protected volatile AsyncProcessFuture<V> future = null;

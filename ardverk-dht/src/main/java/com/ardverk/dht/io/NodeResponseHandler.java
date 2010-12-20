@@ -30,6 +30,9 @@ import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 
+/**
+ * The {@link NodeResponseHandler} manages a FIND_NODE lookup process.
+ */
 public class NodeResponseHandler extends LookupResponseHandler<NodeEntity> {
     
     public NodeResponseHandler(MessageDispatcher messageDispatcher,

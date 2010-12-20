@@ -18,7 +18,7 @@ package com.ardverk.dht.entity;
 
 import java.util.concurrent.TimeUnit;
 
-import com.ardverk.dht.io.LookupResponseHandler.Outcome;
+import com.ardverk.dht.io.Outcome;
 import com.ardverk.dht.routing.Contact;
 
 public class DefaultNodeEntity extends AbstractLookupEntity implements NodeEntity {

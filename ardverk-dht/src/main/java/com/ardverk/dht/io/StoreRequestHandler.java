@@ -34,6 +34,10 @@ import com.ardverk.dht.storage.DatabaseConfig;
 import com.ardverk.dht.storage.DefaultCondition;
 import com.ardverk.dht.storage.ValueTuple;
 
+/**
+ * The {@link StoreRequestHandler} is called for all 
+ * {@link StoreRequest} (STORE) messages.
+ */
 public class StoreRequestHandler extends AbstractRequestHandler {
     
     private final RouteTable routeTable;

@@ -23,7 +23,7 @@ import com.ardverk.dht.KUID;
 import com.ardverk.dht.lang.ArdverkException;
 
 /**
- * 
+ * The {@link PingTimeoutException} is thrown if a timeout occurs.
  */
 public class PingTimeoutException extends ArdverkException {
     
@@ -45,7 +45,7 @@ public class PingTimeoutException extends ArdverkException {
     }
     
     public KUID getContactId() {
-        return entity.getContactId();
+        return entity.getId();
     }
     
     public SocketAddress getAddress() {

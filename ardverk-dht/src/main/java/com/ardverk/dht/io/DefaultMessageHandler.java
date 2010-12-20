@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 import org.ardverk.lang.Arguments;
 
 import com.ardverk.dht.KUID;
+import com.ardverk.dht.message.Message;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
@@ -31,6 +32,11 @@ import com.ardverk.dht.routing.RoundTripTime;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.StoreForward;
 
+/**
+ * The {@link DefaultMessageHandler} is called for every {@link Message}
+ * we're receiving. It's purpose is to add the remote {@link Contact}
+ * to the local {@link RouteTable} and maybe trigger the store-forwarding.
+ */
 public class DefaultMessageHandler implements MessageCallback {
 
     private final StoreForward storeForward;
@@ -76,7 +82,7 @@ public class DefaultMessageHandler implements MessageCallback {
     public void handleTimeout(RequestEntity entity, 
             long time, TimeUnit unit) throws IOException {
         
-        KUID contactId = entity.getContactId();
+        KUID contactId = entity.getId();
         SocketAddress address = entity.getAddress();
         
         routeTable.handleIoError(contactId, address);

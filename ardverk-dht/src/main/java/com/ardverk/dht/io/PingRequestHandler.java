@@ -23,6 +23,9 @@ import com.ardverk.dht.message.PingRequest;
 import com.ardverk.dht.message.PingResponse;
 import com.ardverk.dht.message.RequestMessage;
 
+/**
+ * The {@link PingRequestHandler} handles {@link PingRequest} (PING) messages.
+ */
 public class PingRequestHandler extends AbstractRequestHandler {
     
     public PingRequestHandler(MessageDispatcher messageDispatcher) {
