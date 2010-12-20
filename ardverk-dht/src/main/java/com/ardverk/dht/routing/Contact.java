@@ -132,13 +132,13 @@ public interface Contact extends Identifier, Longevity,
     
     /**
      * Returns the amount of time in the given {@link TimeUnit} that 
-     * has passed since we had IContact with this {@link Contact}.
+     * has passed since we had contact with this {@link Contact}.
      */
     public long getTimeSinceLastContact(TimeUnit unit);
     
     /**
      * Returns the amount of time in milliseconds that has passed since 
-     * we had IContact with this {@link Contact}.
+     * we had contact with this {@link Contact}.
      */
     public long getTimeSinceLastContactInMillis();
     
