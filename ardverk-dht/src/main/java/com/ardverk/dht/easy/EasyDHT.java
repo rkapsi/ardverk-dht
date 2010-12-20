@@ -17,7 +17,6 @@
 package com.ardverk.dht.easy;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketAddress;
 
@@ -37,14 +36,6 @@ import com.ardverk.dht.routing.Contact;
  * An interface that describes a simpler to use version of the {@link DHT}.
  */
 public interface EasyDHT extends DHT, Closeable {
-
-    public void bind(int port) throws IOException;
-    
-    public void bind(String host, int port) throws IOException;
-    
-    public void bind(InetAddress bindaddr, int port) throws IOException;
-    
-    public void bind(SocketAddress address) throws IOException;
     
     public ArdverkFuture<PingEntity> ping(String host, int port);
 

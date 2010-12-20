@@ -16,7 +16,6 @@
 
 package com.ardverk.dht.easy;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketAddress;
 
@@ -31,7 +30,6 @@ import com.ardverk.dht.entity.PutEntity;
 import com.ardverk.dht.entity.QuickenEntity;
 import com.ardverk.dht.entity.SyncEntity;
 import com.ardverk.dht.entity.ValueEntity;
-import com.ardverk.dht.io.transport.DatagramTransport;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
@@ -47,26 +45,6 @@ public class DefaultEasyDHT extends ArdverkDHT implements EasyDHT {
         super(codec, messageFactory, routeTable, database);
         
         this.config = config;
-    }
-    
-    @Override
-    public void bind(int port) throws IOException {
-        bind(new DatagramTransport(port));
-    }
-    
-    @Override
-    public void bind(String host, int port) throws IOException {
-        bind(new DatagramTransport(host, port));
-    }
-    
-    @Override
-    public void bind(InetAddress bindaddr, int port) throws IOException {
-        bind(new DatagramTransport(bindaddr, port));
-    }
-    
-    @Override
-    public void bind(SocketAddress address) throws IOException {
-        bind(new DatagramTransport(address));
     }
     
     @Override

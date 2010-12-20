@@ -16,10 +16,7 @@
 
 package com.ardverk.dht;
 
-import org.ardverk.io.Bindable;
-
 import com.ardverk.dht.concurrent.ArdverkFutureService;
-import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.Localhost;
 import com.ardverk.dht.routing.RouteTable;
@@ -30,7 +27,7 @@ import com.ardverk.dht.storage.Database;
  */
 public interface DHT extends ArdverkService, BootstrapService, 
         QuickenService, SyncService, ArdverkFutureService, 
-        Bindable<Transport> {
+        NetworkService {
     
     /**
      * Returns the localhost {@link Contact}.

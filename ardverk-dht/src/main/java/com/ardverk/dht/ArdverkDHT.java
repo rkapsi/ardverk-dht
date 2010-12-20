@@ -41,6 +41,7 @@ import com.ardverk.dht.entity.SyncEntity;
 import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.io.DefaultMessageDispatcher;
 import com.ardverk.dht.io.MessageDispatcher;
+import com.ardverk.dht.io.transport.DatagramTransport;
 import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.message.DefaultMessageFactory;
 import com.ardverk.dht.message.MessageFactory;
@@ -203,6 +204,11 @@ public class ArdverkDHT extends AbstractDHT {
         return pingManager;
     }
     
+    @Override
+    public void bind(SocketAddress address) throws IOException {
+        bind(new DatagramTransport(address));
+    }
+
     @Override
     public void bind(Transport transport) throws IOException {
         Localhost localhost = getLocalhost();
