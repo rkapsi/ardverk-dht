@@ -18,17 +18,38 @@ package com.ardverk.dht.storage;
 
 import com.ardverk.dht.config.StoreConfig;
 
+/**
+ * 
+ */
 public interface DatabaseConfig {
 
+    /**
+     * Returns {@code true} if store-forwarding is enabled.
+     */
     public boolean isStoreForward();
     
+    /**
+     * Sets weather or not store-forwarding is enabled.
+     */
     public void setStoreForward(boolean storeForward);
     
+    /**
+     * Returns {@code true} if bucket checking is enabled.
+     */
     public boolean isCheckBucket();
     
+    /**
+     * Sets weather or not bucket checking is enabled.
+     */
     public void setCheckBucket(boolean checkBucket);
     
+    /**
+     * Returns the {@link StoreConfig} that is used for store-forwarding.
+     */
     public StoreConfig getStoreConfig();
 
+    /**
+     * Sets the {@link StoreConfig} that is used for store-forwarding.
+     */
     public void setStoreConfig(StoreConfig storeConfig);
 }

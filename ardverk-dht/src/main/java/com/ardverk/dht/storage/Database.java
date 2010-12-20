@@ -20,7 +20,10 @@ import com.ardverk.dht.KUID;
 import com.ardverk.dht.lang.IntegerValue;
 import com.ardverk.dht.lang.StringValue;
 
-
+/**
+ * A simple and minimum interface of a {@link Database} 
+ * that is needed by the DHT.
+ */
 public interface Database {
     
     /**
@@ -29,6 +32,9 @@ public interface Database {
     public static interface Condition extends IntegerValue, StringValue {
     }
     
+    /**
+     * Returns the {@link DatabaseConfig}.
+     */
     public DatabaseConfig getDatabaseConfig();
     
     /**
@@ -39,12 +45,7 @@ public interface Database {
     /**
      * Returns a {@link ValueTuple} for the given {@link KUID}.
      */
-    public ValueTuple get(KUID key);
-    
-    /**
-     * Returns all {@link ValueTuple}s for the given {@link KUID}.
-     */
-    public ValueTuple[] select(KUID key);
+    public ValueTuple get(KUID valueId);
     
     /**
      * Returns all {@link ValueTuple}s.

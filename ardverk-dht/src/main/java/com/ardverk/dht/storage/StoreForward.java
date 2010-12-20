@@ -26,6 +26,10 @@ import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.utils.IdentifierUtils;
 
+/**
+ * This class implements the logic that is used to determinate weather or
+ * not a value should be store-forwarded.
+ */
 public class StoreForward {
 
     private final RouteTable routeTable;

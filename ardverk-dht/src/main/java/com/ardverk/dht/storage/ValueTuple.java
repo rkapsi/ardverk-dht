@@ -21,6 +21,12 @@ import java.util.concurrent.TimeUnit;
 import com.ardverk.dht.lang.Identifier;
 import com.ardverk.dht.routing.Contact;
 
+/**
+ * A {@link ValueTuple} is at its core a simple key-value pair
+ * that holds additional information such as the creator and 
+ * sender of the value, when it was created and what it's current
+ * age is.
+ */
 public interface ValueTuple extends Identifier {
 
     /**

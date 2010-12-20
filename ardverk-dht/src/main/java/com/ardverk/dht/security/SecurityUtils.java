@@ -19,6 +19,9 @@ package com.ardverk.dht.security;
 import java.security.SecureRandom;
 import java.util.Random;
 
+/**
+ * Miscellaneous security utilities for the DHT.  
+ */
 public class SecurityUtils {
 
     private SecurityUtils() {}

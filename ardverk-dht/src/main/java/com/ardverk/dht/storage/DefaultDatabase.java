@@ -16,14 +16,12 @@
 
 package com.ardverk.dht.storage;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.ardverk.lang.Arguments;
 
 import com.ardverk.dht.KUID;
-import com.ardverk.dht.utils.XorComparator;
 
 public class DefaultDatabase extends AbstractDatabase {
 
@@ -46,8 +44,8 @@ public class DefaultDatabase extends AbstractDatabase {
     }
 
     @Override
-    public ValueTuple get(KUID key) {
-        return database.get(key);
+    public ValueTuple get(KUID valueId) {
+        return database.get(valueId);
     }
 
     @Override
@@ -66,13 +64,6 @@ public class DefaultDatabase extends AbstractDatabase {
     @Override
     public int size() {
         return database.size();
-    }
-    
-    @Override
-    public ValueTuple[] select(KUID key) {
-        ValueTuple[] values = values();
-        Arrays.sort(values, new XorComparator(key));
-        return values;
     }
     
     @Override

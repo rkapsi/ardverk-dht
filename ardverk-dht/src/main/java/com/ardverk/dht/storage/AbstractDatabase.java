@@ -16,7 +16,9 @@
 
 package com.ardverk.dht.storage;
 
-
+/**
+ * An abstract implementation of {@link Database}.
+ */
 public abstract class AbstractDatabase implements Database {
 
     @Override

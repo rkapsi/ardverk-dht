@@ -20,6 +20,9 @@ import com.ardverk.dht.ExecutorKey;
 import com.ardverk.dht.config.DefaultStoreConfig;
 import com.ardverk.dht.config.StoreConfig;
 
+/**
+ * A default implementation of {@link DatabaseConfig}.
+ */
 public class DefaultDatabaseConfig implements DatabaseConfig {
 
     private volatile StoreConfig storeConfig = new DefaultStoreConfig();

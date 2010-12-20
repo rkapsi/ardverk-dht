@@ -18,6 +18,9 @@ package com.ardverk.dht.storage;
 
 import com.ardverk.dht.storage.Database.Condition;
 
+/**
+ * A default implementation of {@link Condition}.
+ */
 public class DefaultCondition implements Condition {
     
     public static final DefaultCondition SUCCESS 

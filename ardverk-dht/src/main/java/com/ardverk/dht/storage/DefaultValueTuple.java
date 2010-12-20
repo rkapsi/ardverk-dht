@@ -21,6 +21,9 @@ import org.ardverk.lang.Arguments;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
 
+/**
+ * A default implementation of {@link ValueTuple}.
+ */
 public class DefaultValueTuple extends AbstractValueTuple {
     
     private final Contact sender;
