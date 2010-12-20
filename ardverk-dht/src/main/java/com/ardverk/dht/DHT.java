@@ -27,7 +27,7 @@ import com.ardverk.dht.storage.Database;
  */
 public interface DHT extends ArdverkService, BootstrapService, 
         QuickenService, SyncService, ArdverkFutureService, 
-        NetworkService {
+        TransportService {
     
     /**
      * Returns the localhost {@link Contact}.

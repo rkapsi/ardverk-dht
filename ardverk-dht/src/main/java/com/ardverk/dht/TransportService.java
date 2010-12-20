@@ -25,10 +25,10 @@ import org.ardverk.io.Bindable;
 import com.ardverk.dht.io.transport.Transport;
 
 /**
- * The {@link NetworkService} binds the {@link DHT} 
+ * The {@link TransportService} binds the {@link DHT} 
  * to a {@link Transport} layer.
  */
-public interface NetworkService extends Bindable<Transport> {
+public interface TransportService extends Bindable<Transport> {
 
     /**
      * Binds the {@link DHT} to the given port.
