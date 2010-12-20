@@ -25,6 +25,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.ardverk.concurrent.DefaultThreadFactory;
 import org.ardverk.lang.NullArgumentException;
 
+/**
+ * The {@link EventUtils} class provides a simple interface to fire
+ * events. It provides a SPI interface that allows users to replace
+ * the default event {@link Thread} if necessary.
+ */
 public class EventUtils {
 
     private static final EventThreadProvider PROVIDER;
