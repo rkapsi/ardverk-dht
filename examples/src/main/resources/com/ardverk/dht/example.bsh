@@ -183,14 +183,20 @@ quit() {
 print("\nHello, please type init(); and press Enter. For further instructions and examples see 'example.bsh' and www.beanshell.org.\n");
 
 init() {
+	init(true);
+}
+
+init(boolean withUI) {
 	INSTANCE_COUNT = 256;
 	INITIAL_PORT = 2000;
 
 	print("Creating DHTs...");
 	createDHTs(INSTANCE_COUNT, INITIAL_PORT);
 	
-	print("Creating UI for the first DHT instance...");
-	ui(dhts.get(current));
+	if (withUI) {
+		print("Creating UI for the first DHT instance...");
+		ui(dhts.get(current));
+	}
 
 	print("Bootstrapping all DHTs...");
 	bootstrapAll();
@@ -205,13 +211,13 @@ init() {
 }
 
 store(int count) {
-	store(count, false);
+	store(0, count, false);
 }
 
-store(int count, boolean randomize) {
+store(int offset, int count, boolean randomize) {
 	for(i = 0; i < count; i++) {
-		String key = "Key-" + i;
-		String value1 = "Value-" + i;
+		String key = "Key-" + (offset + i);
+		String value1 = "Value-" + (offset + i);
 		
 		int putIndex = current;
 		int getIndex = current;
