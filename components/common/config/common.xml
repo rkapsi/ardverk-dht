@@ -158,7 +158,7 @@
          ================================= -->
     <target name="publish" depends="clean-build, jar" description="--> publish this project in the ivy repository">
     	<ivy:publish artifactspattern="${build.dir}/[artifact].[ext]" 
-    			           resolver="shared"
+    			           resolver="default"
     			           pubrevision="${version}" 
     			           status="release"
     	/>
@@ -170,7 +170,7 @@
          ================================= -->
     <target name="publish-local" depends="local-version, jar" description="--> publish this project in the local ivy repository">
     	<ivy:publish artifactspattern="${build.dir}/[artifact].[ext]" 
-    			        resolver="local"
+    			        resolver="default"
     			        pubrevision="${version}"
 				        pubdate="${now}"
     			        status="integration"
