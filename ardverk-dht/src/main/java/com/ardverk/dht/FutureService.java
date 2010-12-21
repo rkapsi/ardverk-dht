@@ -18,22 +18,24 @@ package com.ardverk.dht;
 
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.concurrent.AsyncProcess;
-
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.concurrent.ArdverkProcess;
 import com.ardverk.dht.config.Config;
 
+/**
+ * The {@link FutureService} is providing an interface 
+ * for executing {@link ArdverkProcess}es.
+ */
 public interface FutureService {
 
     /**
-     * Submits the given {@link AsyncProcess} for execution.
+     * Submits the given {@link ArdverkProcess} for execution.
      */
     public <V> ArdverkFuture<V> submit(
             ArdverkProcess<V> process, Config config);
     
     /**
-     * Submits the given {@link AsyncProcess} for execution.
+     * Submits the given {@link ArdverkProcess} for execution.
      */
     public <V> ArdverkFuture<V> submit(ExecutorKey executorKey, 
             ArdverkProcess<V> process, long timeout, TimeUnit unit);
