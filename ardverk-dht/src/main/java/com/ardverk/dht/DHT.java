@@ -16,7 +16,6 @@
 
 package com.ardverk.dht;
 
-import com.ardverk.dht.concurrent.ArdverkFutureService;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.Localhost;
 import com.ardverk.dht.routing.RouteTable;

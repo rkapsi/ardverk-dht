@@ -17,7 +17,6 @@
 package com.ardverk.dht;
 
 import com.ardverk.dht.concurrent.ArdverkFuture;
-import com.ardverk.dht.concurrent.ArdverkFutureService;
 import com.ardverk.dht.concurrent.ArdverkProcess;
 import com.ardverk.dht.config.GetConfig;
 import com.ardverk.dht.config.LookupConfig;

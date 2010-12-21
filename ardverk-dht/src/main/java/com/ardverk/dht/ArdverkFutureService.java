@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.ardverk.dht.concurrent;
+package com.ardverk.dht;
 
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncProcess;
 
-import com.ardverk.dht.ExecutorKey;
+import com.ardverk.dht.concurrent.ArdverkFuture;
+import com.ardverk.dht.concurrent.ArdverkProcess;
 import com.ardverk.dht.config.Config;
 
 public interface ArdverkFutureService {

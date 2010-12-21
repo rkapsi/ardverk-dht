@@ -19,7 +19,6 @@ package com.ardverk.dht;
 import java.net.SocketAddress;
 
 import com.ardverk.dht.concurrent.ArdverkFuture;
-import com.ardverk.dht.concurrent.ArdverkFutureService;
 import com.ardverk.dht.concurrent.ArdverkProcess;
 import com.ardverk.dht.config.PingConfig;
 import com.ardverk.dht.entity.PingEntity;
