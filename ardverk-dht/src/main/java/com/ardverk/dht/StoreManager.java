@@ -60,7 +60,7 @@ public class StoreManager {
         return put(key, Bytes.EMPTY, config);
     }
     
-    public ArdverkFuture<PutEntity> put(final KUID key, final byte[] value, 
+    public ArdverkFuture<PutEntity> put(final KUID valueId, final byte[] value, 
             final PutConfig config) {
         
         final Object lock = new Object();
@@ -79,7 +79,7 @@ public class StoreManager {
             
             // Start the lookup for the given KUID
             final ArdverkFuture<NodeEntity> lookupFuture 
-                = dht.lookup(key, config.getLookupConfig());
+                = dht.lookup(valueId, config.getLookupConfig());
             
             // Let's wait for the result of the FIND_NODE operation. On success we're 
             // going to initialize the storeFutureRef and do the actual STOREing.
@@ -103,7 +103,7 @@ public class StoreManager {
                     Contact[] contacts = nodeEntity.getContacts();
                     ArdverkFuture<StoreEntity> storeFuture 
                         = storeFutureRef.make(store(contacts, 
-                                key, value, config.getStoreConfig()));
+                                valueId, value, config.getStoreConfig()));
                     
                     storeFuture.addAsyncFutureListener(new AsyncFutureListener<StoreEntity>() {
                         @Override
@@ -152,11 +152,11 @@ public class StoreManager {
     }
     
     public ArdverkFuture<StoreEntity> store(Contact[] dst, 
-            KUID key, byte[] value, StoreConfig config) {
+            KUID valueId, byte[] value, StoreConfig config) {
         
         Contact localhost = dht.getLocalhost();
         ValueTuple valueTuple = new DefaultValueTuple(
-                localhost, key, value);
+                localhost, valueId, value);
         
         return store(dst, valueTuple, config);
     }

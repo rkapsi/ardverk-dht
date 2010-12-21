@@ -30,22 +30,22 @@ public class DefaultValueTuple extends AbstractValueTuple {
     
     private final Contact creator;
     
-    private final KUID key;
+    private final KUID valueId;
     
     private final byte[] value;
     
-    public DefaultValueTuple(Contact contact, KUID key, byte[] value) {
-        this (contact, contact, key, value);
+    public DefaultValueTuple(Contact contact, KUID valueId, byte[] value) {
+        this (contact, contact, valueId, value);
     }
     
     public DefaultValueTuple(Contact sender, Contact creator, 
-            KUID key, byte[] value) {
+            KUID valueId, byte[] value) {
         
         this.sender = Arguments.notNull(sender, "sender");
         this.creator = Arguments.notNull(
                 pickCreator(sender, creator), "creator");
         
-        this.key = Arguments.notNull(key, "key");
+        this.valueId = Arguments.notNull(valueId, "valueId");
         this.value = Arguments.notNull(value, "value");
     }
 
@@ -61,7 +61,7 @@ public class DefaultValueTuple extends AbstractValueTuple {
     
     @Override
     public KUID getId() {
-        return key;
+        return valueId;
     }
     
     @Override
