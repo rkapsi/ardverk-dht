@@ -46,11 +46,16 @@ public class ContactTest {
                 KUID.createRandom(20), 
                 2, new InetSocketAddress("www.google.com", 4000));
         
+        Contact contact4 = new Localhost(contact1.getId());
+        
         TestCase.assertTrue(contact1.equals(contact2));
         TestCase.assertTrue(contact2.equals(contact1));
+        TestCase.assertTrue(contact1.equals(contact4));
         TestCase.assertEquals(contact1, contact2);
+        TestCase.assertEquals(contact1, contact4);
         
         TestCase.assertFalse(contact1.equals(contact3));
         TestCase.assertFalse(contact3.equals(contact1));
+        TestCase.assertFalse(contact3.equals(contact4));
     }
 }
