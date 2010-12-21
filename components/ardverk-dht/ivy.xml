@@ -1,14 +1,14 @@
 <ivy-module version="1.0">
     <info 
-        organisation="org.apache.ivy.example"
-        module="find"
+        organisation="com.ardverk.dht"
+        module="ardverk-dht"
         status="integration"/>
     <configurations>
       <conf name="core"/>
       <conf name="standalone" extends="core"/>
     </configurations>
     <publications>
-      <artifact name="find" type="jar" conf="core" />
+      <artifact name="ardverk-dht" type="jar" conf="core" />
     </publications>
     <dependencies>
       <dependency name="version" rev="latest.integration" conf="core->default" />
