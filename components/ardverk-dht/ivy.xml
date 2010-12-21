@@ -1,19 +1,23 @@
-<ivy-module version="1.0">
-    <info 
-        organisation="com.ardverk.dht"
-        module="ardverk-dht"
-        status="integration"/>
-    <configurations>
-      <conf name="core"/>
-      <conf name="standalone" extends="core"/>
-    </configurations>
-    <publications>
-      <artifact name="ardverk-dht" type="jar" conf="core" />
-    </publications>
-    <dependencies>
-      <dependency name="version" rev="latest.integration" conf="core->default" />
-      <dependency name="list" rev="latest.integration" conf="core" />
-      <dependency org="commons-collections" name="commons-collections" rev="3.1" conf="core->default" />
-      <dependency org="commons-cli" name="commons-cli" rev="1.0" conf="standalone->default" />
-    </dependencies>
+<ivy-module version="1.0"> 
+	<info organisation="com.ardverk.dht" module="ardverk-dht" status="integration"/>
+	<configurations> 
+		<conf name="core"/> 
+		<conf name="standalone" extends="core"/> 
+	</configurations> 
+	<publications>
+		<artifact name="ardverk-dht" type="jar" conf="core" /> 
+	</publications> 
+	<dependencies> 
+		<!--<dependency name="version"rev="latest.integration" conf="core->default" /> 
+		<dependency name="list" rev="latest.integration" conf="core" />
+		<dependency org="commons-collections" name="commons-collections" rev="3.1" conf="core->default" /> 		
+		<dependency org="commons-cli" name="commons-cli" rev="1.0" conf="standalone->default" /> -->
+		
+		<dependency org="ardverk" name="ardverk-base" rev="0.1" conf="core->default"/>
+		<dependency org="ardverk" name="bee-encode" rev="0.2" conf="core->default"/>
+		<dependency org="ardverk" name="patricia-trie" rev="0.3" conf="core->default"/>
+		
+		<dependency org="slf4j" name="slf4j-api" rev="1.6.1" conf="core->default"/>
+		<!-- <dependency org="slf4j" name="slf4j-simple" rev="1.6.1" conf="core->default"/> -->
+	</dependencies>
 </ivy-module>

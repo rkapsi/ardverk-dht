@@ -68,8 +68,8 @@
 
     
 	<!-- setup ivy default configuration with some custom info -->
-	<property name="ivy.local.default.root" value="${repository.dir}/local"/>
-	<property name="ivy.shared.default.root" value="${repository.dir}/shared"/>
+	<!--<property name="ivy.local.default.root" value="${repository.dir}/local"/>
+	<property name="ivy.shared.default.root" value="${repository.dir}/shared"/> -->
 
    	<!-- here is how we would have configured ivy if we had our own ivysettings file -->
     <ivy:settings file="${common.dir}/ivysettings.xml" />
@@ -82,7 +82,7 @@
     	
     	<!-- the call to resolve is not mandatory, retrieve makes an implicit call if we don't -->
     	<ivy:resolve file="${ivy.file}"/>
-    	<ivy:retrieve pattern="${lib.dir}/[artifact].[ext]" />
+    	<ivy:retrieve pattern="${lib.dir}/[artifact]-[revision].[ext]" />
     </target>
     
     <!-- ================================= 
@@ -97,7 +97,13 @@
          ================================= -->
     <target name="compile" depends="resolve" description="--> compile the project">
         <mkdir dir="${classes.dir}" />
-        <javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="lib.path.id" debug="true" />
+        <javac srcdir="${src.dir}" 
+			destdir="${classes.dir}" 
+			classpathref="lib.path.id" 
+			debug="${compile.debug}"
+			optimize="${compile.optimize}" 
+			source="${compile.source}"
+			target="${compile.target}"/>
     </target>
     
     <!-- ================================= 
@@ -186,7 +192,7 @@
           target: clean-lib              
          ================================= -->
     <target name="clean-lib" description="--> clean the project libraries directory (dependencies)">
-        <!--<delete includeemptydirs="true" dir="${lib.dir}"/>-->
+        <delete includeemptydirs="true" dir="${lib.dir}"/>
     </target>
 
     <!-- ================================= 
