@@ -71,8 +71,8 @@ public class FutureManager implements Closeable {
             throw new IllegalStateException();
         }
         
-        ManagedFuture<T> future 
-            = new ManagedFuture<T>(process, timeout, unit);
+        ManagedFutureTask<T> future 
+            = new ManagedFutureTask<T>(process, timeout, unit);
         
         getExecutor(executorKey).execute(future);
         futures.add(future);
@@ -99,9 +99,9 @@ public class FutureManager implements Closeable {
         futures.remove(future);
     }
     
-    private class ManagedFuture<T> extends ArdverkFutureTask<T> {
+    private class ManagedFutureTask<T> extends ArdverkFutureTask<T> {
         
-        public ManagedFuture(AsyncProcess<T> process, 
+        public ManagedFutureTask(AsyncProcess<T> process, 
                 long timeout, TimeUnit unit) {
             super(process, timeout, unit);
         }
