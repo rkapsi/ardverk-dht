@@ -266,18 +266,18 @@ public class ArdverkDHT extends AbstractDHT {
     }
     
     @Override
-    public ArdverkFuture<ValueEntity> get(KUID key, GetConfig config) {
-        return lookupManager.get(key, config);
+    public ArdverkFuture<ValueEntity> get(KUID valueId, GetConfig config) {
+        return lookupManager.get(valueId, config);
     }
 
     @Override
-    public ArdverkFuture<PutEntity> put(KUID key, byte[] value, PutConfig config) {
-        return storeManager.put(key, value, config);
+    public ArdverkFuture<PutEntity> put(KUID valueId, byte[] value, PutConfig config) {
+        return storeManager.put(valueId, value, config);
     }
     
     @Override
-    public ArdverkFuture<PutEntity> remove(KUID key, PutConfig config) {
-        return storeManager.remove(key, config);
+    public ArdverkFuture<PutEntity> remove(KUID valueId, PutConfig config) {
+        return storeManager.remove(valueId, config);
     }
     
     @Override

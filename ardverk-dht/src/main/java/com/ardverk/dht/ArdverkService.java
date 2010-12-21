@@ -69,16 +69,16 @@ public interface ArdverkService {
      * Retrieves a key-value from the DHT.
      */
     public ArdverkFuture<ValueEntity> get(
-            KUID key, GetConfig config);
+            KUID valueId, GetConfig config);
     
     /**
      * Stores the given key-value in the DHT.
      */
     public ArdverkFuture<PutEntity> put(
-            KUID key, byte[] value, PutConfig config);
+            KUID valueId, byte[] value, PutConfig config);
     
     /**
      * Removes the given {@link KUID} from the DHT.
      */
-    public ArdverkFuture<PutEntity> remove(KUID key, PutConfig config);
+    public ArdverkFuture<PutEntity> remove(KUID valueId, PutConfig config);
 }
