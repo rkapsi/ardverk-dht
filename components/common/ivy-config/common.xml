@@ -186,7 +186,7 @@
           target: clean-lib              
          ================================= -->
     <target name="clean-lib" description="--> clean the project libraries directory (dependencies)">
-        <delete includeemptydirs="true" dir="${lib.dir}"/>
+        <!--<delete includeemptydirs="true" dir="${lib.dir}"/>-->
     </target>
 
     <!-- ================================= 
