@@ -27,7 +27,7 @@ import com.ardverk.dht.routing.Contact;
 /**
  * The {@link BootstrapService} provides an interface to bootstrap a {@link DHT}.
  */
-public interface BootstrapService {
+interface BootstrapService {
 
     /**
      * Bootstraps the DHT from the given hostname and port.

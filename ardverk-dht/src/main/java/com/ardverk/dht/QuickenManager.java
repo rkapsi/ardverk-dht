@@ -36,7 +36,6 @@ import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.QuickenEntity;
 import com.ardverk.dht.routing.Bucket;
 import com.ardverk.dht.routing.Contact;
-import com.ardverk.dht.routing.Localhost;
 import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.utils.IdentifierUtils;
 
@@ -68,7 +67,7 @@ public class QuickenManager {
         synchronized (routeTable) {
             int pingCount = (int)(routeTable.getK() * config.getPingCount());
             
-            Localhost localhost = dht.getLocalhost();
+            Contact localhost = dht.getLocalhost();
             KUID localhostId = localhost.getId();
 
             if (0 < pingCount) {

@@ -24,7 +24,7 @@ import com.ardverk.dht.routing.RouteTable;
 /**
  * The {@link QuickenService} provides methods to keep the DHT fresh.
  */
-public interface QuickenService {
+interface QuickenService {
 
     /**
      * Performs specially targeted PING and FIND_NODE requests with the

@@ -34,7 +34,6 @@ import com.ardverk.dht.entity.DefaultBootstrapEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.routing.Contact;
-import com.ardverk.dht.routing.Localhost;
 
 /**
  * The {@link BootstrapManager} manages the bootstrap process.
@@ -108,7 +107,7 @@ public class BootstrapManager {
                 Contact[] contacts = new Contact[] { pingEntity.getContact() };
                 LookupManager lookupManager = dht.getLookupManager();
                 
-                Localhost localhost = dht.getLocalhost();
+                Contact localhost = dht.getLocalhost();
                 KUID localhostId = localhost.getId();
                 AsyncFuture<NodeEntity> lookupFuture 
                     = lookupFutureRef.make(

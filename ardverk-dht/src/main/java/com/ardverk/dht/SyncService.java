@@ -25,7 +25,7 @@ import com.ardverk.dht.routing.Contact;
  * The {@link SyncService} provides methods to sync one DHT's values with
  * everyone else's in the same bucket.
  */
-public interface SyncService {
+interface SyncService {
 
     /**
      * Synchronizes this {@link Contact}'s values with the k-closest.

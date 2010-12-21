@@ -26,7 +26,7 @@ import com.ardverk.dht.config.Config;
  * The {@link FutureService} is providing an interface 
  * for executing {@link ArdverkProcess}es.
  */
-public interface FutureService {
+interface FutureService {
 
     /**
      * Submits the given {@link ArdverkProcess} for execution.

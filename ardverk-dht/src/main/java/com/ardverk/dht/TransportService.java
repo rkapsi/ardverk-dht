@@ -28,7 +28,7 @@ import com.ardverk.dht.io.transport.Transport;
  * The {@link TransportService} binds the {@link DHT} 
  * to a {@link Transport} layer.
  */
-public interface TransportService extends Bindable<Transport> {
+interface TransportService extends Bindable<Transport> {
 
     /**
      * Binds the {@link DHT} to the given port.

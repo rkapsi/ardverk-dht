@@ -33,7 +33,7 @@ import com.ardverk.dht.routing.Contact;
 /**
  * The {@link ArdverkService} defines the basic operations of a DHT.
  */
-public interface ArdverkService {
+interface ArdverkService {
 
     /**
      * Sends a PING to the given host.
