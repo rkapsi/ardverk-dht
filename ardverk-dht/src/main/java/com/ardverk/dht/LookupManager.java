@@ -33,13 +33,13 @@ import com.ardverk.dht.routing.RouteTable;
  */
 public class LookupManager {
 
-    private final ArdverkFutureService futureService;
+    private final FutureService futureService;
     
     private final MessageDispatcher messageDispatcher;
     
     private final RouteTable routeTable;
     
-    LookupManager(ArdverkFutureService futureService, 
+    LookupManager(FutureService futureService, 
             MessageDispatcher messageDispatcher, 
             RouteTable routeTable) {
         this.futureService = futureService;

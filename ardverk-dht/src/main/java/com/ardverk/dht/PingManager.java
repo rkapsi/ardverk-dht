@@ -31,11 +31,11 @@ import com.ardverk.dht.routing.Contact;
  */
 public class PingManager {
 
-    private final ArdverkFutureService futureService;
+    private final FutureService futureService;
     
     private final MessageDispatcher messageDispatcher;
     
-    PingManager(ArdverkFutureService futureService, 
+    PingManager(FutureService futureService, 
             MessageDispatcher messageDispatcher) {
         this.futureService = futureService;
         this.messageDispatcher = messageDispatcher;

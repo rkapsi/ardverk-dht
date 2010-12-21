@@ -24,7 +24,7 @@ import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.concurrent.ArdverkProcess;
 import com.ardverk.dht.config.Config;
 
-public interface ArdverkFutureService {
+public interface FutureService {
 
     /**
      * Submits the given {@link AsyncProcess} for execution.
