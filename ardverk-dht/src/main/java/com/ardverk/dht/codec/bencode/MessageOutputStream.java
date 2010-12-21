@@ -41,6 +41,10 @@ import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.storage.Database.Condition;
 import com.ardverk.dht.storage.ValueTuple;
 
+/**
+ * The {@link MessageOutputStream} writes {@link Message}s to a
+ * {@link BencodingOutputStream}.
+ */
 class MessageOutputStream extends BencodingOutputStream {
     
     public MessageOutputStream(OutputStream out) {
@@ -119,7 +123,7 @@ class MessageOutputStream extends BencodingOutputStream {
     
     public void writeMessage(Message message) throws IOException {
         
-        writeByte(MessageUtils.VERSION);
+        writeByte(Constants.VERSION);
         
         OpCode opcode = OpCode.valueOf(message);
         writeEnum(opcode);

@@ -24,6 +24,15 @@ import org.ardverk.security.MessageDigestCRC32;
 import com.ardverk.dht.codec.bencode.BencodeMessageCodec;
 import com.ardverk.dht.message.Message;
 
+/**
+ * The {@link DefaultMessageCodec} uses some all of the 
+ * following {@link MessageCodec}s.
+ * 
+ * @see DigestMessageCodec
+ * @see CompressorMessageCodec
+ * @see BencodeMessageCodec
+ * @see CipherMessageCodec
+ */
 public class DefaultMessageCodec extends AbstractMessageCodec {
 
     private final MessageCodec codec;

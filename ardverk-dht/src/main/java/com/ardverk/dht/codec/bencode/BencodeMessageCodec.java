@@ -27,6 +27,10 @@ import org.ardverk.lang.NumberUtils;
 import com.ardverk.dht.codec.AbstractMessageCodec;
 import com.ardverk.dht.message.Message;
 
+/**
+ * The {@link BencodeMessageCodec} encodes and decodes {@link Message}s
+ * from Bencode.
+ */
 public class BencodeMessageCodec extends AbstractMessageCodec {
     
     private static final int DEFAULT_MESSAGE_SIZE = 1024;

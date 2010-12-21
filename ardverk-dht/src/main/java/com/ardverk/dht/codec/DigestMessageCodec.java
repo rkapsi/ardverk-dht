@@ -22,6 +22,12 @@ import java.security.MessageDigest;
 
 import com.ardverk.dht.message.Message;
 
+/**
+ * The {@link DigestMessageCodec} adds and checks a {@link MessageDigest} to
+ * every outgoing and incoming {@link Message}.
+ * 
+ * @see MessageDigest
+ */
 public class DigestMessageCodec extends AbstractMessageCodec {
 
     private final MessageCodec codec;

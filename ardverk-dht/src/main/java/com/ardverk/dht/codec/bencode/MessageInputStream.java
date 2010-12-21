@@ -55,6 +55,10 @@ import com.ardverk.dht.storage.DefaultCondition;
 import com.ardverk.dht.storage.DefaultValueTuple;
 import com.ardverk.dht.storage.ValueTuple;
 
+/**
+ * The {@link MessageInputStream} reads {@link Message}s from
+ * a {@link BencodingInputStream}.
+ */
 class MessageInputStream extends BencodingInputStream {
     
     public MessageInputStream(InputStream in) {
@@ -153,7 +157,7 @@ class MessageInputStream extends BencodingInputStream {
     
     public Message readMessage(SocketAddress src) throws IOException {
         int version = readUnsignedByte();
-        if (version != MessageUtils.VERSION) {
+        if (version != Constants.VERSION) {
             throw new IOException("version=" + version);
         }
         

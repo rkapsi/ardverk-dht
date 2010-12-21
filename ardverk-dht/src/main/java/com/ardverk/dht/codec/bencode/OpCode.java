@@ -27,7 +27,10 @@ import com.ardverk.dht.message.StoreResponse;
 import com.ardverk.dht.message.ValueRequest;
 import com.ardverk.dht.message.ValueResponse;
 
-
+/**
+ * The {@link OpCode} is the type of a {@link Message} as 
+ * it's written over the wire.
+ */
 enum OpCode implements IntegerValue {
     
     PING_REQUEST(0x00),
@@ -53,6 +56,9 @@ enum OpCode implements IntegerValue {
         return value;
     }
     
+    /**
+     * Returns {@code true} if the {@link OpCode} is representing a request.
+     */
     public boolean isRequest() {
         switch (this) {
             case PING_REQUEST:
@@ -85,6 +91,11 @@ enum OpCode implements IntegerValue {
         }
     }
     
+    /**
+     * Returns an {@link OpCode} for the given int value.
+     * 
+     * @see #intValue()
+     */
     public static OpCode valueOf(int value) {
         int index = (value & Integer.MAX_VALUE) % VALUES.length;
         OpCode opcode = VALUES[index];
@@ -95,6 +106,9 @@ enum OpCode implements IntegerValue {
         throw new IllegalArgumentException("value=" + value);
     }
     
+    /**
+     * Returns an {@link OpCode} for the given {@link Message}.
+     */
     public static OpCode valueOf(Message message) {
         if (message instanceof PingRequest) {
             return PING_REQUEST;

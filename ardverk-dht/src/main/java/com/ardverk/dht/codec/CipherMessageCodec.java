@@ -38,7 +38,10 @@ import com.ardverk.dht.message.Message;
 import com.ardverk.dht.security.SecurityUtils;
 
 /**
+ * A {@link CipherMessageCodec} that encrypts and decrypts all incoming
+ * and outgoing {@link Message}s with AES.
  * 
+ * @see Cipher
  */
 public class CipherMessageCodec extends AbstractMessageCodec {
     

@@ -16,7 +16,15 @@
 
 package com.ardverk.dht.codec.bencode;
 
-class MessageUtils {
+import com.ardverk.dht.message.Message;
 
+/**
+ * Just a few constants.
+ */
+interface Constants {
+    
+    /**
+     * The current {@link Message} Version.
+     */
     public static final int VERSION = 0;
 }

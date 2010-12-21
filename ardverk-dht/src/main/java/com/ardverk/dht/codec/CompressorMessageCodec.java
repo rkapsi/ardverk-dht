@@ -25,7 +25,10 @@ import org.ardverk.io.ZlibCompressor;
 import com.ardverk.dht.message.Message;
 
 /**
+ * The {@link CompressorMessageCodec} compresses and decompresses all
+ * incoming and outgoing {@link Message}s.
  * 
+ * @see Compressor
  */
 public class CompressorMessageCodec extends AbstractMessageCodec {
 
