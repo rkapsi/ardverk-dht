@@ -42,7 +42,6 @@
     <target name="resolve" depends="clean-lib, load-ivy">
         <mkdir dir="${lib.dir}"/>
         <ivy:resolve file="${ivy.file}"/>
-        <!--<ivy:retrieve/>-->
         <ivy:retrieve pattern="${lib.dir}/[conf]/[artifact]-[revision].[ext]"/>
     </target>
     
@@ -65,6 +64,37 @@
 			deprecation="${compile.deprecation}"
 			encoding="${compile.encoding}"
 			classpathref="lib.path.id"/>
+    </target>
+    
+    <!-- -->
+    <target name="jar" depends="version, compile">
+        <jar destfile="${jar.file}">
+            <fileset dir="${classes.dir}" />
+            <manifest>
+                <attribute name="Built-By" value="${user.name}"/>
+                <attribute name="Build-Version" value="${version}" />
+            </manifest>
+        </jar>
+    </target>
+    
+    <!-- -->
+    <target name="version">
+		<tstamp>
+			<format property="now" pattern="yyyyMMddHHmmss"/>
+		</tstamp>
+        <property name="ivy.new.revision" value="${module.version.target}-${now}"/>
+    </target>
+    
+    <!-- -->
+    <target name="publish" depends="version, jar">
+    	<ivy:publish artifactspattern="${build.dir}/[artifact].[ext]" 
+    			        resolver="default"
+    			        pubrevision="${version}"
+				        pubdate="${now}"
+    			        status="integration"
+    					forcedeliver="true"
+    	/>
+        <echo message="project ${ant.project.name} published locally with version ${version}" />
     </target>
     
     <!-- -->
