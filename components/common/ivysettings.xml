@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<ivysettings>
+
+	<property file="${common.config.dir}/ivysettings.properties"/>
+
+	<settings defaultResolver="default"/>
+	<property name="jar.pattern" value="[module]-[revision].[ext]" override="false"/>
+	<resolvers>
+		<filesystem name="default">
+			<ivy pattern="${ardverk-dht.main.jars}/${jar.pattern}"/>
+			<artifact pattern="${ardverk-dht.main.jars}/${jar.pattern}"/>
+		</filesystem>
+	</resolvers>
+</ivysettings>
