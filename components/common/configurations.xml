@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<configurations defaultconfmapping="compile->*;runtime->*;test->*">
+<configurations defaultconfmapping="compile->default;runtime->default;test->default">
     <conf name="compile" description=""/>
     <conf name="runtime" extends="compile" description=""/>
     <conf name="test" extends="runtime" description=""/>
