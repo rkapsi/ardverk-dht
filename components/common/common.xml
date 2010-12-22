@@ -88,7 +88,7 @@
     <!-- -->
     <target name="publish" depends="version, jar">
     	<ivy:publish artifactspattern="${build.dir}/[artifact].[ext]" 
-    			        resolver="default"
+    			        resolver="local"
     			        pubrevision="${version}"
 				        pubdate="${now}"
     			        status="integration"

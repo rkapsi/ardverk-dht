@@ -17,6 +17,11 @@
 			<artifact pattern="${test.jar.dir}/${jar.pattern}"/>
 		</filesystem>
 		
+		<filesystem name="local" checkmodified="true">
+			<ivy pattern="/Users/roger/foobar/${jar.pattern}"/>
+			<artifact pattern="/Users/roger/foobar/${jar.pattern}"/>
+		</filesystem>
+		
 		<chain name="default" checkmodified="true">
             <resolver ref="main"/>
             <resolver ref="test"/>
