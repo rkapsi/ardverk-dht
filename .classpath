@@ -6,12 +6,12 @@
 	<classpathentry kind="src" path="components/examples/src/main/resources"/>
 	<classpathentry kind="src" path="components/tools/src/main/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="components/examples/lib/main/java/bsh-2.0b4.jar"/>
 	<classpathentry kind="lib" path="components/common/lib/main/java/ardverk-base-0.1.jar"/>
 	<classpathentry kind="lib" path="components/common/lib/main/java/bee-encode-0.2.jar"/>
 	<classpathentry kind="lib" path="components/common/lib/main/java/patricia-trie-0.3.jar"/>
 	<classpathentry kind="lib" path="components/common/lib/main/java/slf4j-api-1.6.1.jar"/>
 	<classpathentry kind="lib" path="components/common/lib/main/java/slf4j-simple-1.6.1.jar"/>
 	<classpathentry kind="lib" path="components/common/lib/test/java/junit-4.8.2.jar"/>
+	<classpathentry kind="lib" path="components/common/lib/main/java/bsh-2.0b4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

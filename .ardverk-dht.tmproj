@@ -57,7 +57,9 @@
 					<key>filename</key>
 					<string>components/common/configurations.xml</string>
 					<key>lastUsed</key>
-					<date>2010-12-22T17:12:21Z</date>
+					<date>2010-12-22T17:39:45Z</date>
+					<key>selected</key>
+					<true/>
 				</dict>
 				<dict>
 					<key>filename</key>
@@ -82,8 +84,6 @@
 					<string>components/common/ivysettings.xml</string>
 					<key>lastUsed</key>
 					<date>2010-12-22T17:12:21Z</date>
-					<key>selected</key>
-					<true/>
 				</dict>
 			</array>
 			<key>expanded</key>

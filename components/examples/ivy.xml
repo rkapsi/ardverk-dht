@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<ivy-module version="1.0"> 
+	<info organisation="com.ardverk.dht" module="ardverk-dht-example" status="integration"/>
+	<configurations> 
+		<include file="../common/configurations.xml"/>
+	</configurations> 
+	<publications>
+		<artifact name="ardverk-dht-examples" type="jar" conf="compile" /> 
+	</publications> 
+	<dependencies>
+		<dependency org="ardverk" name="ardverk-dht" rev="latest.integration"/>
+		<dependency org="beanshell" name="bsh" rev="2.0b4"/>
+	</dependencies>
+</ivy-module>
