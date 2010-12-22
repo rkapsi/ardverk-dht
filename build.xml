@@ -1,3 +1,28 @@
-<project name="all" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
-	<property name="ardverk-dht.home" location="${basedir}"/>
+<?xml version="1.0"?>
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="all" basedir=".">
+    <property name="common.dir" location="${basedir}/components/common"/>
+    <import file="${common.dir}/common.xml"/>
+    
+    <target name="buildlist" depends="load-ivy">
+        <ivy:buildlist reference="build-path">
+            <fileset dir="components" includes="**/build.xml"/>
+        </ivy:buildlist>
+    </target>
+    
+    <target name="compile-all" depends="buildlist">
+        <subant target="compile" buildpathref="build-path"/>
+    </target>
+    
+    <target name="publish-all" depends="buildlist">
+        <subant target="publish" buildpathref="build-path"/>
+    </target>
+    
+    <target name="clean-all" depends="buildlist">
+        <subant target="clean" buildpathref="build-path"/>
+    </target>
+    
+    <target name="clean" depends="clean-all, load-ivy">
+        <delete dir="repository"/>
+        <ivy:cleancache/>
+    </target>
 </project>
