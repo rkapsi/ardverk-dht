@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>currentDocument</key>
-	<string>components/common/config/ivysettings.properties</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -17,7 +15,7 @@
 					<key>filename</key>
 					<string>components/build.xml</string>
 					<key>lastUsed</key>
-					<date>2010-12-22T00:48:37Z</date>
+					<date>2010-12-22T16:21:37Z</date>
 				</dict>
 			</array>
 			<key>expanded</key>
@@ -32,19 +30,19 @@
 					<key>filename</key>
 					<string>components/ardverk-dht/build.properties</string>
 					<key>lastUsed</key>
-					<date>2010-12-22T15:27:42Z</date>
+					<date>2010-12-22T16:21:37Z</date>
 				</dict>
 				<dict>
 					<key>filename</key>
 					<string>components/ardverk-dht/build.xml</string>
 					<key>lastUsed</key>
-					<date>2010-12-22T15:27:43Z</date>
+					<date>2010-12-22T16:21:37Z</date>
 				</dict>
 				<dict>
 					<key>filename</key>
 					<string>components/ardverk-dht/ivy.xml</string>
 					<key>lastUsed</key>
-					<date>2010-12-22T15:27:43Z</date>
+					<date>2010-12-22T17:12:20Z</date>
 				</dict>
 			</array>
 			<key>expanded</key>
@@ -56,65 +54,36 @@
 			<key>children</key>
 			<array>
 				<dict>
-					<key>children</key>
-					<array>
-						<dict>
-							<key>filename</key>
-							<string>components/common/config/build.properties</string>
-							<key>lastUsed</key>
-							<date>2010-12-22T15:26:38Z</date>
-						</dict>
-						<dict>
-							<key>filename</key>
-							<string>components/common/config/common.properties</string>
-							<key>lastUsed</key>
-							<date>2010-12-22T15:26:40Z</date>
-						</dict>
-						<dict>
-							<key>filename</key>
-							<string>components/common/config/common.xml</string>
-							<key>lastUsed</key>
-							<date>2010-12-22T01:09:21Z</date>
-						</dict>
-						<dict>
-							<key>filename</key>
-							<string>components/common/config/common2.xml</string>
-							<key>lastUsed</key>
-							<date>2010-12-22T02:20:21Z</date>
-						</dict>
-						<dict>
-							<key>filename</key>
-							<string>components/common/config/configurations.xml</string>
-						</dict>
-						<dict>
-							<key>filename</key>
-							<string>components/common/config/ivyinstall.properties</string>
-							<key>lastUsed</key>
-							<date>2010-12-22T00:53:23Z</date>
-						</dict>
-						<dict>
-							<key>filename</key>
-							<string>components/common/config/ivyinstall.xml</string>
-						</dict>
-						<dict>
-							<key>filename</key>
-							<string>components/common/config/ivysettings.properties</string>
-							<key>lastUsed</key>
-							<date>2010-12-22T15:27:44Z</date>
-							<key>selected</key>
-							<true/>
-						</dict>
-						<dict>
-							<key>filename</key>
-							<string>components/common/config/ivysettings.xml</string>
-							<key>lastUsed</key>
-							<date>2010-12-22T15:27:44Z</date>
-						</dict>
-					</array>
-					<key>expanded</key>
+					<key>filename</key>
+					<string>components/common/configurations.xml</string>
+					<key>lastUsed</key>
+					<date>2010-12-22T17:12:21Z</date>
+				</dict>
+				<dict>
+					<key>filename</key>
+					<string>components/common/common.properties</string>
+					<key>lastUsed</key>
+					<date>2010-12-22T17:12:21Z</date>
+				</dict>
+				<dict>
+					<key>filename</key>
+					<string>components/common/common.xml</string>
+					<key>lastUsed</key>
+					<date>2010-12-22T17:12:20Z</date>
+				</dict>
+				<dict>
+					<key>filename</key>
+					<string>components/common/ivysettings.properties</string>
+					<key>lastUsed</key>
+					<date>2010-12-22T17:12:21Z</date>
+				</dict>
+				<dict>
+					<key>filename</key>
+					<string>components/common/ivysettings.xml</string>
+					<key>lastUsed</key>
+					<date>2010-12-22T17:12:21Z</date>
+					<key>selected</key>
 					<true/>
-					<key>name</key>
-					<string>config</string>
 				</dict>
 			</array>
 			<key>expanded</key>
@@ -126,136 +95,10 @@
 	<key>fileHierarchyDrawerWidth</key>
 	<integer>200</integer>
 	<key>metaData</key>
-	<dict>
-		<key>components/common/config/build.properties</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>24</integer>
-				<key>line</key>
-				<integer>11</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>0</integer>
-		</dict>
-		<key>components/common/config/common.properties</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>28</integer>
-				<key>line</key>
-				<integer>6</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>0</integer>
-		</dict>
-		<key>components/common/config/common.xml</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>96</integer>
-				<key>line</key>
-				<integer>207</integer>
-			</dict>
-			<key>columnSelection</key>
-			<false/>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>172</integer>
-			<key>selectFrom</key>
-			<dict>
-				<key>column</key>
-				<integer>1</integer>
-				<key>line</key>
-				<integer>184</integer>
-			</dict>
-			<key>selectTo</key>
-			<dict>
-				<key>column</key>
-				<integer>96</integer>
-				<key>line</key>
-				<integer>207</integer>
-			</dict>
-		</dict>
-		<key>components/common/config/common2.xml</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>66</integer>
-				<key>line</key>
-				<integer>41</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>25</integer>
-		</dict>
-		<key>components/common/config/ivyinstall.properties</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>0</integer>
-			</dict>
-			<key>columnSelection</key>
-			<false/>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>0</integer>
-			<key>selectFrom</key>
-			<dict>
-				<key>column</key>
-				<integer>35</integer>
-				<key>line</key>
-				<integer>6</integer>
-			</dict>
-			<key>selectTo</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>0</integer>
-			</dict>
-		</dict>
-		<key>components/common/config/ivysettings.properties</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>0</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>0</integer>
-		</dict>
-	</dict>
-	<key>openDocuments</key>
-	<array>
-		<string>components/common/config/common2.xml</string>
-		<string>components/common/config/ivyinstall.properties</string>
-		<string>components/common/config/common.properties</string>
-		<string>components/common/config/build.properties</string>
-		<string>components/common/config/ivysettings.properties</string>
-		<string>components/common/config/common.xml</string>
-	</array>
+	<dict/>
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{217, 37}, {967, 707}}</string>
+	<string>{{272, 71}, {967, 707}}</string>
 </dict>
 </plist>
