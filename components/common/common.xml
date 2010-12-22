@@ -83,7 +83,7 @@
 			<format property="now" pattern="yyyyMMddHHmmss"/>
 		</tstamp>
         <!--<property name="ivy.new.revision" value="${module.version.target}-${now}"/>-->
-        <property name="version" value="1.0-${now}"/>
+        <property name="version" value="${now}"/>
     </target>
     
     <!-- -->
