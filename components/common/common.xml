@@ -2,7 +2,7 @@
 <project xmlns:ivy="antlib:org.apache.ivy.ant" name="common">
     
     <!-- -->
-    <property file="${common.config.dir}/common.properties"/>
+    <property file="${common.dir}/common.properties"/>
     <!-- <import file="ivyinstall.xml"/> -->
     
     <!-- -->
@@ -35,14 +35,15 @@
     <!-- -->
     <target name="configure" depends="load-ivy">
         <echo message="${ivy.settings.file}"/>
-        <ivy:settings/>
+       	<ivy:settings/>
     </target>
     
     <!-- -->
-    <target name="resolve" depends="clean-lib, load-ivy, configure">
+    <target name="resolve" depends="clean-lib, load-ivy">
         <mkdir dir="${lib.dir}"/>
-    	<ivy:resolve file="${ivy.file}"/>
-    	<ivy:retrieve pattern="${lib.dir}/[artifact]-[revision].[ext]" />
+        <ivy:resolve file="${ivy.file}"/>
+        <!--<ivy:retrieve/>-->
+        <ivy:retrieve pattern="${lib.dir}/[conf]/[artifact]-[revision].[ext]"/>
     </target>
     
     <!-- -->
@@ -61,6 +62,8 @@
 			optimize="${compile.optimize}" 
 			source="${compile.source}"
 			target="${compile.target}"
+			deprecation="${compile.deprecation}"
+			encoding="${compile.encoding}"
 			classpathref="lib.path.id"/>
     </target>
     

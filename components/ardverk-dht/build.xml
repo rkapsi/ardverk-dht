@@ -1,4 +1,5 @@
+<?xml version="1.0"?>
 <project name="ardverk-dht" default="compile">
 	<property file="build.properties"/>
-	<import file="${common.config.file}"/>
+	<import file="${common.dir}/common.xml"/>
 </project>
