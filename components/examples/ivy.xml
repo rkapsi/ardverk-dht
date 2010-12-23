@@ -2,7 +2,7 @@
 <ivy-module version="1.0"> 
 	<info organisation="com.ardverk.dht" module="ardverk-dht-examples" status="integration"/>
 	<configurations> 
-		<include file="../common/configurations.xml"/>
+		<include file="../../config/configurations.xml"/>
 	</configurations> 
 	<publications>
 		<artifact name="ardverk-dht-examples" type="jar" conf="compile" /> 
