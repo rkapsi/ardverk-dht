@@ -1,4 +1,5 @@
 .DS_Store
+.ivy2
 bin
 build
 dist
