@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <ivy-module version="1.0"> 
-	<info organisation="com.ardverk.dht" module="ardverk-dht" status="integration"/>
+	<info organisation="ardverk" module="ardverk-dht" status="integration"/>
 	<configurations> 
 		<include file="../../config/configurations.xml"/>
 	</configurations> 

@@ -4,27 +4,12 @@
     <!-- -->
     <properties file="${config.dir}/ivysettings.properties"/>
     
-    <!-- a bunch of patterns for how to store & lookup dependencies. -->
-    <property name="ivy.local.default.root" 
-        value="${project.home}/ivy2/local" override="false"/>
-        
-	<property name="ivy.local.default.ivy.pattern" 
-	    value="[organisation]/[module]/[type]s/ivy.xml"/>
-	    
-	<property name="ivy.local.default.artifact.pattern" 
-	    value="[organisation]/[module]/[type]s/[artifact]-[revision].[ext]"/>
-	
     <!-- -->
 	<settings defaultResolver="default"/>
 	<resolvers>
 		<filesystem name="main" checkmodified="true" local="true">
-			<ivy pattern="${main.jar.dir}/${jar.pattern}"/>
-			<artifact pattern="${main.jar.dir}/${jar.pattern}"/>
-		</filesystem>
-		
-		<filesystem name="test" checkmodified="true" local="true">
-			<ivy pattern="${test.jar.dir}/${jar.pattern}"/>
-			<artifact pattern="${test.jar.dir}/${jar.pattern}"/>
+			<ivy pattern="${ivy.shared.default.root}/${ivy.shared.default.ivy.pattern}"/>
+			<artifact pattern="${ivy.shared.default.root}/${ivy.shared.default.artifact.pattern}"/>
 		</filesystem>
 		
 		<filesystem name="local">
@@ -34,8 +19,7 @@
 		
 		<chain name="shared" checkmodified="true">
 		    <resolver ref="main"/>
-            <resolver ref="test"/>
-	    </chain>
+        </chain>
 	    
 		<chain name="default" checkmodified="true">
 		    <resolver ref="local"/>

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <ivy-module version="1.0"> 
-	<info organisation="com.ardverk.dht" module="ardverk-dht-examples" status="integration"/>
+	<info organisation="ardverk" module="ardverk-dht-examples" status="integration"/>
 	<configurations> 
 		<include file="../../config/configurations.xml"/>
 	</configurations> 
@@ -8,7 +8,7 @@
 		<artifact name="ardverk-dht-examples" type="jar" conf="compile" /> 
 	</publications> 
 	<dependencies>
-		<dependency org="com.ardverk.dht" name="ardverk-dht" rev="latest.integration"/>
+		<dependency org="ardverk" name="ardverk-dht" rev="latest.integration"/>
 		<dependency org="beanshell" name="bsh" rev="2.0b4"/>
 	</dependencies>
 </ivy-module>
