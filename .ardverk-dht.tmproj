@@ -3,12 +3,24 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>components/common/common.xml</string>
+	<string>components/tools/ivy.xml</string>
 	<key>documents</key>
 	<array>
 		<dict>
 			<key>filename</key>
 			<string>build.xml</string>
+			<key>lastUsed</key>
+			<date>2010-12-23T15:52:46Z</date>
+		</dict>
+		<dict>
+			<key>expanded</key>
+			<true/>
+			<key>name</key>
+			<string>config</string>
+			<key>regexFolderFilter</key>
+			<string>!.*/(\.[^/]*|CVS|_darcs|_MTN|\{arch\}|blib|.*~\.nib|.*\.(framework|app|pbproj|pbxproj|xcode(proj)?|bundle))$</string>
+			<key>sourceDirectory</key>
+			<string>config</string>
 		</dict>
 		<dict>
 			<key>expanded</key>
@@ -25,19 +37,77 @@
 	<integer>200</integer>
 	<key>metaData</key>
 	<dict>
-		<key>components/common/common.xml</key>
+		<key>build.xml</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>32</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>90</integer>
+				<integer>0</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>74</integer>
+			<integer>0</integer>
+		</dict>
+		<key>components/ardverk-dht/build.properties</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>components/ardverk-dht/ivy.xml</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>51</integer>
+				<key>line</key>
+				<integer>4</integer>
+			</dict>
+			<key>columnSelection</key>
+			<false/>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>2</integer>
+				<key>line</key>
+				<integer>4</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>51</integer>
+				<key>line</key>
+				<integer>4</integer>
+			</dict>
+		</dict>
+		<key>components/examples/build.properties</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
 		</dict>
 		<key>components/examples/ivy.xml</key>
 		<dict>
@@ -46,7 +116,77 @@
 				<key>column</key>
 				<integer>51</integer>
 				<key>line</key>
-				<integer>11</integer>
+				<integer>4</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>components/tools/build.properties</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>components/tools/ivy.xml</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>config/common.properties</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>config/ivysettings.properties</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>config/ivysettings.xml</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -56,8 +196,16 @@
 	</dict>
 	<key>openDocuments</key>
 	<array>
+		<string>components/ardverk-dht/build.properties</string>
+		<string>components/examples/build.properties</string>
+		<string>components/tools/build.properties</string>
+		<string>config/ivysettings.xml</string>
+		<string>config/common.properties</string>
+		<string>components/ardverk-dht/ivy.xml</string>
 		<string>components/examples/ivy.xml</string>
-		<string>components/common/common.xml</string>
+		<string>components/tools/ivy.xml</string>
+		<string>build.xml</string>
+		<string>config/ivysettings.properties</string>
 	</array>
 	<key>showFileHierarchyDrawer</key>
 	<true/>
