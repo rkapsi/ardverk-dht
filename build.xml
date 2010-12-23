@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <project xmlns:ivy="antlib:org.apache.ivy.ant" name="all" basedir=".">
-    <property name="common.dir" location="${basedir}/config"/>
-    <import file="${common.dir}/common.xml"/>
+    <property name="config.dir" location="${basedir}/config"/>
+    <import file="${config.dir}/common.xml"/>
     
     <target name="buildlist" depends="load-ivy">
         <ivy:buildlist reference="build-path">

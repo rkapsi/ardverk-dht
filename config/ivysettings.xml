@@ -2,7 +2,7 @@
 <ivysettings>
 
     <!-- -->
-    <properties file="${common.dir}/ivysettings.properties"/>
+    <properties file="${config.dir}/ivysettings.properties"/>
     
     <!-- a bunch of patterns for how to store & lookup dependencies. -->
     <property name="ivy.local.default.root" 
