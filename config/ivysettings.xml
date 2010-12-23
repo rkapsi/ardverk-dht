@@ -7,20 +7,16 @@
     <!-- -->
 	<settings defaultResolver="default"/>
 	<resolvers>
-		<filesystem name="main" checkmodified="true" local="true">
+		<filesystem name="shared" checkmodified="true" local="true">
 			<ivy pattern="${ivy.shared.default.root}/${ivy.shared.default.ivy.pattern}"/>
 			<artifact pattern="${ivy.shared.default.root}/${ivy.shared.default.artifact.pattern}"/>
 		</filesystem>
 		
-		<filesystem name="local">
+		<filesystem name="local" checkmodified="true" local="true">
 			<ivy pattern="${ivy.local.default.root}/${ivy.local.default.ivy.pattern}" />
 			<artifact pattern="${ivy.local.default.root}/${ivy.local.default.artifact.pattern}" />
 		</filesystem>
 		
-		<chain name="shared" checkmodified="true">
-		    <resolver ref="main"/>
-        </chain>
-	    
 		<chain name="default" checkmodified="true">
 		    <resolver ref="local"/>
             <resolver ref="shared"/>

@@ -3,7 +3,6 @@
     
     <!-- -->
     <property file="${config.dir}/common.properties"/>
-    <!-- <import file="ivyinstall.xml"/> -->
     
     <!-- -->
     <path id="lib.path.id">
@@ -18,18 +17,8 @@
     
     <!-- -->
     <target name="load-ivy">
-        
-        <mkdir dir="${ivy.jar.dir}"/>
-        
-        <copy file="${ivy.install.jar.file}" 
-            tofile="${ivy.jar.file}" 
-            overwrite="false"/>
-            
-        <path id="ivy.lib.path">
-            <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
-        </path>
         <taskdef resource="org/apache/ivy/ant/antlib.xml" 
-            uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+            uri="antlib:org.apache.ivy.ant" classpath="${ivy.jar.file}"/>
     </target>
     
     <!-- -->
@@ -100,9 +89,8 @@
     </target>
     
     <!-- -->
-    <target name="clean-local" depends="load-ivy">
-		<ivy:info file="${ivy.file}" />
-	   <delete dir="${ivy.local.default.root}/${ivy.organisation}/${ivy.module}"/>
+    <target name="clean-ivy">
+        <delete dir="${ivy.home}"/>
 	</target>
 	
 	<!-- -->
@@ -116,5 +104,5 @@
     </target>
 
     <!-- -->
-    <target name="clean" depends="clean-build, clean-lib"/>
+    <target name="clean" depends="clean-build"/>
 </project>
