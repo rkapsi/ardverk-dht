@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project xmlns:ivy="antlib:org.apache.ivy.ant" name="all" basedir=".">
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="ardverk-dht-all" basedir="." default="publish-all">
     <property name="config.dir" location="${basedir}/config"/>
     <import file="${config.dir}/common.xml"/>
     
@@ -7,10 +7,6 @@
         <ivy:buildlist reference="build-path">
             <fileset dir="components" includes="**/build.xml"/>
         </ivy:buildlist>
-    </target>
-    
-    <target name="compile-all" depends="buildlist">
-        <subant target="compile" buildpathref="build-path"/>
     </target>
     
     <target name="publish-all" depends="buildlist">

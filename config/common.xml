@@ -58,10 +58,11 @@
     <!-- -->
     <target name="jar" depends="version, compile">
         <jar destfile="${jar.file}">
-            <fileset dir="${classes.dir}" />
+            <fileset dir="${classes.dir}"/>
+            <fileset dir="${resources.dir}" erroronmissingdir="false"/>
             <manifest>
                 <attribute name="Built-By" value="${user.name}"/>
-                <attribute name="Build-Version" value="${version}" />
+                <attribute name="Build-Version" value="${version}"/>
             </manifest>
         </jar>
     </target>
@@ -71,7 +72,6 @@
 		<tstamp>
 			<format property="now" pattern="yyyyMMddHHmmss"/>
 		</tstamp>
-        <!--<property name="ivy.new.revision" value="${module.version.target}-${now}"/>-->
         <property name="version" value="${now}"/>
     </target>
     
@@ -99,10 +99,7 @@
     </target>
 
     <!-- -->
-    <target name="clean-build">
+    <target name="clean">
         <delete includeemptydirs="true" dir="${build.dir}"/>
     </target>
-
-    <!-- -->
-    <target name="clean" depends="clean-build"/>
 </project>
