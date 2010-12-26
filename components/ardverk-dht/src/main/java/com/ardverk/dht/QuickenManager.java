@@ -67,7 +67,7 @@ public class QuickenManager {
         synchronized (routeTable) {
             int pingCount = (int)(routeTable.getK() * config.getPingCount());
             
-            Contact localhost = dht.getLocalhost();
+            Contact localhost = routeTable.getLocalhost();
             KUID localhostId = localhost.getId();
 
             if (0 < pingCount) {
