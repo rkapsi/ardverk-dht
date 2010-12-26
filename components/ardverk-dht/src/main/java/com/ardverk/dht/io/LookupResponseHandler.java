@@ -24,9 +24,11 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncFuture;
+import org.ardverk.concurrent.ExecutorUtils;
 import org.ardverk.concurrent.FutureUtils;
 import org.ardverk.lang.Arguments;
 import org.slf4j.Logger;
@@ -38,7 +40,6 @@ import com.ardverk.dht.logging.LoggerUtils;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
-import com.ardverk.dht.utils.SchedulingUtils;
 import com.ardverk.dht.utils.XorComparator;
 
 /**
@@ -50,6 +51,9 @@ abstract class LookupResponseHandler<T extends LookupEntity>
     
     private static final Logger LOG 
         = LoggerUtils.getLogger(LookupResponseHandler.class);
+    
+    private static final ScheduledThreadPoolExecutor EXECUTOR 
+        = ExecutorUtils.newSingleThreadScheduledExecutor("BoostThread");
     
     protected final LookupConfig config;
     
@@ -91,7 +95,7 @@ abstract class LookupResponseHandler<T extends LookupEntity>
                 }
             };
             
-            boostFuture = SchedulingUtils.scheduleWithFixedDelay(
+            boostFuture = EXECUTOR.scheduleWithFixedDelay(
                     task, boostFrequency, boostFrequency, 
                     TimeUnit.MILLISECONDS);
         }

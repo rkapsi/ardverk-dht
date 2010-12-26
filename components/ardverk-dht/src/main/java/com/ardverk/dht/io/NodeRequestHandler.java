@@ -46,10 +46,19 @@ public class NodeRequestHandler extends AbstractRequestHandler {
     @Override
     public void handleRequest(RequestMessage message) throws IOException {
         
-        //System.out.println("REQUEST: " + message);
-        
         NodeRequest request = (NodeRequest)message;
         KUID lookupId = request.getKey();
+        
+        // This is an idea where I'm not sure if it's improving anything 
+        // or not. In short we're excluding the localhost from the result 
+        // set. The other guy knows us already and our information is in 
+        // the message header anyways. There is therefore no reason to
+        // send it again and the remote host can determinate computationally 
+        // if we were supposed to be in the result set or not. 
+        //
+        // Instead we could send back some other contact. It's maybe not
+        // useful in the context of this lookup but maybe helps the remote
+        // host to keep it's RT fresh.
         
         /*Contact localhost = routeTable.getLocalhost();
         int k = routeTable.getK();
