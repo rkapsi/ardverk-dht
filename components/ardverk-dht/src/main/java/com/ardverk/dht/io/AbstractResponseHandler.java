@@ -25,10 +25,10 @@ import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.AsyncProcessFuture;
 import org.ardverk.lang.Arguments;
-import org.ardverk.utils.TimeUtils;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.entity.Entity;
+import com.ardverk.dht.lang.TimeStamp;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
@@ -43,9 +43,9 @@ abstract class AbstractResponseHandler<V extends Entity>
     
     private final AtomicBoolean done = new AtomicBoolean(false);
     
-    private volatile long lastSendTime = -1L;
+    private volatile TimeStamp lastSendTime = null;
     
-    private volatile long lastResponseTime = -1L;
+    private volatile TimeStamp lastResponseTime = null;
     
     public AbstractResponseHandler(MessageDispatcher messageDispatcher) {
         super(messageDispatcher);
@@ -56,7 +56,8 @@ abstract class AbstractResponseHandler<V extends Entity>
      * has been sent or -1 if no messages have been sent yet.
      */
     public long getLastSendTime(TimeUnit unit) {
-        return convertTimeMillisTo(lastSendTime, unit);
+        TimeStamp lastSendTime = this.lastSendTime;
+        return lastSendTime != null ? lastSendTime.getAge(unit) : -1L;
     }
     
     /**
@@ -73,7 +74,8 @@ abstract class AbstractResponseHandler<V extends Entity>
      * has been received or -1 if no messages have been received yet.
      */
     public long getLastResponseTime(TimeUnit unit) {
-        return convertTimeMillisTo(lastResponseTime, unit);
+        TimeStamp lastResponseTime = this.lastResponseTime;
+        return lastResponseTime != null ? lastResponseTime.getAge(unit) : -1L;
     }
     
     /**
@@ -83,18 +85,6 @@ abstract class AbstractResponseHandler<V extends Entity>
      */
     public long getLastResponseTimeInMillis() {
         return getLastResponseTime(TimeUnit.MILLISECONDS);
-    }
-    
-    /**
-     * Converts a time from milliseconds to the given {@link TimeUnit}.
-     */
-    private static long convertTimeMillisTo(long timeInMillis, TimeUnit unit) {
-        if (timeInMillis == -1L) {
-            return -1L;
-        }
-        
-        long time = System.currentTimeMillis() - timeInMillis;
-        return TimeUtils.convert(time, TimeUnit.MILLISECONDS, unit);
     }
     
     @Override
@@ -176,7 +166,7 @@ abstract class AbstractResponseHandler<V extends Entity>
         if (isOpen()) {
             messageDispatcher.send(this, contactId, 
                     message, timeout, unit);
-            lastSendTime = System.currentTimeMillis();
+            lastSendTime = TimeStamp.now();
         }
     }
     
@@ -224,7 +214,7 @@ abstract class AbstractResponseHandler<V extends Entity>
             }
             
             synchronized (this) {
-                lastResponseTime = System.currentTimeMillis();
+                lastResponseTime = TimeStamp.now();
                 processResponse(entity, response, time, unit);
             }
         }

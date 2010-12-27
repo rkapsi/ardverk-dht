@@ -22,6 +22,7 @@ import org.ardverk.net.NetworkUtils;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.lang.Identifier;
+import com.ardverk.dht.lang.SystemUtils;
 
 /**
  * The {@link DefaultRouteTable} uses internally {@link ContactEntry}s 
@@ -75,7 +76,10 @@ public class ContactEntry implements Identifier, Longevity {
      */
     public Update update(Contact other) {
         Contact previous = contact;
-        contact = previous.merge(other);
+        
+        if (other.getCreationTime() >= previous.getCreationTime()) {
+            contact = previous.merge(other);
+        }
         
         if (other.isActive()) {
             errorCount = 0;
@@ -107,7 +111,7 @@ public class ContactEntry implements Identifier, Longevity {
      */
     public boolean error() {
         ++errorCount;
-        errorTimeStamp = System.currentTimeMillis();
+        errorTimeStamp = SystemUtils.currentTimeMillis();
         return isDead();
     }
     
@@ -161,7 +165,7 @@ public class ContactEntry implements Identifier, Longevity {
      */
     public boolean hasBeenActiveRecently() {
         long timeout = config.getHasBeenActiveTimeoutInMillis();
-        return (System.currentTimeMillis() - getTimeStamp()) < timeout;
+        return (SystemUtils.currentTimeMillis() - getTimeStamp()) < timeout;
     }
     
     /**

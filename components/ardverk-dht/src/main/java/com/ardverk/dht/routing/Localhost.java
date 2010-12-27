@@ -23,12 +23,13 @@ import org.ardverk.io.Bindable;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.io.transport.Transport;
+import com.ardverk.dht.lang.SystemUtils;
 
 public class Localhost extends AbstractContact implements Bindable<Transport> {
     
     private static final long serialVersionUID = 1919885060478043754L;
 
-    private final long creationTime = System.currentTimeMillis();
+    private final long creationTime = SystemUtils.currentTimeMillis();
     
     private volatile int instanceId = 0;
     
@@ -51,7 +52,7 @@ public class Localhost extends AbstractContact implements Bindable<Transport> {
 
     @Override
     public long getTimeStamp() {
-        return System.currentTimeMillis();
+        return SystemUtils.currentTimeMillis();
     }
     
     @Override

@@ -29,6 +29,7 @@ import org.ardverk.lang.Arguments;
 import com.ardverk.dht.config.StoreConfig;
 import com.ardverk.dht.entity.DefaultStoreEntity;
 import com.ardverk.dht.entity.StoreEntity;
+import com.ardverk.dht.lang.TimeStamp;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.message.StoreRequest;
@@ -46,6 +47,8 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     private final List<StoreResponse> responses 
         = new ArrayList<StoreResponse>();
 
+    private final TimeStamp creationTime = TimeStamp.now();
+    
     private final Iterator<Contact> contacts;
     
     private final int k;
@@ -53,8 +56,6 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     private final ValueTuple tuple;
     
     private final StoreConfig config;
-    
-    private long startTime = -1L;
     
     public StoreResponseHandler(
             MessageDispatcher messageDispatcher, 
@@ -97,10 +98,6 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     }
     
     private synchronized void preProcess(int pop) {
-        if (startTime == -1L) {
-            startTime = System.currentTimeMillis();
-        }
-        
         while (0 < pop--) {
             counter.decrement();
         }
@@ -108,7 +105,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     
     private synchronized void postProcess() {
         if (counter.getProcesses() == 0) {
-            long time = System.currentTimeMillis() - startTime;
+            long time = creationTime.getAgeInMillis();
             
             StoreResponse[] values = responses.toArray(new StoreResponse[0]);
             if (values.length == 0) {

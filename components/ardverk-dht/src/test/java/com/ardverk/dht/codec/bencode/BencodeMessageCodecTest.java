@@ -27,9 +27,9 @@ import com.ardverk.dht.message.DefaultPingRequest;
 import com.ardverk.dht.message.Message;
 import com.ardverk.dht.message.MessageId;
 import com.ardverk.dht.message.PingRequest;
-import com.ardverk.dht.routing.DefaultContact;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.Contact.Type;
+import com.ardverk.dht.routing.DefaultContact;
 
 public class BencodeMessageCodecTest {
 

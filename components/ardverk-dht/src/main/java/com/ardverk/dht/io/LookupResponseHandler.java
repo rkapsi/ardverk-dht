@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.config.LookupConfig;
 import com.ardverk.dht.entity.LookupEntity;
+import com.ardverk.dht.lang.TimeStamp;
 import com.ardverk.dht.logging.LoggerUtils;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
@@ -55,13 +56,13 @@ abstract class LookupResponseHandler<T extends LookupEntity>
     private static final ScheduledThreadPoolExecutor EXECUTOR 
         = ExecutorUtils.newSingleThreadScheduledExecutor("BoostThread");
     
+    private final TimeStamp creatinTime = TimeStamp.now();
+    
     protected final LookupConfig config;
     
     private final LookupManager lookupManager;
     
     private final ProcessCounter lookupCounter;
-    
-    private long startTime = -1L;
     
     private ScheduledFuture<?> boostFuture;
     
@@ -177,10 +178,6 @@ abstract class LookupResponseHandler<T extends LookupEntity>
      * Called by {@link #process(int)} before it is executing its own code.
      */
     private synchronized void preProcess(int decrement) {
-        if (startTime == -1L) {
-            startTime = System.currentTimeMillis();
-        }
-        
         while (0 < decrement--) {
             lookupCounter.decrement();
         }
@@ -257,13 +254,9 @@ abstract class LookupResponseHandler<T extends LookupEntity>
      * Creates and returns the current lookup {@link Outcome}.
      */
     protected synchronized Outcome createOutcome() {
-        if (startTime < 0) {
-            throw new IllegalStateException("startTime=" + startTime);
-        }
-        
         return new Outcome() {
 
-            private final long time = System.currentTimeMillis() - startTime;
+            private final long time = creatinTime.getAgeInMillis();
             private final Contact[] contacts = lookupManager.getContacts();
             private final int hop = lookupManager.getHop();
             private final int timeouts = lookupManager.getErrorCount();

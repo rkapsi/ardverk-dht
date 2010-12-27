@@ -17,13 +17,14 @@
 package com.ardverk.dht.routing;
 
 import com.ardverk.dht.KUID;
+import com.ardverk.dht.lang.SystemUtils;
 
 /**
  * An abstract implementation of {@link Bucket}.
  */
 public abstract class AbstractBucket implements Bucket {
 
-    private final long creationTime = System.currentTimeMillis();
+    private final long creationTime = SystemUtils.currentTimeMillis();
     
     private final KUID bucketId;
     
@@ -59,7 +60,7 @@ public abstract class AbstractBucket implements Bucket {
      * @see System#currentTimeMillis()
      */
     public void touch() {
-        setTimeStamp(System.currentTimeMillis());
+        setTimeStamp(SystemUtils.currentTimeMillis());
     }
     
     @Override

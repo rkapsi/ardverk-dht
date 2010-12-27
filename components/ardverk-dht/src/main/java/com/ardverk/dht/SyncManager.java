@@ -38,6 +38,7 @@ import com.ardverk.dht.entity.DefaultSyncEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.entity.SyncEntity;
+import com.ardverk.dht.lang.TimeStamp;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.Localhost;
 import com.ardverk.dht.routing.RouteTable;
@@ -77,7 +78,7 @@ public class SyncManager {
         
         synchronized (lock) {
             
-            final long startTime = System.currentTimeMillis();
+            final TimeStamp creationTime = TimeStamp.now();
             
             final Map<ContactKey, ArdverkFuture<PingEntity>> futures 
                 = new HashMap<ContactKey, ArdverkFuture<PingEntity>>();
@@ -185,7 +186,7 @@ public class SyncManager {
                     }
                     
                     private void complete() {
-                        long time = System.currentTimeMillis() - startTime;
+                        long time = creationTime.getAgeInMillis();
                         
                         @SuppressWarnings("unchecked")
                         ArdverkFuture<StoreEntity>[] futures 
@@ -207,7 +208,7 @@ public class SyncManager {
             
             if (pingCounter.get() == 0 
                     && storeCounter.get() == 0) {
-                long time = System.currentTimeMillis() - startTime;
+                long time = creationTime.getAgeInMillis();
                 userFuture.setValue(new DefaultSyncEntity(time, TimeUnit.MILLISECONDS));
             }
             

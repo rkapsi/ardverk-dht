@@ -34,6 +34,8 @@ import com.ardverk.dht.entity.DefaultQuickenEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.QuickenEntity;
+import com.ardverk.dht.lang.SystemUtils;
+import com.ardverk.dht.lang.TimeStamp;
 import com.ardverk.dht.routing.Bucket;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
@@ -56,7 +58,7 @@ public class QuickenManager {
     
     public ArdverkFuture<QuickenEntity> quicken(QuickenConfig config) {
         
-        long startTime = System.currentTimeMillis();
+        TimeStamp creationTime = TimeStamp.now();
         
         List<ArdverkFuture<PingEntity>> pingFutures 
             = new ArrayList<ArdverkFuture<PingEntity>>();
@@ -101,7 +103,7 @@ public class QuickenManager {
                 }
                 
                 long timeStamp = bucket.getTimeStamp();
-                if ((System.currentTimeMillis() - timeStamp) < bucketTimeout) {
+                if ((SystemUtils.currentTimeMillis()-timeStamp) < bucketTimeout) {
                     continue;
                 }
                 
@@ -123,24 +125,24 @@ public class QuickenManager {
         ArdverkFuture<NodeEntity>[] lookups 
             = lookupFutures.toArray(new ArdverkFuture[0]);
         
-        return new QuickenFuture(startTime, pings, lookups);
+        return new QuickenFuture(creationTime, pings, lookups);
     }
     
     public static class QuickenFuture extends ArdverkValueFuture<QuickenEntity> {
         
         private final AtomicInteger countdown = new AtomicInteger();
         
-        private final long startTime;
+        private final TimeStamp timeStamp;
         
         private final ArdverkFuture<PingEntity>[] pingFutures;
         
         private final ArdverkFuture<NodeEntity>[] lookupFutures;
         
         @SuppressWarnings("unchecked")
-        private QuickenFuture(long startTime, 
+        private QuickenFuture(TimeStamp timeStamp, 
                 ArdverkFuture<PingEntity>[] pingFutures, 
                 ArdverkFuture<NodeEntity>[] lookupFutures) {
-            this.startTime = startTime;
+            this.timeStamp = timeStamp;
             this.pingFutures = pingFutures;
             this.lookupFutures = lookupFutures;
             
@@ -193,7 +195,7 @@ public class QuickenManager {
         }
         
         private void complete() {
-            long time = System.currentTimeMillis() - startTime;
+            long time = timeStamp.getAgeInMillis();
             setValue(new DefaultQuickenEntity(pingFutures, lookupFutures, 
                     time, TimeUnit.MILLISECONDS));
         }

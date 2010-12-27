@@ -18,22 +18,23 @@ package com.ardverk.dht.storage;
 
 import java.util.concurrent.TimeUnit;
 
+import com.ardverk.dht.lang.TimeStamp;
+
 /**
  * An abstract implementation of {@link ValueTuple}.
  */
 abstract class AbstractValueTuple implements ValueTuple {
 
-    private final long creationTime = System.currentTimeMillis();
+    private final TimeStamp creationTime = TimeStamp.now();
     
     @Override
     public long getCreationTime() {
-        return creationTime;
+        return creationTime.getCreationTime();
     }
     
     @Override
     public long getAge(TimeUnit unit) {
-        long age = System.currentTimeMillis() - creationTime;
-        return unit.convert(age, TimeUnit.MILLISECONDS);
+        return creationTime.getAge(unit);
     }
 
     @Override

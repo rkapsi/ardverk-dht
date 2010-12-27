@@ -24,6 +24,7 @@ import org.ardverk.lang.Arguments;
 import org.ardverk.net.NetworkUtils;
 
 import com.ardverk.dht.KUID;
+import com.ardverk.dht.lang.SystemUtils;
 
 /**
  * 
@@ -85,7 +86,7 @@ public class DefaultContact extends AbstractContact {
         }
         
         this.type = Arguments.notNull(type, "type");
-        this.creationTime = System.currentTimeMillis();
+        this.creationTime = SystemUtils.currentTimeMillis();
         this.timeStamp = creationTime;
         
         this.instanceId = instanceId;
@@ -178,12 +179,8 @@ public class DefaultContact extends AbstractContact {
     
     @Override
     public Contact merge(Contact other) {
-        if (!getId().equals(other.getId())) {
+        if (!equals(other)) {
             throw new IllegalArgumentException("other=" + other);
-        }
-        
-        if (other.getCreationTime() < getCreationTime()) {
-            throw new IllegalArgumentException();
         }
         
         return other != this ? new DefaultContact(this, other) : this;

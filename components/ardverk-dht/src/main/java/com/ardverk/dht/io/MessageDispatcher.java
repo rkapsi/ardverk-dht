@@ -43,6 +43,7 @@ import com.ardverk.dht.codec.MessageCodec;
 import com.ardverk.dht.event.EventUtils;
 import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.io.transport.TransportCallback;
+import com.ardverk.dht.lang.TimeStamp;
 import com.ardverk.dht.logging.LoggerUtils;
 import com.ardverk.dht.message.Message;
 import com.ardverk.dht.message.MessageFactory;
@@ -481,7 +482,7 @@ public abstract class MessageDispatcher
      */
     private class MessageEntity {
         
-        private final long creationTime = System.currentTimeMillis();
+        private final TimeStamp creationTime = TimeStamp.now();
         
         private final ScheduledFuture<?> future;
 
@@ -509,20 +510,11 @@ public abstract class MessageDispatcher
         }
         
         /**
-         * Returns the amount of time that has passed ever since
-         * this {@link MessageEntity} was created.
-         */
-        public long getTime(TimeUnit unit) {
-            long time = System.currentTimeMillis() - creationTime;
-            return unit.convert(time, TimeUnit.MILLISECONDS);
-        }
-        
-        /**
          * Called if a {@link ResponseMessage} was received.
          */
         public void handleResponse(ResponseMessage response) throws IOException {
             if (cancel()) {
-                long time = getTime(TimeUnit.MILLISECONDS);
+                long time = creationTime.getAgeInMillis();
                 
                 if (entity.check(response)) {
                     MessageDispatcher.this.handleResponse(callback, entity, 
@@ -541,7 +533,7 @@ public abstract class MessageDispatcher
         public void handleTimeout() throws IOException {
             if (cancel()) {
                 
-                long time = getTime(TimeUnit.MILLISECONDS);
+                long time = creationTime.getAgeInMillis();
                 MessageDispatcher.this.handleTimeout(callback, entity, 
                         time, TimeUnit.MILLISECONDS);
             }
