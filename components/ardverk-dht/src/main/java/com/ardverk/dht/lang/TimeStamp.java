@@ -26,7 +26,8 @@ import java.util.concurrent.TimeUnit;
  * elapsed time. It's not related to any other notion of system or wall-clock 
  * time.
  */
-public final class TimeStamp implements Comparable<TimeStamp>, Serializable {
+public final class TimeStamp implements ElapsedTime, 
+        Comparable<TimeStamp>, Serializable {
     
     private static final long serialVersionUID = -981788126324372167L;
 
@@ -73,16 +74,12 @@ public final class TimeStamp implements Comparable<TimeStamp>, Serializable {
         return INIT_TIME_STAMP + timeStamp;
     }
     
-    /**
-     * Returns the age of the {@link TimeStamp} in the given {@link TimeUnit}.
-     */
+    @Override
     public long getAge(TimeUnit unit) {
         return unit.convert(SystemUtils.nanoTime() - getTimeStamp(), TimeUnit.NANOSECONDS);
     }
     
-    /**
-     * Returns the age of the {@link TimeStamp} in milliseconds.
-     */
+    @Override
     public long getAgeInMillis() {
         return getAge(TimeUnit.MILLISECONDS);
     }
@@ -93,6 +90,13 @@ public final class TimeStamp implements Comparable<TimeStamp>, Serializable {
      */
     public long getTime(TimeStamp ts, TimeUnit unit) {
         return unit.convert(timeStamp - ts.timeStamp, TimeUnit.NANOSECONDS);
+    }
+    
+    /**
+     * 
+     */
+    public TimeSlice slice() {
+        return new TimeSlice();
     }
     
     @Override
@@ -129,5 +133,22 @@ public final class TimeStamp implements Comparable<TimeStamp>, Serializable {
         buffer.append("Creation Time: ").append(new Date(getCreationTime()))
             .append(", Age=").append(getAgeInMillis()).append("ms");
         return buffer.toString();
+    }
+    
+    public class TimeSlice implements ElapsedTime {
+        
+        private final long slice = SystemUtils.nanoTime() - INIT_TIME_STAMP;
+        
+        private TimeSlice() {}
+        
+        @Override
+        public long getAge(TimeUnit unit) {
+            return unit.convert(slice - timeStamp, TimeUnit.NANOSECONDS);
+        }
+        
+        @Override
+        public long getAgeInMillis() {
+            return getAge(TimeUnit.MILLISECONDS);
+        }
     }
 }
