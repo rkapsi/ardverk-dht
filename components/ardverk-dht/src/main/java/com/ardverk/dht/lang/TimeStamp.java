@@ -21,7 +21,10 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 
+ * A {@link TimeStamp} is a relative point in the JVM's time. It's based on
+ * {@link System#nanoTime()} and like nano time it's only good for measuring 
+ * elapsed time. It's not related to any other notion of system or wall-clock 
+ * time.
  */
 public final class TimeStamp implements Comparable<TimeStamp>, Serializable {
     
@@ -52,7 +55,8 @@ public final class TimeStamp implements Comparable<TimeStamp>, Serializable {
     private final long timeStamp = SystemUtils.nanoTime() - INIT_TIME_STAMP;
     
     /**
-     * Returns the creation time (as in UTC time) of the {@link TimeStamp}.
+     * Returns an approximated UTC time as returned by {@link System#currentTimeMillis()}
+     * when this {@link TimeStamp} instance was created.
      * 
      * @see System#currentTimeMillis()
      */
