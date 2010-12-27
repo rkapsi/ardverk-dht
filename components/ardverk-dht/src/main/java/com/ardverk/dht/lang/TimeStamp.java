@@ -137,13 +137,13 @@ public final class TimeStamp implements ElapsedTime,
     
     public class TimeSlice implements ElapsedTime {
         
-        private final long slice = SystemUtils.nanoTime() - INIT_TIME_STAMP;
+        private final long timeStamp = SystemUtils.nanoTime();
         
         private TimeSlice() {}
         
         @Override
         public long getAge(TimeUnit unit) {
-            return unit.convert(slice - timeStamp, TimeUnit.NANOSECONDS);
+            return unit.convert(timeStamp - getTimeStamp(), TimeUnit.NANOSECONDS);
         }
         
         @Override
