@@ -82,11 +82,16 @@ public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>,
     }
     
     /**
-     * Creates and returns a {@link KUID} from a hex string.
+     * Creates and returns a {@link KUID} from a string encoded key.
      */
-    public static KUID createWithHexString(String key) {
-        byte[] data = CodingUtils.decodeBase16(key);
-        return create(data);
+    public static KUID create(String key, int radix) {
+        switch (radix) {
+            case 16:
+                byte[] data = CodingUtils.decodeBase16(key);
+                return create(data);
+            default:
+                throw new IllegalArgumentException("radix=" + radix);
+        }
     }
     
     /**
