@@ -21,7 +21,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.utils.LongComparator;
+import org.ardverk.lang.Longs;
 import org.ardverk.utils.ReverseComparator;
 
 
@@ -48,7 +48,7 @@ public class ContactUtils {
                 // TODO: Take the number of errors into account?
                 long t1 = o1.getErrorTimeStamp();
                 long t2 = o2.getErrorTimeStamp();
-                return LongComparator.compare(t1, t2);
+                return Longs.compare(t1, t2);
             }
         };
         
