@@ -105,7 +105,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     
     private synchronized void postProcess() {
         if (counter.getProcesses() == 0) {
-            long time = creationTime.getTimeInMillis();
+            long time = creationTime.getAgeInMillis();
             
             StoreResponse[] values = responses.toArray(new StoreResponse[0]);
             if (values.length == 0) {

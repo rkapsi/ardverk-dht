@@ -186,7 +186,7 @@ public class SyncManager {
                     }
                     
                     private void complete() {
-                        long time = creationTime.getTimeInMillis();
+                        long time = creationTime.getAgeInMillis();
                         
                         @SuppressWarnings("unchecked")
                         ArdverkFuture<StoreEntity>[] futures 
@@ -208,7 +208,7 @@ public class SyncManager {
             
             if (pingCounter.get() == 0 
                     && storeCounter.get() == 0) {
-                long time = creationTime.getTimeInMillis();
+                long time = creationTime.getAgeInMillis();
                 userFuture.setValue(new DefaultSyncEntity(time, TimeUnit.MILLISECONDS));
             }
             

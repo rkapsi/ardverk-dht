@@ -28,7 +28,7 @@ import org.ardverk.utils.LongComparator;
  * elapsed time. It's not related to any other notion of system or wall-clock 
  * time.
  */
-public final class TimeStamp implements ElapsedTime, 
+public final class TimeStamp implements Age, 
         Comparable<TimeStamp>, Serializable {
     
     private static final long serialVersionUID = -981788126324372167L;
@@ -77,13 +77,13 @@ public final class TimeStamp implements ElapsedTime,
     }
     
     @Override
-    public long getTime(TimeUnit unit) {
+    public long getAge(TimeUnit unit) {
         return unit.convert(SystemUtils.nanoTime() - getTimeStamp(), TimeUnit.NANOSECONDS);
     }
     
     @Override
-    public long getTimeInMillis() {
-        return getTime(TimeUnit.MILLISECONDS);
+    public long getAgeInMillis() {
+        return getAge(TimeUnit.MILLISECONDS);
     }
     
     /**
@@ -92,14 +92,6 @@ public final class TimeStamp implements ElapsedTime,
      */
     public long getTime(TimeStamp ts, TimeUnit unit) {
         return unit.convert(timeStamp - ts.timeStamp, TimeUnit.NANOSECONDS);
-    }
-    
-    /**
-     * 
-     */
-    public Time time() {
-        long elapsedTime = getTime(TimeUnit.NANOSECONDS);
-        return new Time(elapsedTime, TimeUnit.NANOSECONDS);
     }
     
     @Override
@@ -128,7 +120,7 @@ public final class TimeStamp implements ElapsedTime,
     public String toString() {
         StringBuilder buffer = new StringBuilder();
         buffer.append("Creation Time: ").append(new Date(getCreationTime()))
-            .append(", Age=").append(getTimeInMillis()).append("ms");
+            .append(", Age=").append(getAgeInMillis()).append("ms");
         return buffer.toString();
     }
 }

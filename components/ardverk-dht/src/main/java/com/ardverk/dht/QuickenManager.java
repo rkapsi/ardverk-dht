@@ -102,7 +102,7 @@ public class QuickenManager {
                 }
                 
                 TimeStamp timeStamp = bucket.getTimeStamp();
-                if (timeStamp.getTimeInMillis() < bucketTimeout) {
+                if (timeStamp.getAgeInMillis() < bucketTimeout) {
                     continue;
                 }
                 
@@ -194,7 +194,7 @@ public class QuickenManager {
         }
         
         private void complete() {
-            long time = timeStamp.getTimeInMillis();
+            long time = timeStamp.getAgeInMillis();
             setValue(new DefaultQuickenEntity(pingFutures, lookupFutures, 
                     time, TimeUnit.MILLISECONDS));
         }

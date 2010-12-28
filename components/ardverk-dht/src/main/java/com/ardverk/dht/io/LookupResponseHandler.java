@@ -256,7 +256,7 @@ abstract class LookupResponseHandler<T extends LookupEntity>
     protected synchronized Outcome createOutcome() {
         return new Outcome() {
 
-            private final long time = creatinTime.getTimeInMillis();
+            private final long time = creatinTime.getAgeInMillis();
             private final Contact[] contacts = lookupManager.getContacts();
             private final int hop = lookupManager.getHop();
             private final int timeouts = lookupManager.getErrorCount();

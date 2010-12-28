@@ -167,7 +167,7 @@ public class ContactEntry implements Identifier, Longevity {
      */
     public boolean hasBeenActiveRecently() {
         long timeout = config.getHasBeenActiveTimeoutInMillis();
-        return getTimeStamp().getTimeInMillis() < timeout;
+        return getTimeStamp().getAgeInMillis() < timeout;
     }
     
     /**

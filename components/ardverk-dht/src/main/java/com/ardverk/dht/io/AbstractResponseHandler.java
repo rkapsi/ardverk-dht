@@ -57,7 +57,7 @@ abstract class AbstractResponseHandler<V extends Entity>
      */
     public long getLastSendTime(TimeUnit unit) {
         TimeStamp lastSendTime = this.lastSendTime;
-        return lastSendTime != null ? lastSendTime.getTime(unit) : -1L;
+        return lastSendTime != null ? lastSendTime.getAge(unit) : -1L;
     }
     
     /**
@@ -75,7 +75,7 @@ abstract class AbstractResponseHandler<V extends Entity>
      */
     public long getLastResponseTime(TimeUnit unit) {
         TimeStamp lastResponseTime = this.lastResponseTime;
-        return lastResponseTime != null ? lastResponseTime.getTime(unit) : -1L;
+        return lastResponseTime != null ? lastResponseTime.getAge(unit) : -1L;
     }
     
     /**

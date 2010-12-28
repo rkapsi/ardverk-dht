@@ -85,7 +85,7 @@ abstract class AbstractContact implements Contact {
     
     @Override
     public long getTimeSinceLastContact(TimeUnit unit) {
-        return getTimeStamp().getTime(unit);
+        return getTimeStamp().getAge(unit);
     }
     
     @Override

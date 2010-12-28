@@ -18,15 +18,15 @@ package com.ardverk.dht.lang;
 
 import java.util.concurrent.TimeUnit;
 
-public interface ElapsedTime {
+public interface Age {
 
     /**
      * Returns the amount of elapsed time in the given {@link TimeUnit}.
      */
-    public long getTime(TimeUnit unit);
+    public long getAge(TimeUnit unit);
     
     /**
      * Returns the amount of elapsed time in milliseconds.
      */
-    public long getTimeInMillis();
+    public long getAgeInMillis();
 }

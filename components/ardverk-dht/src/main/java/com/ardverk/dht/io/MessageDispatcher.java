@@ -514,7 +514,7 @@ public abstract class MessageDispatcher
          */
         public void handleResponse(ResponseMessage response) throws IOException {
             if (cancel()) {
-                long time = creationTime.getTimeInMillis();
+                long time = creationTime.getAgeInMillis();
                 
                 if (entity.check(response)) {
                     MessageDispatcher.this.handleResponse(callback, entity, 
@@ -533,7 +533,7 @@ public abstract class MessageDispatcher
         public void handleTimeout() throws IOException {
             if (cancel()) {
                 
-                long time = creationTime.getTimeInMillis();
+                long time = creationTime.getAgeInMillis();
                 MessageDispatcher.this.handleTimeout(callback, entity, 
                         time, TimeUnit.MILLISECONDS);
             }
