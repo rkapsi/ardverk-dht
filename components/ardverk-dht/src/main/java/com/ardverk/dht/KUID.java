@@ -28,6 +28,7 @@ import org.ardverk.coding.CodingUtils;
 import org.ardverk.collection.Key;
 import org.ardverk.collection.KeyAnalyzer;
 import org.ardverk.io.Writable;
+import org.ardverk.lang.Bytes;
 
 import com.ardverk.dht.lang.Identifier;
 import com.ardverk.dht.lang.Negation;
@@ -390,7 +391,7 @@ public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>,
         
         int length = length();
         for (int i = 0; i < length; i++) {
-            int diff = (int)(key[i] & 0xFF) - (int)(otherId.key[i] & 0xFF);
+            int diff = Bytes.compareUnsigned(key[i], otherId.key[i]);
             if (diff != 0) {
                 return diff;
             }
