@@ -22,7 +22,6 @@ import org.ardverk.net.NetworkUtils;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.lang.Identifier;
-import com.ardverk.dht.lang.SystemUtils;
 import com.ardverk.dht.lang.TimeStamp;
 
 /**
@@ -113,7 +112,7 @@ public class ContactEntry implements Identifier, Longevity {
      */
     public boolean error() {
         ++errorCount;
-        errorTimeStamp = SystemUtils.currentTimeMillis();
+        errorTimeStamp = System.currentTimeMillis();
         return isDead();
     }
     

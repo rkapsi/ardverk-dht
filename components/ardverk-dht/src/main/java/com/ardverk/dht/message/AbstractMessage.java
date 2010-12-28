@@ -21,12 +21,11 @@ import java.net.SocketAddress;
 import org.ardverk.lang.Arguments;
 
 import com.ardverk.dht.lang.Epoch;
-import com.ardverk.dht.lang.SystemUtils;
 import com.ardverk.dht.routing.Contact;
 
 public abstract class AbstractMessage implements Message, Epoch {
 
-    private final long creationTime = SystemUtils.currentTimeMillis();
+    private final long creationTime = System.currentTimeMillis();
     
     private final MessageId messageId;
     

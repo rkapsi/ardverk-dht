@@ -36,13 +36,13 @@ public class TimeStamp implements Epoch, Age, Comparable<TimeStamp>, Serializabl
      * The initial system time (UTC). We use/need it to terminate the 
      * {@link TimeStamp}'s creation time.
      */
-    private static final long INIT_SYSTEM_TIME = SystemUtils.currentTimeMillis();
+    private static final long INIT_SYSTEM_TIME = System.currentTimeMillis();
     
     /**
      * The initial JVM time. We use/need it to terminate the {@link TimeStamp}'s
      * creation time.
      */
-    private static final long INIT_TIME_STAMP = SystemUtils.nanoTime();
+    private static final long INIT_TIME_STAMP = System.nanoTime();
     
     /**
      * Creates and returns a {@link TimeStamp}.
@@ -52,9 +52,11 @@ public class TimeStamp implements Epoch, Age, Comparable<TimeStamp>, Serializabl
     }
     
     /**
-     * The JVM time when this {@link TimeStamp} was created.
+     * The JVM time when this {@link TimeStamp} was created. We must store it
+     * as a relative value to enable serialization because the time as returned
+     * by {@link System#nanoTime()} is some fixed but arbitrary time.
      */
-    private final long timeStamp = SystemUtils.nanoTime() - INIT_TIME_STAMP;
+    private final long timeStamp = System.nanoTime() - INIT_TIME_STAMP;
     
     private TimeStamp() {}
     
@@ -74,20 +76,12 @@ public class TimeStamp implements Epoch, Age, Comparable<TimeStamp>, Serializabl
     
     @Override
     public long getAge(TimeUnit unit) {
-        return unit.convert(SystemUtils.nanoTime() - getTimeStamp(), TimeUnit.NANOSECONDS);
+        return unit.convert(System.nanoTime() - getTimeStamp(), TimeUnit.NANOSECONDS);
     }
     
     @Override
     public long getAgeInMillis() {
         return getAge(TimeUnit.MILLISECONDS);
-    }
-    
-    /**
-     * Returns the difference in time between this {@link TimeStamp} and
-     * the provided {@link TimeStamp} in the given {@link TimeUnit}.
-     */
-    public long getTime(TimeStamp ts, TimeUnit unit) {
-        return unit.convert(timeStamp - ts.timeStamp, TimeUnit.NANOSECONDS);
     }
     
     @Override
