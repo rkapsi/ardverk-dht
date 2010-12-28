@@ -110,6 +110,8 @@ public abstract class MessageDispatcher
         this.factory = Arguments.notNull(factory, "factory");
         this.codec = Arguments.notNull(codec, "codec");
         
+        // TODO: Is memorizing the 512 most recently received MessageIds
+        // too much or too little? 
         this.checker = new ResponseChecker(factory, 512);
     }
     
