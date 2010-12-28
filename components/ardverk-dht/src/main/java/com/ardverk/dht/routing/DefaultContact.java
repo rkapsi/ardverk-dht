@@ -21,10 +21,10 @@ import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.lang.Arguments;
+import org.ardverk.lang.TimeStamp;
 import org.ardverk.net.NetworkUtils;
 
 import com.ardverk.dht.KUID;
-import com.ardverk.dht.lang.TimeStamp;
 
 /**
  * 

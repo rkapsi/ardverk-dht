@@ -16,8 +16,9 @@
 
 package com.ardverk.dht.storage;
 
-import com.ardverk.dht.lang.Age;
-import com.ardverk.dht.lang.Epoch;
+import org.ardverk.lang.Age;
+import org.ardverk.lang.Epoch;
+
 import com.ardverk.dht.lang.Identifier;
 import com.ardverk.dht.routing.Contact;
 

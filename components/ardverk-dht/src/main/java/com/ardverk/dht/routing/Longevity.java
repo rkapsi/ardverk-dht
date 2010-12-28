@@ -16,7 +16,7 @@
 
 package com.ardverk.dht.routing;
 
-import com.ardverk.dht.lang.TimeStamp;
+import org.ardverk.lang.TimeStamp;
 
 /**
  * Objects that have a persistent creation time and update

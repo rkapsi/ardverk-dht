@@ -18,11 +18,11 @@ package com.ardverk.dht.routing;
 
 import java.net.SocketAddress;
 
+import org.ardverk.lang.TimeStamp;
 import org.ardverk.net.NetworkUtils;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.lang.Identifier;
-import com.ardverk.dht.lang.TimeStamp;
 
 /**
  * The {@link DefaultRouteTable} uses internally {@link ContactEntry}s 

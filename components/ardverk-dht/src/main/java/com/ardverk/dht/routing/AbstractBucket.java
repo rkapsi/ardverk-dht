@@ -16,8 +16,9 @@
 
 package com.ardverk.dht.routing;
 
+import org.ardverk.lang.TimeStamp;
+
 import com.ardverk.dht.KUID;
-import com.ardverk.dht.lang.TimeStamp;
 
 /**
  * An abstract implementation of {@link Bucket}.

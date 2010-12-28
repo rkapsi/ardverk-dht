@@ -25,10 +25,10 @@ import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.AsyncProcessFuture;
 import org.ardverk.lang.Arguments;
+import org.ardverk.lang.TimeStamp;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.entity.Entity;
-import com.ardverk.dht.lang.TimeStamp;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;

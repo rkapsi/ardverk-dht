@@ -19,8 +19,8 @@ package com.ardverk.dht.message;
 import java.net.SocketAddress;
 
 import org.ardverk.lang.Arguments;
+import org.ardverk.lang.Epoch;
 
-import com.ardverk.dht.lang.Epoch;
 import com.ardverk.dht.routing.Contact;
 
 public abstract class AbstractMessage implements Message, Epoch {

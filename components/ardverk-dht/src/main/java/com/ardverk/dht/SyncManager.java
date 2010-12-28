@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.FutureUtils;
+import org.ardverk.lang.TimeStamp;
 import org.ardverk.utils.ArrayUtils;
 
 import com.ardverk.dht.concurrent.ArdverkFuture;
@@ -38,7 +39,6 @@ import com.ardverk.dht.entity.DefaultSyncEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.entity.SyncEntity;
-import com.ardverk.dht.lang.TimeStamp;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.Localhost;
 import com.ardverk.dht.routing.RouteTable;

@@ -25,11 +25,11 @@ import java.util.concurrent.TimeUnit;
 import org.ardverk.collection.Iterators;
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.lang.Arguments;
+import org.ardverk.lang.TimeStamp;
 
 import com.ardverk.dht.config.StoreConfig;
 import com.ardverk.dht.entity.DefaultStoreEntity;
 import com.ardverk.dht.entity.StoreEntity;
-import com.ardverk.dht.lang.TimeStamp;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.message.StoreRequest;

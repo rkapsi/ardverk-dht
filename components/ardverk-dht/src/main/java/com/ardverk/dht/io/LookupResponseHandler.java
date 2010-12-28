@@ -31,12 +31,12 @@ import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.ExecutorUtils;
 import org.ardverk.concurrent.FutureUtils;
 import org.ardverk.lang.Arguments;
+import org.ardverk.lang.TimeStamp;
 import org.slf4j.Logger;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.config.LookupConfig;
 import com.ardverk.dht.entity.LookupEntity;
-import com.ardverk.dht.lang.TimeStamp;
 import com.ardverk.dht.logging.LoggerUtils;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;

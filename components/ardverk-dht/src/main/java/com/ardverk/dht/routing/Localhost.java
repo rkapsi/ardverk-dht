@@ -20,10 +20,10 @@ import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.io.Bindable;
+import org.ardverk.lang.TimeStamp;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.io.transport.Transport;
-import com.ardverk.dht.lang.TimeStamp;
 
 public class Localhost extends AbstractContact implements Bindable<Transport> {
     
