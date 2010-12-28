@@ -20,6 +20,8 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.utils.LongComparator;
+
 /**
  * A {@link TimeStamp} is a relative point in the JVM's time. It's based on
  * {@link System#nanoTime()} and like nano time it's only good for measuring 
@@ -75,13 +77,13 @@ public final class TimeStamp implements ElapsedTime,
     }
     
     @Override
-    public long getAge(TimeUnit unit) {
+    public long getTime(TimeUnit unit) {
         return unit.convert(SystemUtils.nanoTime() - getTimeStamp(), TimeUnit.NANOSECONDS);
     }
     
     @Override
-    public long getAgeInMillis() {
-        return getAge(TimeUnit.MILLISECONDS);
+    public long getTimeInMillis() {
+        return getTime(TimeUnit.MILLISECONDS);
     }
     
     /**
@@ -95,19 +97,14 @@ public final class TimeStamp implements ElapsedTime,
     /**
      * 
      */
-    public TimeSlice slice() {
-        return new TimeSlice();
+    public Time time() {
+        long elapsedTime = getTime(TimeUnit.NANOSECONDS);
+        return new Time(elapsedTime, TimeUnit.NANOSECONDS);
     }
     
     @Override
     public int compareTo(TimeStamp other) {
-        long diff = timeStamp - other.timeStamp;
-        if (diff < 0) {
-            return -1;
-        } else if (0 < diff) {
-            return 1;
-        }
-        return 0;
+        return LongComparator.compare(timeStamp, other.timeStamp);
     }
     
     @Override
@@ -131,24 +128,7 @@ public final class TimeStamp implements ElapsedTime,
     public String toString() {
         StringBuilder buffer = new StringBuilder();
         buffer.append("Creation Time: ").append(new Date(getCreationTime()))
-            .append(", Age=").append(getAgeInMillis()).append("ms");
+            .append(", Age=").append(getTimeInMillis()).append("ms");
         return buffer.toString();
-    }
-    
-    public class TimeSlice implements ElapsedTime {
-        
-        private final long timeStamp = SystemUtils.nanoTime();
-        
-        private TimeSlice() {}
-        
-        @Override
-        public long getAge(TimeUnit unit) {
-            return unit.convert(timeStamp - getTimeStamp(), TimeUnit.NANOSECONDS);
-        }
-        
-        @Override
-        public long getAgeInMillis() {
-            return getAge(TimeUnit.MILLISECONDS);
-        }
     }
 }

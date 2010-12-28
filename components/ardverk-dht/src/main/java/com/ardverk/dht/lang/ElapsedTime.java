@@ -23,10 +23,10 @@ public interface ElapsedTime {
     /**
      * Returns the amount of elapsed time in the given {@link TimeUnit}.
      */
-    public long getAge(TimeUnit unit);
+    public long getTime(TimeUnit unit);
     
     /**
      * Returns the amount of elapsed time in milliseconds.
      */
-    public long getAgeInMillis();
+    public long getTimeInMillis();
 }

@@ -34,7 +34,7 @@ abstract class AbstractValueTuple implements ValueTuple {
     
     @Override
     public long getAge(TimeUnit unit) {
-        return creationTime.getAge(unit);
+        return creationTime.getTime(unit);
     }
 
     @Override

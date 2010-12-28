@@ -195,7 +195,7 @@ public class QuickenManager {
         }
         
         private void complete() {
-            long time = timeStamp.getAgeInMillis();
+            long time = timeStamp.getTimeInMillis();
             setValue(new DefaultQuickenEntity(pingFutures, lookupFutures, 
                     time, TimeUnit.MILLISECONDS));
         }
