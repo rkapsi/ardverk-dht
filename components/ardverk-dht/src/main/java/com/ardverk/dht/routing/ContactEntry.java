@@ -23,6 +23,7 @@ import org.ardverk.net.NetworkUtils;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.lang.Identifier;
 import com.ardverk.dht.lang.SystemUtils;
+import com.ardverk.dht.lang.TimeStamp;
 
 /**
  * The {@link DefaultRouteTable} uses internally {@link ContactEntry}s 
@@ -50,12 +51,12 @@ public class ContactEntry implements Identifier, Longevity {
     }
     
     @Override
-    public long getCreationTime() {
+    public TimeStamp getCreationTime() {
         return contact.getCreationTime();
     }
     
     @Override
-    public long getTimeStamp() {
+    public TimeStamp getTimeStamp() {
         return contact.getTimeStamp();
     }
     
@@ -77,7 +78,8 @@ public class ContactEntry implements Identifier, Longevity {
     public Update update(Contact other) {
         Contact previous = contact;
         
-        if (other.getCreationTime() >= previous.getCreationTime()) {
+        if (other.getCreationTime().compareTo(
+                previous.getCreationTime()) >= 0) {
             contact = previous.merge(other);
         }
         
@@ -165,7 +167,7 @@ public class ContactEntry implements Identifier, Longevity {
      */
     public boolean hasBeenActiveRecently() {
         long timeout = config.getHasBeenActiveTimeoutInMillis();
-        return (SystemUtils.currentTimeMillis() - getTimeStamp()) < timeout;
+        return getTimeStamp().getTimeInMillis() < timeout;
     }
     
     /**

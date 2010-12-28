@@ -17,20 +17,20 @@
 package com.ardverk.dht.routing;
 
 import com.ardverk.dht.KUID;
-import com.ardverk.dht.lang.SystemUtils;
+import com.ardverk.dht.lang.TimeStamp;
 
 /**
  * An abstract implementation of {@link Bucket}.
  */
 public abstract class AbstractBucket implements Bucket {
 
-    private final long creationTime = SystemUtils.currentTimeMillis();
+    private final TimeStamp creationTime = TimeStamp.now();
     
     private final KUID bucketId;
     
     private final int depth;
     
-    private long timeStamp = creationTime;
+    private TimeStamp timeStamp = creationTime;
     
     public AbstractBucket(KUID bucketId, int depth) {
         this.bucketId = bucketId;
@@ -38,19 +38,19 @@ public abstract class AbstractBucket implements Bucket {
     }
 
     @Override
-    public long getCreationTime() {
+    public TimeStamp getCreationTime() {
         return creationTime;
     }
     
     @Override
-    public long getTimeStamp() {
+    public TimeStamp getTimeStamp() {
         return timeStamp;
     }
 
     /**
      * Sets the {@link Bucket}'s time stamp
      */
-    public void setTimeStamp(long timeStamp) {
+    public void setTimeStamp(TimeStamp timeStamp) {
         this.timeStamp = timeStamp;
     }
     
@@ -60,7 +60,7 @@ public abstract class AbstractBucket implements Bucket {
      * @see System#currentTimeMillis()
      */
     public void touch() {
-        setTimeStamp(SystemUtils.currentTimeMillis());
+        setTimeStamp(TimeStamp.now());
     }
     
     @Override

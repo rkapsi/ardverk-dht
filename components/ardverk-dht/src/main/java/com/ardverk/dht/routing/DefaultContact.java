@@ -24,7 +24,7 @@ import org.ardverk.lang.Arguments;
 import org.ardverk.net.NetworkUtils;
 
 import com.ardverk.dht.KUID;
-import com.ardverk.dht.lang.SystemUtils;
+import com.ardverk.dht.lang.TimeStamp;
 
 /**
  * 
@@ -35,9 +35,9 @@ public class DefaultContact extends AbstractContact {
     
     private final Type type;
     
-    private final long creationTime;
+    private final TimeStamp creationTime;
     
-    private final long timeStamp;
+    private final TimeStamp timeStamp;
     
     private final int instanceId;
     
@@ -86,7 +86,7 @@ public class DefaultContact extends AbstractContact {
         }
         
         this.type = Arguments.notNull(type, "type");
-        this.creationTime = SystemUtils.currentTimeMillis();
+        this.creationTime = TimeStamp.now();
         this.timeStamp = creationTime;
         
         this.instanceId = instanceId;
@@ -143,12 +143,12 @@ public class DefaultContact extends AbstractContact {
     }
     
     @Override
-    public long getCreationTime() {
+    public TimeStamp getCreationTime() {
         return creationTime;
     }
     
     @Override
-    public long getTimeStamp() {
+    public TimeStamp getTimeStamp() {
         return timeStamp;
     }
     

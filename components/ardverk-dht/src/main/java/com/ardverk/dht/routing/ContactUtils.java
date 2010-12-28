@@ -100,7 +100,7 @@ public class ContactUtils {
             Collection<? extends ContactEntry> entries) {
         ContactEntry lrs = null;
         for (ContactEntry entry : entries) {
-            if (lrs == null || entry.getTimeStamp() < lrs.getTimeStamp()) {
+            if (lrs == null || entry.getTimeStamp().compareTo(lrs.getTimeStamp()) < 0) {
                 lrs = entry;
             }
         }
@@ -115,7 +115,7 @@ public class ContactUtils {
             Collection<? extends ContactEntry> entries) {
         ContactEntry mrs = null;
         for (ContactEntry entry : entries) {
-            if (mrs == null || entry.getTimeStamp() >= mrs.getTimeStamp()) {
+            if (mrs == null || entry.getTimeStamp().compareTo(mrs.getTimeStamp()) >= 0) {
                 mrs = entry;
             }
         }

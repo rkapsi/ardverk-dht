@@ -19,7 +19,6 @@ package com.ardverk.dht.routing;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import org.ardverk.utils.LongComparator;
 import org.ardverk.utils.ReverseComparator;
 
 /**
@@ -33,9 +32,7 @@ public class LongevityUtils {
             @Override
             public int compare(Longevity o1, Longevity o2) {
                 // NOTE: We're swapping the arguments!
-                return LongComparator.compare(
-                        o2.getTimeStamp(), 
-                        o1.getTimeStamp());
+                return o2.getTimeStamp().compareTo(o1.getTimeStamp());
             }
         };
         
@@ -47,9 +44,7 @@ public class LongevityUtils {
         = new Comparator<Longevity>() {
             @Override
             public int compare(Longevity o1, Longevity o2) {
-                return LongComparator.compare(
-                        o1.getCreationTime(), 
-                        o2.getCreationTime());
+                return o1.getCreationTime().compareTo(o2.getCreationTime());
             }
         };
         

@@ -20,7 +20,6 @@ import java.util.concurrent.TimeUnit;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.lang.Identifier;
-import com.ardverk.dht.lang.SystemUtils;
 
 abstract class AbstractContact implements Contact {
     
@@ -86,8 +85,7 @@ abstract class AbstractContact implements Contact {
     
     @Override
     public long getTimeSinceLastContact(TimeUnit unit) {
-        long time = SystemUtils.currentTimeMillis() - getTimeStamp();
-        return unit.convert(time, TimeUnit.MILLISECONDS);
+        return getTimeStamp().getTime(unit);
     }
     
     @Override

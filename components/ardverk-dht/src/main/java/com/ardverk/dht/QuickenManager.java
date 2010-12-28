@@ -34,7 +34,6 @@ import com.ardverk.dht.entity.DefaultQuickenEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.QuickenEntity;
-import com.ardverk.dht.lang.SystemUtils;
 import com.ardverk.dht.lang.TimeStamp;
 import com.ardverk.dht.routing.Bucket;
 import com.ardverk.dht.routing.Contact;
@@ -102,8 +101,8 @@ public class QuickenManager {
                     continue;
                 }
                 
-                long timeStamp = bucket.getTimeStamp();
-                if ((SystemUtils.currentTimeMillis()-timeStamp) < bucketTimeout) {
+                TimeStamp timeStamp = bucket.getTimeStamp();
+                if (timeStamp.getTimeInMillis() < bucketTimeout) {
                     continue;
                 }
                 
