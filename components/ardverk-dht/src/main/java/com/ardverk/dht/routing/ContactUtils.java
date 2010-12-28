@@ -21,9 +21,8 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.lang.Longs;
+import org.ardverk.lang.TimeStamp;
 import org.ardverk.utils.ReverseComparator;
-
 
 public class ContactUtils {
 
@@ -46,9 +45,14 @@ public class ContactUtils {
                 
                 // Sort everyone else from least recently failed to most recently failed.
                 // TODO: Take the number of errors into account?
-                long t1 = o1.getErrorTimeStamp();
-                long t2 = o2.getErrorTimeStamp();
-                return Longs.compare(t1, t2);
+                TimeStamp t1 = o1.getErrorTimeStamp();
+                TimeStamp t2 = o2.getErrorTimeStamp();
+                if (t1 == null) {
+                    return (t2 != null) ? -1 : 0;
+                } else if (t2 == null) {
+                    return 1;
+                }
+                return t1.compareTo(t2);
             }
         };
         

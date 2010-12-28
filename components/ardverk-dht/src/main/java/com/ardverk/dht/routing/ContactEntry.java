@@ -42,7 +42,7 @@ public class ContactEntry implements Identifier, Longevity {
     
     private int errorCount = 0;
     
-    private long errorTimeStamp;
+    private TimeStamp errorTimeStamp = null;
     
     ContactEntry(RouteTableConfig config, Contact contact) {
         this.config = config;
@@ -84,7 +84,7 @@ public class ContactEntry implements Identifier, Longevity {
         
         if (other.isActive()) {
             errorCount = 0;
-            errorTimeStamp = 0;
+            errorTimeStamp = null;
         }
         
         return new Update(previous, other, contact);
@@ -99,9 +99,10 @@ public class ContactEntry implements Identifier, Longevity {
     }
     
     /**
-     * Returns the time when the most recent error occurred.
+     * Returns the time when the most recent error occurred not {@code null}
+     * if no errors have occurred recently.
      */
-    public long getErrorTimeStamp() {
+    public TimeStamp getErrorTimeStamp() {
         return errorTimeStamp;
     }
     
@@ -112,7 +113,7 @@ public class ContactEntry implements Identifier, Longevity {
      */
     public boolean error() {
         ++errorCount;
-        errorTimeStamp = System.currentTimeMillis();
+        errorTimeStamp = TimeStamp.now();
         return isDead();
     }
     
