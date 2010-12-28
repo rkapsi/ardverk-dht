@@ -28,8 +28,7 @@ import org.ardverk.utils.LongComparator;
  * elapsed time. It's not related to any other notion of system or wall-clock 
  * time.
  */
-public final class TimeStamp implements Age, 
-        Comparable<TimeStamp>, Serializable {
+public class TimeStamp implements Epoch, Age, Comparable<TimeStamp>, Serializable {
     
     private static final long serialVersionUID = -981788126324372167L;
 
@@ -57,15 +56,7 @@ public final class TimeStamp implements Age,
      */
     private final long timeStamp = SystemUtils.nanoTime() - INIT_TIME_STAMP;
     
-    /**
-     * Returns an approximated UTC time as returned by {@link System#currentTimeMillis()}
-     * when this {@link TimeStamp} instance was created.
-     * 
-     * @see System#currentTimeMillis()
-     */
-    public long getCreationTime() {
-        return INIT_SYSTEM_TIME + TimeUnit.NANOSECONDS.toMillis(timeStamp);
-    }
+    private TimeStamp() {}
     
     /**
      * Returns the {@link TimeStamp}'s value
@@ -74,6 +65,11 @@ public final class TimeStamp implements Age,
      */
     public long getTimeStamp() {
         return INIT_TIME_STAMP + timeStamp;
+    }
+    
+    @Override
+    public long getCreationTime() {
+        return INIT_SYSTEM_TIME + TimeUnit.NANOSECONDS.toMillis(timeStamp);
     }
     
     @Override

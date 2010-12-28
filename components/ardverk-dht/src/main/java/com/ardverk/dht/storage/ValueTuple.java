@@ -17,6 +17,7 @@
 package com.ardverk.dht.storage;
 
 import com.ardverk.dht.lang.Age;
+import com.ardverk.dht.lang.Epoch;
 import com.ardverk.dht.lang.Identifier;
 import com.ardverk.dht.routing.Contact;
 
@@ -26,12 +27,7 @@ import com.ardverk.dht.routing.Contact;
  * sender of the value, when it was created and what it's current
  * age is.
  */
-public interface ValueTuple extends Identifier, Age {
-
-    /**
-     * Returns the {@link ValueTuple}'s creation time.
-     */
-    public long getCreationTime();
+public interface ValueTuple extends Identifier, Epoch, Age {
     
     /**
      * Returns the sender of the {@link ValueTuple}.

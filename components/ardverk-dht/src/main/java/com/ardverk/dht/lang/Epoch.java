@@ -16,20 +16,15 @@
 
 package com.ardverk.dht.lang;
 
-import java.util.concurrent.TimeUnit;
-
 /**
- * Objects that have an age may implement this interface.
+ * Objects that have an creation time may implement this interface.
  */
-public interface Age {
+public interface Epoch {
 
     /**
-     * Returns the amount of elapsed time in the given {@link TimeUnit}.
+     * Returns the creation time of the object in UTC time.
+     * 
+     * @see System#currentTimeMillis()
      */
-    public long getAge(TimeUnit unit);
-    
-    /**
-     * Returns the amount of elapsed time in milliseconds.
-     */
-    public long getAgeInMillis();
+    public long getCreationTime();
 }
