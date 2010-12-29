@@ -31,9 +31,9 @@ import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.routing.Contact;
 
 /**
- * The {@link ArdverkService} defines the basic operations of a DHT.
+ * The {@link DHTService} defines the basic operations of a DHT.
  */
-interface ArdverkService {
+interface DHTService {
 
     /**
      * Sends a PING to the given host.
