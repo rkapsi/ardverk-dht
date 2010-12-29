@@ -26,8 +26,8 @@ public class DefaultNodeEntity extends AbstractLookupEntity implements NodeEntit
     private final Outcome outcome;
     
     public DefaultNodeEntity(Outcome outcome) {
-        super(outcome.getLookupId(), 
-                outcome.getTimeInMillis(), TimeUnit.MILLISECONDS);
+        super(outcome.getId(), outcome.getTimeInMillis(), 
+                TimeUnit.MILLISECONDS);
         
         this.outcome = outcome;
     }
