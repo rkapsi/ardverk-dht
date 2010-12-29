@@ -56,7 +56,7 @@ abstract class LookupResponseHandler<T extends LookupEntity>
     private static final ScheduledThreadPoolExecutor EXECUTOR 
         = ExecutorUtils.newSingleThreadScheduledExecutor("BoostThread");
     
-    private final TimeStamp creatinTime = TimeStamp.now();
+    private final TimeStamp creationTime = TimeStamp.now();
     
     protected final LookupConfig config;
     
@@ -256,7 +256,7 @@ abstract class LookupResponseHandler<T extends LookupEntity>
     protected synchronized Outcome createOutcome() {
         return new Outcome() {
 
-            private final long time = creatinTime.getAgeInMillis();
+            private final long time = creationTime.getAgeInMillis();
             private final Contact[] contacts = lookupManager.getContacts();
             private final int hop = lookupManager.getHop();
             private final int timeouts = lookupManager.getErrorCount();
