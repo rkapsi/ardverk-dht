@@ -18,18 +18,13 @@ package com.ardverk.dht.io;
 
 import java.util.concurrent.TimeUnit;
 
-import com.ardverk.dht.KUID;
+import com.ardverk.dht.lang.Identifier;
 import com.ardverk.dht.routing.Contact;
 
 /**
  * The {@link Outcome} is a snapshot of the current lookup process.
  */
-public abstract class Outcome {
-    
-    /**
-     * Returns the lookup {@link KUID}.
-     */
-    public abstract KUID getLookupId();
+public abstract class Outcome implements Identifier {
     
     /**
      * Returns the {@link Contact}s that have been found.

@@ -262,7 +262,7 @@ abstract class LookupResponseHandler<T extends LookupEntity>
             private final int timeouts = lookupManager.getErrorCount();
             
             @Override
-            public KUID getLookupId() {
+            public KUID getId() {
                 return lookupManager.lookupId;
             }
 
