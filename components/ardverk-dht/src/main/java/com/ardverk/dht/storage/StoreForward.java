@@ -78,6 +78,10 @@ public class StoreForward {
             return;
         }
         
+        if (contact.isInvisible()) {
+            return;
+        }
+        
         StoreConfig storeConfig = config.getStoreConfig();
         
         KUID contactId = contact.getId();

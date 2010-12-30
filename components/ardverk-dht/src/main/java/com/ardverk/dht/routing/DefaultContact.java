@@ -41,6 +41,8 @@ public class DefaultContact extends AbstractContact {
     
     private final int instanceId;
     
+    private final boolean invisible;
+    
     private final SocketAddress socketAddress;
     
     private final SocketAddress contactAddress;
@@ -48,34 +50,38 @@ public class DefaultContact extends AbstractContact {
     private final SocketAddress remoteAddress;
     
     /**
-     * Creates a {@link Contact}
+     * Creates a {@link DefaultContact}
      */
-    public DefaultContact(Type type, 
-            KUID contactId, 
-            int instanceId, 
+    public DefaultContact(KUID contactId, SocketAddress address) {
+        this(Type.UNKNOWN, contactId, 0, false, address);
+    }
+    
+    /**
+     * Creates a {@link DefaultContact}
+     */
+    public DefaultContact(Type type, KUID contactId, 
+            int instanceId, boolean invisible, 
             SocketAddress address) {
-        this(type, contactId, instanceId, address, address, 
-                -1L, TimeUnit.MILLISECONDS);
+        this(type, contactId, instanceId, invisible, address, address);
     }
     
     /**
-     * Creates a {@link Contact}
+     * Creates a {@link DefaultContact}
+     */
+    public DefaultContact(Type type, KUID contactId, 
+            int instanceId, boolean invisible, 
+            SocketAddress socketAddress, SocketAddress contactAddress) {
+        this(type, contactId, instanceId, invisible, 
+                socketAddress, contactAddress, -1L, TimeUnit.MILLISECONDS);
+    }
+    
+    /**
+     * Creates a {@link DefaultContact}
      */
     public DefaultContact(Type type, 
             KUID contactId, 
             int instanceId, 
-            SocketAddress socketAddress, 
-            SocketAddress contactAddress) {
-        this(type, contactId, instanceId, socketAddress, 
-                contactAddress, -1L, TimeUnit.MILLISECONDS);
-    }
-    
-    /**
-     * Creates a {@link Contact}
-     */
-    public DefaultContact(Type type, 
-            KUID contactId, 
-            int instanceId, 
+            boolean invisible,
             SocketAddress socketAddress, 
             SocketAddress contactAddress,
             long rtt, TimeUnit unit) {
@@ -90,6 +96,7 @@ public class DefaultContact extends AbstractContact {
         this.timeStamp = creationTime;
         
         this.instanceId = instanceId;
+        this.invisible = invisible;
         this.socketAddress = Arguments.notNull(socketAddress, "socketAddress");
         this.contactAddress = Arguments.notNull(contactAddress, "contactAddress");
         this.remoteAddress = combine(socketAddress, contactAddress);
@@ -111,12 +118,14 @@ public class DefaultContact extends AbstractContact {
         
         if (existing.isBetter(other)) {
             this.instanceId = existing.getInstanceId();
+            this.invisible = existing.isInvisible();
             this.socketAddress = existing.getSocketAddress();
             this.contactAddress = existing.getContactAddress();
             this.remoteAddress = existing.getRemoteAddress();
             this.type = existing.getType();
         } else {
             this.instanceId = other.getInstanceId();
+            this.invisible = other.isInvisible();
             this.socketAddress = other.getSocketAddress();
             this.contactAddress = other.getContactAddress();
             this.remoteAddress = other.getRemoteAddress();
@@ -158,6 +167,11 @@ public class DefaultContact extends AbstractContact {
     }
     
     @Override
+    public boolean isInvisible() {
+        return invisible;
+    }
+    
+    @Override
     public SocketAddress getSocketAddress() {
         return socketAddress;
     }
@@ -179,7 +193,7 @@ public class DefaultContact extends AbstractContact {
     
     @Override
     public Contact merge(Contact other) {
-        if (!equals(other)) {
+        if (!equals(other) || other.isInvisible()) {
             throw new IllegalArgumentException("other=" + other);
         }
         

@@ -48,7 +48,6 @@ import com.ardverk.dht.message.StoreResponse;
 import com.ardverk.dht.message.ValueRequest;
 import com.ardverk.dht.message.ValueResponse;
 import com.ardverk.dht.routing.Contact;
-import com.ardverk.dht.routing.Contact.Type;
 import com.ardverk.dht.routing.DefaultContact;
 import com.ardverk.dht.storage.Database.Condition;
 import com.ardverk.dht.storage.DefaultCondition;
@@ -118,23 +117,27 @@ class MessageInputStream extends BencodingInputStream {
         return NetworkUtils.createUnresolved(host, port);
     }
     
-    public Contact readContact(Contact.Type type, SocketAddress src) throws IOException {
+    public Contact readSender(Contact.Type type, SocketAddress src) throws IOException {
         KUID contactId = readKUID();
         int instanceId = readInt();
+        boolean invisible = readBoolean();
         SocketAddress address = readSocketAddress();
         
-        if (type == Contact.Type.UNKNOWN) {
-            src = address;
-        }
-        
         return new DefaultContact(type, contactId, 
-                instanceId, src, address);
+                instanceId, invisible, src, address);
     }
     
-    public Contact[] readContacts(Contact.Type type, SocketAddress src) throws IOException {
+    public Contact readContact() throws IOException {
+        KUID contactId = readKUID();
+        SocketAddress address = readSocketAddress();
+        
+        return new DefaultContact(contactId, address);
+    }
+    
+    public Contact[] readContacts() throws IOException {
         Contact[] contacts = new Contact[readInt()];
         for (int i = 0; i < contacts.length; i++) {
-            contacts[i] = readContact(type, src);
+            contacts[i] = readContact();
         }
         return contacts;
     }
@@ -147,7 +150,7 @@ class MessageInputStream extends BencodingInputStream {
     
     public ValueTuple readValueTuple(Contact contact, 
             SocketAddress address) throws IOException {
-        Contact creator = readContact(Type.UNKNOWN, address);
+        Contact creator = readContact();
         
         KUID key = readKUID();
         byte[] value = readBytes();
@@ -163,7 +166,7 @@ class MessageInputStream extends BencodingInputStream {
         
         OpCode opcode = readEnum(OpCode.class);
         MessageId messageId = readMessageId();
-        Contact contact = readContact(opcode.isRequest() 
+        Contact contact = readSender(opcode.isRequest() 
                 ? Contact.Type.UNSOLICITED : Contact.Type.SOLICITED, src);
         SocketAddress address = readSocketAddress();
         
@@ -208,7 +211,7 @@ class MessageInputStream extends BencodingInputStream {
     private NodeResponse readNodeResponse(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
         
-        Contact[] contacts = readContacts(Contact.Type.UNKNOWN, address);
+        Contact[] contacts = readContacts();
         return new DefaultNodeResponse(messageId, contact, address, contacts);
     }
     

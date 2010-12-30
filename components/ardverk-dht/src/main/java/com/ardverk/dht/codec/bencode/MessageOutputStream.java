@@ -86,7 +86,6 @@ class MessageOutputStream extends BencodingOutputStream {
     }
     
     public void writeSocketAddress(SocketAddress sa) throws IOException {
-        //InetSocketAddress isa = NetworkUtils.getResolved(sa);
         InetSocketAddress isa = (InetSocketAddress)sa;
         writeString(isa.getHostName() + ":" + isa.getPort());
     }
@@ -99,9 +98,15 @@ class MessageOutputStream extends BencodingOutputStream {
         writeBytes(messageId.getBytes());
     }
     
-    public void writeContact(Contact contact) throws IOException {
+    public void writeSender(Contact contact) throws IOException {
         writeKUID(contact.getId());
         writeInt(contact.getInstanceId());
+        writeBoolean(contact.isInvisible());
+        writeSocketAddress(contact.getRemoteAddress());
+    }
+    
+    public void writeContact(Contact contact) throws IOException {
+        writeKUID(contact.getId());
         writeSocketAddress(contact.getRemoteAddress());
     }
     
@@ -130,7 +135,7 @@ class MessageOutputStream extends BencodingOutputStream {
         writeMessageId(message.getMessageId());
         
         // Write the source and destination
-        writeContact(message.getContact());
+        writeSender(message.getContact());
         writeSocketAddress(message.getAddress());
         
         switch (opcode) {

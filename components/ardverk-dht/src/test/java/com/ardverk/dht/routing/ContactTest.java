@@ -36,15 +36,15 @@ public class ContactTest {
         
         Contact contact1 = new DefaultContact(Type.SOLICITED, 
                 KUID.createRandom(20), 
-                0, new InetSocketAddress("www.apple.com", 2000));
+                0, false, new InetSocketAddress("www.apple.com", 2000));
         
         Contact contact2 = new DefaultContact(Type.UNKNOWN, 
                 contact1.getId(), 
-                1, new InetSocketAddress("www.microsoft.com", 3000));
+                1, false, new InetSocketAddress("www.microsoft.com", 3000));
         
         Contact contact3 = new DefaultContact(Type.UNSOLICITED, 
                 KUID.createRandom(20), 
-                2, new InetSocketAddress("www.google.com", 4000));
+                2, false, new InetSocketAddress("www.google.com", 4000));
         
         Contact contact4 = new Localhost(contact1.getId());
         

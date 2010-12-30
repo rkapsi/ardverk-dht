@@ -152,6 +152,11 @@ public class DefaultRouteTable extends AbstractRouteTable {
             throw new IllegalArgumentException("contact=" + contact);
         }
         
+        // Don't add invisible contacts to the RouteTable.
+        if (contact.isInvisible()) {
+            return;
+        }
+        
         // Reset the consecutive errors counter every time
         // we receive a "message" from an actual Contact.
         if (contact.isActive()) {

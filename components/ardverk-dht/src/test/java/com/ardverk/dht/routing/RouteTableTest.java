@@ -177,6 +177,6 @@ public class RouteTableTest {
     
     private static Contact createContact(KUID contactId, int port) {
         return new DefaultContact(Type.SOLICITED, contactId, 
-                0, new InetSocketAddress("localhost", port));
+                0, false, new InetSocketAddress("localhost", port));
     }
 }

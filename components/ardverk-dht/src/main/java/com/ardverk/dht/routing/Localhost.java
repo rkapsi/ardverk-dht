@@ -31,6 +31,8 @@ public class Localhost extends AbstractContact implements Bindable<Transport> {
 
     private final TimeStamp creationTime = TimeStamp.now();
     
+    private volatile boolean invisible = false;
+    
     private volatile int instanceId = 0;
     
     private volatile Transport transport;
@@ -72,6 +74,19 @@ public class Localhost extends AbstractContact implements Bindable<Transport> {
         this.instanceId = instanceId;
     }
 
+    @Override
+    public boolean isInvisible() {
+        return invisible;
+    }
+
+    /**
+     * Sets weather or not this instance is invisible to
+     * other nodes in the network.
+     */
+    public void setInvisible(boolean invisible) {
+        this.invisible = invisible;
+    }
+    
     /**
      * Binds the {@link Localhost} to the given {@link Transport}.
      */

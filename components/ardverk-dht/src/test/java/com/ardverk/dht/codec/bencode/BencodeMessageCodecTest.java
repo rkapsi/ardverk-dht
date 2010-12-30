@@ -42,7 +42,7 @@ public class BencodeMessageCodecTest {
         KUID contactId = KUID.createRandom(20);
         
         Contact contact = new DefaultContact(Type.SOLICITED, 
-                contactId, 0, 
+                contactId, 0, false,
                 new InetSocketAddress("localhost", 6666));
         
         SocketAddress address = new InetSocketAddress("localhost", 6666);

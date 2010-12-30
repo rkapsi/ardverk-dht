@@ -100,11 +100,17 @@ public interface Contact extends Identifier, Longevity,
     public boolean isUnsolicited();
     
     /**
-     * Returns true if the {@link Contact} is considered active.
+     * Returns {@code true} if the {@link Contact} is considered active.
      * 
      * @see Type
      */
     public boolean isActive();
+    
+    /**
+     * Returns {@code true} if the {@link Contact} is considered invisible
+     * and shouldn't be added to the {@link RouteTable}.
+     */
+    public boolean isInvisible();
     
     /**
      * Returns the {@link Contact}'s instance ID
