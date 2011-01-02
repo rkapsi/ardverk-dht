@@ -20,15 +20,21 @@ import java.io.InputStream;
 
 import org.ardverk.io.Writable;
 
+import com.ardverk.dht.DHT;
+
+/**
+ * A value that's stored in the {@link DHT}.
+ */
 public interface Value extends Writable {
 
     /**
-     * 
+     * Returns the length of the {@link Value} in {@code byte}s.
      */
     public long getContentLength();
     
     /**
-     * 
+     * Returns the content as an {@link InputStream}. The user is
+     * responsible for closing it!
      */
     public InputStream getContent();
 }

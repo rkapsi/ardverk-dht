@@ -24,6 +24,9 @@ import java.io.OutputStream;
 import org.ardverk.coding.CodingUtils;
 import org.ardverk.lang.Bytes;
 
+/**
+ * An implementation of {@link Value} for {@code byte[])s.
+ */
 public class ByteArrayValue implements Value {
 
     public static final Value EMPTY = new ByteArrayValue(Bytes.EMPTY);
@@ -34,6 +37,9 @@ public class ByteArrayValue implements Value {
         this.value = value;
     }
     
+    /**
+     * Returns the {@link ByteArrayValue}'s value.
+     */
     public byte[] getBytes() {
         return value;
     }
