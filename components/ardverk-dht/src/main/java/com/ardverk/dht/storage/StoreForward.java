@@ -24,7 +24,6 @@ import com.ardverk.dht.config.StoreConfig;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
-import com.ardverk.dht.utils.IdentifierUtils;
 
 /**
  * This class implements the logic that is used to determinate weather or
@@ -82,26 +81,19 @@ public class StoreForward {
             return;
         }
         
+        KUID contactId = contact.getId();
+        Contact[] contacts = routeTable.select(contactId);
+        
+        if (!isResponsible(contact, contacts)) {
+            return;
+        }
+        
+        Contact last = CollectionUtils.last(contacts);    
+        Iterable<ValueTuple> tuples = database.values(contactId, last.getId());
+        
         StoreConfig storeConfig = config.getStoreConfig();
         
-        KUID contactId = contact.getId();
-        Contact existing = routeTable.get(contactId);
-        
-        for (ValueTuple tuple : database.values()) {
-            KUID valueId = tuple.getId();
-            Contact[] contacts = routeTable.select(valueId);
-            
-            // Check if the Contact is closer to the value than
-            // the furthest of the current Contacts.
-            if (!isCloserThanFurthest(valueId, contact, contacts)) {
-                continue;
-            }
-            
-            // And we must be responsible for forwarding it.
-            if (!isResponsible(contact, existing, contacts)) {
-                continue;
-            }
-            
+        for (ValueTuple tuple : tuples) {
             //System.out.println(routeTable.getLocalhost().getId() 
             //        + " foward " + tuple.getId() + " to " + contact.getId());
             callback.store(contact, tuple, storeConfig);
@@ -109,41 +101,25 @@ public class StoreForward {
     }
     
     /**
-     * Returns {@code true} if the new {@link Contact} is closer to
-     * the given {@link KUID} than the furthest of our current k-closest
-     * {@link Contact}s.
-     */
-    private boolean isCloserThanFurthest(KUID valueId, 
-            Contact contact, Contact[] contacts) {
-        
-        if (contacts.length >= routeTable.getK()) {
-            Contact furthest = CollectionUtils.last(contacts);
-            
-            if (!IdentifierUtils.isCloserTo(contact, valueId, furthest) 
-                    && !furthest.equals(contact)) {
-                return false;
-            }
-        }
-        return true;
-    }
-    
-    /**
      * Returns {@code true} if we're responsible for store-forwarding
      * a value to the given {@link Contact}.
      */
-    private boolean isResponsible(Contact contact, 
-            Contact existing, Contact[] contacts) {
-        
-        if (0 < contacts.length && isNewOrHasChanged(contact, existing)) {
+    private boolean isResponsible(Contact contact, Contact[] contacts) {
+        if (0 < contacts.length) {
             Contact localhost = routeTable.getLocalhost();
             Contact first = CollectionUtils.first(contacts);
+            
+            // The contact isn't in our Route Table yet.
             if (first.equals(localhost)) {
                 return true;
             }
             
+            // The contact is in our Route Table, we're the second
+            // closest to it and its instance ID has changed.
             if (1 < contacts.length && first.equals(contact)) {
                 Contact second = CollectionUtils.nth(contacts, 1);
-                if (second.equals(localhost)) {
+                if (second.equals(localhost) 
+                        && isNewOrHasChanged(contact, first)) {
                     return true;
                 }
             }

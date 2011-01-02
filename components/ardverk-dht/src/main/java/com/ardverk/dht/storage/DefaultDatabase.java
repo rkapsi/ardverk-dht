@@ -16,17 +16,21 @@
 
 package com.ardverk.dht.storage;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
 
+import org.ardverk.collection.Cursor;
+import org.ardverk.collection.PatriciaTrie;
+import org.ardverk.collection.Trie;
 import org.ardverk.lang.Arguments;
 
 import com.ardverk.dht.KUID;
 
 public class DefaultDatabase extends AbstractDatabase {
-
-    private final Map<KUID, ValueTuple> database 
-        = new ConcurrentHashMap<KUID, ValueTuple>();
+    
+    private final Trie<KUID, ValueTuple> database 
+        = new PatriciaTrie<KUID, ValueTuple>();
     
     private final DatabaseConfig config;
     
@@ -44,35 +48,56 @@ public class DefaultDatabase extends AbstractDatabase {
     }
 
     @Override
-    public ValueTuple get(KUID valueId) {
+    public synchronized ValueTuple get(KUID valueId) {
         return database.get(valueId);
     }
 
     @Override
-    public Condition store(ValueTuple tuple) {
-        KUID key = tuple.getId();
+    public synchronized Condition store(ValueTuple tuple) {
+        KUID valueId = tuple.getId();
         
         if (!tuple.isEmpty()) {
-            database.put(key, tuple);
+            database.put(valueId, tuple);
         } else {
-            database.remove(key);
+            database.remove(valueId);
         }
         
         return DefaultCondition.SUCCESS;
     }
     
     @Override
-    public int size() {
+    public synchronized int size() {
         return database.size();
     }
     
     @Override
-    public ValueTuple[] values() {
-        return database.values().toArray(new ValueTuple[0]);
+    public synchronized Iterable<ValueTuple> values() {
+        return new ArrayList<ValueTuple>(database.values());
     }
 
     @Override
-    public String toString() {
+    public synchronized Iterable<ValueTuple> values(
+            final KUID lookupId, final KUID lastId) {
+        
+        final List<ValueTuple> values = new ArrayList<ValueTuple>();
+        database.select(lookupId, new Cursor<KUID, ValueTuple>() {
+            @Override
+            public Decision select(Entry<? extends KUID, 
+                    ? extends ValueTuple> entry) {
+                KUID valueId = entry.getKey();
+                if (lookupId.isCloserTo(valueId, lastId)) {
+                    values.add(entry.getValue());
+                    return Decision.CONTINUE;
+                }
+                return Decision.EXIT;
+            }
+        });
+        
+        return values;
+    }
+    
+    @Override
+    public synchronized String toString() {
         StringBuilder buffer = new StringBuilder();
         
         for (ValueTuple entity : database.values()) {

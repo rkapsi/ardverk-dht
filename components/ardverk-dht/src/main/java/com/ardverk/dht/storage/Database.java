@@ -50,7 +50,13 @@ public interface Database {
     /**
      * Returns all {@link ValueTuple}s.
      */
-    public ValueTuple[] values();
+    public Iterable<ValueTuple> values();
+    
+    /**
+     * Returns all {@link ValueTuple}s that are close to the lookup 
+     * {@link KUID} but not any further than the last {@link KUID}.
+     */
+    public Iterable<ValueTuple> values(KUID lookupId, KUID lastId);
     
     /**
      * Returns the size of the {@link Database}.
