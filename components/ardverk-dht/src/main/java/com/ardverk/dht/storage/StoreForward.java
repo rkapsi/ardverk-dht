@@ -90,7 +90,7 @@ public class StoreForward {
         
         Contact last = CollectionUtils.last(contacts);    
         Iterable<ValueTuple> tuples = database.values(contactId, last.getId());
-        //if (true) { return; }
+        
         StoreConfig storeConfig = config.getStoreConfig();
         
         for (ValueTuple tuple : tuples) {
