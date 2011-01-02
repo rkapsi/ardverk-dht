@@ -105,8 +105,9 @@ public class StoreForward {
      * a value to the given {@link Contact}.
      */
     private boolean isResponsible(Contact contact, Contact[] contacts) {
-        if (0 < contacts.length) {
-            Contact localhost = routeTable.getLocalhost();
+        Contact localhost = routeTable.getLocalhost();
+        
+        if (0 < contacts.length && !contact.equals(localhost)) {
             Contact first = CollectionUtils.first(contacts);
             
             // The contact isn't in our Route Table yet.
