@@ -43,14 +43,14 @@ public interface ValueTuple extends Identifier, Epoch, Age {
     /**
      * Returns the value of the {@link ValueTuple}.
      */
-    public byte[] getValue();
+    public Value getValue();
     
     /**
-     * Returns the size of the value.
+     * Returns the {@link Value}'s content length.
      * 
      * @see #getValue()
      */
-    public int size();
+    public long getContentLength();
     
     /**
      * Returns {@code true} if the value is empty.

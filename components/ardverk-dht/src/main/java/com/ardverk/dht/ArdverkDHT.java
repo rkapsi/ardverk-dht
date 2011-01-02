@@ -52,6 +52,7 @@ import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.Database;
 import com.ardverk.dht.storage.DefaultDatabase;
 import com.ardverk.dht.storage.StoreForward;
+import com.ardverk.dht.storage.Value;
 import com.ardverk.dht.storage.ValueTuple;
 
 /**
@@ -271,7 +272,7 @@ public class ArdverkDHT extends AbstractDHT {
     }
 
     @Override
-    public ArdverkFuture<PutEntity> put(KUID valueId, byte[] value, PutConfig config) {
+    public ArdverkFuture<PutEntity> put(KUID valueId, Value value, PutConfig config) {
         return storeManager.put(valueId, value, config);
     }
     

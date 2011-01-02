@@ -133,8 +133,7 @@ put(String key, String value) {
 
 // Stores the given key-value
 put(DHT dht, String key, String value) {
-	ArdverkFuture future = dht.put(
-		kuid(key), StringUtils.getBytes(value));
+	ArdverkFuture future = dht.put(kuid(key), toValue(value));
 		
 	PutEntity entity = future.get();
 	for (StoreResponse response : entity.getStoreResponses()) {
@@ -152,7 +151,7 @@ get(DHT dht, String key) {
 	ArdverkFuture future = dht.get(kuid(key));
 	
 	ValueEntity entity = future.get();
-	String value = StringUtils.toString(entity.getValue());
+	String value = toString(entity.getValue());
 	
 	print("GET: " + entity.getId() + " (" + key + ")" + " -> " 
 		+ value
@@ -161,6 +160,14 @@ get(DHT dht, String key) {
 		+ "\n TIME: " + entity.getTimeInMillis() + "ms");
 		
 	return value;
+}
+
+toValue(String value) {
+	return new ByteArrayValue(StringUtils.getBytes(value));
+}
+
+toString(Value value) {
+	return StringUtils.toString(value.getBytes());
 }
 
 // Closes all DHTs

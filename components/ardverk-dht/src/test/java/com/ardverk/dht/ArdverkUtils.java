@@ -44,6 +44,7 @@ import com.ardverk.dht.entity.PutEntity;
 import com.ardverk.dht.entity.QuickenEntity;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.DefaultRouteTable;
+import com.ardverk.dht.storage.ByteArrayValue;
 import com.ardverk.dht.storage.Database;
 
 public class ArdverkUtils {
@@ -197,7 +198,7 @@ public class ArdverkUtils {
             final byte[] value = StringUtils.getBytes("World-" + i);
             
             int rnd = (int)(dhts.size() * Math.random());
-            future = dhts.get(rnd).put(key, value, putConfig);
+            future = dhts.get(rnd).put(key, new ByteArrayValue(value), putConfig);
             
             if (i % 1000 == 0) {
                 System.out.println("PROGRESS: " + i);

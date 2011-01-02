@@ -20,7 +20,6 @@ import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.FutureUtils;
 import org.ardverk.concurrent.ValueReference;
-import org.ardverk.lang.Bytes;
 
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.concurrent.ArdverkProcess;
@@ -35,7 +34,9 @@ import com.ardverk.dht.io.MessageDispatcher;
 import com.ardverk.dht.io.StoreResponseHandler;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
+import com.ardverk.dht.storage.ByteArrayValue;
 import com.ardverk.dht.storage.DefaultValueTuple;
+import com.ardverk.dht.storage.Value;
 import com.ardverk.dht.storage.ValueTuple;
 
 /**
@@ -57,10 +58,10 @@ public class StoreManager {
     }
     
     public ArdverkFuture<PutEntity> remove(KUID key, PutConfig config) {
-        return put(key, Bytes.EMPTY, config);
+        return put(key, ByteArrayValue.EMPTY, config);
     }
     
-    public ArdverkFuture<PutEntity> put(final KUID valueId, final byte[] value, 
+    public ArdverkFuture<PutEntity> put(final KUID valueId, final Value value, 
             final PutConfig config) {
         
         final Object lock = new Object();
@@ -152,7 +153,7 @@ public class StoreManager {
     }
     
     public ArdverkFuture<StoreEntity> store(Contact[] dst, 
-            KUID valueId, byte[] value, StoreConfig config) {
+            KUID valueId, Value value, StoreConfig config) {
         
         Contact localhost = dht.getLocalhost();
         ValueTuple valueTuple = new DefaultValueTuple(

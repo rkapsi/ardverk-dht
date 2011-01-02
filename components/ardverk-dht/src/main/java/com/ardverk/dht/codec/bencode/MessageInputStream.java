@@ -49,9 +49,11 @@ import com.ardverk.dht.message.ValueRequest;
 import com.ardverk.dht.message.ValueResponse;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.DefaultContact;
+import com.ardverk.dht.storage.ByteArrayValue;
 import com.ardverk.dht.storage.Database.Condition;
 import com.ardverk.dht.storage.DefaultCondition;
 import com.ardverk.dht.storage.DefaultValueTuple;
+import com.ardverk.dht.storage.Value;
 import com.ardverk.dht.storage.ValueTuple;
 
 /**
@@ -152,10 +154,15 @@ class MessageInputStream extends BencodingInputStream {
             SocketAddress address) throws IOException {
         Contact creator = readContact();
         
-        KUID key = readKUID();
-        byte[] value = readBytes();
+        KUID valueId = readKUID();
+        Value value = readValue();
         
-        return new DefaultValueTuple(contact, creator, key, value);
+        return new DefaultValueTuple(contact, creator, valueId, value);
+    }
+    
+    public Value readValue() throws IOException {
+        byte[] value = readBytes();
+        return new ByteArrayValue(value);
     }
     
     public Message readMessage(SocketAddress src) throws IOException {

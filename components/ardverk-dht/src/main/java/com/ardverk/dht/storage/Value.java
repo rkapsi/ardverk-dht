@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package com.ardverk.dht.entity;
+package com.ardverk.dht.storage;
 
-import com.ardverk.dht.routing.Contact;
-import com.ardverk.dht.storage.Value;
-import com.ardverk.dht.storage.ValueTuple;
+import java.io.InputStream;
 
-public interface ValueEntity extends LookupEntity {
+import org.ardverk.io.Writable;
+
+public interface Value extends Writable {
+
+    /**
+     * 
+     */
+    public long getContentLength();
     
-    public Contact getSender();
-    
-    public Contact getCreator();
-    
-    public Value getValue();
-    
-    public ValueTuple getValueTuple();
-    
-    public ValueTuple[] getValueTuples();
+    /**
+     * 
+     */
+    public InputStream getContent();
 }

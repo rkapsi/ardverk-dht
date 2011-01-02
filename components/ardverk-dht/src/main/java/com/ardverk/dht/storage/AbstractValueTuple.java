@@ -43,7 +43,12 @@ abstract class AbstractValueTuple implements ValueTuple {
     }
 
     @Override
+    public long getContentLength() {
+        return getValue().getContentLength();
+    }
+    
+    @Override
     public boolean isEmpty() {
-        return size() == 0;
+        return getContentLength() == 0;
     }
 }

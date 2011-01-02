@@ -29,6 +29,7 @@ import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.entity.PutEntity;
 import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.storage.Value;
 
 /**
  * The {@link DHTService} defines the basic operations of a DHT.
@@ -75,7 +76,7 @@ interface DHTService {
      * Stores the given key-value in the DHT.
      */
     public ArdverkFuture<PutEntity> put(
-            KUID valueId, byte[] value, PutConfig config);
+            KUID valueId, Value value, PutConfig config);
     
     /**
      * Removes the given {@link KUID} from the DHT.
