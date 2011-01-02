@@ -118,6 +118,14 @@ public class KUIDTest {
     }
     
     @Test
+    public void isCloserToSelf() {
+        KUID contactId = KUID.createRandom(20);
+        KUID valueId = KUID.createRandom(contactId);
+        
+        TestCase.assertFalse(contactId.isCloserTo(valueId, contactId));
+    }
+    
+    @Test
     public void commonPrefix() {
         for (int i = 0; i < 1000; i++) {
             
