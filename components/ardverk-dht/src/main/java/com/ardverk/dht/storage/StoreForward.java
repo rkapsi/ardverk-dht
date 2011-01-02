@@ -17,11 +17,13 @@
 package com.ardverk.dht.storage;
 
 import org.ardverk.collection.CollectionUtils;
+import org.slf4j.Logger;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.config.StoreConfig;
 import com.ardverk.dht.entity.StoreEntity;
+import com.ardverk.dht.logging.LoggerUtils;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 
@@ -31,6 +33,9 @@ import com.ardverk.dht.routing.RouteTable;
  */
 public class StoreForward {
 
+    private static final Logger LOG 
+        = LoggerUtils.getLogger(StoreForward.class);
+    
     private final RouteTable routeTable;
     
     private final Database database;
@@ -94,8 +99,12 @@ public class StoreForward {
         StoreConfig storeConfig = config.getStoreConfig();
         
         for (ValueTuple tuple : tuples) {
-            //System.out.println(routeTable.getLocalhost().getId() 
-            //        + " foward " + tuple.getId() + " to " + contact.getId());
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(routeTable.getLocalhost().getId() 
+                        + " foward " + tuple.getId() 
+                        + " to " + contact.getId());
+            }
+            
             callback.store(contact, tuple, storeConfig);
         }
     }
