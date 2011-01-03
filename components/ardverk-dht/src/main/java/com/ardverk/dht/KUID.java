@@ -125,6 +125,22 @@ public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>,
         return create(dst);
     }
     
+    /**
+     * Returns a minimum {@link KUID} of the given length.
+     */
+    public static KUID min(int length) {
+        return new KUID(new byte[length]);
+    }
+    
+    /**
+     * Returns a maximum {@link KUID} of the given length.
+     */
+    public static KUID max(int length) {
+        byte[] maxKey = new byte[length];
+        Arrays.fill(maxKey, (byte)0xFF);
+        return new KUID(maxKey);
+    }
+    
     private final byte[] key;
     
     private final int hashCode;
@@ -264,17 +280,14 @@ public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>,
      * Returns the minimum {@link KUID}.
      */
     public KUID min() {
-        byte[] minKey = new byte[length()];
-        return new KUID(minKey);
+        return min(length());
     }
     
     /**
      * Returns the maximum {@link KUID}.
      */
     public KUID max() {
-        byte[] maxKey = new byte[length()];
-        Arrays.fill(maxKey, (byte)0xFF);
-        return new KUID(maxKey);
+        return max(length());
     }
     
     /**
