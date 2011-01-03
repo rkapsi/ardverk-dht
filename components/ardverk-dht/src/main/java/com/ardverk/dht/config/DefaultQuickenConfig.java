@@ -31,10 +31,10 @@ public class DefaultQuickenConfig extends AbstractConfig implements QuickenConfi
     private volatile float pingCount = 1.0f;
     
     private volatile long contactTimeoutInMillis 
-        = TimeUtils.convert(5L, TimeUnit.MINUTES, TimeUnit.MILLISECONDS);
+        = TimeUtils.convert(5L*60L, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
     
     private volatile long bucketTimeoutInMillis 
-        = TimeUtils.convert(5L, TimeUnit.MINUTES, TimeUnit.MILLISECONDS);
+        = TimeUtils.convert(5L*60L, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
     
     @Override
     public void setExecutorKey(ExecutorKey executorKey) {

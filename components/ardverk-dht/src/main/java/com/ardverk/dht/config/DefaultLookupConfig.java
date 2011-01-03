@@ -24,7 +24,7 @@ public class DefaultLookupConfig extends DefaultConfig
         implements LookupConfig {
     
     private static final long DEFAULT_OPERATION_TIMEOUT 
-        = TimeUtils.convert(1L, TimeUnit.MINUTES, TimeUnit.MILLISECONDS);
+        = TimeUtils.convert(60L, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
     
     private volatile boolean exhaustive = false;
     

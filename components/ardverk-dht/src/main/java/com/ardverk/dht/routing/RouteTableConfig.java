@@ -52,7 +52,7 @@ public class RouteTableConfig {
     private volatile int maxContactErrors = 5;
     
     private volatile long hasBeenActiveTimeoutInMillis 
-        = TimeUtils.convert(5L, TimeUnit.MINUTES, TimeUnit.MILLISECONDS);
+        = TimeUtils.convert(5L*60L, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
     
     // INIT
     {
