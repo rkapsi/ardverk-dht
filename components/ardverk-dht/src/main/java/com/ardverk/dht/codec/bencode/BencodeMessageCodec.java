@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.net.SocketAddress;
 
 import org.ardverk.io.IoUtils;
-import org.ardverk.lang.NumberUtils;
+import org.ardverk.lang.MathUtils;
 
 import com.ardverk.dht.codec.AbstractMessageCodec;
 import com.ardverk.dht.message.Message;
@@ -42,7 +42,7 @@ public class BencodeMessageCodec extends AbstractMessageCodec {
     }
     
     public BencodeMessageCodec(int messageSize) {
-        this.messageSize = NumberUtils.nextPowOfTwo(messageSize);
+        this.messageSize = MathUtils.nextPowOfTwo(messageSize);
     }
     
     @Override
