@@ -18,6 +18,14 @@ package com.ardverk.dht.config;
 
 import java.util.concurrent.TimeUnit;
 
+import com.ardverk.dht.routing.Bucket;
+import com.ardverk.dht.routing.Contact;
+import com.ardverk.dht.routing.RouteTable;
+
+/**
+ * The {@link QuickenConfig} provides configuration data for the
+ * quicken operation.
+ */
 public interface QuickenConfig extends Config {
 
     /**
@@ -40,19 +48,53 @@ public interface QuickenConfig extends Config {
      */
     public void setLookupConfig(LookupConfig lookupConfig);
     
+    /**
+     * The ping count is used to determinate how many {@link Contact}s 
+     * should be selected from the {@link RouteTable}.
+     * 
+     * selectCount = ping count * K
+     */
     public float getPingCount();
     
+    /**
+     * Sets how many {@link Contact}s should be selected from 
+     * the {@link RouteTable}.
+     */
     public void setPingCount(float pingCount);
     
+    /**
+     * The {@link Contact} timeout is used to determinate if it's necessary
+     * to send a PING to a {@link Contact}.
+     */
     public long getContactTimeout(TimeUnit unit);
     
+    /**
+     * The {@link Contact} timeout is used to determinate if it's necessary
+     * to send a PING to a {@link Contact}.
+     */
     public long getContactTimeoutInMillis();
     
+    /**
+     * The {@link Contact} timeout is used to determinate if it's necessary
+     * to send a PING to a {@link Contact}.
+     */
     public void setContactTimeout(long timeout, TimeUnit unit);
     
+    /**
+     * The {@link Bucket} timeout is used to determinate if it's necessary
+     * to refresh a {@link Bucket}.
+     */
     public long getBucketTimeout(TimeUnit unit);
     
+    /**
+     * The {@link Bucket} timeout is used to determinate if it's necessary
+     * to refresh a {@link Bucket}.
+     */
     public long getBucketTimeoutInMillis();
     
+    /**
+     * The {@link Bucket} timeout is used to determinate if it's necessary
+     * to refresh a {@link Bucket}.
+     */
     public void setBucketTimeout(long timeout, TimeUnit unit);
 }

@@ -16,13 +16,29 @@
 
 package com.ardverk.dht.config;
 
+/**
+ * The {@link PutConfig} provides configuration data for the FIND_NODE
+ * and STORE operations.
+ */
 public interface PutConfig extends Config {
 
+    /**
+     * Returns the {@link LookupConfig}.
+     */
     public LookupConfig getLookupConfig();
     
+    /**
+     * Sets the {@link LookupConfig}.
+     */
     public void setLookupConfig(LookupConfig lookupConfig);
     
+    /**
+     * Returns the {@link StoreConfig}.
+     */
     public StoreConfig getStoreConfig();
     
+    /**
+     * Sets the {@link StoreConfig}.
+     */
     public void setStoreConfig(StoreConfig storeConfig);
 }

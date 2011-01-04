@@ -18,15 +18,35 @@ package com.ardverk.dht.config;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * The {@link StoreConfig} provides configuration data for the STORE operation.
+ */
 public interface StoreConfig extends Config {
     
+    /**
+     * Returns the network timeout in the given {@link TimeUnit}.
+     */
     public long getStoreTimeout(TimeUnit unit);
     
+    /**
+     * Returns the network timeout in milliseconds.
+     */
     public long getStoreTimeoutInMillis();
     
+    /**
+     * Sets the network timeout.
+     */
     public void setStoreTimeout(long timeout, TimeUnit unit);
     
+    /**
+     * The S parameter is controlling how many STORE operations 
+     * should run in parallel.
+     */
     public int getS();
     
+    /**
+     * The S parameter is controlling how many STORE operations 
+     * should run in parallel.
+     */
     public void setS(int value);
 }

@@ -16,9 +16,20 @@
 
 package com.ardverk.dht.config;
 
+/**
+ * The {@link GetConfig} is providing configuration date for the
+ * FIND_VALUE process.
+ */
 public interface GetConfig extends LookupConfig {
     
+    /**
+     * Returns the retrieval count. The default value is 1.
+     */
     public int getR();
 
+    /**
+     * Sets the retrieval count. The default value is 1 and the
+     * maximum is K.
+     */
     public void setR(int r);
 }
