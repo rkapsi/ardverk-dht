@@ -16,29 +16,13 @@
 
 package com.ardverk.dht.storage;
 
-import java.io.InputStream;
-
-import com.ardverk.dht.DHT;
-
 /**
- * A value that's stored in the {@link DHT}.
+ * An abstract implementation of {@link Value}.
  */
-public interface Value {
+public abstract class AbstractValue implements Value {
 
-    /**
-     * Returns the length of the {@link Value} in {@code byte}s.
-     */
-    public long getContentLength();
-    
-    /**
-     * Returns the content as an {@link InputStream}. The user is
-     * responsible for closing it!
-     */
-    public InputStream getContent();
-    
-    /**
-     * Returns the content as an {@code byte[]}. This method may
-     * thrown an {@link UnsupportedOperationException}.
-     */
-    public byte[] getContentAsBytes();
+    @Override
+    public byte[] getContentAsBytes() {
+        throw new UnsupportedOperationException();
+    }
 }

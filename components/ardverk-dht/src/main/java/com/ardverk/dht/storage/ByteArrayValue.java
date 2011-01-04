@@ -17,9 +17,7 @@
 package com.ardverk.dht.storage;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 import org.ardverk.coding.CodingUtils;
 import org.ardverk.lang.Bytes;
@@ -37,17 +35,9 @@ public class ByteArrayValue implements Value {
         this.value = value;
     }
     
-    /**
-     * Returns the {@link ByteArrayValue}'s value.
-     */
-    public byte[] getBytes() {
-        return value;
-    }
-    
     @Override
-    public int write(OutputStream out) throws IOException {
-        out.write(value);
-        return value.length;
+    public byte[] getContentAsBytes() {
+        return value;
     }
 
     @Override

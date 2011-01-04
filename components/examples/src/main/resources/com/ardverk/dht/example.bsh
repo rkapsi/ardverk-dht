@@ -167,7 +167,7 @@ toValue(String value) {
 }
 
 toString(Value value) {
-	return StringUtils.toString(value.getBytes());
+	return StringUtils.toString(value.getContentAsBytes());
 }
 
 // Closes all DHTs

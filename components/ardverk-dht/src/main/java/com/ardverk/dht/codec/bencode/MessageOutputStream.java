@@ -16,16 +16,13 @@
 
 package com.ardverk.dht.codec.bencode;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
 import org.ardverk.coding.BencodingOutputStream;
-import org.ardverk.io.IoUtils;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.lang.IntegerValue;
@@ -41,7 +38,6 @@ import com.ardverk.dht.message.StoreResponse;
 import com.ardverk.dht.message.ValueRequest;
 import com.ardverk.dht.message.ValueResponse;
 import com.ardverk.dht.routing.Contact;
-import com.ardverk.dht.storage.ByteArrayValue;
 import com.ardverk.dht.storage.Database.Condition;
 import com.ardverk.dht.storage.Value;
 import com.ardverk.dht.storage.ValueTuple;
@@ -51,8 +47,6 @@ import com.ardverk.dht.storage.ValueTuple;
  * {@link BencodingOutputStream}.
  */
 class MessageOutputStream extends BencodingOutputStream {
-    
-    private static final int BUFFSER_SIZE = 4 * 1024;
     
     public MessageOutputStream(OutputStream out) {
         super(out);
@@ -134,26 +128,8 @@ class MessageOutputStream extends BencodingOutputStream {
     }
     
     public void writeValue(Value value) throws IOException {
-        if (value instanceof ByteArrayValue) {
-            writeBytes(((ByteArrayValue)value).getBytes());
-            return;
-        }
-        
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(
-                (int)value.getContentLength());
-        
-        InputStream in = value.getContent();
-        try {
-            byte[] buffer = new byte[BUFFSER_SIZE];
-            int len = -1;
-            while ((len = in.read(buffer)) != -1) {
-                baos.write(buffer, 0, len);
-            }
-        } finally {
-            IoUtils.closeAll(baos, in);
-        }
-        
-        writeBytes(baos.toByteArray());
+        // We assume all Values support this.
+        writeBytes(value.getContentAsBytes());
     }
     
     public void writeMessage(Message message) throws IOException {
