@@ -20,6 +20,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.lang.Arguments;
 
+/**
+ * An abstract implementation of {@link Entity}.
+ */
 public abstract class AbstractEntity implements Entity {
 
     protected final long time;
