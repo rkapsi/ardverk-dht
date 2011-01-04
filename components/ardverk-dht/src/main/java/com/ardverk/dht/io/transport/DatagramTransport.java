@@ -31,8 +31,7 @@ import org.ardverk.concurrent.ExecutorUtils;
 import org.ardverk.lang.Arguments;
 import org.ardverk.net.NetworkUtils;
 import org.slf4j.Logger;
-
-import com.ardverk.dht.logging.LoggerUtils;
+import org.slf4j.LoggerFactory;
 
 /**
  * An implementation of {@link Transport} that uses {@link DatagramSocket}s.
@@ -40,7 +39,7 @@ import com.ardverk.dht.logging.LoggerUtils;
 public class DatagramTransport extends AbstractTransport implements Closeable {
 
     private static final Logger LOG 
-        = LoggerUtils.getLogger(DatagramTransport.class);
+        = LoggerFactory.getLogger(DatagramTransport.class);
     
     private static final ExecutorService EXECUTOR 
         = ExecutorUtils.newCachedThreadPool("DatagramTransportThread");

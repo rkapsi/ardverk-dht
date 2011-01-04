@@ -18,12 +18,12 @@ package com.ardverk.dht.storage;
 
 import org.ardverk.collection.CollectionUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.config.StoreConfig;
 import com.ardverk.dht.entity.StoreEntity;
-import com.ardverk.dht.logging.LoggerUtils;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 
@@ -34,7 +34,7 @@ import com.ardverk.dht.routing.RouteTable;
 public class StoreForward {
 
     private static final Logger LOG 
-        = LoggerUtils.getLogger(StoreForward.class);
+        = LoggerFactory.getLogger(StoreForward.class);
     
     private final RouteTable routeTable;
     

@@ -21,17 +21,16 @@ import java.io.Reader;
 import java.lang.reflect.Constructor;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import bsh.Interpreter;
-
-import com.ardverk.dht.logging.LoggerUtils;
 
 /**
  * An utility class to create {@link Interpreter}s.
  */
 class InterpreterFactory {
 
-    private static final Logger LOG = LoggerUtils.getLogger(InterpreterFactory.class);
+    private static final Logger LOG = LoggerFactory.getLogger(InterpreterFactory.class);
     
     static {
         Interpreter.DEBUG = LOG.isDebugEnabled();

@@ -38,13 +38,13 @@ import org.ardverk.lang.Arguments;
 import org.ardverk.lang.NullArgumentException;
 import org.ardverk.lang.TimeStamp;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.codec.MessageCodec;
 import com.ardverk.dht.event.EventUtils;
 import com.ardverk.dht.io.transport.Transport;
 import com.ardverk.dht.io.transport.TransportCallback;
-import com.ardverk.dht.logging.LoggerUtils;
 import com.ardverk.dht.message.Message;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.MessageId;
@@ -60,7 +60,7 @@ public abstract class MessageDispatcher
         implements Bindable<Transport>, Closeable {
     
     private static final Logger LOG 
-        = LoggerUtils.getLogger(MessageDispatcher.class);
+        = LoggerFactory.getLogger(MessageDispatcher.class);
     
     private static final ScheduledExecutorService EXECUTOR 
         = ExecutorUtils.newSingleThreadScheduledExecutor(
@@ -549,7 +549,7 @@ public abstract class MessageDispatcher
     private static class ResponseChecker {
         
         private static final Logger LOG 
-            = LoggerUtils.getLogger(ResponseChecker.class);
+            = LoggerFactory.getLogger(ResponseChecker.class);
         
         private final MessageFactory factory;
         

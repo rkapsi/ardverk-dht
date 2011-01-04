@@ -20,9 +20,9 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ardverk.dht.codec.MessageCodec;
-import com.ardverk.dht.logging.LoggerUtils;
 import com.ardverk.dht.message.Message;
 import com.ardverk.dht.message.MessageFactory;
 import com.ardverk.dht.message.NodeRequest;
@@ -41,7 +41,7 @@ import com.ardverk.dht.storage.StoreForward;
 public class DefaultMessageDispatcher extends MessageDispatcher {
 
     private static final Logger LOG 
-        = LoggerUtils.getLogger(DefaultMessageDispatcher.class);
+        = LoggerFactory.getLogger(DefaultMessageDispatcher.class);
     
     private final DefaultMessageHandler defaultHandler;
     

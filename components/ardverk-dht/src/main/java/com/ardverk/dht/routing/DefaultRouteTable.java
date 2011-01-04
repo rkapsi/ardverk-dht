@@ -37,20 +37,20 @@ import org.ardverk.lang.Arguments;
 import org.ardverk.lang.NullArgumentException;
 import org.ardverk.net.NetworkCounter;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.config.PingConfig;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.lang.Identifier;
-import com.ardverk.dht.logging.LoggerUtils;
 import com.ardverk.dht.routing.ContactEntry.Update;
 import com.ardverk.dht.utils.ContactKey;
 
 public class DefaultRouteTable extends AbstractRouteTable {
     
     private static final Logger LOG 
-        = LoggerUtils.getLogger(DefaultRouteTable.class);
+        = LoggerFactory.getLogger(DefaultRouteTable.class);
     
     private final Map<ContactKey, ArdverkFuture<PingEntity>> pingFutures 
         = new HashMap<ContactKey, ArdverkFuture<PingEntity>>();

@@ -33,11 +33,11 @@ import org.ardverk.concurrent.FutureUtils;
 import org.ardverk.lang.Arguments;
 import org.ardverk.lang.TimeStamp;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.config.LookupConfig;
 import com.ardverk.dht.entity.LookupEntity;
-import com.ardverk.dht.logging.LoggerUtils;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
@@ -51,7 +51,7 @@ abstract class LookupResponseHandler<T extends LookupEntity>
         extends AbstractResponseHandler<T> {
     
     private static final Logger LOG 
-        = LoggerUtils.getLogger(LookupResponseHandler.class);
+        = LoggerFactory.getLogger(LookupResponseHandler.class);
     
     private static final ScheduledThreadPoolExecutor EXECUTOR 
         = ExecutorUtils.newSingleThreadScheduledExecutor("BoostThread");
