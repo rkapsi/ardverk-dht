@@ -18,8 +18,11 @@ package com.ardverk.dht.config;
 
 import java.util.concurrent.TimeUnit;
 
+import com.ardverk.dht.message.MessageType;
+
 /**
- * The {@link StoreConfig} provides configuration data for the STORE operation.
+ * The {@link StoreConfig} provides configuration data for the 
+ * {@link MessageType#STORE} operation.
  */
 public interface StoreConfig extends Config {
     
@@ -39,14 +42,14 @@ public interface StoreConfig extends Config {
     public void setStoreTimeout(long timeout, TimeUnit unit);
     
     /**
-     * The S parameter is controlling how many STORE operations 
-     * should run in parallel.
+     * The S parameter is controlling how many {@link MessageType#STORE} 
+     * operations should run in parallel.
      */
     public int getS();
     
     /**
-     * The S parameter is controlling how many STORE operations 
-     * should run in parallel.
+     * The S parameter is controlling how many {@link MessageType#STORE}
+     * operations should run in parallel.
      */
     public void setS(int value);
 }

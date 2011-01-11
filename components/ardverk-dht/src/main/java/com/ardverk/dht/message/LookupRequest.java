@@ -19,8 +19,8 @@ package com.ardverk.dht.message;
 import com.ardverk.dht.lang.Identifier;
 
 /**
- * 
+ * A mix-in interface for {@link MessageType#FIND_NODE} and 
+ * {@link MessageType#FIND_VALUE} request messages.
  */
 public interface LookupRequest extends RequestMessage, Identifier {
-    
 }

@@ -17,7 +17,7 @@
 package com.ardverk.dht.message;
 
 /**
- * 
+ * A request {@link Message}.
  */
 public interface RequestMessage extends Message {
 

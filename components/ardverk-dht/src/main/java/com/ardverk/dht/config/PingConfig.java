@@ -18,25 +18,28 @@ package com.ardverk.dht.config;
 
 import java.util.concurrent.TimeUnit;
 
+import com.ardverk.dht.message.MessageType;
+
 /**
- * The {@link PingConfig} provides configuration date for the PING operation.
+ * The {@link PingConfig} provides configuration date for the 
+ * {@link MessageType#PING} operation.
  */
 public interface PingConfig extends Config {
     
     /**
-     * Sets the network timeout for the PING operation.
+     * Sets the network timeout for the {@link MessageType#PING} operation.
      */
     public void setPingTimeout(long timeout, TimeUnit unit);
     
     /**
-     * Returns the network timeout for the PING operation in
-     * the given {@link TimeUnit}.
+     * Returns the network timeout for the {@link MessageType#PING} operation 
+     * in the given {@link TimeUnit}.
      */
     public long getPingTimeout(TimeUnit unit);
     
     /**
-     * Returns the network timeout for the PING operation in
-     * milliseconds.
+     * Returns the network timeout for the {@link MessageType#PING} operation 
+     * in milliseconds.
      */
     public long getPingTimeoutInMillis();
 }

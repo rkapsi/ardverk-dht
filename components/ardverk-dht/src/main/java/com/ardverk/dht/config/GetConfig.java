@@ -16,9 +16,11 @@
 
 package com.ardverk.dht.config;
 
+import com.ardverk.dht.message.MessageType;
+
 /**
  * The {@link GetConfig} is providing configuration date for the
- * FIND_VALUE process.
+ * {@link MessageType#FIND_VALUE} process.
  */
 public interface GetConfig extends LookupConfig {
     

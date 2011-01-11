@@ -24,6 +24,7 @@ import com.ardverk.dht.config.LookupConfig;
 import com.ardverk.dht.entity.DefaultNodeEntity;
 import com.ardverk.dht.entity.NodeEntity;
 import com.ardverk.dht.message.MessageFactory;
+import com.ardverk.dht.message.MessageType;
 import com.ardverk.dht.message.NodeRequest;
 import com.ardverk.dht.message.NodeResponse;
 import com.ardverk.dht.message.ResponseMessage;
@@ -31,7 +32,8 @@ import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 
 /**
- * The {@link NodeResponseHandler} manages a FIND_NODE lookup process.
+ * The {@link NodeResponseHandler} manages a {@link MessageType#FIND_NODE} 
+ * lookup process.
  */
 public class NodeResponseHandler extends LookupResponseHandler<NodeEntity> {
     

@@ -18,6 +18,7 @@ package com.ardverk.dht.codec.bencode;
 
 import com.ardverk.dht.lang.IntegerValue;
 import com.ardverk.dht.message.Message;
+import com.ardverk.dht.message.MessageType;
 import com.ardverk.dht.message.NodeRequest;
 import com.ardverk.dht.message.NodeResponse;
 import com.ardverk.dht.message.PingRequest;
@@ -33,27 +34,37 @@ import com.ardverk.dht.message.ValueResponse;
  */
 enum OpCode implements IntegerValue {
     
-    PING_REQUEST(0x00),
-    PING_RESPONSE(0x01),
+    PING_REQUEST(0x00, MessageType.PING),
+    PING_RESPONSE(0x01, MessageType.PING),
     
-    FIND_NODE_REQUEST(0x02),
-    FIND_NODE_RESPONSE(0x03),
+    FIND_NODE_REQUEST(0x02, MessageType.FIND_NODE),
+    FIND_NODE_RESPONSE(0x03, MessageType.FIND_NODE),
     
-    FIND_VALUE_REQUEST(0x04),
-    FIND_VALUE_RESPONSE(0x05),
+    FIND_VALUE_REQUEST(0x04, MessageType.FIND_VALUE),
+    FIND_VALUE_RESPONSE(0x05, MessageType.FIND_VALUE),
     
-    STORE_REQUEST(0x06),
-    STORE_RESPONSE(0x07);
+    STORE_REQUEST(0x06, MessageType.STORE),
+    STORE_RESPONSE(0x07, MessageType.STORE);
     
     private final int value;
     
-    private OpCode(int value) {
+    private final MessageType messageType;
+    
+    private OpCode(int value, MessageType messageType) {
         this.value = value;
+        this.messageType = messageType;
     }
     
     @Override
     public int intValue() {
         return value;
+    }
+    
+    /**
+     * Returns the {@link MessageType}.
+     */
+    public MessageType getMessageType() {
+        return messageType;
     }
     
     /**
@@ -73,7 +84,7 @@ enum OpCode implements IntegerValue {
     
     @Override
     public String toString() {
-        return name() + " (" + intValue() + ")";
+        return name() + " (" + value + ", " + messageType + ")";
     }
     
     private static final OpCode[] VALUES;

@@ -28,13 +28,14 @@ import com.ardverk.dht.config.PingConfig;
 import com.ardverk.dht.entity.DefaultPingEntity;
 import com.ardverk.dht.entity.PingEntity;
 import com.ardverk.dht.message.MessageFactory;
+import com.ardverk.dht.message.MessageType;
 import com.ardverk.dht.message.PingRequest;
 import com.ardverk.dht.message.PingResponse;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
 
 /**
- * The {@link PingResponseHandler} manages the PING process.
+ * The {@link PingResponseHandler} manages the {@link MessageType#PING} process.
  */
 public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
     

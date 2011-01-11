@@ -23,6 +23,7 @@ import org.ardverk.utils.ArrayUtils;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.message.MessageFactory;
+import com.ardverk.dht.message.MessageType;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.message.StoreRequest;
@@ -35,8 +36,8 @@ import com.ardverk.dht.storage.DefaultCondition;
 import com.ardverk.dht.storage.ValueTuple;
 
 /**
- * The {@link StoreRequestHandler} is called for all 
- * {@link StoreRequest} (STORE) messages.
+ * The {@link StoreRequestHandler} is called for all {@link StoreRequest} 
+ * ({@link MessageType#STORE}) messages.
  */
 public class StoreRequestHandler extends AbstractRequestHandler {
     

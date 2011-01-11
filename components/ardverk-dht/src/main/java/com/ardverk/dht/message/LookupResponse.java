@@ -16,6 +16,9 @@
 
 package com.ardverk.dht.message;
 
+/**
+ * A mix-in interface for {@link MessageType#FIND_NODE} and 
+ * {@link MessageType#FIND_VALUE} response messages.
+ */
 public interface LookupResponse extends ResponseMessage {
-
 }

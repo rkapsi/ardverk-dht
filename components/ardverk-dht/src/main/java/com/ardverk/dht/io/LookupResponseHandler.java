@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.config.LookupConfig;
 import com.ardverk.dht.entity.LookupEntity;
+import com.ardverk.dht.message.MessageType;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
@@ -45,7 +46,7 @@ import com.ardverk.dht.utils.XorComparator;
 
 /**
  * The {@link LookupResponseHandler} implements the base logic for the 
- * FIND_NODE and FIND_VALUE logic.
+ * {@link MessageType#FIND_NODE} and {@link MessageType#FIND_VALUE} logic.
  */
 abstract class LookupResponseHandler<T extends LookupEntity> 
         extends AbstractResponseHandler<T> {

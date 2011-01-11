@@ -17,8 +17,7 @@
 package com.ardverk.dht.message;
 
 /**
- * 
+ * A {@link MessageType#PING} response.
  */
 public interface PingResponse extends ResponseMessage {
-
 }

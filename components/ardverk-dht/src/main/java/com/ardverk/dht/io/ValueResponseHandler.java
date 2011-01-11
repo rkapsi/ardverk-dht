@@ -26,6 +26,7 @@ import com.ardverk.dht.config.GetConfig;
 import com.ardverk.dht.entity.DefaultValueEntity;
 import com.ardverk.dht.entity.ValueEntity;
 import com.ardverk.dht.message.MessageFactory;
+import com.ardverk.dht.message.MessageType;
 import com.ardverk.dht.message.NodeResponse;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.message.ValueRequest;
@@ -35,7 +36,8 @@ import com.ardverk.dht.routing.RouteTable;
 import com.ardverk.dht.storage.ValueTuple;
 
 /**
- * The {@link ValueResponseHandler} manages a FIND_VALUE lookup process.
+ * The {@link ValueResponseHandler} manages a {@link MessageType#FIND_VALUE} 
+ * lookup process.
  */
 public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     

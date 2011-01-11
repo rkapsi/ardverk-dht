@@ -19,12 +19,14 @@ package com.ardverk.dht.io;
 import java.io.IOException;
 
 import com.ardverk.dht.message.MessageFactory;
+import com.ardverk.dht.message.MessageType;
 import com.ardverk.dht.message.PingRequest;
 import com.ardverk.dht.message.PingResponse;
 import com.ardverk.dht.message.RequestMessage;
 
 /**
- * The {@link PingRequestHandler} handles {@link PingRequest} (PING) messages.
+ * The {@link PingRequestHandler} handles {@link PingRequest} 
+ * ({@link MessageType#PING}) messages.
  */
 public class PingRequestHandler extends AbstractRequestHandler {
     

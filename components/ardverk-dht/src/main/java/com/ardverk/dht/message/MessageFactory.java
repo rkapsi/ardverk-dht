@@ -24,62 +24,64 @@ import com.ardverk.dht.storage.Database.Condition;
 import com.ardverk.dht.storage.ValueTuple;
 
 /**
- * 
+ * A factory interface to create various {@link Message}es such as
+ * {@link PingRequest} etc.
  */
 public interface MessageFactory {
     
     /**
-     * 
+     * Creates and returns a {@link MessageId}.
      */
     public MessageId createMessageId(SocketAddress dst);
     
     /**
-     * 
+     * Returns {@code true} if the given {@link MessageId} is for 
+     * the {@link SocketAddress}.
      */
     public boolean isFor(MessageId messageId, SocketAddress src);
     
     /**
-     * 
+     * Creates and returns a {@link PingRequest}.
      */
     public PingRequest createPingRequest(SocketAddress dst);
     
     /**
-     * 
+     * Creates and returns a {@link PingRequest}.
      */
     public PingRequest createPingRequest(Contact dst);
     
     /**
-     * 
+     * Creates and returns a {@link PingResponse}.
      */
     public PingResponse createPingResponse(PingRequest request);
     
     /**
-     * 
+     * Creates and returns a {@link NodeRequest}.
      */
     public NodeRequest createNodeRequest(Contact dst, KUID key);
     
     /**
-     * 
+     * Creates and returns a {@link NodeResponse}.
      */
     public NodeResponse createNodeResponse(LookupRequest request, Contact[] contacts);
     
     /**
-     * 
+     * Creates and returns a {@link ValueRequest}.
      */
     public ValueRequest createValueRequest(Contact dst, KUID key);
     
     /**
-     * 
+     * Creates and returns a {@link ValueResponse}.
      */
     public ValueResponse createValueResponse(LookupRequest request, ValueTuple tuple);
     
     /**
-     * 
+     * Creates and returns a {@link StoreRequest}.
      */
     public StoreRequest createStoreRequest(Contact dst, ValueTuple tuple);
     
     /**
-     * 
+     * Creates and returns a {@link StoreResponse}.
      */
     public StoreResponse createStoreResponse(StoreRequest request, Condition status);
 }

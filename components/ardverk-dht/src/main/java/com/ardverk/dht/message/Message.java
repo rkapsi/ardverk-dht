@@ -21,7 +21,7 @@ import java.net.SocketAddress;
 import com.ardverk.dht.routing.Contact;
 
 /**
- * 
+ * The base interface for messages.
  */
 public interface Message {
     

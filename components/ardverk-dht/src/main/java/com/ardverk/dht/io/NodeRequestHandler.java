@@ -22,6 +22,7 @@ import org.ardverk.lang.Arguments;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.message.MessageFactory;
+import com.ardverk.dht.message.MessageType;
 import com.ardverk.dht.message.NodeRequest;
 import com.ardverk.dht.message.NodeResponse;
 import com.ardverk.dht.message.RequestMessage;
@@ -29,7 +30,8 @@ import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.routing.RouteTable;
 
 /**
- * The {@link NodeRequestHandler} handles {@link NodeRequest} (FIND_NODE) messages. 
+ * The {@link NodeRequestHandler} handles {@link NodeRequest} 
+ * ({@link MessageType#FIND_NODE}) messages. 
  */
 public class NodeRequestHandler extends AbstractRequestHandler {
     

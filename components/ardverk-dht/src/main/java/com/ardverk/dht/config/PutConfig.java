@@ -16,9 +16,11 @@
 
 package com.ardverk.dht.config;
 
+import com.ardverk.dht.message.MessageType;
+
 /**
- * The {@link PutConfig} provides configuration data for the FIND_NODE
- * and STORE operations.
+ * The {@link PutConfig} provides configuration data for the {@link MessageType#FIND_NODE}
+ * and {@link MessageType#STORE} operations.
  */
 public interface PutConfig extends Config {
 

@@ -16,15 +16,16 @@
 
 package com.ardverk.dht.message;
 
+import com.ardverk.dht.KUID;
 import com.ardverk.dht.routing.Contact;
 
 /**
- * 
+ * A {@link MessageType#FIND_NODE} response.
  */
 public interface NodeResponse extends LookupResponse {
 
     /**
-     * 
+     * Returns the {@link Contact}s that were closest to a lookup {@link KUID}.
      */
     public Contact[] getContacts();
 }

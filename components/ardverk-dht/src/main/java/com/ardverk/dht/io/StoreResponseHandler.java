@@ -31,6 +31,7 @@ import com.ardverk.dht.config.StoreConfig;
 import com.ardverk.dht.entity.DefaultStoreEntity;
 import com.ardverk.dht.entity.StoreEntity;
 import com.ardverk.dht.message.MessageFactory;
+import com.ardverk.dht.message.MessageType;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.message.StoreRequest;
 import com.ardverk.dht.message.StoreResponse;
@@ -38,7 +39,7 @@ import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.storage.ValueTuple;
 
 /**
- * The {@link StoreResponseHandler} manages the STORE process.
+ * The {@link StoreResponseHandler} manages the {@link MessageType#STORE} process.
  */
 public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     

@@ -19,7 +19,7 @@ package com.ardverk.dht.message;
 import com.ardverk.dht.storage.ValueTuple;
 
 /**
- * 
+ * A {@link MessageType#FIND_VALUE} response.
  */
 public interface ValueResponse extends LookupResponse {
     

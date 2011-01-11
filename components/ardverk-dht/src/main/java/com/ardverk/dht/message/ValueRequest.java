@@ -16,9 +16,8 @@
 
 package com.ardverk.dht.message;
 
-
 /**
- * 
+ * A {@link MessageType#FIND_VALUE} request.
  */
 public interface ValueRequest extends LookupRequest {
 }

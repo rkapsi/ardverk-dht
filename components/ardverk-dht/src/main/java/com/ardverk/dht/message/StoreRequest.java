@@ -19,12 +19,12 @@ package com.ardverk.dht.message;
 import com.ardverk.dht.storage.ValueTuple;
 
 /**
- * 
+ * A {@link MessageType#STORE} request.
  */
 public interface StoreRequest extends RequestMessage {
     
     /**
-     * 
+     * Returns the found {@link ValueTuple}.
      */
     public ValueTuple getValueTuple();
 }

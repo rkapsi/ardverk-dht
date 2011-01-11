@@ -17,8 +17,7 @@
 package com.ardverk.dht.message;
 
 /**
- * 
+ * A {@link Message} that's sent as a response for a {@link RequestMessage}.
  */
 public interface ResponseMessage extends Message {
-
 }

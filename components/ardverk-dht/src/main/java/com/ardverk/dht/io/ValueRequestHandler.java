@@ -22,6 +22,7 @@ import org.ardverk.lang.Arguments;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.message.MessageFactory;
+import com.ardverk.dht.message.MessageType;
 import com.ardverk.dht.message.RequestMessage;
 import com.ardverk.dht.message.ResponseMessage;
 import com.ardverk.dht.message.ValueRequest;
@@ -31,7 +32,8 @@ import com.ardverk.dht.storage.Database;
 import com.ardverk.dht.storage.ValueTuple;
 
 /**
- * The {@link ValueRequestHandler} handles {@link ValueRequest} (FIND_VALUE) messages. 
+ * The {@link ValueRequestHandler} handles {@link ValueRequest} 
+ * ({@link MessageType#FIND_VALUE}) messages. 
  */
 public class ValueRequestHandler extends AbstractRequestHandler {
 

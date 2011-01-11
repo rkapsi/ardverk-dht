@@ -16,5 +16,8 @@
 
 package com.ardverk.dht.message;
 
+/**
+ * A {@link MessageType#FIND_NODE} request.
+ */
 public interface NodeRequest extends LookupRequest {
 }

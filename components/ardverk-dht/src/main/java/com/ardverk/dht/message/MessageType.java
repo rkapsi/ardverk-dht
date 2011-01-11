@@ -16,15 +16,28 @@
 
 package com.ardverk.dht.message;
 
-import com.ardverk.dht.storage.Database.Condition;
-
 /**
- * A {@link MessageType#STORE} response.
+ * This class describes the basic Kademlia IPC operations.
  */
-public interface StoreResponse extends ResponseMessage {
-
+public enum MessageType {
+    
     /**
-     * Returns the remote host's {@link Condition}.
+     * See Kademlia Specification(s) for PING.
      */
-    public Condition getCondition();
+    PING,
+    
+    /**
+     * See Kademlia Specification(s) for FIND_NODE.
+     */
+    FIND_NODE,
+    
+    /**
+     * See Kademlia Specification(s) for FIND_VALUE.
+     */
+    FIND_VALUE,
+    
+    /**
+     * See Kademlia Specification(s) for STORE.
+     */
+    STORE
 }
