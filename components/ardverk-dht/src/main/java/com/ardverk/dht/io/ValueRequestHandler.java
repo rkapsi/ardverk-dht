@@ -53,7 +53,7 @@ public class ValueRequestHandler extends AbstractRequestHandler {
     public void handleRequest(RequestMessage message) throws IOException {
         ValueRequest request = (ValueRequest)message;
         
-        KUID valueId = request.getKey();
+        KUID valueId = request.getId();
         ValueTuple value = database.get(valueId);
         
         MessageFactory factory = messageDispatcher.getMessageFactory();

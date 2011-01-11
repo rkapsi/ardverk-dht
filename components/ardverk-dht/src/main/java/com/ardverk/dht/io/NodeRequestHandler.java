@@ -47,7 +47,7 @@ public class NodeRequestHandler extends AbstractRequestHandler {
     public void handleRequest(RequestMessage message) throws IOException {
         
         NodeRequest request = (NodeRequest)message;
-        KUID lookupId = request.getKey();
+        KUID lookupId = request.getId();
         
         // This is an idea where I'm not sure if it's improving anything 
         // or not. In short we're excluding the localhost from the result 

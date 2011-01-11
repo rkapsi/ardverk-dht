@@ -36,7 +36,7 @@ public class DefaultNodeRequest extends AbstractLookupRequest
     }
 
     @Override
-    public KUID getKey() {
+    public KUID getId() {
         return lookupId;
     }
 }

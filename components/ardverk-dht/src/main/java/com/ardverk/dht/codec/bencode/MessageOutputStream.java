@@ -181,7 +181,7 @@ class MessageOutputStream extends BencodingOutputStream {
     }
     
     private void writeNodeRequest(NodeRequest message) throws IOException {
-        writeKUID(message.getKey());
+        writeKUID(message.getId());
     }
     
     private void writeNodeResponse(NodeResponse message) throws IOException {
@@ -194,7 +194,7 @@ class MessageOutputStream extends BencodingOutputStream {
     }
     
     private void writeValueRequest(ValueRequest message) throws IOException {
-        writeKUID(message.getKey());
+        writeKUID(message.getId());
     }
     
     private void writeValueResponse(ValueResponse message) throws IOException {

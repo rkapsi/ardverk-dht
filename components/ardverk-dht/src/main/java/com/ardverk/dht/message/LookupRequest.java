@@ -16,9 +16,11 @@
 
 package com.ardverk.dht.message;
 
+import com.ardverk.dht.lang.Identifier;
+
 /**
  * 
  */
-public interface LookupRequest extends RequestMessage {
+public interface LookupRequest extends RequestMessage, Identifier {
     
 }

@@ -24,16 +24,16 @@ import com.ardverk.dht.routing.Contact;
 public class DefaultValueRequest extends AbstractLookupRequest 
         implements ValueRequest {
     
-    private final KUID key;
+    private final KUID valueId;
     
     public DefaultValueRequest(MessageId messageId, Contact contact, 
-            SocketAddress address, KUID key) {
+            SocketAddress address, KUID valueId) {
         super(messageId, contact, address);
-        this.key = key;
+        this.valueId = valueId;
     }
     
     @Override
-    public KUID getKey() {
-        return key;
+    public KUID getId() {
+        return valueId;
     }
 }
