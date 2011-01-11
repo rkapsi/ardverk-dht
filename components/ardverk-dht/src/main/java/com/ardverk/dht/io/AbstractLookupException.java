@@ -18,9 +18,11 @@ package com.ardverk.dht.io;
 
 import java.util.concurrent.TimeUnit;
 
+import com.ardverk.dht.KUID;
 import com.ardverk.dht.lang.ArdverkException;
+import com.ardverk.dht.lang.Identifier;
 
-abstract class AbstractLookupException extends ArdverkException {
+abstract class AbstractLookupException extends ArdverkException implements Identifier {
     
     private static final long serialVersionUID = -2767832375265292182L;
 
@@ -37,5 +39,10 @@ abstract class AbstractLookupException extends ArdverkException {
      */
     public Outcome getOutcome() {
         return outcome;
+    }
+
+    @Override
+    public KUID getId() {
+        return outcome.getId();
     }
 }
