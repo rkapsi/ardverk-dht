@@ -22,13 +22,39 @@ import com.ardverk.dht.storage.ValueTuple;
 
 public interface ValueEntity extends LookupEntity {
     
+    /**
+     * Returns the sender who sent us the {@link ValueTuple}.
+     * 
+     * @see #getValueTuple()
+     * @see ValueTuple#getSender()
+     */
     public Contact getSender();
     
+    /**
+     * Returns the creator who created the {@link ValueTuple}.
+     * 
+     * @see #getValueTuple()
+     * @see ValueTuple#getCreator()
+     */
     public Contact getCreator();
     
+    /**
+     * Returns first {@link ValueTuple}'s {@link Value}.
+     * 
+     * @see #getValueTuple()
+     * @see ValueTuple#getValue()
+     */
     public Value getValue();
     
+    /**
+     * Returns the first {@link ValueTuple}.
+     * 
+     * @see #getValueTuples()
+     */
     public ValueTuple getValueTuple();
     
+    /**
+     * Returns all {@link ValueTuple}s.
+     */
     public ValueTuple[] getValueTuples();
 }

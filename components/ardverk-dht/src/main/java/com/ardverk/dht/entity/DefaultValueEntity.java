@@ -18,6 +18,8 @@ package com.ardverk.dht.entity;
 
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.collection.CollectionUtils;
+
 import com.ardverk.dht.io.Outcome;
 import com.ardverk.dht.routing.Contact;
 import com.ardverk.dht.storage.Value;
@@ -54,7 +56,7 @@ public class DefaultValueEntity extends AbstractLookupEntity implements ValueEnt
     
     @Override
     public ValueTuple getValueTuple() {
-        return getValueTuples()[0];
+        return CollectionUtils.first(values);
     }
     
     @Override

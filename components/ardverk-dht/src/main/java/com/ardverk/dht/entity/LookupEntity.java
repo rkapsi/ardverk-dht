@@ -16,9 +16,7 @@
 
 package com.ardverk.dht.entity;
 
-import com.ardverk.dht.KUID;
+import com.ardverk.dht.lang.Identifier;
 
-public interface LookupEntity extends Entity {
-
-    public KUID getId();
+public interface LookupEntity extends Entity, Identifier {
 }

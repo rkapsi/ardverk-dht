@@ -20,5 +20,8 @@ import com.ardverk.dht.message.StoreResponse;
 
 public interface StoreEntity extends Entity {
     
+    /**
+     * Returns all {@link StoreResponse}s.
+     */
     public StoreResponse[] getStoreResponses();
 }

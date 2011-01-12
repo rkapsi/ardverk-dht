@@ -18,6 +18,7 @@ package com.ardverk.dht.io;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.NavigableSet;
 import java.util.NoSuchElementException;
@@ -258,6 +259,7 @@ abstract class LookupResponseHandler<T extends LookupEntity>
         return new Outcome() {
 
             private final long time = creationTime.getAgeInMillis();
+            private final Contact[] closest = lookupManager.getClosest();
             private final Contact[] contacts = lookupManager.getContacts();
             private final int hop = lookupManager.getHop();
             private final int timeouts = lookupManager.getErrorCount();
@@ -267,6 +269,11 @@ abstract class LookupResponseHandler<T extends LookupEntity>
                 return lookupManager.lookupId;
             }
 
+            @Override
+            public Contact[] getClosest() {
+                return closest;
+            }
+            
             @Override
             public Contact[] getContacts() {
                 return contacts;
@@ -365,6 +372,17 @@ abstract class LookupResponseHandler<T extends LookupEntity>
         
         public void handleTimeout(long time, TimeUnit unit) {
             timeouts++;
+        }
+        
+        public Contact[] getClosest() {
+            int length = Math.min(routeTable.getK(), responses.size());
+            Contact[] closest = new Contact[length];
+            
+            Iterator<Contact> it = responses.iterator();
+            for (int i = 0; i < closest.length; i++) {
+                closest[i] = it.next();
+            }
+            return closest;
         }
         
         public Contact[] getContacts() {

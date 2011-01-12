@@ -63,15 +63,21 @@ public class NodeResponseHandlerTest {
             TestCase.assertEquals(lookupId, entity.getId());
             
             Contact[] contacts = entity.getContacts();
+            Contact[] closest = entity.getClosest();
             
             // The Contacts in the response should be in the same order
             // as our DHT instances!
             int k = first.getRouteTable().getK();
             for (int i = 0; i < k && i < contacts.length; i++) {
                 KUID contactId = contacts[i].getId();
+                KUID closestId = closest[i].getId();
+                
                 KUID expectedId = expected.pollFirst();
                 
                 TestCase.assertEquals(expectedId, contactId);
+                TestCase.assertEquals(expectedId, closestId);
+                
+                TestCase.assertSame(closest[i], contacts[i]);
             }
             
         } finally {

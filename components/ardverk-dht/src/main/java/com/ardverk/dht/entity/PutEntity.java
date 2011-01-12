@@ -20,9 +20,20 @@ import com.ardverk.dht.message.StoreResponse;
 
 public interface PutEntity extends LookupEntity {
 
+    /**
+     * Returns the {@link NodeEntity}.
+     */
     public NodeEntity getNodeEntity();
     
+    /**
+     * Returns the {@link StoreEntity}.
+     */
     public StoreEntity getStoreEntity();
     
+    /**
+     * Returns all {@link StoreResponse}s.
+     * 
+     * @see StoreEntity#getStoreResponses()
+     */
     public StoreResponse[] getStoreResponses();
 }

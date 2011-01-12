@@ -33,6 +33,11 @@ public class DefaultNodeEntity extends AbstractLookupEntity implements NodeEntit
     }
     
     @Override
+    public Contact[] getClosest() {
+        return outcome.getClosest();
+    }
+    
+    @Override
     public Contact[] getContacts() {
         return outcome.getContacts();
     }

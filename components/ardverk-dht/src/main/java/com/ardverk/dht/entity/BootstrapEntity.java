@@ -19,12 +19,12 @@ package com.ardverk.dht.entity;
 public interface BootstrapEntity extends Entity {
 
     /**
-     * 
+     * Returns the {@link PingEntity}.
      */
     public PingEntity getPingEntity();
     
     /**
-     * 
+     * Returns the {@link NodeEntity}.
      */
     public NodeEntity getNodeEntity();
 }

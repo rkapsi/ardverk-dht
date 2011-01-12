@@ -20,7 +20,18 @@ import com.ardverk.dht.routing.Contact;
 
 public interface NodeEntity extends LookupEntity {
     
+    /**
+     * Returns number of hops it took to find the k-closest {@link Contact}s.
+     */
     public int getHop();
     
+    /**
+     * Returns the k-closest {@link Contact}s that were found.
+     */
+    public Contact[] getClosest();
+    
+    /**
+     * Returns all {@link Contact}s that were found.
+     */
     public Contact[] getContacts();
 }

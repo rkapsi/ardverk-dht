@@ -27,7 +27,12 @@ import com.ardverk.dht.routing.Contact;
 public abstract class Outcome implements Identifier {
     
     /**
-     * Returns the {@link Contact}s that have been found.
+     * Returns the k-closest {@link Contact}s that have been found.
+     */
+    public abstract Contact[] getClosest();
+    
+    /**
+     * Returns all {@link Contact}s that have been found.
      */
     public abstract Contact[] getContacts();
     
