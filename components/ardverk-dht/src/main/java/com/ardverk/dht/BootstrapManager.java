@@ -17,13 +17,13 @@
 package com.ardverk.dht;
 
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.FutureUtils;
 import org.ardverk.concurrent.ValueReference;
+import org.ardverk.net.NetworkUtils;
 
 import com.ardverk.dht.concurrent.ArdverkFuture;
 import com.ardverk.dht.concurrent.ArdverkProcess;
@@ -48,17 +48,17 @@ public class BootstrapManager {
     
     public ArdverkFuture<BootstrapEntity> bootstrap(
             String host, int port, BootstrapConfig config) {
-        return bootstrap(new InetSocketAddress(host, port), config);
+        return bootstrap(NetworkUtils.createResolved(host, port), config);
     }
     
     public ArdverkFuture<BootstrapEntity> bootstrap(
             InetAddress address, int port, BootstrapConfig config) {
-        return bootstrap(new InetSocketAddress(address, port), config);
+        return bootstrap(NetworkUtils.createResolved(address, port), config);
     }
     
     public ArdverkFuture<BootstrapEntity> bootstrap(
             Contact contact, BootstrapConfig config) {
-        return bootstrap(contact.getContactAddress(), config);
+        return bootstrap(contact.getRemoteAddress(), config);
     }
     
     public ArdverkFuture<BootstrapEntity> bootstrap(
