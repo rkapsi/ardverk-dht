@@ -21,6 +21,8 @@ import java.util.concurrent.TimeUnit;
 
 import com.ardverk.dht.KUID;
 import com.ardverk.dht.lang.ArdverkException;
+import com.ardverk.dht.message.MessageType;
+import com.ardverk.dht.routing.Contact;
 
 /**
  * The {@link PingTimeoutException} is thrown if a timeout occurs.
@@ -38,16 +40,24 @@ public class PingTimeoutException extends ArdverkException {
     }
     
     /**
-     * 
+     * Returns the {@link RequestEntity}.
      */
     public RequestEntity getRequestEntity() {
         return entity;
     }
     
+    /**
+     * Returns the remote {@link Contact}'s {@link KUID} or {@code null}
+     * if the {@link MessageType#PING} was sent to an IP-address and no
+     * {@link KUID} was provided.
+     */
     public KUID getContactId() {
         return entity.getId();
     }
     
+    /**
+     * Returns the remote {@link Contact}'s IP-address.
+     */
     public SocketAddress getAddress() {
         return entity.getAddress();
     }

@@ -36,6 +36,9 @@ public class StoreException extends ArdverkException {
         this.tuple = tuple;
     }
 
+    /**
+     * Returns the {@link ValueTuple} that failed to be stored.
+     */
     public ValueTuple getValueTuple() {
         return tuple;
     }

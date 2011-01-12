@@ -34,9 +34,9 @@ import com.ardverk.dht.message.ValueResponse;
 import com.ardverk.dht.routing.Contact;
 
 /**
- * The {@link RequestEntity} holds the necessary information to
- * verify and validate a {@link ResponseMessage} that we're receiving 
- * in response for a {@link RequestMessage}.
+ * The {@link RequestEntity} holds the necessary information to verify and 
+ * validate a {@link ResponseMessage} that we're receiving in response for 
+ * a {@link RequestMessage}.
  */
 public class RequestEntity implements Identifier {
 

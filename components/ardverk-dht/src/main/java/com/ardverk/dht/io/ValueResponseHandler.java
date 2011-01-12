@@ -43,14 +43,14 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     
     private final FixedSizeArrayList<ValueTuple> tuples;
     
-    private final KUID key;
+    private final KUID valueId;
     
     public ValueResponseHandler(MessageDispatcher messageDispatcher,
-            Contact[] contacts, RouteTable routeTable, KUID key, GetConfig config) {
-        super(messageDispatcher, contacts, routeTable, key, config);
+            Contact[] contacts, RouteTable routeTable, KUID valueId, GetConfig config) {
+        super(messageDispatcher, contacts, routeTable, valueId, config);
         
         tuples = new FixedSizeArrayList<ValueTuple>(config.getR());
-        this.key = key;
+        this.valueId = valueId;
     }
 
     @Override
@@ -90,10 +90,10 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     protected void lookup(Contact dst, KUID lookupId, 
             long timeout, TimeUnit unit) throws IOException {
         
-        assert (lookupId.equals(key));
+        assert (lookupId.equals(valueId));
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
-        ValueRequest message = factory.createValueRequest(dst, key);
+        ValueRequest message = factory.createValueRequest(dst, valueId);
         
         send(dst, message, timeout, unit);
     }

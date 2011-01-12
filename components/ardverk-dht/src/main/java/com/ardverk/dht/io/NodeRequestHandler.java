@@ -60,7 +60,7 @@ public class NodeRequestHandler extends AbstractRequestHandler {
         //
         // Instead we could send back some other contact. It's maybe not
         // useful in the context of this lookup but maybe helps the remote
-        // host to keep it's RT fresh.
+        // host to keep its RouteTable "more" fresh.
         
         /*Contact localhost = routeTable.getLocalhost();
         int k = routeTable.getK();
