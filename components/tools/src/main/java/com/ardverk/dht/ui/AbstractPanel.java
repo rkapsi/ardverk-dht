@@ -19,9 +19,10 @@ package com.ardverk.dht.ui;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import com.ardverk.dht.KUID;
-import com.ardverk.dht.io.MessageListener;
-import com.ardverk.dht.message.Message;
+import org.ardverk.dht.KUID;
+import org.ardverk.dht.io.MessageListener;
+import org.ardverk.dht.message.Message;
+
 
 abstract class AbstractPanel extends JPanel implements MessageListener {
     

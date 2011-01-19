@@ -16,15 +16,15 @@
 
 package com.ardverk.dht.easy;
 
-import com.ardverk.dht.codec.DefaultMessageCodec;
-import com.ardverk.dht.codec.MessageCodec;
-import com.ardverk.dht.message.DefaultMessageFactory;
-import com.ardverk.dht.message.MessageFactory;
-import com.ardverk.dht.routing.DefaultRouteTable;
-import com.ardverk.dht.routing.Localhost;
-import com.ardverk.dht.routing.RouteTable;
-import com.ardverk.dht.storage.Database;
-import com.ardverk.dht.storage.DefaultDatabase;
+import org.ardverk.dht.codec.DefaultMessageCodec;
+import org.ardverk.dht.codec.MessageCodec;
+import org.ardverk.dht.message.DefaultMessageFactory;
+import org.ardverk.dht.message.MessageFactory;
+import org.ardverk.dht.routing.DefaultRouteTable;
+import org.ardverk.dht.routing.Localhost;
+import org.ardverk.dht.routing.RouteTable;
+import org.ardverk.dht.storage.Database;
+import org.ardverk.dht.storage.DefaultDatabase;
 
 public class EasyFactory {
     

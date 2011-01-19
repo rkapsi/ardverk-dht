@@ -16,20 +16,20 @@
 
 package com.ardverk.dht.easy;
 
-import com.ardverk.dht.config.BootstrapConfig;
-import com.ardverk.dht.config.DefaultBootstrapConfig;
-import com.ardverk.dht.config.DefaultGetConfig;
-import com.ardverk.dht.config.DefaultLookupConfig;
-import com.ardverk.dht.config.DefaultPingConfig;
-import com.ardverk.dht.config.DefaultPutConfig;
-import com.ardverk.dht.config.DefaultQuickenConfig;
-import com.ardverk.dht.config.DefaultSyncConfig;
-import com.ardverk.dht.config.GetConfig;
-import com.ardverk.dht.config.LookupConfig;
-import com.ardverk.dht.config.PingConfig;
-import com.ardverk.dht.config.PutConfig;
-import com.ardverk.dht.config.QuickenConfig;
-import com.ardverk.dht.config.SyncConfig;
+import org.ardverk.dht.config.BootstrapConfig;
+import org.ardverk.dht.config.DefaultBootstrapConfig;
+import org.ardverk.dht.config.DefaultGetConfig;
+import org.ardverk.dht.config.DefaultLookupConfig;
+import org.ardverk.dht.config.DefaultPingConfig;
+import org.ardverk.dht.config.DefaultPutConfig;
+import org.ardverk.dht.config.DefaultQuickenConfig;
+import org.ardverk.dht.config.DefaultSyncConfig;
+import org.ardverk.dht.config.GetConfig;
+import org.ardverk.dht.config.LookupConfig;
+import org.ardverk.dht.config.PingConfig;
+import org.ardverk.dht.config.PutConfig;
+import org.ardverk.dht.config.QuickenConfig;
+import org.ardverk.dht.config.SyncConfig;
 
 public class EasyConfig {
     

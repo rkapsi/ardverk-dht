@@ -19,8 +19,9 @@ package com.ardverk.dht.ui;
 import java.awt.Component;
 import java.awt.Graphics;
 
-import com.ardverk.dht.KUID;
-import com.ardverk.dht.message.Message;
+import org.ardverk.dht.KUID;
+import org.ardverk.dht.message.Message;
+
 
 interface Painter {
 

@@ -18,7 +18,8 @@ package com.ardverk.dht.ui;
 
 import javax.swing.JFrame;
 
-import com.ardverk.dht.DHT;
+import org.ardverk.dht.DHT;
+
 
 public class PainterFrame extends JFrame {
     

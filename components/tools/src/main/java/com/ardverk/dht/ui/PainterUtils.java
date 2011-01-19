@@ -21,16 +21,17 @@ import java.awt.Color;
 import java.awt.Stroke;
 import java.util.List;
 
-import com.ardverk.dht.message.Message;
-import com.ardverk.dht.message.NodeRequest;
-import com.ardverk.dht.message.NodeResponse;
-import com.ardverk.dht.message.PingRequest;
-import com.ardverk.dht.message.PingResponse;
-import com.ardverk.dht.message.RequestMessage;
-import com.ardverk.dht.message.StoreRequest;
-import com.ardverk.dht.message.StoreResponse;
-import com.ardverk.dht.message.ValueRequest;
-import com.ardverk.dht.message.ValueResponse;
+import org.ardverk.dht.message.Message;
+import org.ardverk.dht.message.NodeRequest;
+import org.ardverk.dht.message.NodeResponse;
+import org.ardverk.dht.message.PingRequest;
+import org.ardverk.dht.message.PingResponse;
+import org.ardverk.dht.message.RequestMessage;
+import org.ardverk.dht.message.StoreRequest;
+import org.ardverk.dht.message.StoreResponse;
+import org.ardverk.dht.message.ValueRequest;
+import org.ardverk.dht.message.ValueResponse;
+
 
 class PainterUtils {
 

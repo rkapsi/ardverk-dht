@@ -29,12 +29,13 @@ import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-import com.ardverk.dht.ArdverkDHT;
-import com.ardverk.dht.DHT;
-import com.ardverk.dht.KUID;
-import com.ardverk.dht.io.MessageListener;
-import com.ardverk.dht.message.Message;
-import com.ardverk.dht.routing.Contact;
+import org.ardverk.dht.ArdverkDHT;
+import org.ardverk.dht.DHT;
+import org.ardverk.dht.KUID;
+import org.ardverk.dht.io.MessageListener;
+import org.ardverk.dht.message.Message;
+import org.ardverk.dht.routing.Contact;
+
 import com.ardverk.dht.ui.Painter.EventType;
 
 public class PainterPanel extends JPanel {

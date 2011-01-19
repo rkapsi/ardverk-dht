@@ -22,7 +22,8 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.math.BigDecimal;
 
-import com.ardverk.dht.KUID;
+import org.ardverk.dht.KUID;
+
 
 abstract class AbstractPainter implements Painter {
     

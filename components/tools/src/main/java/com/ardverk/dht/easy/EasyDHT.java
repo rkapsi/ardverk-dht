@@ -20,18 +20,19 @@ import java.io.Closeable;
 import java.net.InetAddress;
 import java.net.SocketAddress;
 
-import com.ardverk.dht.DHT;
-import com.ardverk.dht.KUID;
-import com.ardverk.dht.concurrent.ArdverkFuture;
-import com.ardverk.dht.entity.BootstrapEntity;
-import com.ardverk.dht.entity.NodeEntity;
-import com.ardverk.dht.entity.PingEntity;
-import com.ardverk.dht.entity.PutEntity;
-import com.ardverk.dht.entity.QuickenEntity;
-import com.ardverk.dht.entity.SyncEntity;
-import com.ardverk.dht.entity.ValueEntity;
-import com.ardverk.dht.routing.Contact;
-import com.ardverk.dht.storage.Value;
+import org.ardverk.dht.DHT;
+import org.ardverk.dht.KUID;
+import org.ardverk.dht.concurrent.ArdverkFuture;
+import org.ardverk.dht.entity.BootstrapEntity;
+import org.ardverk.dht.entity.NodeEntity;
+import org.ardverk.dht.entity.PingEntity;
+import org.ardverk.dht.entity.PutEntity;
+import org.ardverk.dht.entity.QuickenEntity;
+import org.ardverk.dht.entity.SyncEntity;
+import org.ardverk.dht.entity.ValueEntity;
+import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.storage.Value;
+
 
 /**
  * An interface that describes a simpler to use version of the {@link DHT}.

@@ -30,8 +30,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import com.ardverk.dht.KUID;
-import com.ardverk.dht.message.Message;
+import org.ardverk.dht.KUID;
+import org.ardverk.dht.message.Message;
+
 
 public class JuicePainter extends AbstractPainter {
 
