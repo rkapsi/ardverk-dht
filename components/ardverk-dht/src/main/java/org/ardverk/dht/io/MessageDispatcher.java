@@ -33,7 +33,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.ardverk.collection.FixedSizeHashSet;
 import org.ardverk.concurrent.ExecutorUtils;
 import org.ardverk.dht.KUID;
-import org.ardverk.dht.codec.MessageCodec;
 import org.ardverk.dht.event.EventUtils;
 import org.ardverk.dht.io.transport.Transport;
 import org.ardverk.dht.io.transport.TransportCallback;
@@ -69,10 +68,8 @@ public abstract class MessageDispatcher
     private final TransportCallback callback 
             = new TransportCallback() {
         @Override
-        public void received(SocketAddress src, 
-                byte[] message, int offset, int length) throws IOException {
-            MessageDispatcher.this.handleMessage(
-                    src, message, offset, length);
+        public void received(Message message) throws IOException {
+            MessageDispatcher.this.handleMessage(message);
         }
     };
     
@@ -86,8 +83,6 @@ public abstract class MessageDispatcher
     
     private final MessageFactory factory;
     
-    private final MessageCodec codec;
-    
     private final ResponseChecker checker;
     
     private Transport transport = null;
@@ -95,8 +90,8 @@ public abstract class MessageDispatcher
     /**
      * Creates a {@link MessageDispatcher}.
      */
-    public MessageDispatcher(MessageFactory factory, MessageCodec codec) {
-        this(EXECUTOR, factory, codec);
+    public MessageDispatcher(MessageFactory factory) {
+        this(EXECUTOR, factory);
     }
     
     /**
@@ -105,10 +100,9 @@ public abstract class MessageDispatcher
      * keep for timing out requests.
      */
     public MessageDispatcher(ScheduledExecutorService executor, 
-            MessageFactory factory, MessageCodec codec) {
+            MessageFactory factory) {
         this.executor = Arguments.notNull(executor, "executor");
         this.factory = Arguments.notNull(factory, "factory");
-        this.codec = Arguments.notNull(codec, "codec");
         
         // TODO: Is memorizing the 512 most recently received MessageIds
         // too much or too little? 
@@ -175,33 +169,9 @@ public abstract class MessageDispatcher
     }
     
     /**
-     * Returns the {@link MessageCodec}
-     */
-    public MessageCodec getMessageCodec() {
-        return codec;
-    }
-    
-    /**
      * Sends the given {@link Message}.
      */
     protected void send(Message message) throws IOException {
-        SocketAddress address = message.getAddress();
-        byte[] data = codec.encode(message);
-        send(address, data);
-    }
-    
-    /**
-     * Sends the given bytes (message) to the given {@link SocketAddress}.
-     */
-    protected void send(SocketAddress dst, byte[] message) throws IOException {
-        send(dst, message, 0, message.length);
-    }
-    
-    /**
-     * Sends the given bytes (message) to the given {@link SocketAddress}.
-     */
-    protected void send(SocketAddress dst, byte[] message, 
-            int offset, int length) throws IOException {
         
         Transport transport = null;
         synchronized (this) {
@@ -212,7 +182,7 @@ public abstract class MessageDispatcher
             throw new IOException();
         }
         
-        transport.send(dst, message, offset, length);
+        transport.send(message);
     }
     
     /**
@@ -254,16 +224,6 @@ public abstract class MessageDispatcher
         
         send(request);
         fireMessageSent(contactId, request);
-    }
-    
-    /**
-     * Callback method for incoming {@link Message}s.
-     */
-    public void handleMessage(SocketAddress src, 
-            byte[] data, int offset, int length) throws IOException {
-        Message message = codec.decode(src, data, offset, length);
-        handleMessage(message);
-        fireMessageReceived(message);
     }
     
     /**

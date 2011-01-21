@@ -36,6 +36,9 @@ import org.ardverk.dht.config.BootstrapConfig;
 import org.ardverk.dht.config.DefaultBootstrapConfig;
 import org.ardverk.dht.config.DefaultPutConfig;
 import org.ardverk.dht.config.DefaultQuickenConfig;
+import org.ardverk.dht.easy.EasyConfig;
+import org.ardverk.dht.easy.EasyDHT;
+import org.ardverk.dht.easy.EasyFactory;
 import org.ardverk.dht.entity.BootstrapEntity;
 import org.ardverk.dht.entity.PutEntity;
 import org.ardverk.dht.entity.QuickenEntity;
@@ -47,9 +50,6 @@ import org.ardverk.io.IoUtils;
 import org.ardverk.security.MessageDigestUtils;
 import org.ardverk.utils.StringUtils;
 
-import com.ardverk.dht.easy.EasyConfig;
-import com.ardverk.dht.easy.EasyDHT;
-import com.ardverk.dht.easy.EasyFactory;
 
 public class ArdverkUtils {
 

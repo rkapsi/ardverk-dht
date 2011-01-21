@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.ardverk.dht.easy;
+package org.ardverk.dht.easy;
 
 import org.ardverk.dht.config.BootstrapConfig;
 import org.ardverk.dht.config.DefaultBootstrapConfig;

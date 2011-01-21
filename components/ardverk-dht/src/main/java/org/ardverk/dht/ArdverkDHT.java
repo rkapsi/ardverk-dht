@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketAddress;
 
-import org.ardverk.dht.codec.DefaultMessageCodec;
-import org.ardverk.dht.codec.MessageCodec;
 import org.ardverk.dht.concurrent.ArdverkFuture;
 import org.ardverk.dht.config.BootstrapConfig;
 import org.ardverk.dht.config.GetConfig;
@@ -92,16 +90,11 @@ public class ArdverkDHT extends AbstractDHT {
     }
     
     public ArdverkDHT(RouteTable routeTable, Database database) {
-        this(new DefaultMessageCodec(), routeTable, database);
-    }
-    
-    public ArdverkDHT(MessageCodec codec, 
-            RouteTable routeTable, Database database) {
-        this(codec, new DefaultMessageFactory(
+        this(new DefaultMessageFactory(
                 routeTable.getLocalhost()), routeTable, database);
     }
     
-    public ArdverkDHT(MessageCodec codec, MessageFactory messageFactory, 
+    public ArdverkDHT(MessageFactory messageFactory, 
             RouteTable routeTable, Database database) {
         
         this.routeTable = routeTable;
@@ -111,7 +104,7 @@ public class ArdverkDHT extends AbstractDHT {
             = new StoreForward(routeTable, database);
         
         messageDispatcher = new DefaultMessageDispatcher(
-                messageFactory, codec, storeForward, 
+                messageFactory, storeForward, 
                 routeTable, database);
         
         pingManager = new PingManager(this, messageDispatcher);
@@ -210,7 +203,7 @@ public class ArdverkDHT extends AbstractDHT {
     public void bind(SocketAddress address) throws IOException {
         bind(new DatagramTransport(address));
     }
-
+    
     @Override
     public void bind(Transport transport) throws IOException {
         getLocalhost().bind(transport);

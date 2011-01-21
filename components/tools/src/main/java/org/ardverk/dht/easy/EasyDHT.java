@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.ardverk.dht.easy;
+package org.ardverk.dht.easy;
 
 import java.io.Closeable;
 import java.net.InetAddress;

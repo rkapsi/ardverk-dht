@@ -17,7 +17,8 @@
 package org.ardverk.dht.io.transport;
 
 import java.io.IOException;
-import java.net.SocketAddress;
+
+import org.ardverk.dht.message.Message;
 
 /**
  * A callback interface to receive messages.
@@ -27,6 +28,5 @@ public interface TransportCallback {
     /**
      * Called by {@link Transport} for every message that's being received.
      */
-    public void received(SocketAddress src, byte[] message, 
-            int offset, int length) throws IOException;
+    public void received(Message message) throws IOException;
 }

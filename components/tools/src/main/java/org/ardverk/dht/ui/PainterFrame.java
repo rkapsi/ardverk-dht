@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.ardverk.dht.ui;
+package org.ardverk.dht.ui;
 
 import javax.swing.JFrame;
 

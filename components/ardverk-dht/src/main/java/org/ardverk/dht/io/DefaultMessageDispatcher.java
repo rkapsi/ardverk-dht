@@ -19,7 +19,6 @@ package org.ardverk.dht.io;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.dht.codec.MessageCodec;
 import org.ardverk.dht.message.Message;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.message.NodeRequest;
@@ -54,9 +53,9 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
     private final StoreRequestHandler store;
     
     public DefaultMessageDispatcher(MessageFactory factory, 
-            MessageCodec codec, StoreForward storeForward, 
-            RouteTable routeTable, Database database) {
-        super(factory, codec);
+            StoreForward storeForward, RouteTable routeTable, 
+            Database database) {
+        super(factory);
         
         defaultHandler = new DefaultMessageHandler(storeForward, routeTable);
         ping = new PingRequestHandler(this);

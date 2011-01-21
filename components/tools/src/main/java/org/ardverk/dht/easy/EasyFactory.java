@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package com.ardverk.dht.easy;
+package org.ardverk.dht.easy;
 
-import org.ardverk.dht.codec.DefaultMessageCodec;
-import org.ardverk.dht.codec.MessageCodec;
 import org.ardverk.dht.message.DefaultMessageFactory;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.routing.DefaultRouteTable;
@@ -36,24 +34,14 @@ public class EasyFactory {
         int keySize = config.getKeySize();
         Localhost localhost = new Localhost(keySize);
         
-        String secretKey = config.getSecretKey();
-        String initVector = config.getInitVector();
-        
-        MessageCodec codec = null;
-        if (secretKey != null && initVector != null) {
-            codec = new DefaultMessageCodec(secretKey, initVector);
-        } else {
-            codec = new DefaultMessageCodec();
-        }
-        
         MessageFactory messageFactory 
             = new DefaultMessageFactory(keySize, localhost);
         
         Database database = new DefaultDatabase();
         RouteTable routeTable = new DefaultRouteTable(localhost);
         
-        return new DefaultEasyDHT(config, codec, 
-                messageFactory, routeTable, database);
+        return new DefaultEasyDHT(config, messageFactory, 
+                routeTable, database);
     }
     
     private EasyFactory() {}

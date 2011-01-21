@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package com.ardverk.dht.easy;
+package org.ardverk.dht.easy;
 
 import java.net.InetAddress;
 import java.net.SocketAddress;
 
 import org.ardverk.dht.ArdverkDHT;
 import org.ardverk.dht.KUID;
-import org.ardverk.dht.codec.MessageCodec;
 import org.ardverk.dht.concurrent.ArdverkFuture;
 import org.ardverk.dht.entity.BootstrapEntity;
 import org.ardverk.dht.entity.NodeEntity;
@@ -41,11 +40,9 @@ public class DefaultEasyDHT extends ArdverkDHT implements EasyDHT {
         
     private final EasyConfig config;
     
-    public DefaultEasyDHT(EasyConfig config, MessageCodec codec, 
-            MessageFactory messageFactory, RouteTable routeTable, 
-            Database database) {
-        super(codec, messageFactory, routeTable, database);
-        
+    public DefaultEasyDHT(EasyConfig config, MessageFactory messageFactory, 
+            RouteTable routeTable, Database database) {
+        super(messageFactory, routeTable, database);
         this.config = config;
     }
     

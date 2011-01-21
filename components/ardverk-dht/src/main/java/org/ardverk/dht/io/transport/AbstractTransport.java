@@ -17,9 +17,9 @@
 package org.ardverk.dht.io.transport;
 
 import java.io.IOException;
-import java.net.SocketAddress;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.ardverk.dht.message.Message;
 import org.ardverk.lang.NullArgumentException;
 
 /**
@@ -29,11 +29,6 @@ public abstract class AbstractTransport implements Transport {
     
     private final AtomicReference<TransportCallback> callbackRef 
         = new AtomicReference<TransportCallback>();
-    
-    @Override
-    public void send(SocketAddress dst, byte[] message) throws IOException {
-        send(dst, message, 0, message.length);
-    }
     
     @Override
     public void bind(TransportCallback callback) throws IOException {
@@ -56,12 +51,10 @@ public abstract class AbstractTransport implements Transport {
         return callbackRef.get() != null;
     }
     
-    protected boolean received(SocketAddress src, byte[] message, 
-            int offset, int length) throws IOException {
-        
+    protected boolean received(Message message) throws IOException {
         TransportCallback callback = callbackRef.get();
         if (callback != null) {
-            callback.received(src, message, offset, length);
+            callback.received(message);
             return true;
         }
         return false;

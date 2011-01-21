@@ -27,13 +27,13 @@ import org.ardverk.dht.KUID;
 import org.ardverk.dht.concurrent.ArdverkFuture;
 import org.ardverk.dht.config.DefaultLookupConfig;
 import org.ardverk.dht.config.LookupConfig;
+import org.ardverk.dht.easy.EasyDHT;
 import org.ardverk.dht.entity.NodeEntity;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.utils.XorComparator;
 import org.ardverk.io.IoUtils;
 import org.junit.Test;
 
-import com.ardverk.dht.easy.EasyDHT;
 
 public class NodeResponseHandlerTest {
     

@@ -19,6 +19,7 @@ package org.ardverk.dht.io.transport;
 import java.io.IOException;
 import java.net.SocketAddress;
 
+import org.ardverk.dht.message.Message;
 import org.ardverk.io.Bindable;
 
 /**
@@ -33,14 +34,7 @@ public interface Transport extends Bindable<TransportCallback> {
     public SocketAddress getSocketAddress();
     
     /**
-     * Sends a message to the given {@link SocketAddress}.
+     * Sends the given {@link Message}.
      */
-    public void send(SocketAddress dst, byte[] message)
-            throws IOException;
-
-    /**
-     * Sends a message to the given {@link SocketAddress}.
-     */
-    public void send(SocketAddress dst, byte[] message, int offset,
-            int length) throws IOException;
+    public void send(Message message) throws IOException;
 }

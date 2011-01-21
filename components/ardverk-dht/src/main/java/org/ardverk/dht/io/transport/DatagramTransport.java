@@ -28,6 +28,9 @@ import java.util.concurrent.Future;
 
 import org.ardverk.concurrent.ExecutorGroup;
 import org.ardverk.concurrent.ExecutorUtils;
+import org.ardverk.dht.codec.DefaultMessageCodec;
+import org.ardverk.dht.codec.MessageCodec;
+import org.ardverk.dht.message.Message;
 import org.ardverk.lang.Arguments;
 import org.ardverk.net.NetworkUtils;
 import org.slf4j.Logger;
@@ -49,6 +52,8 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
     private final ExecutorGroup executor 
         = new ExecutorGroup(EXECUTOR);
     
+    private final MessageCodec codec;
+    
     private final SocketAddress bindaddr;
     
     private volatile DatagramSocket socket = null;
@@ -57,19 +62,27 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
     
     private boolean open = true;
     
-    public DatagramTransport(int port) {
-        this(new InetSocketAddress(port));
+    public DatagramTransport(MessageCodec codec, int port) {
+        this(codec, new InetSocketAddress(port));
     }
     
-    public DatagramTransport(String bindaddr, int port) {
-        this(new InetSocketAddress(bindaddr, port));
+    public DatagramTransport(MessageCodec codec, 
+            String bindaddr, int port) {
+        this(codec, new InetSocketAddress(bindaddr, port));
     }
     
-    public DatagramTransport(InetAddress bindaddr, int port) {
-        this(new InetSocketAddress(bindaddr, port));
+    public DatagramTransport(MessageCodec codec, 
+            InetAddress bindaddr, int port) {
+        this(codec, new InetSocketAddress(bindaddr, port));
     }
     
     public DatagramTransport(SocketAddress bindaddr) {
+        this(new DefaultMessageCodec(), bindaddr);
+    }
+    
+    public DatagramTransport(MessageCodec codec, 
+            SocketAddress bindaddr) {
+        this.codec = Arguments.notNull(codec, "codec");
         this.bindaddr = Arguments.notNull(bindaddr, "bindaddr");
     }
     
@@ -151,14 +164,15 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
         int offset = packet.getOffset();
         int length = packet.getLength();
         
-        final byte[] message = new byte[length];
-        System.arraycopy(data, offset, message, 0, message.length);
+        final byte[] copy = new byte[length];
+        System.arraycopy(data, offset, copy, 0, copy.length);
         
         Runnable task = new Runnable() {
             @Override
             public void run() {
                 try {
-                    received(src, message, 0, message.length);
+                    Message message = codec.decode(src, copy);
+                    received(message);
                 } catch (IOException err) {
                     uncaughtException(socket, err);
                 }
@@ -168,8 +182,14 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
         executor.execute(task);
     }
     
+    
     @Override
-    public void send(SocketAddress dst, byte[] message, int offset, int length)
+    public void send(Message message) throws IOException {
+        byte[] encoded = codec.encode(message);
+        send(message.getAddress(), encoded, 0, encoded.length);
+    }
+
+    private void send(SocketAddress dst, byte[] message, int offset, int length)
             throws IOException {
         
         final DatagramPacket packet = new DatagramPacket(

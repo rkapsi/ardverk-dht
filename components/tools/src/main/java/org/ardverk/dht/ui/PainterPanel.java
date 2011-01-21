@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.ardverk.dht.ui;
+package org.ardverk.dht.ui;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -35,8 +35,8 @@ import org.ardverk.dht.KUID;
 import org.ardverk.dht.io.MessageListener;
 import org.ardverk.dht.message.Message;
 import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.ui.Painter.EventType;
 
-import com.ardverk.dht.ui.Painter.EventType;
 
 public class PainterPanel extends JPanel {
     
