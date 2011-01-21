@@ -27,10 +27,8 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.dht.ArdverkDHT;
-import org.ardverk.dht.DHT;
-import org.ardverk.dht.ExecutorKey;
-import org.ardverk.dht.KUID;
+import org.ardverk.dht.codec.DefaultMessageCodec;
+import org.ardverk.dht.codec.MessageCodec;
 import org.ardverk.dht.concurrent.ArdverkFuture;
 import org.ardverk.dht.config.BootstrapConfig;
 import org.ardverk.dht.config.DefaultBootstrapConfig;
@@ -42,6 +40,7 @@ import org.ardverk.dht.easy.EasyFactory;
 import org.ardverk.dht.entity.BootstrapEntity;
 import org.ardverk.dht.entity.PutEntity;
 import org.ardverk.dht.entity.QuickenEntity;
+import org.ardverk.dht.io.transport.DatagramTransport;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.DefaultRouteTable;
 import org.ardverk.dht.storage.ByteArrayValue;
@@ -56,6 +55,11 @@ public class ArdverkUtils {
     private static final String SECRET_KEY = "90fb237cbec71523ba9d883a8ec6ae9f";
     private static final String INIT_VECTOR = "6fd7bda068bf2425980e5c9b1c9e2097";
     
+    private static final MessageCodec CODEC 
+        = new DefaultMessageCodec(SECRET_KEY, INIT_VECTOR);
+    
+    private static final EasyConfig CONFIG = new EasyConfig();
+    
     private ArdverkUtils() {}
     
     public static EasyDHT createDHT(int port) throws IOException {
@@ -63,13 +67,8 @@ public class ArdverkUtils {
     }
     
     public static EasyDHT createDHT(SocketAddress address) throws IOException {
-        EasyConfig config = new EasyConfig();
-        config.setSecretKey(SECRET_KEY);
-        config.setInitVector(INIT_VECTOR);
-        
-        EasyDHT dht = EasyFactory.create(config);
-        dht.bind(address);
-        
+        EasyDHT dht = EasyFactory.create(CONFIG);
+        dht.bind(new DatagramTransport(CODEC, address));
         return dht;
     }
     

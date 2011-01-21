@@ -51,10 +51,6 @@ public class EasyConfig {
     
     private volatile SyncConfig syncConfig = new DefaultSyncConfig();
     
-    private volatile String secretKey = null;
-    
-    private volatile String initVector = null;
-    
     public EasyConfig() {
         this(DEFAULT_KEY_SIZE);
     }
@@ -121,21 +117,5 @@ public class EasyConfig {
 
     public void setSyncConfig(SyncConfig syncConfig) {
         this.syncConfig = syncConfig;
-    }
-
-    public String getSecretKey() {
-        return secretKey;
-    }
-
-    public void setSecretKey(String secretKey) {
-        this.secretKey = secretKey;
-    }
-
-    public String getInitVector() {
-        return initVector;
-    }
-
-    public void setInitVector(String initVector) {
-        this.initVector = initVector;
     }
 }
