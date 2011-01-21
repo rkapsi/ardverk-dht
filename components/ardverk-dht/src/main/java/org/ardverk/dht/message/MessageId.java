@@ -28,7 +28,9 @@ import org.ardverk.io.Writable;
 import org.ardverk.lang.Arguments;
 import org.ardverk.utils.ByteArrayComparator;
 
-
+/**
+ * A {@link MessageId} is a randomly generated identifier for {@link Message}s.
+ */
 public final class MessageId implements Writable, Serializable, 
         Comparable<MessageId>, Cloneable {
 
@@ -88,15 +90,24 @@ public final class MessageId implements Writable, Serializable,
         return messageId.length;
     }
 
+    /**
+     * Returns the {@link MessageId}'s {@code byte[]}s.
+     */
     public byte[] getBytes() {
         return messageId.clone();
     }
 
+    /**
+     * Copies the {@link MessageId}'s into the given {@code byte[]}.
+     */
     public byte[] getBytes(byte[] dst, int destPos) {
         System.arraycopy(messageId, 0, dst, destPos, messageId.length);
         return dst;
     }
     
+    /**
+     * Returns the length of the {@link MessageId}.
+     */
     public int length() {
         return messageId.length;
     }
@@ -123,6 +134,9 @@ public final class MessageId implements Writable, Serializable,
         return Arrays.equals(messageId, other.messageId);
     }
     
+    /**
+     * Returns the {@link MessageId} as a Base-16 (hex) encoded string.
+     */
     public String toHexString() {
         return CodingUtils.encodeBase16(messageId);
     }
