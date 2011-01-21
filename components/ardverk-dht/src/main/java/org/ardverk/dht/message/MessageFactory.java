@@ -23,7 +23,6 @@ import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.storage.ValueTuple;
 import org.ardverk.dht.storage.Database.Condition;
 
-
 /**
  * A factory interface to create various {@link Message}es such as
  * {@link PingRequest} etc.

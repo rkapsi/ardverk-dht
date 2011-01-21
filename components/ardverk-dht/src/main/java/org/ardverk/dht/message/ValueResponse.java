@@ -24,7 +24,7 @@ import org.ardverk.dht.storage.ValueTuple;
 public interface ValueResponse extends LookupResponse {
     
     /**
-     * 
+     * Returns the {@link ValueTuple} we were looking for.
      */
     public ValueTuple getValueTuple();
 }

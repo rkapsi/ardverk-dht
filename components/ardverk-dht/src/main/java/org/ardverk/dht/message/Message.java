@@ -20,7 +20,6 @@ import java.net.SocketAddress;
 
 import org.ardverk.dht.routing.Contact;
 
-
 /**
  * The base interface for messages.
  */
