@@ -34,6 +34,7 @@ import org.ardverk.collection.FixedSizeHashSet;
 import org.ardverk.concurrent.ExecutorUtils;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.event.EventUtils;
+import org.ardverk.dht.io.transport.ExceptionCallback;
 import org.ardverk.dht.io.transport.Transport;
 import org.ardverk.dht.io.transport.TransportCallback;
 import org.ardverk.dht.message.Message;
@@ -70,6 +71,14 @@ public abstract class MessageDispatcher
         @Override
         public void received(Message message) throws IOException {
             MessageDispatcher.this.handleMessage(message);
+        }
+    };
+    
+    private final ExceptionCallback exceptionCallback 
+            = new ExceptionCallback() {
+        @Override
+        public void handleException(Message message, Throwable t) {
+            MessageDispatcher.this.handleException(message, t);
         }
     };
     
@@ -182,7 +191,7 @@ public abstract class MessageDispatcher
             throw new IOException();
         }
         
-        transport.send(message);
+        transport.send(message, exceptionCallback);
     }
     
     /**
@@ -224,6 +233,21 @@ public abstract class MessageDispatcher
         
         send(request);
         fireMessageSent(contactId, request);
+    }
+    
+    /**
+     * Callback method for outgoing {@link Message} that failed to be sent.
+     * Returns {@code true} if the {@link Throwable} was handled or not.
+     */
+    public boolean handleException(Message message, Throwable t) {
+        MessageId messageId = message.getMessageId();
+        MessageEntity entity = entityManager.get(messageId);
+        
+        if (entity != null) {
+            entity.handleException(t);
+            return true;
+        }
+        return false;
     }
     
     /**
@@ -292,6 +316,14 @@ public abstract class MessageDispatcher
         if (LOG.isErrorEnabled()) {
             LOG.error("Illegal Response: " + entity + " -> " + response);
         }
+    }
+    
+    /**
+     * Callback for {@link Exception}s.
+     */
+    protected void handleException(MessageCallback callback, 
+            RequestEntity entity, Throwable t) {
+        callback.handleException(entity, t);
     }
     
     /**
@@ -434,7 +466,14 @@ public abstract class MessageDispatcher
          * Returns a {@link MessageEntity} for the given {@link ResponseMessage}.
          */
         public MessageEntity get(ResponseMessage message) {
-            return callbacks.remove(message.getMessageId());
+            return get(message.getMessageId());
+        }
+        
+        /**
+         * Returns a {@link MessageEntity} for the given {@link MessageId}.
+         */
+        public MessageEntity get(MessageId messageId) {
+            return callbacks.remove(messageId);
         }
     }
 
@@ -498,6 +537,15 @@ public abstract class MessageDispatcher
                 long time = creationTime.getAgeInMillis();
                 MessageDispatcher.this.handleTimeout(callback, entity, 
                         time, TimeUnit.MILLISECONDS);
+            }
+        }
+        
+        /**
+         * Called if an exception occured.
+         */
+        public void handleException(Throwable t) {
+            if (cancel()) {
+                MessageDispatcher.this.handleException(callback, entity, t);
             }
         }
     }

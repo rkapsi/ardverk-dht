@@ -16,19 +16,19 @@
 
 package org.ardverk.dht.io.transport;
 
-import java.io.IOException;
-
 import org.ardverk.dht.message.Message;
 
 /**
- * A callback interface to receive messages.
+ * The {@link ExceptionCallback} is called if the {@link Transport}'s
+ * {@link Transport#send(Message, ExceptionCallback)} method fails to
+ * send the given {@link Message}.
  * 
  * @see Transport
  */
-public interface TransportCallback {
-    
+public interface ExceptionCallback {
+
     /**
-     * Called by {@link Transport} for every message that's being received.
+     * Called if a transport error occurred.
      */
-    public void received(Message message) throws IOException;
+    public void handleException(Message message, Throwable t);
 }

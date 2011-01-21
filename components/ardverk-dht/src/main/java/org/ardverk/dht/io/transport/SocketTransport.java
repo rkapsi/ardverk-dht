@@ -53,6 +53,8 @@ public class SocketTransport extends AbstractTransport implements Closeable {
     private static final ExecutorService EXECUTOR 
         = ExecutorUtils.newCachedThreadPool("SocketTransportThread");
     
+    private static final int CONNECT_TIMEOUT = 5000;
+    
     private final ExecutorGroup executor 
         = new ExecutorGroup(EXECUTOR);
     
@@ -183,22 +185,16 @@ public class SocketTransport extends AbstractTransport implements Closeable {
         executor.execute(task);
     }
     
-    
     @Override
-    public void send(Message message) throws IOException {
-        byte[] encoded = codec.encode(message);
-        send(message.getAddress(), encoded, 0, encoded.length);
-    }
-    
-    private static final int TIMEOUT = 5000;
-    
-    private void send(final SocketAddress dst, 
-            final byte[] message, final int offset, final int length)
+    public void send(final Message message, final ExceptionCallback callback)
                 throws IOException {
         
         if (socket == null) {
             throw new IOException();
         }
+        
+        final SocketAddress dst = message.getAddress();
+        final byte[] encoded = codec.encode(message);
         
         Runnable task = new Runnable() {
             @Override
@@ -207,18 +203,23 @@ public class SocketTransport extends AbstractTransport implements Closeable {
                 DataOutputStream out = null;
                 try {
                     socket = new Socket();
-                    socket.connect(NetworkUtils.getResolved(dst), TIMEOUT);
+                    socket.connect(NetworkUtils.getResolved(dst), CONNECT_TIMEOUT);
                     
                     socket.shutdownInput();
                     out = new DataOutputStream(
                             new BufferedOutputStream(
                                 socket.getOutputStream()));
                     
-                    out.writeInt(length);
-                    out.write(message, 0, length);
+                    out.writeInt(encoded.length);
+                    out.write(encoded);
                     
                 } catch (IOException err) {
                     uncaughtException(socket, err);
+                    
+                    if (callback != null) {
+                        callback.handleException(message, err);
+                    }
+                    
                 } finally {
                     IoUtils.close(out);
                     IoUtils.close(socket);

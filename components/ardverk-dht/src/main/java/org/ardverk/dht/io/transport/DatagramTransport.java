@@ -181,25 +181,21 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
         executor.execute(task);
     }
     
-    
     @Override
-    public void send(Message message) throws IOException {
-        byte[] encoded = codec.encode(message);
-        send(message.getAddress(), encoded, 0, encoded.length);
-    }
-
-    private void send(SocketAddress dst, byte[] message, int offset, int length)
+    public void send(final Message message, final ExceptionCallback callback) 
             throws IOException {
         
-        final DatagramPacket packet = new DatagramPacket(
-                message, offset, length, 
-                NetworkUtils.getResolved(dst));
-        
         final DatagramSocket socket = this.socket;
-        
         if (socket == null) {
             throw new IOException();
         }
+        
+        SocketAddress dst = message.getAddress();
+        byte[] encoded = codec.encode(message);
+        
+        final DatagramPacket packet = new DatagramPacket(
+                encoded, 0, encoded.length, 
+                NetworkUtils.getResolved(dst));
         
         Runnable task = new Runnable() {
             @Override
@@ -208,6 +204,10 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
                     socket.send(packet);
                 } catch (IOException err) {
                     uncaughtException(socket, err);
+                    
+                    if (callback != null) {
+                        callback.handleException(message, err);
+                    }
                 }
             }
         };

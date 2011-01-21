@@ -36,5 +36,5 @@ public interface Transport extends Bindable<TransportCallback> {
     /**
      * Sends the given {@link Message}.
      */
-    public void send(Message message) throws IOException;
+    public void send(Message message, ExceptionCallback callback) throws IOException;
 }
