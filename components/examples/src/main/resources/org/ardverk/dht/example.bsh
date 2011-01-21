@@ -57,7 +57,7 @@ createDHT(int port) {
 	DHT dht = EasyFactory.create(config);
 	
 	MessageCodec codec = new DefaultMessageCodec(SECRET_KEY, INIT_VECTOR);
-	dht.bind(new DatagramTransport(codec, port));
+	dht.bind(new SocketTransport(codec, port));
 	
 	return dht;
 }
