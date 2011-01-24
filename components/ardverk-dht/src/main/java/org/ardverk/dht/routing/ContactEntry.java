@@ -184,10 +184,10 @@ public class ContactEntry implements Identifier, Longevity {
      * 
      * @see DefaultContact#getRemoteAddress()
      */
-    public boolean isSameRemoteAddress(Contact contact) {
-        return NetworkUtils.isSameAddress(
-                this.contact.getRemoteAddress(), 
-                contact.getRemoteAddress());
+    public boolean isSameRemoteAddress(Contact other) {
+        SocketAddress a = contact.getRemoteAddress();
+        SocketAddress b = other.getRemoteAddress();
+        return NetworkUtils.isSameAddress(a, b);
     }
     
     public static class Update {
