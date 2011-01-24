@@ -17,6 +17,7 @@
 package org.ardverk.dht.io.transport;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 
@@ -45,6 +46,10 @@ public class HybridTransport extends DatagramTransport {
 
     private final SocketTransport socket;
     
+    public HybridTransport(MessageCodec codec, int port) {
+        this(codec, new InetSocketAddress(port));
+    }
+
     public HybridTransport(MessageCodec codec, SocketAddress bindaddr) {
         super(codec, bindaddr);
         socket = new SocketTransport(codec, bindaddr);
