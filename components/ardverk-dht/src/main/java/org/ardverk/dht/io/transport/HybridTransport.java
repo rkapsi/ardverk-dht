@@ -30,13 +30,16 @@ import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.io.IoUtils;
 
 /**
- * An implementation of {@link Transport} that uses UDP for most
- * operations and TCP for some operations.
+ * An (experimental) implementation of {@link Transport} that uses UDP 
+ * for most operations and TCP for some operations.
  * 
  * <ul>
  * <li>TCP: STORE (request+response) and FIND_VALUE (response)
  * <li>UDP: Everything else
  * </ul>
+ * 
+ * @see DatagramTransport
+ * @see SocketTransport
  */
 public class HybridTransport extends DatagramTransport {
 
@@ -48,7 +51,7 @@ public class HybridTransport extends DatagramTransport {
     }
 
     @Override
-    public synchronized void close() {
+    public void close() {
         super.close();
         IoUtils.close(socket);
     }
