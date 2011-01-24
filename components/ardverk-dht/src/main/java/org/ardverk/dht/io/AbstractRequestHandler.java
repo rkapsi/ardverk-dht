@@ -22,7 +22,6 @@ import org.ardverk.dht.message.RequestMessage;
 import org.ardverk.dht.message.ResponseMessage;
 import org.ardverk.dht.routing.Contact;
 
-
 /**
  * An abstract base class for {@link RequestHandler}s.
  */
@@ -33,12 +32,9 @@ abstract class AbstractRequestHandler
         super(messageDispatcher);
     }
     
-    public void send(RequestMessage request, 
+    protected void send(RequestMessage request, 
             ResponseMessage message) throws IOException {
-        messageDispatcher.send(request.getContact(), message);
-    }
-    
-    public void send(Contact dst, ResponseMessage message) throws IOException {
-        messageDispatcher.send(dst, message);
+        Contact src = request.getContact();
+        messageDispatcher.send(src, message);
     }
 }

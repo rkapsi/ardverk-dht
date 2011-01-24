@@ -56,17 +56,8 @@ public abstract class AbstractConfig implements Config {
     @Override
     public long getAdaptiveTimeout(Contact dst, 
             long defaultTimeout, TimeUnit unit) {
-        
         double multiplier = getRoundTripTimeMultiplier();
-        long rttInMillis = dst.getRoundTripTimeInMillis();
-        
-        if (0L < rttInMillis && 0d < multiplier) {
-            long timeout = (long)(rttInMillis * multiplier);
-            long adaptive = Math.min(timeout, 
-                    unit.toMillis(defaultTimeout));
-            return unit.convert(adaptive, TimeUnit.MILLISECONDS);
-        }
-        
-        return defaultTimeout;
+        return ConfigUtils.getAdaptiveTimeout(dst, 
+                multiplier, defaultTimeout, unit);
     }
 }

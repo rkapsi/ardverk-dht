@@ -25,6 +25,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.ExecutorGroup;
 import org.ardverk.concurrent.ExecutorUtils;
@@ -93,7 +94,7 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
     }
 
     @Override
-    public synchronized void bind(TransportCallback callback) throws IOException {
+    public synchronized void bind(TransportCallback.Inbound callback) throws IOException {
         if (!open) {
             throw new IOException();
         }
@@ -171,7 +172,7 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
             public void run() {
                 try {
                     Message message = codec.decode(src, copy);
-                    received(message);
+                    messageReceived(message);
                 } catch (IOException err) {
                     uncaughtException(socket, err);
                 }
@@ -182,32 +183,33 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
     }
     
     @Override
-    public void send(final Message message, final ExceptionCallback callback) 
-            throws IOException {
+    public void send(final Message message, final TransportCallback.Outbound callback,
+            long timeout, TimeUnit unit) 
+                throws IOException {
         
         final DatagramSocket socket = this.socket;
         if (socket == null) {
             throw new IOException();
         }
         
-        SocketAddress dst = message.getAddress();
-        byte[] encoded = codec.encode(message);
-        
-        final DatagramPacket packet = new DatagramPacket(
-                encoded, 0, encoded.length, 
-                NetworkUtils.getResolved(dst));
-        
         Runnable task = new Runnable() {
             @Override
             public void run() {
                 try {
+                    
+                    SocketAddress endpoint = NetworkUtils.getResolved(
+                            message.getAddress());
+                    byte[] encoded = codec.encode(message);
+                    
+                    DatagramPacket packet = new DatagramPacket(
+                            encoded, 0, encoded.length, endpoint);
+                    
                     socket.send(packet);
+                    messageSent(callback, message);
+                    
                 } catch (IOException err) {
                     uncaughtException(socket, err);
-                    
-                    if (callback != null) {
-                        callback.handleException(message, err);
-                    }
+                    handleException(callback, message, err);
                 }
             }
         };

@@ -29,6 +29,7 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.ExecutorGroup;
 import org.ardverk.concurrent.ExecutorUtils;
@@ -53,7 +54,7 @@ public class SocketTransport extends AbstractTransport implements Closeable {
     private static final ExecutorService EXECUTOR 
         = ExecutorUtils.newCachedThreadPool("SocketTransportThread");
     
-    private static final int CONNECT_TIMEOUT = 5000;
+    private static final int DEFAULT_TIMEOUT = 10000;
     
     private final ExecutorGroup executor 
         = new ExecutorGroup(EXECUTOR);
@@ -98,7 +99,7 @@ public class SocketTransport extends AbstractTransport implements Closeable {
     }
     
     @Override
-    public synchronized void bind(TransportCallback callback) throws IOException {
+    public synchronized void bind(TransportCallback.Inbound callback) throws IOException {
         if (!open) {
             throw new IOException();
         }
@@ -172,7 +173,7 @@ public class SocketTransport extends AbstractTransport implements Closeable {
                     in.readFully(data);
                     
                     Message message = codec.decode(src, data);
-                    received(message);
+                    messageReceived(message);
                 } catch (IOException err) {
                     uncaughtException(socket, err);
                 } finally {
@@ -186,7 +187,8 @@ public class SocketTransport extends AbstractTransport implements Closeable {
     }
     
     @Override
-    public void send(final Message message, final ExceptionCallback callback)
+    public void send(final Message message, final TransportCallback.Outbound callback, 
+            final long timeout, final TimeUnit unit)
                 throws IOException {
         
         if (socket == null) {
@@ -203,7 +205,16 @@ public class SocketTransport extends AbstractTransport implements Closeable {
                 DataOutputStream out = null;
                 try {
                     socket = new Socket();
-                    socket.connect(NetworkUtils.getResolved(dst), CONNECT_TIMEOUT);
+                    
+                    int timeoutInMillis = (int)unit.toMillis(timeout);
+                    if (timeoutInMillis < 0) {
+                        timeoutInMillis = DEFAULT_TIMEOUT;
+                    }
+                    
+                    SocketAddress endpoint 
+                        = NetworkUtils.getResolved(dst);
+                    
+                    socket.connect(endpoint, timeoutInMillis);
                     
                     socket.shutdownInput();
                     out = new DataOutputStream(
@@ -212,13 +223,11 @@ public class SocketTransport extends AbstractTransport implements Closeable {
                     
                     out.writeInt(encoded.length);
                     out.write(encoded);
+                    messageSent(callback, message);
                     
                 } catch (IOException err) {
                     uncaughtException(socket, err);
-                    
-                    if (callback != null) {
-                        callback.handleException(message, err);
-                    }
+                    handleException(callback, message, err);
                     
                 } finally {
                     IoUtils.close(out);

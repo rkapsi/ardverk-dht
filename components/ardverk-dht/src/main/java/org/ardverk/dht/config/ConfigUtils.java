@@ -18,6 +18,8 @@ package org.ardverk.dht.config;
 
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.dht.routing.Contact;
+
 class ConfigUtils {
 
     public ConfigUtils() {}
@@ -42,5 +44,19 @@ class ConfigUtils {
         }
         
         return time;
+    }
+    
+    public static long getAdaptiveTimeout(Contact dst, 
+            double multiplier, long defaultTimeout, TimeUnit unit) {
+        
+        long rttInMillis = dst.getRoundTripTimeInMillis();
+        if (0L < rttInMillis && 0d < multiplier) {
+            long timeout = (long)(rttInMillis * multiplier);
+            long adaptive = Math.min(timeout, 
+                    unit.toMillis(defaultTimeout));
+            return unit.convert(adaptive, TimeUnit.MILLISECONDS);
+        }
+        
+        return defaultTimeout;
     }
 }

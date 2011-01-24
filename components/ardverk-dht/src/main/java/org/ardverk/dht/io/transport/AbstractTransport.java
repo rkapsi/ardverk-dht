@@ -27,11 +27,11 @@ import org.ardverk.lang.NullArgumentException;
  */
 public abstract class AbstractTransport implements Transport {
     
-    private final AtomicReference<TransportCallback> callbackRef 
-        = new AtomicReference<TransportCallback>();
+    private final AtomicReference<TransportCallback.Inbound> callbackRef 
+        = new AtomicReference<TransportCallback.Inbound>();
     
     @Override
-    public void bind(TransportCallback callback) throws IOException {
+    public void bind(TransportCallback.Inbound callback) throws IOException {
         if (callback == null) {
             throw new NullArgumentException("callback");
         }
@@ -51,10 +51,38 @@ public abstract class AbstractTransport implements Transport {
         return callbackRef.get() != null;
     }
     
-    protected boolean received(Message message) throws IOException {
-        TransportCallback callback = callbackRef.get();
+    /**
+     * A helper method to notify the {@link TransportCallback.Inbound} callback.
+     */
+    protected boolean messageReceived(Message message) throws IOException {
+        TransportCallback.Inbound callback = callbackRef.get();
         if (callback != null) {
-            callback.received(message);
+            callback.messageReceived(message);
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * A helper method to notify the {@link TransportCallback.Outbound} callback.
+     */
+    protected static boolean messageSent(
+            TransportCallback.Outbound callback, Message message) {
+        if (callback != null) {
+            callback.messageSent(message);
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * A helper method to notify the {@link TransportCallback.Outbound} callback.
+     */
+    protected static boolean handleException(
+            TransportCallback.Outbound callback, 
+            Message message, Throwable t) {
+        if (callback != null) {
+            callback.handleException(message, t);
             return true;
         }
         return false;

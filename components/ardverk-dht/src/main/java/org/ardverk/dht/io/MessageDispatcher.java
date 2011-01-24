@@ -34,7 +34,6 @@ import org.ardverk.collection.FixedSizeHashSet;
 import org.ardverk.concurrent.ExecutorUtils;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.event.EventUtils;
-import org.ardverk.dht.io.transport.ExceptionCallback;
 import org.ardverk.dht.io.transport.Transport;
 import org.ardverk.dht.io.transport.TransportCallback;
 import org.ardverk.dht.message.Message;
@@ -66,16 +65,22 @@ public abstract class MessageDispatcher
         = ExecutorUtils.newSingleThreadScheduledExecutor(
             "MessageDispatcherThread");
     
-    private final TransportCallback callback 
-            = new TransportCallback() {
+    private final TransportCallback.Inbound inbound 
+            = new TransportCallback.Inbound() {
         @Override
-        public void received(Message message) throws IOException {
+        public void messageReceived(Message message) throws IOException {
             MessageDispatcher.this.handleMessage(message);
         }
     };
     
-    private final ExceptionCallback exceptionCallback 
-            = new ExceptionCallback() {
+    private final TransportCallback.Outbound outbound 
+            = new TransportCallback.Outbound() {
+        
+        @Override
+        public void messageSent(Message message) {
+            MessageDispatcher.this.messageSent(message);
+        }
+        
         @Override
         public void handleException(Message message, Throwable t) {
             MessageDispatcher.this.handleException(message, t);
@@ -140,7 +145,7 @@ public abstract class MessageDispatcher
             throw new IOException();
         }
         
-        transport.bind(callback);
+        transport.bind(inbound);
         this.transport = transport;
     }
     
@@ -180,7 +185,7 @@ public abstract class MessageDispatcher
     /**
      * Sends the given {@link Message}.
      */
-    protected void send(Message message) throws IOException {
+    protected void send(Message message, long timeout, TimeUnit unit) throws IOException {
         
         Transport transport = null;
         synchronized (this) {
@@ -191,14 +196,14 @@ public abstract class MessageDispatcher
             throw new IOException();
         }
         
-        transport.send(message, exceptionCallback);
+        transport.send(message, outbound, timeout, unit);
     }
     
     /**
      * Sends a {@link ResponseMessage} to the given {@link Contact}.
      */
     public void send(Contact dst, ResponseMessage message) throws IOException {
-        send(message);
+        send(message, -1L, TimeUnit.MILLISECONDS);
         fireMessageSent(dst, message);
     }
     
@@ -217,7 +222,7 @@ public abstract class MessageDispatcher
      * Sends a {@link RequestMessage} to the a {@link Contact} with the 
      * given {@link KUID}.
      * 
-     * NOTE: The destination {@link SocketAddress} is encoded in the 
+     * <p>NOTE: The destination {@link SocketAddress} is encoded in the 
      * {@link RequestMessage}. The {@link KUID} is used to validate
      * {@link ResponseMessage}s.
      */
@@ -231,7 +236,7 @@ public abstract class MessageDispatcher
             entityManager.add(callback, entity, timeout, unit);
         }
         
-        send(request);
+        send(request, timeout, unit);
         fireMessageSent(contactId, request);
     }
     
@@ -251,6 +256,12 @@ public abstract class MessageDispatcher
     }
     
     /**
+     * Callback method for all outgoing {@link Message}s that have been sent.
+     */
+    public void messageSent(Message message) {
+    }
+    
+    /**
      * Callback method for incoming {@link Message}s.
      */
     public void handleMessage(Message message) throws IOException {
@@ -259,6 +270,8 @@ public abstract class MessageDispatcher
         } else {
             handleResponse((ResponseMessage)message);
         }
+        
+        fireMessageReceived(message);
     }
     
     /**

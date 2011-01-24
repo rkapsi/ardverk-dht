@@ -21,14 +21,37 @@ import java.io.IOException;
 import org.ardverk.dht.message.Message;
 
 /**
- * A callback interface to receive messages.
- * 
- * @see Transport
+ * The {@link TransportCallback} provides two interfaces to handle inbound
+ * and outbound {@link Message}s.
  */
-public interface TransportCallback {
+public class TransportCallback {
+
+    private TransportCallback() {}
     
     /**
-     * Called by {@link Transport} for every message that's being received.
+     * A callback for inbound {@link Message}s.
      */
-    public void received(Message message) throws IOException;
+    public static interface Inbound {
+        
+        /**
+         * Called by {@link Transport} for every message that's being received.
+         */
+        public void messageReceived(Message message) throws IOException;
+    }
+    
+    /**
+     * A callback for outbound {@link Message}s.
+     */
+    public static interface Outbound {
+        
+        /**
+         * Called for every sent {@link Message}.
+         */
+        public void messageSent(Message message);
+        
+        /**
+         * Called for every message that failed to be sent.
+         */
+        public void handleException(Message message, Throwable t);
+    }
 }
