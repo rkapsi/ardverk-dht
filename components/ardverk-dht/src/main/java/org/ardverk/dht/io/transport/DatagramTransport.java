@@ -159,19 +159,13 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
     private void process(DatagramPacket packet) {
         
         final SocketAddress src = packet.getSocketAddress();
-        
-        byte[] data = packet.getData();
-        int offset = packet.getOffset();
-        int length = packet.getLength();
-        
-        final byte[] copy = new byte[length];
-        System.arraycopy(data, offset, copy, 0, copy.length);
+        final byte[] data = extract(packet);
         
         Runnable task = new Runnable() {
             @Override
             public void run() {
                 try {
-                    Message message = codec.decode(src, copy);
+                    Message message = codec.decode(src, data);
                     messageReceived(message);
                 } catch (IOException err) {
                     uncaughtException(socket, err);
@@ -223,5 +217,21 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
         } else {
             LOG.error("Exception", t);
         }
+    }
+    
+    /**
+     * Extracts and returns a copy of the {@link DatagramPacket}'s {@code byte[]}.
+     * 
+     * @see DatagramPacket#getData()
+     */
+    private static byte[] extract(DatagramPacket packet) {
+        byte[] data = packet.getData();
+        int offset = packet.getOffset();
+        int length = packet.getLength();
+        
+        byte[] copy = new byte[length];
+        System.arraycopy(data, offset, copy, 0, copy.length);
+        
+        return copy;
     }
 }
