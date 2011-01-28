@@ -20,7 +20,7 @@ import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.dht.KUID;
-import org.ardverk.dht.lang.ArdverkException;
+import org.ardverk.dht.lang.DHTException;
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.routing.Contact;
 
@@ -28,7 +28,7 @@ import org.ardverk.dht.routing.Contact;
 /**
  * The {@link PingTimeoutException} is thrown if a timeout occurs.
  */
-public class PingTimeoutException extends ArdverkException {
+public class PingTimeoutException extends DHTException {
     
     private static final long serialVersionUID = -7330783412590437071L;
 

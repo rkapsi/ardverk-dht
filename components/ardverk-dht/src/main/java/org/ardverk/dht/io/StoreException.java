@@ -18,7 +18,7 @@ package org.ardverk.dht.io;
 
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.dht.lang.ArdverkException;
+import org.ardverk.dht.lang.DHTException;
 import org.ardverk.dht.storage.ValueTuple;
 
 
@@ -26,7 +26,7 @@ import org.ardverk.dht.storage.ValueTuple;
  * The {@link StoreException} is thrown if a {@link ValueTuple} couldn't
  * be stored in the DHT at all.
  */
-public class StoreException extends ArdverkException {
+public class StoreException extends DHTException {
     
     private static final long serialVersionUID = -1874658787780091708L;
 
