@@ -19,6 +19,13 @@ package org.ardverk.dht.entity;
 import org.ardverk.dht.concurrent.ArdverkFuture;
 import org.ardverk.dht.message.MessageType;
 
+/**
+ * The result of a quicken operation. It's a combination of multiple
+ * operations.
+ * 
+ * @see PingEntity
+ * @see NodeEntity
+ */
 public interface QuickenEntity extends Entity {
 
     /**

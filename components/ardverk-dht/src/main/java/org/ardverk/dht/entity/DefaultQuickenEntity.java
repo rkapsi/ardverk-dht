@@ -20,7 +20,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.dht.concurrent.ArdverkFuture;
 
-
+/**
+ * A default implementation of {@link QuickenEntity}.
+ */
 public class DefaultQuickenEntity extends AbstractEntity implements QuickenEntity {
 
     private final ArdverkFuture<PingEntity>[] pingFutures;

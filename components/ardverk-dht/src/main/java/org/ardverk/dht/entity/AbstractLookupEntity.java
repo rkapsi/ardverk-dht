@@ -20,7 +20,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.dht.KUID;
 
-
+/**
+ * An abstract implementation of {@link LookupEntity}.
+ */
 abstract class AbstractLookupEntity extends AbstractEntity 
         implements LookupEntity {
 

@@ -20,7 +20,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.dht.message.StoreResponse;
 
-
+/**
+ * A default implementation of {@link PutEntity}.
+ */
 public class DefaultPutEntity extends AbstractLookupEntity implements PutEntity {
 
     private final NodeEntity nodeEntity;

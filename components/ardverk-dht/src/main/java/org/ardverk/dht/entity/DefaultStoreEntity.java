@@ -20,7 +20,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.dht.message.StoreResponse;
 
-
+/**
+ * A default implementation of {@link StoreEntity}.
+ */
 public class DefaultStoreEntity extends AbstractEntity implements StoreEntity {
 
     private final StoreResponse[] responses;

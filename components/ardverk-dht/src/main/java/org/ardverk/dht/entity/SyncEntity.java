@@ -19,6 +19,14 @@ package org.ardverk.dht.entity;
 import org.ardverk.dht.concurrent.ArdverkFuture;
 import org.ardverk.dht.message.MessageType;
 
+/**
+ * The result of a sync operation. It's a combination of multiple 
+ * other operations.
+ * 
+ * @see NodeEntity
+ * @see StoreEntity
+ * @see PutEntity
+ */
 public interface SyncEntity extends Entity {
     
     /**

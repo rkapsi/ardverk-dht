@@ -20,7 +20,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.dht.concurrent.ArdverkFuture;
 
-
+/**
+ * A default implementation of {@link SyncEntity}.
+ */
 public class DefaultSyncEntity extends AbstractEntity implements SyncEntity {
 
     private final ArdverkFuture<StoreEntity>[] futures;

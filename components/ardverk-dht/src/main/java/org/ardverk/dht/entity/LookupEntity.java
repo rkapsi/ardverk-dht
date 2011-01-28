@@ -17,6 +17,11 @@
 package org.ardverk.dht.entity;
 
 import org.ardverk.dht.lang.Identifier;
+import org.ardverk.dht.message.MessageType;
 
+/**
+ * The result of a {@link MessageType#FIND_NODE} 
+ * or {@link MessageType#FIND_VALUE} operation.
+ */
 public interface LookupEntity extends Entity, Identifier {
 }

@@ -18,6 +18,9 @@ package org.ardverk.dht.entity;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * An {@link Entity} is the result of a DHT operation.
+ */
 public interface Entity {
 
     /**

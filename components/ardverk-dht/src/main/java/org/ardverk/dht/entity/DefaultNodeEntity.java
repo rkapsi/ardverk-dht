@@ -21,7 +21,9 @@ import java.util.concurrent.TimeUnit;
 import org.ardverk.dht.io.Outcome;
 import org.ardverk.dht.routing.Contact;
 
-
+/**
+ * A default implementation of {@link NodeEntity}.
+ */
 public class DefaultNodeEntity extends AbstractLookupEntity implements NodeEntity {
     
     private final Outcome outcome;

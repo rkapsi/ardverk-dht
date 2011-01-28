@@ -20,7 +20,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.dht.routing.Contact;
 
-
+/**
+ * A default implementation of {@link BootstrapEntity}.
+ */
 public class DefaultBootstrapEntity extends AbstractEntity 
         implements BootstrapEntity {
 

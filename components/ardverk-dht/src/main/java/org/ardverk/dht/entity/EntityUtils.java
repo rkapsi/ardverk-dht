@@ -16,11 +16,18 @@
 
 package org.ardverk.dht.entity;
 
+/**
+ * Misc utilities for {@link Entity}s.
+ */
 class EntityUtils {
 
     private EntityUtils() {}
 
-    static long getTimeInMillis(Entity... entities) {
+    /**
+     * Returns the sum of {@link Entity#getTimeInMillis()} for the 
+     * given {@link Entity}ies.
+     */
+    public static long getTimeInMillis(Entity... entities) {
         long time = 0L;
         for (Entity entity : entities) {
             time += entity.getTimeInMillis();

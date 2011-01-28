@@ -16,6 +16,12 @@
 
 package org.ardverk.dht.entity;
 
+/**
+ * The result of a bootstrap operation.
+ * 
+ * @see PingEntity
+ * @see NodeEntity
+ */
 public interface BootstrapEntity extends Entity {
 
     /**

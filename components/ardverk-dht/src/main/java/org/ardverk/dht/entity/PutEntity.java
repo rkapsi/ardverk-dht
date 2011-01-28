@@ -16,8 +16,16 @@
 
 package org.ardverk.dht.entity;
 
+import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.message.StoreResponse;
 
+/**
+ * The result of a {@link MessageType#FIND_NODE} and 
+ * {@link MessageType#STORE} operation.
+ * 
+ * @see NodeEntity
+ * @see StoreEntity
+ */
 public interface PutEntity extends LookupEntity {
 
     /**

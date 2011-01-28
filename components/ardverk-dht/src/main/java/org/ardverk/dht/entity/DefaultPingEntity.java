@@ -21,7 +21,9 @@ import java.util.concurrent.TimeUnit;
 import org.ardverk.dht.message.PingResponse;
 import org.ardverk.dht.routing.Contact;
 
-
+/**
+ * A default implementation of {@link PingEntity}.
+ */
 public class DefaultPingEntity extends AbstractEntity implements PingEntity {
     
     private final PingResponse response;

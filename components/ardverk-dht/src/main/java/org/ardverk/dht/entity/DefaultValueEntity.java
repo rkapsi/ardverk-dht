@@ -24,7 +24,9 @@ import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.storage.Value;
 import org.ardverk.dht.storage.ValueTuple;
 
-
+/**
+ * A default implementation of {@link ValueEntity}.
+ */
 public class DefaultValueEntity extends AbstractLookupEntity implements ValueEntity {
     
     private final Outcome outcome;
