@@ -20,6 +20,9 @@ import java.net.SocketAddress;
 
 import org.ardverk.lang.Arguments;
 
+/**
+ * An abstract implementation of {@link MessageFactory}.
+ */
 public abstract class AbstractMessageFactory implements MessageFactory {
     
     private final int length;

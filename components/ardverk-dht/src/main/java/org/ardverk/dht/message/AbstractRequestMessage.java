@@ -20,7 +20,9 @@ import java.net.SocketAddress;
 
 import org.ardverk.dht.routing.Contact;
 
-
+/**
+ * An abstract implementation of {@link RequestMessage}.
+ */
 public abstract class AbstractRequestMessage extends AbstractMessage 
         implements RequestMessage {
     

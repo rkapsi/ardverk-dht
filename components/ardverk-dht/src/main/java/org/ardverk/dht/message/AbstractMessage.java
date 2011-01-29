@@ -22,7 +22,9 @@ import org.ardverk.dht.routing.Contact;
 import org.ardverk.lang.Arguments;
 import org.ardverk.lang.Epoch;
 
-
+/**
+ * An abstract implementation of {@link Message}.
+ */
 public abstract class AbstractMessage implements Message, Epoch {
 
     private final long creationTime = System.currentTimeMillis();
