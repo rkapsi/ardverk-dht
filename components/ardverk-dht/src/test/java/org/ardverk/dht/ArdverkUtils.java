@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.dht.codec.DefaultMessageCodec;
 import org.ardverk.dht.codec.MessageCodec;
-import org.ardverk.dht.concurrent.ArdverkFuture;
+import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.config.BootstrapConfig;
 import org.ardverk.dht.config.DefaultBootstrapConfig;
 import org.ardverk.dht.config.DefaultPutConfig;
@@ -87,7 +87,7 @@ public class ArdverkUtils {
         return dhts;
     }
     
-    public static List<ArdverkFuture<BootstrapEntity>> bootstrap(List<? extends DHT> dhts) 
+    public static List<DHTFuture<BootstrapEntity>> bootstrap(List<? extends DHT> dhts) 
             throws InterruptedException, ExecutionException {
         
         if (dhts.size() <= 1) {
@@ -96,31 +96,31 @@ public class ArdverkUtils {
         
         // Bootstrap everyone from the first DHT
         DHT first = dhts.get(0);
-        List<ArdverkFuture<BootstrapEntity>> futures1 
+        List<DHTFuture<BootstrapEntity>> futures1 
             = bootstrap(first.getLocalhost(), dhts, 1, dhts.size()-1);
         
         // The RouteTable is all messed up! Clear it and bootstrap
         // the first DHT from the others.
         ((DefaultRouteTable)first.getRouteTable()).clear();
-        List<ArdverkFuture<BootstrapEntity>> futures2 
+        List<DHTFuture<BootstrapEntity>> futures2 
             = bootstrap(dhts.get(1).getLocalhost(), dhts, 0, 1);
         
         futures2.addAll(futures1);
         return futures2;
     }
     
-    public static List<ArdverkFuture<BootstrapEntity>> bootstrap(Contact from, 
+    public static List<DHTFuture<BootstrapEntity>> bootstrap(Contact from, 
             List<? extends DHT> dhts, int offset, int length) 
                 throws InterruptedException, ExecutionException {
         
-        List<ArdverkFuture<BootstrapEntity>> futures 
-            = new ArrayList<ArdverkFuture<BootstrapEntity>>();
+        List<DHTFuture<BootstrapEntity>> futures 
+            = new ArrayList<DHTFuture<BootstrapEntity>>();
         
         BootstrapConfig config = new DefaultBootstrapConfig();
         config.setExecutorKey(ExecutorKey.BACKEND);
         
         for (int i = 0; i < length; i++) {
-            ArdverkFuture<BootstrapEntity> future 
+            DHTFuture<BootstrapEntity> future 
                 = dhts.get(offset+i).bootstrap(from, config);
             futures.add(future);
             future.get();
@@ -129,16 +129,16 @@ public class ArdverkUtils {
         return futures;
     }
     
-    public static List<ArdverkFuture<QuickenEntity>> refresh(List<? extends DHT> dhts) 
+    public static List<DHTFuture<QuickenEntity>> refresh(List<? extends DHT> dhts) 
             throws InterruptedException, ExecutionException {
         return refresh(dhts, 0, dhts.size());
     }
     
-    public static List<ArdverkFuture<QuickenEntity>> refresh(List<? extends DHT> dhts, int offset, int length) 
+    public static List<DHTFuture<QuickenEntity>> refresh(List<? extends DHT> dhts, int offset, int length) 
             throws InterruptedException, ExecutionException {
         
-        List<ArdverkFuture<QuickenEntity>> futures 
-            = new ArrayList<ArdverkFuture<QuickenEntity>>();
+        List<DHTFuture<QuickenEntity>> futures 
+            = new ArrayList<DHTFuture<QuickenEntity>>();
         
         DefaultQuickenConfig config = new DefaultQuickenConfig();
         config.setExecutorKey(ExecutorKey.BACKEND);
@@ -147,7 +147,7 @@ public class ArdverkUtils {
             config.setBucketTimeout(-1L, TimeUnit.MILLISECONDS);
             //config.setBucketTimeout(1L, TimeUnit.MINUTES);
             
-            ArdverkFuture<QuickenEntity> future 
+            DHTFuture<QuickenEntity> future 
                 = ((ArdverkDHT)dhts.get(offset + i)).quicken(config);
             futures.add(future);
             future.get();
@@ -192,7 +192,7 @@ public class ArdverkUtils {
         putConfig.setExecutorKey(ExecutorKey.BACKEND);
         
         int count = 30000;
-        ArdverkFuture<PutEntity> future = null;
+        DHTFuture<PutEntity> future = null;
         for (int i = 0; i < count; i++) {
             MessageDigest md = MessageDigestUtils.createSHA1();
             md.update(StringUtils.getBytes("Hello-" + i));

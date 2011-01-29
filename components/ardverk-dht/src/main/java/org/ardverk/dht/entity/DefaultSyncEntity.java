@@ -18,28 +18,28 @@ package org.ardverk.dht.entity;
 
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.dht.concurrent.ArdverkFuture;
+import org.ardverk.dht.concurrent.DHTFuture;
 
 /**
  * A default implementation of {@link SyncEntity}.
  */
 public class DefaultSyncEntity extends AbstractEntity implements SyncEntity {
 
-    private final ArdverkFuture<StoreEntity>[] futures;
+    private final DHTFuture<StoreEntity>[] futures;
     
     @SuppressWarnings("unchecked")
     public DefaultSyncEntity(long time, TimeUnit unit) {
-        this(new ArdverkFuture[0], time, unit);
+        this(new DHTFuture[0], time, unit);
     }
     
-    public DefaultSyncEntity(ArdverkFuture<StoreEntity>[] futures, 
+    public DefaultSyncEntity(DHTFuture<StoreEntity>[] futures, 
             long time, TimeUnit unit) {
         super(time, unit);
         this.futures = futures;
     }
 
     @Override
-    public ArdverkFuture<StoreEntity>[] getStoreFutures() {
+    public DHTFuture<StoreEntity>[] getStoreFutures() {
         return futures;
     }
 }

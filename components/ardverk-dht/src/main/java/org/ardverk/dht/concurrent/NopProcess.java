@@ -19,19 +19,19 @@ package org.ardverk.dht.concurrent;
 import org.ardverk.concurrent.AsyncProcessFuture;
 
 /**
- * An implementation of {@link ArdverkProcess} that does nothing.
+ * An implementation of {@link DHTProcess} that does nothing.
  */
-public class NopArdverkProcess<V> implements ArdverkProcess<V> {
+public class NopProcess<V> implements DHTProcess<V> {
 
-    private static final ArdverkProcess<Object> NOP 
-        = new NopArdverkProcess<Object>();
+    private static final DHTProcess<Object> NOP 
+        = new NopProcess<Object>();
     
     @SuppressWarnings("unchecked")
-    public static <V> ArdverkProcess<V> create() {
-        return (ArdverkProcess<V>)NOP;
+    public static <V> DHTProcess<V> create() {
+        return (DHTProcess<V>)NOP;
     }
     
-    private NopArdverkProcess() {}
+    private NopProcess() {}
     
     @Override
     public void start(AsyncProcessFuture<V> future) {

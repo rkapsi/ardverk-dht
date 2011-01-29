@@ -16,7 +16,7 @@
 
 package org.ardverk.dht.io;
 
-import org.ardverk.dht.concurrent.ArdverkProcess;
+import org.ardverk.dht.concurrent.DHTProcess;
 import org.ardverk.dht.entity.Entity;
 import org.ardverk.dht.message.ResponseMessage;
 
@@ -24,7 +24,7 @@ import org.ardverk.dht.message.ResponseMessage;
  * Classes that process {@link ResponseMessage}s may implement this interface.
  */
 public interface ResponseHandler<V extends Entity> 
-        extends MessageCallback, ArdverkProcess<V> {
+        extends MessageCallback, DHTProcess<V> {
 
     /**
      * Returns {@code true} if the {@link ResponseHandler} is open.

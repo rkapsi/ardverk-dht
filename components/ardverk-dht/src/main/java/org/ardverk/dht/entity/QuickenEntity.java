@@ -16,7 +16,7 @@
 
 package org.ardverk.dht.entity;
 
-import org.ardverk.dht.concurrent.ArdverkFuture;
+import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.message.MessageType;
 
 /**
@@ -29,12 +29,12 @@ import org.ardverk.dht.message.MessageType;
 public interface QuickenEntity extends Entity {
 
     /**
-     * Returns all {@link MessageType#PING} {@link ArdverkFuture}s.
+     * Returns all {@link MessageType#PING} {@link DHTFuture}s.
      */
-    public ArdverkFuture<PingEntity>[] getPingFutures();
+    public DHTFuture<PingEntity>[] getPingFutures();
     
     /**
-     * Returns all {@link MessageType#FIND_NODE} {@link ArdverkFuture}s.
+     * Returns all {@link MessageType#FIND_NODE} {@link DHTFuture}s.
      */
-    public ArdverkFuture<NodeEntity>[] getLookupFutures();
+    public DHTFuture<NodeEntity>[] getLookupFutures();
 }

@@ -34,7 +34,7 @@ import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.FutureUtils;
 import org.ardverk.dht.KUID;
-import org.ardverk.dht.concurrent.ArdverkFuture;
+import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.config.PingConfig;
 import org.ardverk.dht.entity.PingEntity;
 import org.ardverk.dht.lang.Identifier;
@@ -52,8 +52,8 @@ public class DefaultRouteTable extends AbstractRouteTable {
     private static final Logger LOG 
         = LoggerFactory.getLogger(DefaultRouteTable.class);
     
-    private final Map<ContactKey, ArdverkFuture<PingEntity>> pingFutures 
-        = new HashMap<ContactKey, ArdverkFuture<PingEntity>>();
+    private final Map<ContactKey, DHTFuture<PingEntity>> pingFutures 
+        = new HashMap<ContactKey, DHTFuture<PingEntity>>();
     
     private final RouteTableConfig config;
     
@@ -242,7 +242,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
             
             final Contact previous = entry.getContact();
             
-            ArdverkFuture<PingEntity> future = ping(entry);
+            DHTFuture<PingEntity> future = ping(entry);
             future.addAsyncFutureListener(new AsyncFutureListener<PingEntity>() {
                 @Override
                 public void operationComplete(AsyncFuture<PingEntity> future) {
@@ -489,13 +489,13 @@ public class DefaultRouteTable extends AbstractRouteTable {
         });
     }
     
-    private synchronized ArdverkFuture<PingEntity> ping(ContactEntry entry) {
+    private synchronized DHTFuture<PingEntity> ping(ContactEntry entry) {
         Contact contact = entry.getContact();
         
         // Make sure we're not pinging the same host in parallel.
         // It is an unlikely but possible case...
         final ContactKey pingKey = new ContactKey(contact);
-        ArdverkFuture<PingEntity> future 
+        DHTFuture<PingEntity> future 
             = pingFutures.get(pingKey);
         
         if (future == null) {

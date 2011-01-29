@@ -18,19 +18,19 @@ package org.ardverk.dht.entity;
 
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.dht.concurrent.ArdverkFuture;
+import org.ardverk.dht.concurrent.DHTFuture;
 
 /**
  * A default implementation of {@link QuickenEntity}.
  */
 public class DefaultQuickenEntity extends AbstractEntity implements QuickenEntity {
 
-    private final ArdverkFuture<PingEntity>[] pingFutures;
+    private final DHTFuture<PingEntity>[] pingFutures;
     
-    private final ArdverkFuture<NodeEntity>[] lookupFutures;
+    private final DHTFuture<NodeEntity>[] lookupFutures;
     
-    public DefaultQuickenEntity(ArdverkFuture<PingEntity>[] pingFutures, 
-            ArdverkFuture<NodeEntity>[] lookupFutures, long time, TimeUnit unit) {
+    public DefaultQuickenEntity(DHTFuture<PingEntity>[] pingFutures, 
+            DHTFuture<NodeEntity>[] lookupFutures, long time, TimeUnit unit) {
         super(time, unit);
         
         this.pingFutures = pingFutures;
@@ -38,12 +38,12 @@ public class DefaultQuickenEntity extends AbstractEntity implements QuickenEntit
     }
 
     @Override
-    public ArdverkFuture<PingEntity>[] getPingFutures() {
+    public DHTFuture<PingEntity>[] getPingFutures() {
         return pingFutures;
     }
 
     @Override
-    public ArdverkFuture<NodeEntity>[] getLookupFutures() {
+    public DHTFuture<NodeEntity>[] getLookupFutures() {
         return lookupFutures;
     }
 }

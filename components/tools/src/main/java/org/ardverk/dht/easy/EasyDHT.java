@@ -22,7 +22,7 @@ import java.net.SocketAddress;
 
 import org.ardverk.dht.DHT;
 import org.ardverk.dht.KUID;
-import org.ardverk.dht.concurrent.ArdverkFuture;
+import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.entity.BootstrapEntity;
 import org.ardverk.dht.entity.NodeEntity;
 import org.ardverk.dht.entity.PingEntity;
@@ -39,32 +39,32 @@ import org.ardverk.dht.storage.Value;
  */
 public interface EasyDHT extends DHT, Closeable {
     
-    public ArdverkFuture<PingEntity> ping(String host, int port);
+    public DHTFuture<PingEntity> ping(String host, int port);
 
-    public ArdverkFuture<PingEntity> ping(InetAddress address, int port);
+    public DHTFuture<PingEntity> ping(InetAddress address, int port);
 
-    public ArdverkFuture<PingEntity> ping(SocketAddress address);
+    public DHTFuture<PingEntity> ping(SocketAddress address);
     
-    public ArdverkFuture<PingEntity> ping(Contact dst);
+    public DHTFuture<PingEntity> ping(Contact dst);
     
-    public ArdverkFuture<NodeEntity> lookup(KUID lookupId);
+    public DHTFuture<NodeEntity> lookup(KUID lookupId);
 
-    public ArdverkFuture<ValueEntity> get(KUID valueId);
+    public DHTFuture<ValueEntity> get(KUID valueId);
 
-    public ArdverkFuture<PutEntity> put(KUID valueId, Value value);
+    public DHTFuture<PutEntity> put(KUID valueId, Value value);
 
-    public ArdverkFuture<PutEntity> remove(KUID valueId);
+    public DHTFuture<PutEntity> remove(KUID valueId);
     
-    public ArdverkFuture<BootstrapEntity> bootstrap(String host, int port);
+    public DHTFuture<BootstrapEntity> bootstrap(String host, int port);
 
-    public ArdverkFuture<BootstrapEntity> bootstrap(
+    public DHTFuture<BootstrapEntity> bootstrap(
             InetAddress address, int port);
 
-    public ArdverkFuture<BootstrapEntity> bootstrap(SocketAddress address);
+    public DHTFuture<BootstrapEntity> bootstrap(SocketAddress address);
     
-    public ArdverkFuture<BootstrapEntity> bootstrap(Contact contact);
+    public DHTFuture<BootstrapEntity> bootstrap(Contact contact);
 
-    public ArdverkFuture<QuickenEntity> quicken();
+    public DHTFuture<QuickenEntity> quicken();
     
-    public ArdverkFuture<SyncEntity> sync();
+    public DHTFuture<SyncEntity> sync();
 }

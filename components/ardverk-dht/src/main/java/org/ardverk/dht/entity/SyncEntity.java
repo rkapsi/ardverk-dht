@@ -16,7 +16,7 @@
 
 package org.ardverk.dht.entity;
 
-import org.ardverk.dht.concurrent.ArdverkFuture;
+import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.message.MessageType;
 
 /**
@@ -30,7 +30,7 @@ import org.ardverk.dht.message.MessageType;
 public interface SyncEntity extends Entity {
     
     /**
-     * Returns all {@link MessageType#STORE} {@link ArdverkFuture}s.
+     * Returns all {@link MessageType#STORE} {@link DHTFuture}s.
      */
-    public ArdverkFuture<StoreEntity>[] getStoreFutures();
+    public DHTFuture<StoreEntity>[] getStoreFutures();
 }

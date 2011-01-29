@@ -19,7 +19,7 @@ package org.ardverk.dht;
 import java.net.InetAddress;
 import java.net.SocketAddress;
 
-import org.ardverk.dht.concurrent.ArdverkFuture;
+import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.config.BootstrapConfig;
 import org.ardverk.dht.entity.BootstrapEntity;
 import org.ardverk.dht.routing.Contact;
@@ -33,24 +33,24 @@ interface BootstrapService {
     /**
      * Bootstraps the DHT from the given hostname and port.
      */
-    public ArdverkFuture<BootstrapEntity> bootstrap(
+    public DHTFuture<BootstrapEntity> bootstrap(
             String host, int port, BootstrapConfig config);
     
     /**
      * Bootstraps the DHT from the given {@link InetAddress} and port.
      */
-    public ArdverkFuture<BootstrapEntity> bootstrap(
+    public DHTFuture<BootstrapEntity> bootstrap(
             InetAddress address, int port, BootstrapConfig config);
     
     /**
      * Bootstraps the DHT from the given {@link SocketAddress}.
      */
-    public ArdverkFuture<BootstrapEntity> bootstrap(
+    public DHTFuture<BootstrapEntity> bootstrap(
             SocketAddress address, BootstrapConfig config);
     
     /**
      * Bootstraps the DHT from the given {@link Contact}.
      */
-    public ArdverkFuture<BootstrapEntity> bootstrap(
+    public DHTFuture<BootstrapEntity> bootstrap(
             Contact contact, BootstrapConfig config);
 }

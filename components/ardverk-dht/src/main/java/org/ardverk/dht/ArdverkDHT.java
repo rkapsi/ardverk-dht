@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketAddress;
 
-import org.ardverk.dht.concurrent.ArdverkFuture;
+import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.config.BootstrapConfig;
 import org.ardverk.dht.config.GetConfig;
 import org.ardverk.dht.config.LookupConfig;
@@ -119,7 +119,7 @@ public class ArdverkDHT extends AbstractDHT {
         
         routeTable.bind(new RouteTable.ContactPinger() {
             @Override
-            public ArdverkFuture<PingEntity> ping(Contact contact,
+            public DHTFuture<PingEntity> ping(Contact contact,
                     PingConfig config) {
                 return ArdverkDHT.this.ping(contact, config);
             }
@@ -127,7 +127,7 @@ public class ArdverkDHT extends AbstractDHT {
         
         storeForward.bind(new StoreForward.Callback() {
             @Override
-            public ArdverkFuture<StoreEntity> store(Contact dst, 
+            public DHTFuture<StoreEntity> store(Contact dst, 
                     ValueTuple valueTuple, StoreConfig config) {
                 return storeManager.store(new Contact[] { dst }, valueTuple, config);
             }
@@ -222,66 +222,66 @@ public class ArdverkDHT extends AbstractDHT {
     }
 
     @Override
-    public ArdverkFuture<BootstrapEntity> bootstrap(
+    public DHTFuture<BootstrapEntity> bootstrap(
             String host, int port, BootstrapConfig config) {
         return bootstrapManager.bootstrap(host, port, config);
     }
 
     @Override
-    public ArdverkFuture<BootstrapEntity> bootstrap(
+    public DHTFuture<BootstrapEntity> bootstrap(
             InetAddress address, int port, BootstrapConfig config) {
         return bootstrapManager.bootstrap(address, port, config);
     }
 
     @Override
-    public ArdverkFuture<BootstrapEntity> bootstrap(
+    public DHTFuture<BootstrapEntity> bootstrap(
             SocketAddress address, BootstrapConfig config) {
         return bootstrapManager.bootstrap(address, config);
     }
     
     @Override
-    public ArdverkFuture<BootstrapEntity> bootstrap(
+    public DHTFuture<BootstrapEntity> bootstrap(
             Contact contact, BootstrapConfig config) {
         return bootstrapManager.bootstrap(contact, config);
     }
 
     @Override
-    public ArdverkFuture<PingEntity> ping(Contact contact, PingConfig config) {
+    public DHTFuture<PingEntity> ping(Contact contact, PingConfig config) {
         return pingManager.ping(contact, config);
     }
 
     @Override
-    public ArdverkFuture<PingEntity> ping(SocketAddress dst, PingConfig config) {
+    public DHTFuture<PingEntity> ping(SocketAddress dst, PingConfig config) {
         return pingManager.ping(dst, config);
     }
 
     @Override
-    public ArdverkFuture<NodeEntity> lookup(KUID lookupId, LookupConfig config) {
+    public DHTFuture<NodeEntity> lookup(KUID lookupId, LookupConfig config) {
         return lookupManager.lookup(lookupId, config);
     }
     
     @Override
-    public ArdverkFuture<ValueEntity> get(KUID valueId, GetConfig config) {
+    public DHTFuture<ValueEntity> get(KUID valueId, GetConfig config) {
         return lookupManager.get(valueId, config);
     }
 
     @Override
-    public ArdverkFuture<PutEntity> put(KUID valueId, Value value, PutConfig config) {
+    public DHTFuture<PutEntity> put(KUID valueId, Value value, PutConfig config) {
         return storeManager.put(valueId, value, config);
     }
     
     @Override
-    public ArdverkFuture<PutEntity> remove(KUID valueId, PutConfig config) {
+    public DHTFuture<PutEntity> remove(KUID valueId, PutConfig config) {
         return storeManager.remove(valueId, config);
     }
     
     @Override
-    public ArdverkFuture<QuickenEntity> quicken(QuickenConfig config) {
+    public DHTFuture<QuickenEntity> quicken(QuickenConfig config) {
         return quickenManager.quicken(config);
     }
     
     @Override
-    public ArdverkFuture<SyncEntity> sync(SyncConfig config) {
+    public DHTFuture<SyncEntity> sync(SyncConfig config) {
         return syncManager.sync(config);
     }
 }

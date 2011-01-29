@@ -18,6 +18,8 @@ package org.ardverk.dht.concurrent;
 
 import org.ardverk.concurrent.AsyncProcess;
 
-public interface ArdverkProcess<V> extends AsyncProcess<V> {
-
+/**
+ * An asynchronous DHT process. 
+ */
+public interface DHTProcess<V> extends AsyncProcess<V> {
 }

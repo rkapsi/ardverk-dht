@@ -24,8 +24,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.FutureUtils;
-import org.ardverk.dht.concurrent.ArdverkFuture;
-import org.ardverk.dht.concurrent.ArdverkValueFuture;
+import org.ardverk.dht.concurrent.DHTFuture;
+import org.ardverk.dht.concurrent.DHTValueFuture;
 import org.ardverk.dht.config.LookupConfig;
 import org.ardverk.dht.config.PingConfig;
 import org.ardverk.dht.config.QuickenConfig;
@@ -55,15 +55,15 @@ public class QuickenManager {
         this.routeTable = routeTable;
     }
     
-    public ArdverkFuture<QuickenEntity> quicken(QuickenConfig config) {
+    public DHTFuture<QuickenEntity> quicken(QuickenConfig config) {
         
         TimeStamp creationTime = TimeStamp.now();
         
-        List<ArdverkFuture<PingEntity>> pingFutures 
-            = new ArrayList<ArdverkFuture<PingEntity>>();
+        List<DHTFuture<PingEntity>> pingFutures 
+            = new ArrayList<DHTFuture<PingEntity>>();
         
-        List<ArdverkFuture<NodeEntity>> lookupFutures 
-            = new ArrayList<ArdverkFuture<NodeEntity>>();
+        List<DHTFuture<NodeEntity>> lookupFutures 
+            = new ArrayList<DHTFuture<NodeEntity>>();
         
         synchronized (routeTable) {
             int pingCount = (int)(routeTable.getK() * config.getPingCount());
@@ -83,7 +83,7 @@ public class QuickenManager {
                     }
                     
                     if (contact.isTimeout(contactTimeout, TimeUnit.MILLISECONDS)) {
-                        ArdverkFuture<PingEntity> future 
+                        DHTFuture<PingEntity> future 
                             = dht.ping(contact, pingConfig);
                         pingFutures.add(future);
                     }
@@ -110,37 +110,37 @@ public class QuickenManager {
                 KUID randomId = KUID.createWithPrefix(
                         bucket.getId(), bucket.getDepth());
                 
-                ArdverkFuture<NodeEntity> future 
+                DHTFuture<NodeEntity> future 
                     = dht.lookup(randomId, lookupConfig);
                 lookupFutures.add(future);
             }
         }
         
         @SuppressWarnings("unchecked")
-        ArdverkFuture<PingEntity>[] pings 
-            = pingFutures.toArray(new ArdverkFuture[0]);
+        DHTFuture<PingEntity>[] pings 
+            = pingFutures.toArray(new DHTFuture[0]);
         
         @SuppressWarnings("unchecked")
-        ArdverkFuture<NodeEntity>[] lookups 
-            = lookupFutures.toArray(new ArdverkFuture[0]);
+        DHTFuture<NodeEntity>[] lookups 
+            = lookupFutures.toArray(new DHTFuture[0]);
         
         return new QuickenFuture(creationTime, pings, lookups);
     }
     
-    public static class QuickenFuture extends ArdverkValueFuture<QuickenEntity> {
+    public static class QuickenFuture extends DHTValueFuture<QuickenEntity> {
         
         private final AtomicInteger countdown = new AtomicInteger();
         
         private final TimeStamp timeStamp;
         
-        private final ArdverkFuture<PingEntity>[] pingFutures;
+        private final DHTFuture<PingEntity>[] pingFutures;
         
-        private final ArdverkFuture<NodeEntity>[] lookupFutures;
+        private final DHTFuture<NodeEntity>[] lookupFutures;
         
         @SuppressWarnings("unchecked")
         private QuickenFuture(TimeStamp timeStamp, 
-                ArdverkFuture<PingEntity>[] pingFutures, 
-                ArdverkFuture<NodeEntity>[] lookupFutures) {
+                DHTFuture<PingEntity>[] pingFutures, 
+                DHTFuture<NodeEntity>[] lookupFutures) {
             this.timeStamp = timeStamp;
             this.pingFutures = pingFutures;
             this.lookupFutures = lookupFutures;
@@ -157,12 +157,12 @@ public class QuickenManager {
                     }
                 };
                 
-                for (ArdverkFuture<PingEntity> future : pingFutures) {
+                for (DHTFuture<PingEntity> future : pingFutures) {
                     future.addAsyncFutureListener(
                             (AsyncFutureListener<PingEntity>)listener);
                 }
                 
-                for (ArdverkFuture<NodeEntity> future : lookupFutures) {
+                for (DHTFuture<NodeEntity> future : lookupFutures) {
                     future.addAsyncFutureListener(
                             (AsyncFutureListener<NodeEntity>)listener);
                 }
@@ -171,11 +171,11 @@ public class QuickenManager {
             }
         }
         
-        public ArdverkFuture<PingEntity>[] getPingFutures() {
+        public DHTFuture<PingEntity>[] getPingFutures() {
             return pingFutures;
         }
 
-        public ArdverkFuture<NodeEntity>[] getLookupFutures() {
+        public DHTFuture<NodeEntity>[] getLookupFutures() {
             return lookupFutures;
         }
         

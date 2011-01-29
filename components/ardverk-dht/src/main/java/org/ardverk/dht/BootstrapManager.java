@@ -23,9 +23,9 @@ import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.FutureUtils;
 import org.ardverk.concurrent.ValueReference;
-import org.ardverk.dht.concurrent.ArdverkFuture;
-import org.ardverk.dht.concurrent.ArdverkProcess;
-import org.ardverk.dht.concurrent.NopArdverkProcess;
+import org.ardverk.dht.concurrent.DHTFuture;
+import org.ardverk.dht.concurrent.DHTProcess;
+import org.ardverk.dht.concurrent.NopProcess;
 import org.ardverk.dht.config.BootstrapConfig;
 import org.ardverk.dht.entity.BootstrapEntity;
 import org.ardverk.dht.entity.DefaultBootstrapEntity;
@@ -46,26 +46,26 @@ public class BootstrapManager {
         this.dht = dht;
     }
     
-    public ArdverkFuture<BootstrapEntity> bootstrap(
+    public DHTFuture<BootstrapEntity> bootstrap(
             String host, int port, BootstrapConfig config) {
         return bootstrap(NetworkUtils.createResolved(host, port), config);
     }
     
-    public ArdverkFuture<BootstrapEntity> bootstrap(
+    public DHTFuture<BootstrapEntity> bootstrap(
             InetAddress address, int port, BootstrapConfig config) {
         return bootstrap(NetworkUtils.createResolved(address, port), config);
     }
     
-    public ArdverkFuture<BootstrapEntity> bootstrap(
+    public DHTFuture<BootstrapEntity> bootstrap(
             Contact contact, BootstrapConfig config) {
         return bootstrap(contact.getRemoteAddress(), config);
     }
     
-    public ArdverkFuture<BootstrapEntity> bootstrap(
+    public DHTFuture<BootstrapEntity> bootstrap(
             SocketAddress address, BootstrapConfig config) {
         
         Object lock = new Object();
-        ArdverkFuture<PingEntity> pingFuture = dht.ping(
+        DHTFuture<PingEntity> pingFuture = dht.ping(
                 address, config.getPingConfig());
         
         synchronized (lock) {
@@ -73,19 +73,19 @@ public class BootstrapManager {
         }
     }
     
-    private ArdverkFuture<BootstrapEntity> bootstrap(final Object lock, 
-            final ArdverkFuture<PingEntity> pingFuture, 
+    private DHTFuture<BootstrapEntity> bootstrap(final Object lock, 
+            final DHTFuture<PingEntity> pingFuture, 
             final BootstrapConfig config) {
         
         // Make sure we're holding the lock!
         assert (Thread.holdsLock(lock));
         
-        ArdverkProcess<BootstrapEntity> process = NopArdverkProcess.create();
-        final ArdverkFuture<BootstrapEntity> userFuture 
+        DHTProcess<BootstrapEntity> process = NopProcess.create();
+        final DHTFuture<BootstrapEntity> userFuture 
             = dht.submit(process, config);
         
-        final ValueReference<ArdverkFuture<NodeEntity>> lookupFutureRef
-            = new ValueReference<ArdverkFuture<NodeEntity>>();
+        final ValueReference<DHTFuture<NodeEntity>> lookupFutureRef
+            = new ValueReference<DHTFuture<NodeEntity>>();
         
         pingFuture.addAsyncFutureListener(new AsyncFutureListener<PingEntity>() {
             @Override
@@ -162,21 +162,21 @@ public class BootstrapManager {
     
     public static class Attachment {
         
-        private final ArdverkFuture<PingEntity> pingFuture;
+        private final DHTFuture<PingEntity> pingFuture;
         
-        private final ValueReference<ArdverkFuture<NodeEntity>> lookupFutureRef;
+        private final ValueReference<DHTFuture<NodeEntity>> lookupFutureRef;
         
-        private Attachment(ArdverkFuture<PingEntity> pingFuture, 
-                ValueReference<ArdverkFuture<NodeEntity>> lookupFutureRef) {
+        private Attachment(DHTFuture<PingEntity> pingFuture, 
+                ValueReference<DHTFuture<NodeEntity>> lookupFutureRef) {
             this.pingFuture = pingFuture;
             this.lookupFutureRef = lookupFutureRef;
         }
         
-        public ArdverkFuture<PingEntity> getPingFuture() {
+        public DHTFuture<PingEntity> getPingFuture() {
             return pingFuture;
         }
         
-        public ArdverkFuture<NodeEntity> getLookupFuture() {
+        public DHTFuture<NodeEntity> getLookupFuture() {
             return lookupFutureRef.get();
         }
     }

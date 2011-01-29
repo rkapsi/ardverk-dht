@@ -18,10 +18,10 @@ package org.ardverk.dht.concurrent;
 
 import org.ardverk.concurrent.AsyncProcessFuture;
 
-public interface ArdverkFuture<V> extends AsyncProcessFuture<V> {
+public interface DHTFuture<V> extends AsyncProcessFuture<V> {
 
     /**
-     * Attaches an object to this {@link ArdverkFuture}.
+     * Attaches an object to this {@link DHTFuture}.
      */
     public void setAttachment(Object attachment);
     

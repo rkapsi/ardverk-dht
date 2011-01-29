@@ -16,7 +16,7 @@
 
 package org.ardverk.dht;
 
-import org.ardverk.dht.concurrent.ArdverkFuture;
+import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.config.QuickenConfig;
 import org.ardverk.dht.entity.QuickenEntity;
 import org.ardverk.dht.routing.RouteTable;
@@ -30,5 +30,5 @@ interface QuickenService {
      * Performs specially targeted PING and FIND_NODE requests with the
      * goal to refresh the {@link RouteTable} and keep it up-to-date.
      */
-    public ArdverkFuture<QuickenEntity> quicken(QuickenConfig config);
+    public DHTFuture<QuickenEntity> quicken(QuickenConfig config);
 }

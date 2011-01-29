@@ -19,7 +19,7 @@ package org.ardverk.dht;
 import java.net.InetAddress;
 import java.net.SocketAddress;
 
-import org.ardverk.dht.concurrent.ArdverkFuture;
+import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.config.GetConfig;
 import org.ardverk.dht.config.LookupConfig;
 import org.ardverk.dht.config.PingConfig;
@@ -40,47 +40,47 @@ interface DHTService {
     /**
      * Sends a PING to the given host.
      */
-    public ArdverkFuture<PingEntity> ping(
+    public DHTFuture<PingEntity> ping(
             String host, int port, PingConfig config);
     
     /**
      * Sends a PING to the given host.
      */
-    public ArdverkFuture<PingEntity> ping(
+    public DHTFuture<PingEntity> ping(
             InetAddress address, int port, PingConfig config);
     
     /**
      * Sends a PING to the given host.
      */
-    public ArdverkFuture<PingEntity> ping(
+    public DHTFuture<PingEntity> ping(
             SocketAddress address, PingConfig config);
     
     /**
      * Sends a PING to the given host.
      */
-    public ArdverkFuture<PingEntity> ping(
+    public DHTFuture<PingEntity> ping(
             Contact dst, PingConfig config);
     
     /**
      * Performs a FIND_NODE lookup in the DHT.
      */
-    public ArdverkFuture<NodeEntity> lookup(
+    public DHTFuture<NodeEntity> lookup(
             KUID lookupId, LookupConfig config);
     
     /**
      * Retrieves a key-value from the DHT.
      */
-    public ArdverkFuture<ValueEntity> get(
+    public DHTFuture<ValueEntity> get(
             KUID valueId, GetConfig config);
     
     /**
      * Stores the given key-value in the DHT.
      */
-    public ArdverkFuture<PutEntity> put(
+    public DHTFuture<PutEntity> put(
             KUID valueId, Value value, PutConfig config);
     
     /**
      * Removes the given {@link KUID} from the DHT.
      */
-    public ArdverkFuture<PutEntity> remove(KUID valueId, PutConfig config);
+    public DHTFuture<PutEntity> remove(KUID valueId, PutConfig config);
 }

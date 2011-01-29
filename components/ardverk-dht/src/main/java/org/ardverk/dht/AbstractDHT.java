@@ -22,8 +22,8 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.dht.concurrent.ArdverkFuture;
-import org.ardverk.dht.concurrent.ArdverkProcess;
+import org.ardverk.dht.concurrent.DHTFuture;
+import org.ardverk.dht.concurrent.DHTProcess;
 import org.ardverk.dht.config.Config;
 import org.ardverk.dht.config.PingConfig;
 import org.ardverk.dht.entity.PingEntity;
@@ -63,27 +63,27 @@ abstract class AbstractDHT implements DHT, Closeable {
     }
     
     @Override
-    public ArdverkFuture<PingEntity> ping(InetAddress address, 
+    public DHTFuture<PingEntity> ping(InetAddress address, 
             int port, PingConfig config) {
         return ping(new InetSocketAddress(address, port), config);
     }
     
     @Override
-    public ArdverkFuture<PingEntity> ping(String address, 
+    public DHTFuture<PingEntity> ping(String address, 
             int port, PingConfig config) {
         return ping(new InetSocketAddress(address, port), config);
     }
     
     @Override
-    public <V> ArdverkFuture<V> submit(ArdverkProcess<V> process, Config config) {
+    public <V> DHTFuture<V> submit(DHTProcess<V> process, Config config) {
         ExecutorKey executorKey = config.getExecutorKey();
         long timeout = config.getOperationTimeoutInMillis();
         return submit(executorKey, process, timeout, TimeUnit.MILLISECONDS);
     }
 
     @Override
-    public <V> ArdverkFuture<V> submit(ExecutorKey executorKey,
-            ArdverkProcess<V> process, long timeout, TimeUnit unit) {
+    public <V> DHTFuture<V> submit(ExecutorKey executorKey,
+            DHTProcess<V> process, long timeout, TimeUnit unit) {
         return futureManager.submit(executorKey, process, timeout, unit);
     }
     

@@ -21,8 +21,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.ardverk.dht.KUID;
-import org.ardverk.dht.concurrent.ArdverkFuture;
-import org.ardverk.dht.concurrent.ArdverkValueFuture;
+import org.ardverk.dht.concurrent.DHTFuture;
+import org.ardverk.dht.concurrent.DHTValueFuture;
 import org.ardverk.dht.config.PingConfig;
 import org.ardverk.dht.entity.PingEntity;
 import org.ardverk.dht.event.EventUtils;
@@ -55,11 +55,11 @@ public abstract class AbstractRouteTable implements RouteTable {
         return pingerRef.get() != null;
     }
 
-    protected ArdverkFuture<PingEntity> ping(Contact contact, 
+    protected DHTFuture<PingEntity> ping(Contact contact, 
             PingConfig config) {
         ContactPinger pinger = pingerRef.get();
         
-        ArdverkFuture<PingEntity> future = null;
+        DHTFuture<PingEntity> future = null;
         if (pinger != null) {
             future = pinger.ping(contact, config);
         }
@@ -71,7 +71,7 @@ public abstract class AbstractRouteTable implements RouteTable {
         IllegalStateException exception 
             = new IllegalStateException();
         
-        return new ArdverkValueFuture<PingEntity>(exception);
+        return new DHTValueFuture<PingEntity>(exception);
     }
     
     @Override

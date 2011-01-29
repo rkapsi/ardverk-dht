@@ -20,9 +20,9 @@ import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.FutureUtils;
 import org.ardverk.concurrent.ValueReference;
-import org.ardverk.dht.concurrent.ArdverkFuture;
-import org.ardverk.dht.concurrent.ArdverkProcess;
-import org.ardverk.dht.concurrent.NopArdverkProcess;
+import org.ardverk.dht.concurrent.DHTFuture;
+import org.ardverk.dht.concurrent.DHTProcess;
+import org.ardverk.dht.concurrent.NopProcess;
 import org.ardverk.dht.config.PutConfig;
 import org.ardverk.dht.config.StoreConfig;
 import org.ardverk.dht.entity.DefaultPutEntity;
@@ -57,11 +57,11 @@ public class StoreManager {
         this.messageDispatcher = messageDispatcher;
     }
     
-    public ArdverkFuture<PutEntity> remove(KUID key, PutConfig config) {
+    public DHTFuture<PutEntity> remove(KUID key, PutConfig config) {
         return put(key, ByteArrayValue.EMPTY, config);
     }
     
-    public ArdverkFuture<PutEntity> put(final KUID valueId, final Value value, 
+    public DHTFuture<PutEntity> put(final KUID valueId, final Value value, 
             final PutConfig config) {
         
         final Object lock = new Object();
@@ -69,17 +69,17 @@ public class StoreManager {
             
             // This is the ArdverkFuture we're going to return to the caller
             // of this method (in most cases the user).
-            ArdverkProcess<PutEntity> process = NopArdverkProcess.create();
-            final ArdverkFuture<PutEntity> userFuture 
+            DHTProcess<PutEntity> process = NopProcess.create();
+            final DHTFuture<PutEntity> userFuture 
                 = dht.submit(process, config);
             
             // This will get initialized once we've found the k-closest
             // Contacts to the given KUID
-            final ValueReference<ArdverkFuture<StoreEntity>> storeFutureRef 
-                = new ValueReference<ArdverkFuture<StoreEntity>>();
+            final ValueReference<DHTFuture<StoreEntity>> storeFutureRef 
+                = new ValueReference<DHTFuture<StoreEntity>>();
             
             // Start the lookup for the given KUID
-            final ArdverkFuture<NodeEntity> lookupFuture 
+            final DHTFuture<NodeEntity> lookupFuture 
                 = dht.lookup(valueId, config.getLookupConfig());
             
             // Let's wait for the result of the FIND_NODE operation. On success we're 
@@ -102,7 +102,7 @@ public class StoreManager {
                 
                 private void handleNodeEntity(final NodeEntity nodeEntity) {
                     Contact[] contacts = nodeEntity.getContacts();
-                    ArdverkFuture<StoreEntity> storeFuture 
+                    DHTFuture<StoreEntity> storeFuture 
                         = storeFutureRef.make(store(contacts, 
                                 valueId, value, config.getStoreConfig()));
                     
@@ -152,7 +152,7 @@ public class StoreManager {
         }
     }
     
-    public ArdverkFuture<StoreEntity> store(Contact[] dst, 
+    public DHTFuture<StoreEntity> store(Contact[] dst, 
             KUID valueId, Value value, StoreConfig config) {
         
         Contact localhost = dht.getLocalhost();
@@ -168,12 +168,12 @@ public class StoreManager {
      * NOTE: It's being assumed the {@link Contact}s are already sorted by
      * their XOR distance to the given {@link KUID}.
      */
-    public ArdverkFuture<StoreEntity> store(Contact[] dst, 
+    public DHTFuture<StoreEntity> store(Contact[] dst, 
             ValueTuple valueTuple, StoreConfig config) {
         
         int k = routeTable.getK();
         
-        ArdverkProcess<StoreEntity> process 
+        DHTProcess<StoreEntity> process 
             = new StoreResponseHandler(messageDispatcher, 
                 dst, k, valueTuple, config);
         

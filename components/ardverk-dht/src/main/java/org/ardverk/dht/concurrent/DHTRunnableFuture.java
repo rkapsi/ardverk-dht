@@ -18,6 +18,10 @@ package org.ardverk.dht.concurrent;
 
 import java.util.concurrent.RunnableFuture;
 
-public interface ArdverkRunnableFuture<V> extends ArdverkFuture<V>, RunnableFuture<V> {
+/**
+ * An interface that extends {@link DHTFuture} as well 
+ * as {@link RunnableFuture}.
+ */
+public interface DHTRunnableFuture<V> extends DHTFuture<V>, RunnableFuture<V> {
 
 }

@@ -16,8 +16,8 @@
 
 package org.ardverk.dht;
 
-import org.ardverk.dht.concurrent.ArdverkFuture;
-import org.ardverk.dht.concurrent.ArdverkProcess;
+import org.ardverk.dht.concurrent.DHTFuture;
+import org.ardverk.dht.concurrent.DHTProcess;
 import org.ardverk.dht.config.GetConfig;
 import org.ardverk.dht.config.LookupConfig;
 import org.ardverk.dht.entity.NodeEntity;
@@ -47,28 +47,28 @@ public class LookupManager {
         this.routeTable = routeTable;
     }
     
-    public ArdverkFuture<NodeEntity> lookup(KUID lookupId, LookupConfig config) {
+    public DHTFuture<NodeEntity> lookup(KUID lookupId, LookupConfig config) {
         Contact[] contacts = routeTable.select(lookupId);
         return lookup(contacts, lookupId, config);
     }
     
-    public ArdverkFuture<NodeEntity> lookup(Contact[] contacts, 
+    public DHTFuture<NodeEntity> lookup(Contact[] contacts, 
             KUID lookupId, LookupConfig config) {
         
-        ArdverkProcess<NodeEntity> process 
+        DHTProcess<NodeEntity> process 
             = new NodeResponseHandler(messageDispatcher, 
                     contacts, routeTable, lookupId, config);
         return futureService.submit(process, config);
     }
     
-    public ArdverkFuture<ValueEntity> get(KUID key, GetConfig config) {
+    public DHTFuture<ValueEntity> get(KUID key, GetConfig config) {
         Contact[] contacts = routeTable.select(key);
         return get(contacts, key, config);
     }
     
-    public ArdverkFuture<ValueEntity> get(Contact[] contacts, 
+    public DHTFuture<ValueEntity> get(Contact[] contacts, 
             KUID key, GetConfig config) {
-        ArdverkProcess<ValueEntity> process
+        DHTProcess<ValueEntity> process
             = new ValueResponseHandler(messageDispatcher, contacts, 
                     routeTable, key, config);
         return futureService.submit(process, config);

@@ -17,7 +17,7 @@
 package org.ardverk.dht.routing;
 
 import org.ardverk.dht.KUID;
-import org.ardverk.dht.concurrent.ArdverkFuture;
+import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.config.PingConfig;
 import org.ardverk.dht.entity.PingEntity;
 
@@ -111,6 +111,6 @@ public interface RouteTable extends IoErrorCallback {
         /**
          * Sends a ping to the given {@link Contact}.
          */
-        public ArdverkFuture<PingEntity> ping(Contact contact, PingConfig config);
+        public DHTFuture<PingEntity> ping(Contact contact, PingConfig config);
     }
 }

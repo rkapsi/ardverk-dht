@@ -27,13 +27,13 @@ import org.ardverk.concurrent.AsyncProcess;
 import org.ardverk.concurrent.AsyncProcessExecutorService;
 import org.ardverk.concurrent.ExecutorUtils;
 import org.ardverk.concurrent.FutureUtils;
-import org.ardverk.dht.concurrent.ArdverkFuture;
-import org.ardverk.dht.concurrent.ArdverkFutureTask;
-import org.ardverk.dht.concurrent.ArdverkProcess;
+import org.ardverk.dht.concurrent.DHTFuture;
+import org.ardverk.dht.concurrent.DHTFutureTask;
+import org.ardverk.dht.concurrent.DHTProcess;
 
 
 /**
- * The {@link FutureManager} manages {@link ArdverkFuture}s.
+ * The {@link FutureManager} manages {@link DHTFuture}s.
  */
 public class FutureManager implements Closeable {
     
@@ -61,11 +61,11 @@ public class FutureManager implements Closeable {
     }
     
     /**
-     * Submits the given {@link ArdverkProcess} for execution and returns
-     * an {@link ArdverkFuture} for it.
+     * Submits the given {@link DHTProcess} for execution and returns
+     * an {@link DHTFuture} for it.
      */
-    public synchronized <T> ArdverkFuture<T> submit(ExecutorKey executorKey, 
-            ArdverkProcess<T> process, long timeout, TimeUnit unit) {
+    public synchronized <T> DHTFuture<T> submit(ExecutorKey executorKey, 
+            DHTProcess<T> process, long timeout, TimeUnit unit) {
         
         if (!open) {
             throw new IllegalStateException();
@@ -93,13 +93,13 @@ public class FutureManager implements Closeable {
     }
     
     /**
-     * Callback for completed {@link ArdverkFuture}s.
+     * Callback for completed {@link DHTFuture}s.
      */
-    private synchronized void complete(ArdverkFuture<?> future) {
+    private synchronized void complete(DHTFuture<?> future) {
         futures.remove(future);
     }
     
-    private class ManagedFutureTask<T> extends ArdverkFutureTask<T> {
+    private class ManagedFutureTask<T> extends DHTFutureTask<T> {
         
         public ManagedFutureTask(AsyncProcess<T> process, 
                 long timeout, TimeUnit unit) {

@@ -19,25 +19,31 @@ package org.ardverk.dht.concurrent;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncFutureListener;
-import org.ardverk.concurrent.AsyncValueFuture;
+import org.ardverk.concurrent.AsyncProcess;
+import org.ardverk.concurrent.AsyncProcessFutureTask;
 import org.ardverk.dht.event.EventUtils;
 
-
-public class ArdverkValueFuture<V> extends AsyncValueFuture<V> 
-        implements ArdverkFuture<V> {
+/**
+ * An implementation of {@link DHTFuture} that implements the 
+ * {@link DHTRunnableFuture} interface and can hence be executed
+ * on a {@link Thread}.
+ */
+public class DHTFutureTask<V> extends AsyncProcessFutureTask<V> 
+        implements DHTRunnableFuture<V> {
 
     private volatile Object attachment;
     
-    public ArdverkValueFuture() {
+    public DHTFutureTask() {
         super();
     }
 
-    public ArdverkValueFuture(Throwable t) {
-        super(t);
+    public DHTFutureTask(AsyncProcess<V> process, long timeout,
+            TimeUnit unit) {
+        super(process, timeout, unit);
     }
 
-    public ArdverkValueFuture(V value) {
-        super(value);
+    public DHTFutureTask(AsyncProcess<V> process) {
+        super(process);
     }
     
     @Override
@@ -48,21 +54,6 @@ public class ArdverkValueFuture<V> extends AsyncValueFuture<V>
     @Override
     public Object getAttachment() {
         return attachment;
-    }
-
-    @Override
-    public long getTimeout(TimeUnit unit) {
-        return 0;
-    }
-
-    @Override
-    public long getTimeoutInMillis() {
-        return getTimeout(TimeUnit.MILLISECONDS);
-    }
-
-    @Override
-    public boolean isTimeout() {
-        return false;
     }
 
     @Override
@@ -81,7 +72,7 @@ public class ArdverkValueFuture<V> extends AsyncValueFuture<V>
         Runnable event = new Runnable() {
             @Override
             public void run() {
-                ArdverkValueFuture.super.fireOperationComplete(first, others);
+                DHTFutureTask.super.fireOperationComplete(first, others);
             }
         };
         

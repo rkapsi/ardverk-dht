@@ -19,27 +19,27 @@ package org.ardverk.dht.concurrent;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncFutureListener;
-import org.ardverk.concurrent.AsyncProcess;
-import org.ardverk.concurrent.AsyncProcessFutureTask;
+import org.ardverk.concurrent.AsyncValueFuture;
 import org.ardverk.dht.event.EventUtils;
 
-
-public class ArdverkFutureTask<V> extends AsyncProcessFutureTask<V> 
-        implements ArdverkRunnableFuture<V> {
+/**
+ * 
+ */
+public class DHTValueFuture<V> extends AsyncValueFuture<V> 
+        implements DHTFuture<V> {
 
     private volatile Object attachment;
     
-    public ArdverkFutureTask() {
+    public DHTValueFuture() {
         super();
     }
 
-    public ArdverkFutureTask(AsyncProcess<V> process, long timeout,
-            TimeUnit unit) {
-        super(process, timeout, unit);
+    public DHTValueFuture(Throwable t) {
+        super(t);
     }
 
-    public ArdverkFutureTask(AsyncProcess<V> process) {
-        super(process);
+    public DHTValueFuture(V value) {
+        super(value);
     }
     
     @Override
@@ -50,6 +50,21 @@ public class ArdverkFutureTask<V> extends AsyncProcessFutureTask<V>
     @Override
     public Object getAttachment() {
         return attachment;
+    }
+
+    @Override
+    public long getTimeout(TimeUnit unit) {
+        return 0;
+    }
+
+    @Override
+    public long getTimeoutInMillis() {
+        return getTimeout(TimeUnit.MILLISECONDS);
+    }
+
+    @Override
+    public boolean isTimeout() {
+        return false;
     }
 
     @Override
@@ -68,7 +83,7 @@ public class ArdverkFutureTask<V> extends AsyncProcessFutureTask<V>
         Runnable event = new Runnable() {
             @Override
             public void run() {
-                ArdverkFutureTask.super.fireOperationComplete(first, others);
+                DHTValueFuture.super.fireOperationComplete(first, others);
             }
         };
         

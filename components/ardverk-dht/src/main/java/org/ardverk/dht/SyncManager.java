@@ -27,8 +27,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.FutureUtils;
-import org.ardverk.dht.concurrent.ArdverkFuture;
-import org.ardverk.dht.concurrent.ArdverkValueFuture;
+import org.ardverk.dht.concurrent.DHTFuture;
+import org.ardverk.dht.concurrent.DHTValueFuture;
 import org.ardverk.dht.config.PingConfig;
 import org.ardverk.dht.config.StoreConfig;
 import org.ardverk.dht.config.SyncConfig;
@@ -72,7 +72,7 @@ public class SyncManager {
         this.database = database;
     }
         
-    public ArdverkFuture<SyncEntity> sync(final SyncConfig syncConfig) {
+    public DHTFuture<SyncEntity> sync(final SyncConfig syncConfig) {
         
         final Object lock = new Object();
         
@@ -80,17 +80,17 @@ public class SyncManager {
             
             final TimeStamp creationTime = TimeStamp.now();
             
-            final Map<ContactKey, ArdverkFuture<PingEntity>> futures 
-                = new HashMap<ContactKey, ArdverkFuture<PingEntity>>();
+            final Map<ContactKey, DHTFuture<PingEntity>> futures 
+                = new HashMap<ContactKey, DHTFuture<PingEntity>>();
             
-            final List<ArdverkFuture<StoreEntity>> storeFutures 
-                = new ArrayList<ArdverkFuture<StoreEntity>>();
+            final List<DHTFuture<StoreEntity>> storeFutures 
+                = new ArrayList<DHTFuture<StoreEntity>>();
             
             Localhost localhost = routeTable.getLocalhost();
             PingConfig pingConfig = syncConfig.getPingConfig();
             
-            final ArdverkFuture<SyncEntity> userFuture 
-                = new ArdverkValueFuture<SyncEntity>();
+            final DHTFuture<SyncEntity> userFuture 
+                = new DHTValueFuture<SyncEntity>();
             
             // The number of PINGs we've sent
             final AtomicInteger pingCounter = new AtomicInteger();
@@ -153,7 +153,7 @@ public class SyncManager {
                             return;
                         }
                         
-                        ArdverkFuture<StoreEntity> storeFuture 
+                        DHTFuture<StoreEntity> storeFuture 
                             = store(tuple, syncConfig.getStoreConfig());
                         storeCounter.incrementAndGet();
                         storeFuture.addAsyncFutureListener(
@@ -162,7 +162,7 @@ public class SyncManager {
                             public void operationComplete(AsyncFuture<StoreEntity> future) {
                                 synchronized (lock) {
                                     try {
-                                        storeFutures.add((ArdverkFuture<StoreEntity>)future);
+                                        storeFutures.add((DHTFuture<StoreEntity>)future);
                                     } finally {
                                         countdown(storeCounter);
                                     }
@@ -189,8 +189,8 @@ public class SyncManager {
                         long time = creationTime.getAgeInMillis();
                         
                         @SuppressWarnings("unchecked")
-                        ArdverkFuture<StoreEntity>[] futures 
-                            = storeFutures.toArray(new ArdverkFuture[0]);
+                        DHTFuture<StoreEntity>[] futures 
+                            = storeFutures.toArray(new DHTFuture[0]);
                         userFuture.setValue(new DefaultSyncEntity(
                                 futures, time, TimeUnit.MILLISECONDS));
                     }
@@ -216,7 +216,7 @@ public class SyncManager {
         }
     }
     
-    private ArdverkFuture<StoreEntity> store(ValueTuple tuple, StoreConfig storeConfig) {
+    private DHTFuture<StoreEntity> store(ValueTuple tuple, StoreConfig storeConfig) {
         Localhost localhost = routeTable.getLocalhost();
         Contact[] contacts = routeTable.select(localhost.getId());
         assert (localhost.equals(contacts[0]));
@@ -229,17 +229,17 @@ public class SyncManager {
         return storeManager.store(contacts, tuple, storeConfig);
     }
     
-    private PingFuture ping(Map<ContactKey, ArdverkFuture<PingEntity>> futures, 
+    private PingFuture ping(Map<ContactKey, DHTFuture<PingEntity>> futures, 
             Contact[] contacts, int toIndex, PingConfig pingConfig) {
         
-        List<ArdverkFuture<PingEntity>> pingFutures 
-            = new ArrayList<ArdverkFuture<PingEntity>>(toIndex);
+        List<DHTFuture<PingEntity>> pingFutures 
+            = new ArrayList<DHTFuture<PingEntity>>(toIndex);
         
         for (int i = 0; i < toIndex; i++) {
             Contact contact = contacts[i];
             final ContactKey key = new ContactKey(contact);
             
-            ArdverkFuture<PingEntity> future = futures.get(key);
+            DHTFuture<PingEntity> future = futures.get(key);
             if (future == null) {
                 future = pingManager.ping(contact, pingConfig);
                 futures.put(key, future);
@@ -251,15 +251,15 @@ public class SyncManager {
         return new PingFuture(pingFutures, toIndex);
     }
     
-    private static class PingFuture extends ArdverkValueFuture<Sync> {
+    private static class PingFuture extends DHTValueFuture<Sync> {
         
         private final AtomicInteger countdown = new AtomicInteger();
         
-        private final List<ArdverkFuture<PingEntity>> futures;
+        private final List<DHTFuture<PingEntity>> futures;
         
         private final int index;
         
-        private PingFuture(List<ArdverkFuture<PingEntity>> futures, int index) {
+        private PingFuture(List<DHTFuture<PingEntity>> futures, int index) {
             this.futures = futures;
             this.index = index;
             
@@ -275,7 +275,7 @@ public class SyncManager {
                     }
                 };
                 
-                for (ArdverkFuture<PingEntity> future : futures) {
+                for (DHTFuture<PingEntity> future : futures) {
                     future.addAsyncFutureListener(listener);
                 }
             } else {
@@ -298,7 +298,7 @@ public class SyncManager {
         
         private void complete() {
             boolean store = true;
-            for (ArdverkFuture<PingEntity> future : futures) {
+            for (DHTFuture<PingEntity> future : futures) {
                 if (!future.isCompletedAbnormally()) {
                     store = false;
                     break;

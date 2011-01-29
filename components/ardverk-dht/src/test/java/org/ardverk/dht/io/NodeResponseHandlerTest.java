@@ -24,7 +24,7 @@ import junit.framework.TestCase;
 
 import org.ardverk.dht.ArdverkUtils;
 import org.ardverk.dht.KUID;
-import org.ardverk.dht.concurrent.ArdverkFuture;
+import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.config.DefaultLookupConfig;
 import org.ardverk.dht.config.LookupConfig;
 import org.ardverk.dht.easy.EasyDHT;
@@ -57,7 +57,7 @@ public class NodeResponseHandlerTest {
             LookupConfig config = new DefaultLookupConfig();
             config.setLookupTimeout(20L, TimeUnit.SECONDS);
             
-            ArdverkFuture<NodeEntity> future 
+            DHTFuture<NodeEntity> future 
                 = first.lookup(lookupId, config);
             NodeEntity entity = future.get();
             TestCase.assertEquals(lookupId, entity.getId());

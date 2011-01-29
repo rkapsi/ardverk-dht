@@ -16,7 +16,7 @@
 
 package org.ardverk.dht;
 
-import org.ardverk.dht.concurrent.ArdverkFuture;
+import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.config.SyncConfig;
 import org.ardverk.dht.entity.SyncEntity;
 import org.ardverk.dht.routing.Contact;
@@ -30,5 +30,5 @@ interface SyncService {
     /**
      * Synchronizes this {@link Contact}'s values with the k-closest.
      */
-    public ArdverkFuture<SyncEntity> sync(SyncConfig config);
+    public DHTFuture<SyncEntity> sync(SyncConfig config);
 }

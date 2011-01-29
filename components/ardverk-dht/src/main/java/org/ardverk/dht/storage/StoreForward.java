@@ -18,7 +18,7 @@ package org.ardverk.dht.storage;
 
 import org.ardverk.collection.CollectionUtils;
 import org.ardverk.dht.KUID;
-import org.ardverk.dht.concurrent.ArdverkFuture;
+import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.config.StoreConfig;
 import org.ardverk.dht.entity.StoreEntity;
 import org.ardverk.dht.routing.Contact;
@@ -160,7 +160,7 @@ public class StoreForward {
          * Called by the {@link StoreForward} service for each {@link ValueTuple}
          * that needs to be sent to the given {@link Contact}.
          */
-        public ArdverkFuture<StoreEntity> store(Contact dst, 
+        public DHTFuture<StoreEntity> store(Contact dst, 
                 ValueTuple valueTuple, StoreConfig config);
     }
 }

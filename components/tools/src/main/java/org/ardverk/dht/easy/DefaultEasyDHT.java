@@ -21,7 +21,7 @@ import java.net.SocketAddress;
 
 import org.ardverk.dht.ArdverkDHT;
 import org.ardverk.dht.KUID;
-import org.ardverk.dht.concurrent.ArdverkFuture;
+import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.entity.BootstrapEntity;
 import org.ardverk.dht.entity.NodeEntity;
 import org.ardverk.dht.entity.PingEntity;
@@ -47,73 +47,73 @@ public class DefaultEasyDHT extends ArdverkDHT implements EasyDHT {
     }
     
     @Override
-    public ArdverkFuture<PingEntity> ping(String host, int port) {
+    public DHTFuture<PingEntity> ping(String host, int port) {
         return ping(host, port, config.getPingConfig());
     }
 
     @Override
-    public ArdverkFuture<PingEntity> ping(InetAddress address, int port) {
+    public DHTFuture<PingEntity> ping(InetAddress address, int port) {
         return ping(address, port, config.getPingConfig());
     }
 
     @Override
-    public ArdverkFuture<PingEntity> ping(SocketAddress address) {
+    public DHTFuture<PingEntity> ping(SocketAddress address) {
         return ping(address, config.getPingConfig());
     }
     
     @Override
-    public ArdverkFuture<PingEntity> ping(Contact dst) {
+    public DHTFuture<PingEntity> ping(Contact dst) {
         return ping(dst, config.getPingConfig());
     }
     
     @Override
-    public ArdverkFuture<NodeEntity> lookup(KUID lookupId) {
+    public DHTFuture<NodeEntity> lookup(KUID lookupId) {
         return lookup(lookupId, config.getLookupConfig());
     }
 
     @Override
-    public ArdverkFuture<ValueEntity> get(KUID valueId) {
+    public DHTFuture<ValueEntity> get(KUID valueId) {
         return get(valueId, config.getGetConfig());
     }
 
     @Override
-    public ArdverkFuture<PutEntity> put(KUID valueId, Value value) {
+    public DHTFuture<PutEntity> put(KUID valueId, Value value) {
         return put(valueId, value, config.getPutConfig());
     }
 
     @Override
-    public ArdverkFuture<PutEntity> remove(KUID valueId) {
+    public DHTFuture<PutEntity> remove(KUID valueId) {
         return remove(valueId, config.getPutConfig());
     }
     
     @Override
-    public ArdverkFuture<BootstrapEntity> bootstrap(String host, int port) {
+    public DHTFuture<BootstrapEntity> bootstrap(String host, int port) {
         return bootstrap(host, port, config.getBootstrapConfig());
     }
 
     @Override
-    public ArdverkFuture<BootstrapEntity> bootstrap(
+    public DHTFuture<BootstrapEntity> bootstrap(
             InetAddress address, int port) {
         return bootstrap(address, port, config.getBootstrapConfig());
     }
 
     @Override
-    public ArdverkFuture<BootstrapEntity> bootstrap(SocketAddress address) {
+    public DHTFuture<BootstrapEntity> bootstrap(SocketAddress address) {
         return bootstrap(address, config.getBootstrapConfig());
     }
 
     @Override
-    public ArdverkFuture<BootstrapEntity> bootstrap(Contact contact) {
+    public DHTFuture<BootstrapEntity> bootstrap(Contact contact) {
         return bootstrap(contact, config.getBootstrapConfig());
     }
 
     @Override
-    public ArdverkFuture<QuickenEntity> quicken() {
+    public DHTFuture<QuickenEntity> quicken() {
         return quicken(config.getQuickenConfig());
     }
     
     @Override
-    public ArdverkFuture<SyncEntity> sync() {
+    public DHTFuture<SyncEntity> sync() {
         return sync(config.getSyncConfig());
     }
 }
