@@ -39,27 +39,27 @@ public final class MessageId implements Writable, Serializable,
     private static final Random GENERATOR = SecurityUtils.createRandom();
     
     public static MessageId createRandom(int length) {
-        byte[] key = new byte[length];
-        GENERATOR.nextBytes(key);
-        return new MessageId(key);
+        byte[] messageId = new byte[length];
+        GENERATOR.nextBytes(messageId);
+        return new MessageId(messageId);
     }
     
     public static MessageId createRandom(MessageId otherId) {
         return createRandom(otherId.length());
     }
     
-    public static MessageId create(byte[] key) {
-        return new MessageId(key);
+    public static MessageId create(byte[] messageId) {
+        return new MessageId(messageId);
     }
     
-    public static MessageId create(byte[] key, int offset, int length) {
+    public static MessageId create(byte[] messageId, int offset, int length) {
         byte[] copy = new byte[length];
-        System.arraycopy(key, 0, copy, 0, copy.length);
+        System.arraycopy(messageId, 0, copy, 0, copy.length);
         return new MessageId(copy);
     }
     
-    public static MessageId create(String key) {
-        return create(CodingUtils.decodeBase16(key));
+    public static MessageId create(String messageId) {
+        return create(CodingUtils.decodeBase16(messageId));
     }
     
     private final byte[] messageId;
