@@ -23,7 +23,9 @@ import org.ardverk.concurrent.AsyncValueFuture;
 import org.ardverk.dht.event.EventUtils;
 
 /**
+ * Like {@link AsyncValueFuture} but implements the {@link DHTFuture} interface.
  * 
+ * @see AsyncValueFuture
  */
 public class DHTValueFuture<V> extends AsyncValueFuture<V> 
         implements DHTFuture<V> {
