@@ -67,7 +67,7 @@ public class StoreManager {
         final Object lock = new Object();
         synchronized (lock) {
             
-            // This is the ArdverkFuture we're going to return to the caller
+            // This is the DHTFuture we're going to return to the caller
             // of this method (in most cases the user).
             DHTProcess<PutEntity> process = NopProcess.create();
             final DHTFuture<PutEntity> userFuture 
