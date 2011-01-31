@@ -23,7 +23,6 @@ import java.net.SocketAddress;
 import org.ardverk.dht.io.transport.Transport;
 import org.ardverk.io.Bindable;
 
-
 /**
  * The {@link TransportService} binds the {@link DHT} 
  * to a {@link Transport} layer.
@@ -32,21 +31,32 @@ interface TransportService extends Bindable<Transport> {
 
     /**
      * Binds the {@link DHT} to the given port.
+     * 
+     * @see #bind(Transport)
+     * @see #bind(SocketAddress)
      */
     public void bind(int port) throws IOException;
     
     /**
      * Binds the {@link DHT} to the given host-port.
+     * 
+     * @see #bind(Transport)
+     * @see #bind(SocketAddress)
      */
     public void bind(String host, int port) throws IOException;
     
     /**
      * Binds the {@link DHT} to the given {@link InetAddress} and port.
+     * 
+     * @see #bind(Transport)
+     * @see #bind(SocketAddress)
      */
     public void bind(InetAddress bindaddr, int port) throws IOException;
     
     /**
      * Binds the {@link DHT} to the given {@link SocketAddress}.
+     * 
+     * @see #bind(Transport)
      */
     public void bind(SocketAddress address) throws IOException;
 }
