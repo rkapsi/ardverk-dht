@@ -29,22 +29,23 @@ public class DHTException extends IOException {
     private final long timeInMillis;
 
     public DHTException(long time, TimeUnit unit) {
+        super(message(null, time, unit));
         this.timeInMillis = unit.toMillis(time);
     }
 
     public DHTException(String message, Throwable cause, 
             long time, TimeUnit unit) {
-        super(message, cause);
+        super(message(message, time, unit), cause);
         this.timeInMillis = unit.toMillis(time);
     }
 
     public DHTException(String message, long time, TimeUnit unit) {
-        super(message);
+        super(message(message, time, unit));
         this.timeInMillis = unit.toMillis(time);
     }
 
     public DHTException(Throwable cause, long time, TimeUnit unit) {
-        super(cause);
+        super(message(null, time, unit), cause);
         this.timeInMillis = unit.toMillis(time);
     }
     
@@ -60,5 +61,16 @@ public class DHTException extends IOException {
      */
     public long getTimeInMillis() {
         return getTime(TimeUnit.MILLISECONDS);
+    }
+    
+    /**
+     * Creates and returns an exception message from the given arguments.
+     */
+    private static String message(String message, long time, TimeUnit unit) {
+        if (message == null || message.isEmpty()) {
+            return time + " " + unit;
+        }
+        
+        return message + ": " + time + " " + unit;
     }
 }
