@@ -23,13 +23,6 @@ import java.util.concurrent.TimeUnit;
 import junit.framework.TestCase;
 
 import org.ardverk.dht.KUID;
-import org.ardverk.dht.routing.Bucket;
-import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.routing.ContactEntry;
-import org.ardverk.dht.routing.DefaultContact;
-import org.ardverk.dht.routing.DefaultRouteTable;
-import org.ardverk.dht.routing.Localhost;
-import org.ardverk.dht.routing.RouteTableAdapter;
 import org.ardverk.dht.routing.Contact.Type;
 import org.junit.Test;
 

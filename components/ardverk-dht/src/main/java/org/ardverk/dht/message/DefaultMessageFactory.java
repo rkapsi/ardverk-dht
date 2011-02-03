@@ -21,8 +21,8 @@ import java.net.SocketAddress;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.Localhost;
-import org.ardverk.dht.storage.ValueTuple;
 import org.ardverk.dht.storage.Database.Condition;
+import org.ardverk.dht.storage.ValueTuple;
 import org.ardverk.lang.Arguments;
 
 

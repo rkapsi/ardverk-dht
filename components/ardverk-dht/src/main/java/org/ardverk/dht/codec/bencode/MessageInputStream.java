@@ -48,11 +48,11 @@ import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.DefaultContact;
 import org.ardverk.dht.storage.ByteArrayValue;
+import org.ardverk.dht.storage.Database.Condition;
 import org.ardverk.dht.storage.DefaultCondition;
 import org.ardverk.dht.storage.DefaultValueTuple;
 import org.ardverk.dht.storage.Value;
 import org.ardverk.dht.storage.ValueTuple;
-import org.ardverk.dht.storage.Database.Condition;
 import org.ardverk.net.NetworkUtils;
 
 

@@ -18,21 +18,21 @@ package org.ardverk.dht.config;
 
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.dht.ExecutorKey;
+import org.ardverk.dht.FutureManager.Key;
 import org.ardverk.dht.routing.Contact;
 
 
 public interface Config {
     
     /**
-     * Returns the {@link ExecutorKey}.
+     * Returns the {@link Key}.
      */
-    public ExecutorKey getExecutorKey();
+    public Key getExecutorKey();
     
     /**
-     * Sets the {@link ExecutorKey}.
+     * Sets the {@link Key}.
      */
-    public void setExecutorKey(ExecutorKey executorKey);
+    public void setExecutorKey(Key executorKey);
     
     /**
      * Sets the timeout for the operation

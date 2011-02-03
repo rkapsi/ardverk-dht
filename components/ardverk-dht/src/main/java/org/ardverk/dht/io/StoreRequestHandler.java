@@ -27,10 +27,10 @@ import org.ardverk.dht.message.StoreRequest;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Database;
+import org.ardverk.dht.storage.Database.Condition;
 import org.ardverk.dht.storage.DatabaseConfig;
 import org.ardverk.dht.storage.DefaultCondition;
 import org.ardverk.dht.storage.ValueTuple;
-import org.ardverk.dht.storage.Database.Condition;
 import org.ardverk.lang.Arguments;
 import org.ardverk.utils.ArrayUtils;
 

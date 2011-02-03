@@ -43,6 +43,50 @@ public class FutureManager implements Closeable {
     private static final AsyncProcessExecutorService SINGLE_THREAD_EXECUTOR
         = ExecutorUtils.newSingleThreadExecutor("FutureManagerSingleThread");
     
+    /**
+     * The {@link Key} controls how a particular operation should
+     * be executed.
+     */
+    public static enum Key {
+        
+        /**
+         * The {@link #SERIAL} {@link ExecutorKey} executions enqueued operations
+         * in a serial fashion.
+         */
+        SERIAL(SINGLE_THREAD_EXECUTOR),
+        
+        /**
+         * The {@link #PARALLEL} {@link ExecutorKey} executions enqueued operations
+         * in a parallel fashion.
+         */
+        PARALLEL(CACHED_THREAD_EXECUTOR);
+        
+        /**
+         * The default {@link Key} that should be used unless there
+         * is a reason not to use this {@link Key}.
+         */
+        public static final Key DEFAULT = Key.PARALLEL;
+        
+        /**
+         * The {@link Key} that should be used for backend and possibly 
+         * for other low priority operations.
+         */
+        public static final Key BACKEND = Key.SERIAL;
+        
+        private final Executor executor;
+        
+        private Key(Executor executor) {
+            this.executor = executor;
+        }
+
+        /**
+         * Executes the given {@link Runnable}.
+         */
+        private void execute(Runnable command) {
+            executor.execute(command);
+        }
+    }
+    
     private final Set<AsyncFuture<?>> futures 
         = new IdentityHashSet<AsyncFuture<?>>();
     
@@ -64,7 +108,7 @@ public class FutureManager implements Closeable {
      * Submits the given {@link DHTProcess} for execution and returns
      * an {@link DHTFuture} for it.
      */
-    public synchronized <T> DHTFuture<T> submit(ExecutorKey executorKey, 
+    public synchronized <T> DHTFuture<T> submit(Key executorKey, 
             DHTProcess<T> process, long timeout, TimeUnit unit) {
         
         if (!open) {
@@ -74,22 +118,10 @@ public class FutureManager implements Closeable {
         ManagedFutureTask<T> future 
             = new ManagedFutureTask<T>(process, timeout, unit);
         
-        getExecutor(executorKey).execute(future);
+        executorKey.execute(future);
         futures.add(future);
         
         return future;
-    }
-    
-    /**
-     * Returns an {@link Executor} for the given {@link ExecutorKey}.
-     */
-    private static Executor getExecutor(ExecutorKey executorKey) {
-        switch (executorKey) {
-            case PARALLEL:
-                return CACHED_THREAD_EXECUTOR;
-            default:
-                return SINGLE_THREAD_EXECUTOR;
-        }
     }
     
     /**

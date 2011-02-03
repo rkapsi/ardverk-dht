@@ -18,6 +18,7 @@ package org.ardverk.dht;
 
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.dht.FutureManager.Key;
 import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.concurrent.DHTProcess;
 import org.ardverk.dht.config.Config;
@@ -38,6 +39,6 @@ interface FutureService {
     /**
      * Submits the given {@link DHTProcess} for execution.
      */
-    public <V> DHTFuture<V> submit(ExecutorKey executorKey, 
+    public <V> DHTFuture<V> submit(Key executorKey, 
             DHTProcess<V> process, long timeout, TimeUnit unit);
 }

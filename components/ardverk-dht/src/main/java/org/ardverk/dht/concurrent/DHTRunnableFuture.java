@@ -23,5 +23,4 @@ import java.util.concurrent.RunnableFuture;
  * as {@link RunnableFuture}.
  */
 public interface DHTRunnableFuture<V> extends DHTFuture<V>, RunnableFuture<V> {
-
 }

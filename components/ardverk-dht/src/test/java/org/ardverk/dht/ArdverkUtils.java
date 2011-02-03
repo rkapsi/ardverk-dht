@@ -27,6 +27,7 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.dht.FutureManager.Key;
 import org.ardverk.dht.codec.DefaultMessageCodec;
 import org.ardverk.dht.codec.MessageCodec;
 import org.ardverk.dht.concurrent.DHTFuture;
@@ -117,7 +118,7 @@ public class ArdverkUtils {
             = new ArrayList<DHTFuture<BootstrapEntity>>();
         
         BootstrapConfig config = new DefaultBootstrapConfig();
-        config.setExecutorKey(ExecutorKey.BACKEND);
+        config.setExecutorKey(Key.BACKEND);
         
         for (int i = 0; i < length; i++) {
             DHTFuture<BootstrapEntity> future 
@@ -141,7 +142,7 @@ public class ArdverkUtils {
             = new ArrayList<DHTFuture<QuickenEntity>>();
         
         DefaultQuickenConfig config = new DefaultQuickenConfig();
-        config.setExecutorKey(ExecutorKey.BACKEND);
+        config.setExecutorKey(Key.BACKEND);
         
         for (int i = 0; i < length; i++) {
             config.setBucketTimeout(-1L, TimeUnit.MILLISECONDS);
@@ -189,7 +190,7 @@ public class ArdverkUtils {
         }
         
         final DefaultPutConfig putConfig = new DefaultPutConfig();
-        putConfig.setExecutorKey(ExecutorKey.BACKEND);
+        putConfig.setExecutorKey(Key.BACKEND);
         
         int count = 30000;
         DHTFuture<PutEntity> future = null;

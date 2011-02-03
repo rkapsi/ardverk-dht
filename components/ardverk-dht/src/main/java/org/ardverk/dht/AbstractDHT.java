@@ -22,6 +22,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.dht.FutureManager.Key;
 import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.concurrent.DHTProcess;
 import org.ardverk.dht.config.Config;
@@ -76,13 +77,13 @@ abstract class AbstractDHT implements DHT, Closeable {
     
     @Override
     public <V> DHTFuture<V> submit(DHTProcess<V> process, Config config) {
-        ExecutorKey executorKey = config.getExecutorKey();
+        Key executorKey = config.getExecutorKey();
         long timeout = config.getOperationTimeoutInMillis();
         return submit(executorKey, process, timeout, TimeUnit.MILLISECONDS);
     }
 
     @Override
-    public <V> DHTFuture<V> submit(ExecutorKey executorKey,
+    public <V> DHTFuture<V> submit(Key executorKey,
             DHTProcess<V> process, long timeout, TimeUnit unit) {
         return futureManager.submit(executorKey, process, timeout, unit);
     }

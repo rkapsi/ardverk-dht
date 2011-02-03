@@ -21,7 +21,6 @@ import java.util.Arrays;
 import junit.framework.TestCase;
 
 import org.ardverk.collection.KeyAnalyzer;
-import org.ardverk.dht.KUID;
 import org.ardverk.dht.utils.XorComparator;
 import org.junit.Test;
 

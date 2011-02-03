@@ -28,6 +28,7 @@ import org.ardverk.dht.entity.NodeEntity;
 import org.ardverk.dht.entity.PingEntity;
 import org.ardverk.dht.entity.PutEntity;
 import org.ardverk.dht.entity.ValueEntity;
+import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.storage.Value;
 
@@ -38,49 +39,53 @@ import org.ardverk.dht.storage.Value;
 interface DHTService {
 
     /**
-     * Sends a PING to the given host.
+     * Sends a {@link MessageType#PING} to the given host.
      */
     public DHTFuture<PingEntity> ping(
             String host, int port, PingConfig config);
     
     /**
-     * Sends a PING to the given host.
+     * Sends a {@link MessageType#PING} to the given host.
      */
     public DHTFuture<PingEntity> ping(
             InetAddress address, int port, PingConfig config);
     
     /**
-     * Sends a PING to the given host.
+     * Sends a {@link MessageType#PING} to the given host.
      */
     public DHTFuture<PingEntity> ping(
             SocketAddress address, PingConfig config);
     
     /**
-     * Sends a PING to the given host.
+     * Sends a {@link MessageType#PING} to the given host.
      */
     public DHTFuture<PingEntity> ping(
             Contact dst, PingConfig config);
     
     /**
-     * Performs a FIND_NODE lookup in the DHT.
+     * Performs a {@link MessageType#FIND_NODE} lookup in the DHT.
      */
     public DHTFuture<NodeEntity> lookup(
             KUID lookupId, LookupConfig config);
     
     /**
-     * Retrieves a key-value from the DHT.
+     * Performs a {@link MessageType#FIND_VALUE} lookup in the DHT.
      */
     public DHTFuture<ValueEntity> get(
             KUID valueId, GetConfig config);
     
     /**
-     * Stores the given key-value in the DHT.
+     * Performs a {@link MessageType#FIND_NODE} lookup followed by 
+     * a {@link MessageType#STORE} operation.
      */
     public DHTFuture<PutEntity> put(
             KUID valueId, Value value, PutConfig config);
     
     /**
      * Removes the given {@link KUID} from the DHT.
+     * 
+     * <p>NOTE: It's essentially a {@link #put(KUID, Value, PutConfig)} 
+     * operation with an empty {@link Value}.
      */
     public DHTFuture<PutEntity> remove(KUID valueId, PutConfig config);
 }

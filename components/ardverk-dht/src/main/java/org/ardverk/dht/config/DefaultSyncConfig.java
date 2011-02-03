@@ -16,7 +16,7 @@
 
 package org.ardverk.dht.config;
 
-import org.ardverk.dht.ExecutorKey;
+import org.ardverk.dht.FutureManager.Key;
 
 public class DefaultSyncConfig implements SyncConfig {
 
@@ -26,8 +26,8 @@ public class DefaultSyncConfig implements SyncConfig {
     
     // INIT
     {
-        pingConfig.setExecutorKey(ExecutorKey.BACKEND);
-        storeConfig.setExecutorKey(ExecutorKey.BACKEND);
+        pingConfig.setExecutorKey(Key.BACKEND);
+        storeConfig.setExecutorKey(Key.BACKEND);
     }
     
     @Override

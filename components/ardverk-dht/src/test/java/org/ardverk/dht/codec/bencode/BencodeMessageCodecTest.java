@@ -21,14 +21,13 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
 import org.ardverk.dht.KUID;
-import org.ardverk.dht.codec.bencode.BencodeMessageCodec;
 import org.ardverk.dht.message.DefaultPingRequest;
 import org.ardverk.dht.message.Message;
 import org.ardverk.dht.message.MessageId;
 import org.ardverk.dht.message.PingRequest;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.routing.DefaultContact;
 import org.ardverk.dht.routing.Contact.Type;
+import org.ardverk.dht.routing.DefaultContact;
 import org.junit.Test;
 
 
