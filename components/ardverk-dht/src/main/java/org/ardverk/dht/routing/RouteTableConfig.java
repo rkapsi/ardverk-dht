@@ -18,7 +18,7 @@ package org.ardverk.dht.routing;
 
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.dht.FutureManager.Key;
+import org.ardverk.dht.concurrent.DHTExecutor.Key;
 import org.ardverk.dht.config.DefaultPingConfig;
 import org.ardverk.dht.config.PingConfig;
 import org.ardverk.net.NetworkMask;

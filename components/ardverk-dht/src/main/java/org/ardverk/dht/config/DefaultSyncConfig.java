@@ -16,7 +16,7 @@
 
 package org.ardverk.dht.config;
 
-import org.ardverk.dht.FutureManager.Key;
+import org.ardverk.dht.concurrent.DHTExecutor.Key;
 
 public class DefaultSyncConfig implements SyncConfig {
 

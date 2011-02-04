@@ -16,7 +16,7 @@
 
 package org.ardverk.dht.storage;
 
-import org.ardverk.dht.FutureManager.Key;
+import org.ardverk.dht.concurrent.DHTExecutor.Key;
 import org.ardverk.dht.config.DefaultStoreConfig;
 import org.ardverk.dht.config.StoreConfig;
 

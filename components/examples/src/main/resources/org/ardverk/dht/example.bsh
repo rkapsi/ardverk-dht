@@ -134,7 +134,7 @@ put(String key, String value) {
 
 // Stores the given key-value
 put(DHT dht, String key, String value) {
-	ArdverkFuture future = dht.put(kuid(key), toValue(value));
+	DHTFuture future = dht.put(kuid(key), toValue(value));
 		
 	PutEntity entity = future.get();
 	for (StoreResponse response : entity.getStoreResponses()) {
@@ -149,7 +149,7 @@ get(String key) {
 
 // Retrieves the given key-value
 get(DHT dht, String key) {
-	ArdverkFuture future = dht.get(kuid(key));
+	DHTFuture future = dht.get(kuid(key));
 	
 	ValueEntity entity = future.get();
 	String value = toString(entity.getValue());

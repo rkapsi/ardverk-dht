@@ -27,10 +27,10 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.dht.FutureManager.Key;
 import org.ardverk.dht.codec.DefaultMessageCodec;
 import org.ardverk.dht.codec.MessageCodec;
 import org.ardverk.dht.concurrent.DHTFuture;
+import org.ardverk.dht.concurrent.DHTExecutor.Key;
 import org.ardverk.dht.config.BootstrapConfig;
 import org.ardverk.dht.config.DefaultBootstrapConfig;
 import org.ardverk.dht.config.DefaultPutConfig;

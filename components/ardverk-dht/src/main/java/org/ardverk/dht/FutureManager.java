@@ -18,74 +18,23 @@ package org.ardverk.dht;
 
 import java.io.Closeable;
 import java.util.Set;
-import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.collection.IdentityHashSet;
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncProcess;
-import org.ardverk.concurrent.AsyncProcessExecutorService;
-import org.ardverk.concurrent.ExecutorUtils;
 import org.ardverk.concurrent.FutureUtils;
+import org.ardverk.dht.concurrent.DHTExecutor;
 import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.concurrent.DHTFutureTask;
 import org.ardverk.dht.concurrent.DHTProcess;
+import org.ardverk.dht.concurrent.DHTExecutor.Key;
 
 
 /**
  * The {@link FutureManager} manages {@link DHTFuture}s.
  */
 public class FutureManager implements Closeable {
-    
-    private static final AsyncProcessExecutorService CACHED_THREAD_EXECUTOR 
-        = ExecutorUtils.newCachedThreadPool("FutureManagerCachedThread");
-    
-    private static final AsyncProcessExecutorService SINGLE_THREAD_EXECUTOR
-        = ExecutorUtils.newSingleThreadExecutor("FutureManagerSingleThread");
-    
-    /**
-     * The {@link Key} controls how a particular operation should
-     * be executed.
-     */
-    public static enum Key {
-        
-        /**
-         * The {@link #SERIAL} {@link ExecutorKey} executions enqueued operations
-         * in a serial fashion.
-         */
-        SERIAL(SINGLE_THREAD_EXECUTOR),
-        
-        /**
-         * The {@link #PARALLEL} {@link ExecutorKey} executions enqueued operations
-         * in a parallel fashion.
-         */
-        PARALLEL(CACHED_THREAD_EXECUTOR);
-        
-        /**
-         * The default {@link Key} that should be used unless there
-         * is a reason not to use this {@link Key}.
-         */
-        public static final Key DEFAULT = Key.PARALLEL;
-        
-        /**
-         * The {@link Key} that should be used for backend and possibly 
-         * for other low priority operations.
-         */
-        public static final Key BACKEND = Key.SERIAL;
-        
-        private final Executor executor;
-        
-        private Key(Executor executor) {
-            this.executor = executor;
-        }
-
-        /**
-         * Executes the given {@link Runnable}.
-         */
-        private void execute(Runnable command) {
-            executor.execute(command);
-        }
-    }
     
     private final Set<AsyncFuture<?>> futures 
         = new IdentityHashSet<AsyncFuture<?>>();
@@ -118,7 +67,7 @@ public class FutureManager implements Closeable {
         ManagedFutureTask<T> future 
             = new ManagedFutureTask<T>(process, timeout, unit);
         
-        executorKey.execute(future);
+        DHTExecutor.execute(executorKey, future);
         futures.add(future);
         
         return future;
