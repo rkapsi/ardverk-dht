@@ -25,8 +25,7 @@ import org.ardverk.concurrent.ExecutorUtils;
  * The {@link DHTExecutor} provides {@link Executor}s for the DHT.
  */
 public class DHTExecutor {
-
-    // TODO: Use fixed-size Thread Pool with a non-blocking queue?
+    
     private static final AsyncProcessExecutorService CACHED_THREAD_EXECUTOR 
         = ExecutorUtils.newCachedThreadPool("DHTExecutorCachedThread");
     
