@@ -26,7 +26,7 @@ public class DefaultStoreConfig extends DefaultConfig
     private static final long DEFAULT_STORE_TIMEOUT
         = TimeUtils.convert(60L, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
     
-    public int s = 5;
+    public volatile int s = 5;
     
     public DefaultStoreConfig() {
         super(DEFAULT_STORE_TIMEOUT, TimeUnit.MILLISECONDS);
