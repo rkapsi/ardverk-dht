@@ -37,17 +37,22 @@ public interface StoreEntity extends Entity {
     public ValueTuple getValueTuple();
     
     /**
+     * Returns all {@link StoreResponse}s.
+     * 
+     * <p>NOTE: {@link MessageType#STORE} requests are sent out in the order 
+     * as defined in {@link #getContacts()} but the {@link StoreResponse}s 
+     * are sorted in the order as arrived which depends heavily on things
+     * such as network latency and system load on both ends of the system.
+     */
+    public StoreResponse[] getStoreResponses();
+    
+    /**
      * Returns the {@link Contact}s where we attempted to store
      * a value and received responses from.
      * 
      * @see #getStoreResponses()
      */
     public Contact[] getStoreContacts();
-    
-    /**
-     * Returns all {@link StoreResponse}s.
-     */
-    public StoreResponse[] getStoreResponses();
     
     /**
      * Returns {@code true} if all {@link StoreResponse}s indicate
