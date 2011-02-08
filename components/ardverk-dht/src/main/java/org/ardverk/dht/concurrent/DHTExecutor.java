@@ -32,56 +32,22 @@ public class DHTExecutor {
     private static final AsyncProcessExecutorService SINGLE_THREAD_EXECUTOR
         = ExecutorUtils.newSingleThreadExecutor("DHTExecutorSingleThread");
     
-    /**
-     * The {@link Key} controls how a particular operation should
-     * be executed.
-     */
-    public static enum Key {
-        
-        /**
-         * The {@link #SERIAL} {@link Key} executions enqueued operations
-         * in a serial fashion.
-         */
-        SERIAL(SINGLE_THREAD_EXECUTOR),
-        
-        /**
-         * The {@link #PARALLEL} {@link Key} executions enqueued operations
-         * in a parallel fashion.
-         */
-        PARALLEL(CACHED_THREAD_EXECUTOR);
-        
-        /**
-         * The default {@link Key} that should be used unless there
-         * is a reason not to use this {@link Key}.
-         */
-        public static final Key DEFAULT = Key.PARALLEL;
-        
-        /**
-         * The {@link Key} that should be used for backend and possibly 
-         * for other low priority operations.
-         */
-        public static final Key BACKEND = Key.SERIAL;
-        
-        private final Executor executor;
-        
-        private Key(Executor executor) {
-            this.executor = executor;
-        }
-    
-        /**
-         * Executes the given {@link Runnable}.
-         */
-        private void execute(Runnable command) {
-            executor.execute(command);
-        }
-    }
-    
     private DHTExecutor() {}
     
     /**
      * Executes the given {@link Runnable}.
      */
-    public static void execute(Key executorKey, Runnable command) {
-        executorKey.execute(command);
+    public static void execute(ExecutorKey executorKey, Runnable command) {
+        switch (executorKey) {
+            case SERIAL:
+                SINGLE_THREAD_EXECUTOR.execute(command);
+                break;
+            case PARALLEL:
+                CACHED_THREAD_EXECUTOR.execute(command);
+                break;
+            default:
+                throw new IllegalArgumentException(
+                        "executorKey=" + executorKey);
+        }
     }
 }

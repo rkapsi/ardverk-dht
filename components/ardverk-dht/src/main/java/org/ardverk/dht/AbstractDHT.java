@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.concurrent.DHTProcess;
-import org.ardverk.dht.concurrent.DHTExecutor.Key;
+import org.ardverk.dht.concurrent.ExecutorKey;
 import org.ardverk.dht.config.Config;
 import org.ardverk.dht.config.PingConfig;
 import org.ardverk.dht.entity.PingEntity;
@@ -77,13 +77,13 @@ abstract class AbstractDHT implements DHT, Closeable {
     
     @Override
     public <V> DHTFuture<V> submit(DHTProcess<V> process, Config config) {
-        Key executorKey = config.getExecutorKey();
+        ExecutorKey executorKey = config.getExecutorKey();
         long timeout = config.getOperationTimeoutInMillis();
         return submit(executorKey, process, timeout, TimeUnit.MILLISECONDS);
     }
 
     @Override
-    public <V> DHTFuture<V> submit(Key executorKey,
+    public <V> DHTFuture<V> submit(ExecutorKey executorKey,
             DHTProcess<V> process, long timeout, TimeUnit unit) {
         return futureManager.submit(executorKey, process, timeout, unit);
     }

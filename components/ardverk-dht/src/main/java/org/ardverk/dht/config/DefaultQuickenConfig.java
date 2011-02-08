@@ -18,7 +18,7 @@ package org.ardverk.dht.config;
 
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.dht.concurrent.DHTExecutor.Key;
+import org.ardverk.dht.concurrent.ExecutorKey;
 import org.ardverk.utils.TimeUtils;
 
 
@@ -37,7 +37,7 @@ public class DefaultQuickenConfig extends AbstractConfig implements QuickenConfi
         = TimeUtils.convert(5L*60L, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
     
     @Override
-    public void setExecutorKey(Key executorKey) {
+    public void setExecutorKey(ExecutorKey executorKey) {
         super.setExecutorKey(executorKey);
         pingConfig.setExecutorKey(executorKey);
         lookupConfig.setExecutorKey(executorKey);

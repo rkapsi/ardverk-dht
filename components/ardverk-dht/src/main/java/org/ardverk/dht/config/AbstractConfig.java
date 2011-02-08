@@ -18,7 +18,7 @@ package org.ardverk.dht.config;
 
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.dht.concurrent.DHTExecutor.Key;
+import org.ardverk.dht.concurrent.ExecutorKey;
 import org.ardverk.dht.routing.Contact;
 
 
@@ -26,15 +26,15 @@ public abstract class AbstractConfig implements Config {
 
     private volatile double adaptiveTimeoutMultiplier = -1;
     
-    private volatile Key executorKey = Key.DEFAULT;
+    private volatile ExecutorKey executorKey = ExecutorKey.DEFAULT;
     
     @Override
-    public Key getExecutorKey() {
+    public ExecutorKey getExecutorKey() {
         return executorKey;
     }
 
     @Override
-    public void setExecutorKey(Key executorKey) {
+    public void setExecutorKey(ExecutorKey executorKey) {
         this.executorKey = executorKey;
     }
 

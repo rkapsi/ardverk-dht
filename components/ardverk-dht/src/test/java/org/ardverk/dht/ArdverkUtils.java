@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 import org.ardverk.dht.codec.DefaultMessageCodec;
 import org.ardverk.dht.codec.MessageCodec;
 import org.ardverk.dht.concurrent.DHTFuture;
-import org.ardverk.dht.concurrent.DHTExecutor.Key;
+import org.ardverk.dht.concurrent.ExecutorKey;
 import org.ardverk.dht.config.BootstrapConfig;
 import org.ardverk.dht.config.DefaultBootstrapConfig;
 import org.ardverk.dht.config.DefaultPutConfig;
@@ -118,7 +118,7 @@ public class ArdverkUtils {
             = new ArrayList<DHTFuture<BootstrapEntity>>();
         
         BootstrapConfig config = new DefaultBootstrapConfig();
-        config.setExecutorKey(Key.BACKEND);
+        config.setExecutorKey(ExecutorKey.BACKEND);
         
         for (int i = 0; i < length; i++) {
             DHTFuture<BootstrapEntity> future 
@@ -142,7 +142,7 @@ public class ArdverkUtils {
             = new ArrayList<DHTFuture<QuickenEntity>>();
         
         DefaultQuickenConfig config = new DefaultQuickenConfig();
-        config.setExecutorKey(Key.BACKEND);
+        config.setExecutorKey(ExecutorKey.BACKEND);
         
         for (int i = 0; i < length; i++) {
             config.setBucketTimeout(-1L, TimeUnit.MILLISECONDS);
@@ -190,7 +190,7 @@ public class ArdverkUtils {
         }
         
         final DefaultPutConfig putConfig = new DefaultPutConfig();
-        putConfig.setExecutorKey(Key.BACKEND);
+        putConfig.setExecutorKey(ExecutorKey.BACKEND);
         
         int count = 30000;
         DHTFuture<PutEntity> future = null;

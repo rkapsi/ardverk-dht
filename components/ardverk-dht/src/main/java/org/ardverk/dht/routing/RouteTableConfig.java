@@ -18,7 +18,7 @@ package org.ardverk.dht.routing;
 
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.dht.concurrent.DHTExecutor.Key;
+import org.ardverk.dht.concurrent.ExecutorKey;
 import org.ardverk.dht.config.DefaultPingConfig;
 import org.ardverk.dht.config.PingConfig;
 import org.ardverk.net.NetworkMask;
@@ -56,7 +56,7 @@ public class RouteTableConfig {
     
     // INIT
     {
-        pingConfig.setExecutorKey(Key.BACKEND);
+        pingConfig.setExecutorKey(ExecutorKey.BACKEND);
     }
     
     public RouteTableConfig() {

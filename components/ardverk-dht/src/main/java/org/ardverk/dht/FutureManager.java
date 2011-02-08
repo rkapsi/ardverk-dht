@@ -28,7 +28,7 @@ import org.ardverk.dht.concurrent.DHTExecutor;
 import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.concurrent.DHTFutureTask;
 import org.ardverk.dht.concurrent.DHTProcess;
-import org.ardverk.dht.concurrent.DHTExecutor.Key;
+import org.ardverk.dht.concurrent.ExecutorKey;
 
 
 /**
@@ -57,7 +57,7 @@ public class FutureManager implements Closeable {
      * Submits the given {@link DHTProcess} for execution and returns
      * an {@link DHTFuture} for it.
      */
-    public synchronized <T> DHTFuture<T> submit(Key executorKey, 
+    public synchronized <T> DHTFuture<T> submit(ExecutorKey executorKey, 
             DHTProcess<T> process, long timeout, TimeUnit unit) {
         
         if (!open) {
