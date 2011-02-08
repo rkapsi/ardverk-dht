@@ -18,6 +18,8 @@ package org.ardverk.dht.entity;
 
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.message.StoreResponse;
+import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.storage.ValueTuple;
 
 /**
  * The result of a {@link MessageType#STORE} operation.
@@ -25,7 +27,33 @@ import org.ardverk.dht.message.StoreResponse;
 public interface StoreEntity extends Entity {
     
     /**
+     * Returns all {@link Contact}s along the store path.
+     */
+    public Contact[] getContacts();
+    
+    /**
+     * Returns the {@link ValueTuple} that was stored.
+     */
+    public ValueTuple getValueTuple();
+    
+    /**
+     * Returns the {@link Contact}s where we attempted to store
+     * a value and received responses from.
+     * 
+     * @see #getStoreResponses()
+     */
+    public Contact[] getStoreContacts();
+    
+    /**
      * Returns all {@link StoreResponse}s.
      */
     public StoreResponse[] getStoreResponses();
+    
+    /**
+     * Returns {@code true} if all {@link StoreResponse}s indicate
+     * that they were successful.
+     * 
+     * @see #getStoreResponses()
+     */
+    public boolean isSuccess();
 }

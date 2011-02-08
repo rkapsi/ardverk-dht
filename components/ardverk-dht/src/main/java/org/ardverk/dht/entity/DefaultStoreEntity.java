@@ -19,23 +19,63 @@ package org.ardverk.dht.entity;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.dht.message.StoreResponse;
+import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.storage.Database.Condition;
+import org.ardverk.dht.storage.DefaultCondition;
+import org.ardverk.dht.storage.ValueTuple;
 
 /**
  * A default implementation of {@link StoreEntity}.
  */
 public class DefaultStoreEntity extends AbstractEntity implements StoreEntity {
 
+    private final Contact[] contacts;
+    
+    private final ValueTuple tuple;
+    
     private final StoreResponse[] responses;
     
-    public DefaultStoreEntity(StoreResponse[] responses, 
-            long time, TimeUnit unit) {
+    public DefaultStoreEntity(Contact[] contacts, ValueTuple tuple, 
+            StoreResponse[] responses, long time, TimeUnit unit) {
         super(time, unit);
         
+        this.contacts = contacts;
+        this.tuple = tuple;
         this.responses = responses;
+    }
+    
+    @Override
+    public Contact[] getContacts() {
+        return contacts;
+    }
+
+    @Override
+    public ValueTuple getValueTuple() {
+        return tuple;
+    }
+    
+    @Override
+    public Contact[] getStoreContacts() {
+        Contact[] contacts = new Contact[responses.length];
+        for (int i = 0; i < responses.length; i++) {
+            contacts[i] = responses[i].getContact();
+        }
+        return contacts;
     }
 
     @Override
     public StoreResponse[] getStoreResponses() {
         return responses;
+    }
+    
+    @Override
+    public boolean isSuccess() {
+        for (StoreResponse response : responses) {
+            Condition condition = response.getCondition();
+            if (!condition.equals(DefaultCondition.SUCCESS)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

@@ -50,7 +50,9 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
 
     private final TimeStamp creationTime = TimeStamp.now();
     
-    private final Iterator<Contact> contacts;
+    private final Contact[] contacts;
+    
+    private final Iterator<Contact> it;
     
     private final int k;
     
@@ -64,7 +66,8 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
             ValueTuple tuple, StoreConfig config) {
         super(messageDispatcher);
         
-        this.contacts = Iterators.fromArray(contacts);
+        this.contacts = contacts;
+        this.it = Iterators.fromArray(contacts);
         this.k = k;
         
         this.tuple = Arguments.notNull(tuple, "tuple");
@@ -83,11 +86,11 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
             preProcess(pop);
             
             while (counter.hasNext() && counter.getCount() < k) {
-                if (!contacts.hasNext()) {
+                if (!it.hasNext()) {
                     break;
                 }
                 
-                Contact contact = contacts.next();
+                Contact contact = it.next();
                 store(contact);
                 
                 counter.increment();
@@ -112,7 +115,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
             if (values.length == 0) {
                 setException(new StoreException(tuple, time, TimeUnit.MILLISECONDS));
             } else {
-                setValue(new DefaultStoreEntity(values, 
+                setValue(new DefaultStoreEntity(contacts, tuple, values, 
                         time, TimeUnit.MILLISECONDS));
             }
         }

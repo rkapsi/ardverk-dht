@@ -19,6 +19,7 @@ package org.ardverk.dht.entity;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.dht.message.StoreResponse;
+import org.ardverk.dht.routing.Contact;
 
 /**
  * A default implementation of {@link PutEntity}.
@@ -51,5 +52,15 @@ public class DefaultPutEntity extends AbstractLookupEntity implements PutEntity 
     @Override
     public StoreResponse[] getStoreResponses() {
         return storeEntity.getStoreResponses();
+    }
+    
+    @Override
+    public Contact[] getStoreContacts() {
+        return storeEntity.getStoreContacts();
+    }
+
+    @Override
+    public boolean isSuccess() {
+        return storeEntity.isSuccess();
     }
 }
