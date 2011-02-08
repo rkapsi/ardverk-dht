@@ -58,8 +58,8 @@ createDHT(int port) {
 	
 	MessageCodec codec = new DefaultMessageCodec(SECRET_KEY, INIT_VECTOR);
 	//dht.bind(new SocketTransport(codec, port));
-	//dht.bind(new DatagramTransport(codec, port));
-	dht.bind(new HybridTransport(codec, port));
+	dht.bind(new DatagramTransport(codec, port));
+	//dht.bind(new HybridTransport(codec, port));
 	
 	return dht;
 }
@@ -196,7 +196,7 @@ init() {
 
 init(boolean withUI) {
 	INSTANCE_COUNT = 256;
-	INITIAL_PORT = 2000;
+	INITIAL_PORT = 12000;
 
 	print("Creating DHTs...");
 	createDHTs(INSTANCE_COUNT, INITIAL_PORT);
