@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.SocketAddress;
 import java.security.MessageDigest;
 
+import org.ardverk.coding.CodingUtils;
 import org.ardverk.dht.message.Message;
 
 
@@ -60,7 +61,10 @@ public class DigestMessageCodec extends AbstractMessageCodec {
         
         for (int i = 0; i < digest.length; i++) {
             if (digest[i] != data[offset + payload + i]) {
-                throw new IOException("Checksum Error in Message");
+                throw new IOException("Checksum Error in Message: "
+                        + "src=" + src
+                        + ", given=" + CodingUtils.encodeBase16(data, offset + payload, digest.length) 
+                        + ", expected=" + CodingUtils.encodeBase16(digest));
             }
         }
             
