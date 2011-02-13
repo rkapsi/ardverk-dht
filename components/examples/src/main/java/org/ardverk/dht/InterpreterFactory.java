@@ -16,21 +16,26 @@
 
 package org.ardverk.dht;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.Constructor;
 
+import org.ardverk.io.IoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import bsh.EvalError;
 import bsh.Interpreter;
 
 /**
  * An utility class to create {@link Interpreter}s.
  */
-class InterpreterFactory {
+public class InterpreterFactory {
 
-    private static final Logger LOG = LoggerFactory.getLogger(InterpreterFactory.class);
+    private static final Logger LOG 
+        = LoggerFactory.getLogger(InterpreterFactory.class);
     
     static {
         Interpreter.DEBUG = LOG.isDebugEnabled();
@@ -42,6 +47,37 @@ class InterpreterFactory {
     public static Interpreter create() {
         Reader in = createCommandLineReader();
         return new Interpreter(in, System.out, System.err, true);
+    }
+    
+    public static Interpreter create(Class<?> clazz, String name) {
+        Reader reader = getResourceAsStream(clazz, name);
+        try {
+            return create(reader);
+        } finally {
+            IoUtils.close(reader);
+        }
+    }
+    
+    public static Interpreter create(Reader reader) {
+        Interpreter interpreter = create();
+        
+        if (reader != null) {
+            try {
+                interpreter.eval(reader);
+            } catch (EvalError err) {
+                throw new IllegalStateException(err);
+            }
+        }
+        
+        return interpreter;
+    }
+    
+    private static Reader getResourceAsStream(Class<?> clazz, String name) {
+        InputStream in = clazz.getResourceAsStream(name);
+        if (in != null) {
+            return new BufferedReader(new InputStreamReader(in));
+        }
+        return null;
     }
     
     // HACK: Why is CommandLineReader a package private class?
