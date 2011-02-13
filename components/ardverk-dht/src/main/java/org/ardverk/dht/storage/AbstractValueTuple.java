@@ -23,7 +23,7 @@ import org.ardverk.lang.TimeStamp;
 /**
  * An abstract implementation of {@link ValueTuple}.
  */
-abstract class AbstractValueTuple implements ValueTuple {
+public abstract class AbstractValueTuple implements ValueTuple {
 
     private final TimeStamp creationTime = TimeStamp.now();
     
