@@ -65,6 +65,13 @@ public class DefaultDatabase extends AbstractDatabase {
         return DefaultCondition.SUCCESS;
     }
     
+    /**
+     * Removes the given {@link ValueTuple}.
+     */
+    public synchronized boolean remove(ValueTuple tuple) {
+        return database.remove(tuple.getId()) != null;
+    }
+    
     @Override
     public synchronized int size() {
         return database.size();
