@@ -16,6 +16,7 @@
 
 package org.ardverk.dht.storage;
 
+
 /**
  * An abstract implementation of {@link Value}.
  */
@@ -24,5 +25,10 @@ public abstract class AbstractValue implements Value {
     @Override
     public byte[] getContentAsBytes() {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return getContentLength() == 0L;
     }
 }

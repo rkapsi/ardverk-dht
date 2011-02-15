@@ -42,4 +42,9 @@ public interface Value {
      * thrown an {@link UnsupportedOperationException}.
      */
     public byte[] getContentAsBytes();
+    
+    /**
+     * Returns {@code true} if the {@link Value} is empty.
+     */
+    public boolean isEmpty();
 }

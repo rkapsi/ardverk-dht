@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 import org.ardverk.collection.CollectionUtils;
 import org.ardverk.dht.io.Outcome;
 import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.storage.Descriptor;
 import org.ardverk.dht.storage.Value;
 import org.ardverk.dht.storage.ValueTuple;
 
@@ -41,24 +42,31 @@ public class DefaultValueEntity extends AbstractLookupEntity implements ValueEnt
         this.values = values;
     }
     
+    
+    
     @Override
     public Contact getSender() {
-        return getValueTuple().getSender();
+        return getDescriptor().getSender();
     }
     
     @Override
     public Contact getCreator() {
-        return getValueTuple().getCreator();
+        return getCreator();
     }
 
     @Override
-    public Value getValue() {
-        return getValueTuple().getValue();
+    public ValueTuple getValueTuple() {
+        return CollectionUtils.first(values);
     }
     
     @Override
-    public ValueTuple getValueTuple() {
-        return CollectionUtils.first(values);
+    public Descriptor getDescriptor() {
+        return getValueTuple().getDescriptor();
+    }
+    
+    @Override
+    public Value getValue() {
+        return getValueTuple().getValue();
     }
     
     @Override

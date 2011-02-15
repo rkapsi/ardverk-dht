@@ -16,9 +16,6 @@
 
 package org.ardverk.dht.storage;
 
-import org.ardverk.dht.KUID;
-import org.ardverk.dht.routing.Contact;
-import org.ardverk.lang.Arguments;
 
 
 /**
@@ -26,63 +23,22 @@ import org.ardverk.lang.Arguments;
  */
 public class DefaultValueTuple extends AbstractValueTuple {
     
-    private final Contact sender;
-    
-    private final Contact creator;
-    
-    private final KUID valueId;
+    private final Descriptor descriptor;
     
     private final Value value;
     
-    public DefaultValueTuple(Contact contact, KUID valueId, Value value) {
-        this (contact, contact, valueId, value);
-    }
-    
-    public DefaultValueTuple(Contact sender, Contact creator, 
-            KUID valueId, Value value) {
-        
-        this.sender = Arguments.notNull(sender, "sender");
-        this.creator = Arguments.notNull(
-                pickCreator(sender, creator), "creator");
-        
-        this.valueId = Arguments.notNull(valueId, "valueId");
-        this.value = Arguments.notNull(value, "value");
+    public DefaultValueTuple(Descriptor descriptor, Value value) {
+        this.descriptor = descriptor;
+        this.value = value;
     }
 
     @Override
-    public Contact getSender() {
-        return sender;
-    }
-    
-    @Override
-    public Contact getCreator() {
-        return creator;
-    }
-    
-    @Override
-    public KUID getId() {
-        return valueId;
+    public Descriptor getDescriptor() {
+        return descriptor;
     }
     
     @Override
     public Value getValue() {
         return value;
-    }
-
-    @Override
-    public long getContentLength() {
-        return value.getContentLength();
-    }
-    
-    /**
-     * To save memory we're trying to re-use the {@link Contact}
-     * instance if sender and creator are the same.
-     */
-    private static Contact pickCreator(Contact sender, Contact creator) {
-        if (creator == null || sender.equals(creator)) {
-            return sender;
-        }
-        
-        return creator;
     }
 }

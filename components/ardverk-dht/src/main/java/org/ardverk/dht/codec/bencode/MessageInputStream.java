@@ -50,7 +50,9 @@ import org.ardverk.dht.routing.DefaultContact;
 import org.ardverk.dht.storage.ByteArrayValue;
 import org.ardverk.dht.storage.Database.Condition;
 import org.ardverk.dht.storage.DefaultCondition;
+import org.ardverk.dht.storage.DefaultDescriptor;
 import org.ardverk.dht.storage.DefaultValueTuple;
+import org.ardverk.dht.storage.Descriptor;
 import org.ardverk.dht.storage.Value;
 import org.ardverk.dht.storage.ValueTuple;
 import org.ardverk.net.NetworkUtils;
@@ -150,14 +152,17 @@ class MessageInputStream extends BencodingInputStream {
         return DefaultCondition.valueOf(code, value);
     }
     
+    public Descriptor readDescriptor(Contact contact) throws IOException {
+        Contact creator = readContact();
+        KUID valueId = readKUID();
+        return new DefaultDescriptor(contact, creator, valueId);
+    }
+    
     public ValueTuple readValueTuple(Contact contact, 
             SocketAddress address) throws IOException {
-        Contact creator = readContact();
-        
-        KUID valueId = readKUID();
+        Descriptor descriptor = readDescriptor(contact);
         Value value = readValue();
-        
-        return new DefaultValueTuple(contact, creator, valueId, value);
+        return new DefaultValueTuple(descriptor, value);
     }
     
     public Value readValue() throws IOException {

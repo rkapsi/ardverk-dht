@@ -55,8 +55,9 @@ public class DefaultDatabase extends AbstractDatabase {
     @Override
     public synchronized Condition store(ValueTuple tuple) {
         KUID valueId = tuple.getId();
+        Value value = tuple.getValue();
         
-        if (!tuple.isEmpty()) {
+        if (!value.isEmpty()) {
             database.put(valueId, tuple);
         } else {
             database.remove(valueId);

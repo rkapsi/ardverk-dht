@@ -17,7 +17,6 @@
 package org.ardverk.dht.storage;
 
 import org.ardverk.dht.lang.Identifier;
-import org.ardverk.dht.routing.Contact;
 import org.ardverk.lang.Age;
 import org.ardverk.lang.Epoch;
 
@@ -31,29 +30,12 @@ import org.ardverk.lang.Epoch;
 public interface ValueTuple extends Identifier, Epoch, Age {
     
     /**
-     * Returns the sender of the {@link ValueTuple}.
+     * Returns the {@link Descriptor} of the {@link ValueTuple}.
      */
-    public Contact getSender();
+    public Descriptor getDescriptor();
     
     /**
-     * Returns the creator of the {@link ValueTuple}.
-     */
-    public Contact getCreator();
-    
-    /**
-     * Returns the value of the {@link ValueTuple}.
+     * Returns the {@link Value} of the {@link ValueTuple}.
      */
     public Value getValue();
-    
-    /**
-     * Returns the {@link Value}'s content length.
-     * 
-     * @see #getValue()
-     */
-    public long getContentLength();
-    
-    /**
-     * Returns {@code true} if the value is empty.
-     */
-    public boolean isEmpty();
 }

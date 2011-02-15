@@ -18,37 +18,30 @@ package org.ardverk.dht.storage;
 
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.lang.TimeStamp;
+import org.ardverk.dht.KUID;
 
 /**
  * An abstract implementation of {@link ValueTuple}.
  */
 public abstract class AbstractValueTuple implements ValueTuple {
-
-    private final TimeStamp creationTime = TimeStamp.now();
     
     @Override
+    public KUID getId() {
+        return getDescriptor().getId();
+    }
+
+    @Override
     public long getCreationTime() {
-        return creationTime.getCreationTime();
+        return getDescriptor().getCreationTime();
     }
     
     @Override
     public long getAge(TimeUnit unit) {
-        return creationTime.getAge(unit);
+        return getDescriptor().getAge(unit);
     }
 
     @Override
     public long getAgeInMillis() {
-        return creationTime.getAgeInMillis();
-    }
-
-    @Override
-    public long getContentLength() {
-        return getValue().getContentLength();
-    }
-    
-    @Override
-    public boolean isEmpty() {
-        return getContentLength() == 0;
+        return getDescriptor().getAgeInMillis();
     }
 }

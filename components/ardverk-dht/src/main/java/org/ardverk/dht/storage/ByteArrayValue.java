@@ -25,7 +25,7 @@ import org.ardverk.lang.Bytes;
 /**
  * An implementation of {@link Value} for {@code byte[])s.
  */
-public class ByteArrayValue implements Value {
+public class ByteArrayValue extends AbstractValue {
 
     public static final Value EMPTY = new ByteArrayValue(Bytes.EMPTY);
     

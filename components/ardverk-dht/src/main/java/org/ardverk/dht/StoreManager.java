@@ -34,7 +34,9 @@ import org.ardverk.dht.io.StoreResponseHandler;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.ByteArrayValue;
+import org.ardverk.dht.storage.DefaultDescriptor;
 import org.ardverk.dht.storage.DefaultValueTuple;
+import org.ardverk.dht.storage.Descriptor;
 import org.ardverk.dht.storage.Value;
 import org.ardverk.dht.storage.ValueTuple;
 
@@ -156,8 +158,10 @@ public class StoreManager {
             KUID valueId, Value value, StoreConfig config) {
         
         Contact localhost = dht.getLocalhost();
+        
+        Descriptor descriptor = new DefaultDescriptor(localhost, valueId);
         ValueTuple valueTuple = new DefaultValueTuple(
-                localhost, valueId, value);
+                descriptor, value);
         
         return store(dst, valueTuple, config);
     }

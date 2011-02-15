@@ -18,6 +18,7 @@ package org.ardverk.dht.entity;
 
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.storage.Descriptor;
 import org.ardverk.dht.storage.Value;
 import org.ardverk.dht.storage.ValueTuple;
 
@@ -49,6 +50,13 @@ public interface ValueEntity extends LookupEntity {
      * @see ValueTuple#getValue()
      */
     public Value getValue();
+    
+    /**
+     * Returns the first {@link ValueTuple}'s {@link Descriptor}.
+     * 
+     * @see #getValueTuple()
+     */
+    public Descriptor getDescriptor();
     
     /**
      * Returns the first {@link ValueTuple}.
