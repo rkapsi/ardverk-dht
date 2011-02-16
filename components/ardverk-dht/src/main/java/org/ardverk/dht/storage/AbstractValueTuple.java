@@ -16,8 +16,6 @@
 
 package org.ardverk.dht.storage;
 
-import java.util.concurrent.TimeUnit;
-
 import org.ardverk.dht.KUID;
 
 /**
@@ -28,20 +26,5 @@ public abstract class AbstractValueTuple implements ValueTuple {
     @Override
     public KUID getId() {
         return getDescriptor().getId();
-    }
-
-    @Override
-    public long getCreationTime() {
-        return getDescriptor().getCreationTime();
-    }
-    
-    @Override
-    public long getAge(TimeUnit unit) {
-        return getDescriptor().getAge(unit);
-    }
-
-    @Override
-    public long getAgeInMillis() {
-        return getDescriptor().getAgeInMillis();
     }
 }

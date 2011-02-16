@@ -48,29 +48,44 @@ public class DefaultDatabase extends AbstractDatabase {
     }
 
     @Override
-    public synchronized ValueTuple get(KUID valueId) {
-        return database.get(valueId);
-    }
-
-    @Override
     public synchronized Condition store(ValueTuple tuple) {
-        KUID valueId = tuple.getId();
         Value value = tuple.getValue();
         
         if (!value.isEmpty()) {
-            database.put(valueId, tuple);
+            add(tuple);
         } else {
-            database.remove(valueId);
+            remove(tuple.getId());
         }
         
         return DefaultCondition.SUCCESS;
     }
     
+    @Override
+    public synchronized ValueTuple get(KUID valueId) {
+        return database.get(valueId);
+    }
+    
     /**
-     * Removes the given {@link ValueTuple}.
+     * Adds the given {@link ValueTuple}.
      */
-    public synchronized boolean remove(ValueTuple tuple) {
-        return database.remove(tuple.getId()) != null;
+    public synchronized ValueTuple add(ValueTuple tuple) {
+        assert (!tuple.getValue().isEmpty());
+        KUID valueId = tuple.getId();
+        return database.put(valueId, tuple);
+    }
+    
+    /**
+     * Removes and returns a {@link ValueTuple}.
+     */
+    public synchronized ValueTuple remove(ValueTuple tuple) {
+        return database.remove(tuple.getId());
+    }
+    
+    /**
+     * Removes and returns a {@link ValueTuple}.
+     */
+    public synchronized ValueTuple remove(KUID valueId) {
+        return database.remove(valueId);
     }
     
     @Override
@@ -108,8 +123,8 @@ public class DefaultDatabase extends AbstractDatabase {
     public synchronized String toString() {
         StringBuilder buffer = new StringBuilder();
         
-        for (ValueTuple entity : database.values()) {
-            buffer.append(entity).append("\n");
+        for (ValueTuple tuple : database.values()) {
+            buffer.append(tuple).append("\n");
         }
         
         return buffer.toString();

@@ -17,9 +17,6 @@
 package org.ardverk.dht.storage;
 
 import org.ardverk.dht.lang.Identifier;
-import org.ardverk.lang.Age;
-import org.ardverk.lang.Epoch;
-
 
 /**
  * A {@link ValueTuple} is at its core a simple key-value pair
@@ -27,7 +24,7 @@ import org.ardverk.lang.Epoch;
  * sender of the value, when it was created and what it's current
  * age is.
  */
-public interface ValueTuple extends Identifier, Epoch, Age {
+public interface ValueTuple extends Identifier {
     
     /**
      * Returns the {@link Descriptor} of the {@link ValueTuple}.
