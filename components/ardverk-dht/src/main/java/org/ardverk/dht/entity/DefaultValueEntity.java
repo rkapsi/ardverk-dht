@@ -42,8 +42,6 @@ public class DefaultValueEntity extends AbstractLookupEntity implements ValueEnt
         this.values = values;
     }
     
-    
-    
     @Override
     public Contact getSender() {
         return getDescriptor().getSender();
@@ -51,7 +49,7 @@ public class DefaultValueEntity extends AbstractLookupEntity implements ValueEnt
     
     @Override
     public Contact getCreator() {
-        return getCreator();
+        return getDescriptor().getCreator();
     }
 
     @Override
