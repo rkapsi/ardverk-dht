@@ -94,10 +94,10 @@ public class SyncManager {
                 = new DHTValueFuture<SyncEntity>();
             
             // The number of PINGs we've sent
-            final AtomicInteger pingCounter = new AtomicInteger();
+            final CountDown pingCounter = new CountDown();
             
             // The number of STOREs we've sent
-            final AtomicInteger storeCounter = new AtomicInteger();
+            final CountDown storeCounter = new CountDown();
             
             for (final ValueTuple tuple : database.values()) {
                 KUID valueId = tuple.getId();
@@ -207,8 +207,8 @@ public class SyncManager {
                 }
             });
             
-            if (pingCounter.get() == 0 
-                    && storeCounter.get() == 0) {
+            if (pingCounter.countDown() 
+                    && storeCounter.countDown()) {
                 long time = creationTime.getAgeInMillis();
                 userFuture.setValue(new DefaultSyncEntity(time, TimeUnit.MILLISECONDS));
             }
@@ -267,7 +267,7 @@ public class SyncManager {
             countDown = new CountDown(futures.size());
             
             // It's possible that countdown is 0!
-            if (0 < countDown.getInitialValue()) {
+            if (0 < countDown.get()) {
                 AsyncFutureListener<PingEntity> listener 
                         = new AsyncFutureListener<PingEntity>() {
                     @Override

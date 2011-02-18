@@ -148,7 +148,7 @@ public class QuickenManager {
             countDown = new CountDown(pingFutures.length + lookupFutures.length);
             
             // It's possible that countdown is 0!
-            if (0 < countDown.getInitialValue()) {
+            if (0 < countDown.get()) {
                 AsyncFutureListener<?> listener 
                         = new AsyncFutureListener<Object>() {
                     @Override
