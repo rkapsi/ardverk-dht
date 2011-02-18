@@ -19,10 +19,10 @@ package org.ardverk.dht;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
+import org.ardverk.concurrent.CountDown;
 import org.ardverk.concurrent.FutureUtils;
 import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.concurrent.DHTValueFuture;
@@ -129,7 +129,7 @@ public class QuickenManager {
     
     public static class QuickenFuture extends DHTValueFuture<QuickenEntity> {
         
-        private final AtomicInteger countdown = new AtomicInteger();
+        private final CountDown countDown;
         
         private final TimeStamp timeStamp;
         
@@ -145,10 +145,10 @@ public class QuickenManager {
             this.pingFutures = pingFutures;
             this.lookupFutures = lookupFutures;
             
-            countdown.set(pingFutures.length + lookupFutures.length);
+            countDown = new CountDown(pingFutures.length + lookupFutures.length);
             
             // It's possible that countdown is 0!
-            if (0 < countdown.get()) {
+            if (0 < countDown.getInitialValue()) {
                 AsyncFutureListener<?> listener 
                         = new AsyncFutureListener<Object>() {
                     @Override
@@ -188,7 +188,7 @@ public class QuickenManager {
         }
         
         private void coutdown() {
-            if (countdown.decrementAndGet() == 0) {
+            if (countDown.countDown()) {
                 complete();
             }
         }

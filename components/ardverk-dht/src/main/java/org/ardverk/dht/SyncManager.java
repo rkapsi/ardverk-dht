@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
+import org.ardverk.concurrent.CountDown;
 import org.ardverk.concurrent.FutureUtils;
 import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.concurrent.DHTValueFuture;
@@ -253,7 +254,7 @@ public class SyncManager {
     
     private static class PingFuture extends DHTValueFuture<Sync> {
         
-        private final AtomicInteger countdown = new AtomicInteger();
+        private final CountDown countDown;
         
         private final List<DHTFuture<PingEntity>> futures;
         
@@ -263,10 +264,10 @@ public class SyncManager {
             this.futures = futures;
             this.index = index;
             
-            countdown.set(futures.size());
+            countDown = new CountDown(futures.size());
             
             // It's possible that countdown is 0!
-            if (0 < countdown.get()) {
+            if (0 < countDown.getInitialValue()) {
                 AsyncFutureListener<PingEntity> listener 
                         = new AsyncFutureListener<PingEntity>() {
                     @Override
@@ -291,7 +292,7 @@ public class SyncManager {
         }
         
         private void coutdown() {
-            if (countdown.decrementAndGet() == 0) {
+            if (countDown.countDown()) {
                 complete();
             }
         }
