@@ -215,18 +215,22 @@ public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>,
             throw new IllegalArgumentException("otherKey=" + otherId);            
         }
         
-        int lengthInBits = lengthInBits();
         boolean allNull = true;
-        for (int i = 0; i < lengthInBits; i++) {
-            boolean value = isBitSet(i);
-                
-            if (value) {
-                allNull = false;
+        for (int i = 0; i < key.length; i++) {
+            byte b1 = key[i];
+            byte b2 = otherId.key[i];
+            
+            if (b1 != b2) {
+                int xor = b1 ^ b2;
+                for (int j = 0; j < Byte.SIZE; j++) {
+                    if ((xor & mask(j)) != 0) {
+                        return (i * Byte.SIZE) + j;
+                    }
+                }
             }
             
-            boolean otherValue = otherId.isBitSet(i);
-            if (value != otherValue) {
-                return i;
+            if (b1 != 0) {
+                allNull = false;
             }
         }
         
