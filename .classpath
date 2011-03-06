@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="components/ardverk-dht/src/main/java"/>
-	<classpathentry kind="src" path="components/ardverk-dht/src/test/java"/>
+	<classpathentry kind="src" path="components/core/src/main/java"/>
+	<classpathentry kind="src" path="components/core/src/test/java"/>
 	<classpathentry kind="src" path="components/examples/src/main/java"/>
 	<classpathentry kind="src" path="components/examples/src/main/resources"/>
 	<classpathentry kind="src" path="components/tools/src/main/java"/>
