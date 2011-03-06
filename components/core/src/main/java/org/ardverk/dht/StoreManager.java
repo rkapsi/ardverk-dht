@@ -145,7 +145,8 @@ public class StoreManager {
                         }
                         
                         private void handleVectorClock(ValueEntity entity) {
-                            VectorClock<KUID> clock = entity.getVectorClock();
+                            Descriptor descriptor = entity.getDescriptor();
+                            VectorClock<KUID> clock = descriptor.getVectorClock();
                             doStore(nodeEntity, clock);
                         }
                         
@@ -237,9 +238,10 @@ public class StoreManager {
         }
         
         Descriptor descriptor = new DefaultDescriptor(
-                localhost, resource);
+                localhost, resource, update);
+        
         ValueTuple valueTuple = new DefaultValueTuple(
-                descriptor, update, value);
+                descriptor, value);
         
         return store(dst, valueTuple, config);
     }

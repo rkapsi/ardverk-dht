@@ -16,8 +16,6 @@
 
 package org.ardverk.dht.storage;
 
-import org.ardverk.dht.KUID;
-import org.ardverk.version.VectorClock;
 
 
 
@@ -28,14 +26,10 @@ public class DefaultValueTuple extends AbstractValueTuple {
     
     private final Descriptor descriptor;
     
-    private final VectorClock<KUID> clock;
-    
     private final Value value;
     
-    public DefaultValueTuple(Descriptor descriptor, 
-            VectorClock<KUID> clock, Value value) {
+    public DefaultValueTuple(Descriptor descriptor, Value value) {
         this.descriptor = descriptor;
-        this.clock = clock;
         this.value = value;
     }
 
@@ -44,11 +38,6 @@ public class DefaultValueTuple extends AbstractValueTuple {
         return descriptor;
     }
     
-    @Override
-    public VectorClock<KUID> getVectorClock() {
-        return clock;
-    }
-
     @Override
     public Value getValue() {
         return value;

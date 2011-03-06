@@ -59,13 +59,13 @@ public class DefaultDatabase extends AbstractDatabase {
         
         Descriptor descriptor = tuple.getDescriptor();
         Resource resource = descriptor.getResource();        
+        VectorClock<KUID> clock = descriptor.getVectorClock();
         
-        VectorClock<KUID> clock = tuple.getVectorClock();
         VectorClock<KUID> existingClock = null;
         
         ValueTuple existing = get(resource);
         if (existing != null) {
-            existingClock = existing.getVectorClock();
+            existingClock = existing.getDescriptor().getVectorClock();
         }
         
         if (existingClock == null || existingClock.isEmpty() 

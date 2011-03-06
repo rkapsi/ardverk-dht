@@ -16,9 +16,7 @@
 
 package org.ardverk.dht.storage;
 
-import org.ardverk.dht.KUID;
 import org.ardverk.dht.lang.Identifier;
-import org.ardverk.version.VectorClock;
 
 /**
  * A {@link ValueTuple} is at its core a simple key-value pair
@@ -32,11 +30,6 @@ public interface ValueTuple extends Identifier {
      * Returns the {@link Descriptor} of the {@link ValueTuple}.
      */
     public Descriptor getDescriptor();
-    
-    /**
-     * Returns the {@link Value}'s {@link VectorClock}.
-     */
-    public VectorClock<KUID> getVectorClock();
     
     /**
      * Returns the {@link Value} of the {@link ValueTuple}.

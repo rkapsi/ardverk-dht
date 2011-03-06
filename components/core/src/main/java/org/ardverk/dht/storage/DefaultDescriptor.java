@@ -18,6 +18,7 @@ package org.ardverk.dht.storage;
 
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.routing.Contact;
+import org.ardverk.version.VectorClock;
 
 public class DefaultDescriptor extends AbstractDescriptor {
 
@@ -27,15 +28,20 @@ public class DefaultDescriptor extends AbstractDescriptor {
     
     private final Resource resource;
     
-    public DefaultDescriptor(Contact contact, Resource resource) {
-        this (contact, contact, resource);
+    private final VectorClock<KUID> clock;
+    
+    public DefaultDescriptor(Contact contact, Resource resource,
+            VectorClock<KUID> clock) {
+        this (contact, contact, resource, clock);
     }
     
     public DefaultDescriptor(Contact sender, 
-            Contact creator, Resource resource) {
+            Contact creator, Resource resource,
+            VectorClock<KUID> clock) {
         this.sender = sender;
         this.creator = pickCreator(sender, creator);
         this.resource = resource;
+        this.clock = clock;
     }
 
     @Override
@@ -46,6 +52,11 @@ public class DefaultDescriptor extends AbstractDescriptor {
     @Override
     public Resource getResource() {
         return resource;
+    }
+    
+    @Override
+    public VectorClock<KUID> getVectorClock() {
+        return clock;
     }
 
     @Override

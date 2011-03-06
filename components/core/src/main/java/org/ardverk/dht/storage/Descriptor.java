@@ -16,10 +16,12 @@
 
 package org.ardverk.dht.storage;
 
+import org.ardverk.dht.KUID;
 import org.ardverk.dht.lang.Identifier;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.lang.Age;
 import org.ardverk.lang.Epoch;
+import org.ardverk.version.VectorClock;
 
 /**
  * A {@link Descriptor} describes a {@link Value}'s {@link Resource}, its 
@@ -42,4 +44,9 @@ public interface Descriptor extends Identifier, Epoch, Age {
      * Returns the {@link Resource} of the {@link ValueTuple}.
      */
     public Resource getResource();
+    
+    /**
+     * Returns the {@link Value}'s {@link VectorClock}.
+     */
+    public VectorClock<KUID> getVectorClock();
 }

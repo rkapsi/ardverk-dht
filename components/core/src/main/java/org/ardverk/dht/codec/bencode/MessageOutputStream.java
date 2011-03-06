@@ -158,11 +158,11 @@ class MessageOutputStream extends BencodingOutputStream {
     public void writeDescriptor(Descriptor descriptor) throws IOException {
         writeContact(descriptor.getCreator());
         writeResource(descriptor.getResource());
+        writeVectorClock(descriptor.getVectorClock());
     }
     
     public void writeValueTuple(ValueTuple tuple) throws IOException {
         writeDescriptor(tuple.getDescriptor());
-        writeVectorClock(tuple.getVectorClock());
         writeValue(tuple.getValue());
     }
     

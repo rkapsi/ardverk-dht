@@ -19,13 +19,11 @@ package org.ardverk.dht.entity;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.collection.CollectionUtils;
-import org.ardverk.dht.KUID;
 import org.ardverk.dht.io.Outcome;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.storage.Descriptor;
 import org.ardverk.dht.storage.Value;
 import org.ardverk.dht.storage.ValueTuple;
-import org.ardverk.version.VectorClock;
 
 /**
  * A default implementation of {@link ValueEntity}.
@@ -64,11 +62,6 @@ public class DefaultValueEntity extends AbstractLookupEntity implements ValueEnt
         return getValueTuple().getDescriptor();
     }
     
-    @Override
-    public VectorClock<KUID> getVectorClock() {
-        return getValueTuple().getVectorClock();
-    }
-
     @Override
     public Value getValue() {
         return getValueTuple().getValue();

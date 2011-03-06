@@ -192,15 +192,15 @@ class MessageInputStream extends BencodingInputStream {
     public Descriptor readDescriptor(Contact contact) throws IOException {
         Contact creator = readContact();
         Resource resource = readResource();
-        return new DefaultDescriptor(contact, creator, resource);
+        VectorClock<KUID> clock = readVectorClock();
+        return new DefaultDescriptor(contact, creator, resource, clock);
     }
     
     public ValueTuple readValueTuple(Contact contact, 
             SocketAddress address) throws IOException {
         Descriptor descriptor = readDescriptor(contact);
-        VectorClock<KUID> clock = readVectorClock();
         Value value = readValue();
-        return new DefaultValueTuple(descriptor, clock, value);
+        return new DefaultValueTuple(descriptor, value);
     }
     
     public Value readValue() throws IOException {
