@@ -20,21 +20,27 @@ import java.net.SocketAddress;
 
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.storage.Resource;
 
 
 public class DefaultValueRequest extends AbstractLookupRequest 
         implements ValueRequest {
     
-    private final KUID valueId;
+    private final Resource recource;
     
     public DefaultValueRequest(MessageId messageId, Contact contact, 
-            SocketAddress address, KUID valueId) {
+            SocketAddress address, Resource recource) {
         super(messageId, contact, address);
-        this.valueId = valueId;
+        this.recource = recource;
     }
     
     @Override
     public KUID getId() {
-        return valueId;
+        return recource.getId();
+    }
+
+    @Override
+    public Resource getResource() {
+        return recource;
     }
 }

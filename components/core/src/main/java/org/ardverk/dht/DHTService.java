@@ -30,6 +30,7 @@ import org.ardverk.dht.entity.PutEntity;
 import org.ardverk.dht.entity.ValueEntity;
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.Value;
 
 
@@ -72,20 +73,20 @@ interface DHTService {
      * Performs a {@link MessageType#FIND_VALUE} lookup in the DHT.
      */
     public DHTFuture<ValueEntity> get(
-            KUID valueId, GetConfig config);
+            Resource resource, GetConfig config);
     
     /**
      * Performs a {@link MessageType#FIND_NODE} lookup followed by 
      * a {@link MessageType#STORE} operation.
      */
     public DHTFuture<PutEntity> put(
-            KUID valueId, Value value, PutConfig config);
+            Resource resource, Value value, PutConfig config);
     
     /**
      * Removes the given {@link KUID} from the DHT.
      * 
-     * <p>NOTE: It's essentially a {@link #put(KUID, Value, PutConfig)} 
+     * <p>NOTE: It's essentially a {@link #put(Resource, Value, PutConfig)} 
      * operation with an empty {@link Value}.
      */
-    public DHTFuture<PutEntity> remove(KUID valueId, PutConfig config);
+    public DHTFuture<PutEntity> remove(Resource resource, PutConfig config);
 }

@@ -39,6 +39,7 @@ import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.storage.Database.Condition;
 import org.ardverk.dht.storage.Descriptor;
+import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.Value;
 import org.ardverk.dht.storage.ValueTuple;
 
@@ -92,6 +93,10 @@ class MessageOutputStream extends BencodingOutputStream {
         writeString(isa.getHostName() + ":" + isa.getPort());
     }
     
+    public void writeResource(Resource resource) throws IOException {
+        writeKUID(resource.getId());
+    }
+    
     public void writeKUID(KUID kuid) throws IOException {
         writeBytes(kuid.getBytes());
     }
@@ -123,7 +128,7 @@ class MessageOutputStream extends BencodingOutputStream {
     
     public void writeDescriptor(Descriptor descriptor) throws IOException {
         writeContact(descriptor.getCreator());
-        writeKUID(descriptor.getId());
+        writeResource(descriptor.getResource());
     }
     
     public void writeValueTuple(ValueTuple tuple) throws IOException {
@@ -198,7 +203,7 @@ class MessageOutputStream extends BencodingOutputStream {
     }
     
     private void writeValueRequest(ValueRequest message) throws IOException {
-        writeKUID(message.getId());
+        writeResource(message.getResource());
     }
     
     private void writeValueResponse(ValueResponse message) throws IOException {

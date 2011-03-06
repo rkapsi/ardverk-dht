@@ -37,6 +37,7 @@ import org.ardverk.dht.storage.ByteArrayValue;
 import org.ardverk.dht.storage.DefaultDescriptor;
 import org.ardverk.dht.storage.DefaultValueTuple;
 import org.ardverk.dht.storage.Descriptor;
+import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.Value;
 import org.ardverk.dht.storage.ValueTuple;
 
@@ -59,11 +60,11 @@ public class StoreManager {
         this.messageDispatcher = messageDispatcher;
     }
     
-    public DHTFuture<PutEntity> remove(KUID key, PutConfig config) {
-        return put(key, ByteArrayValue.EMPTY, config);
+    public DHTFuture<PutEntity> remove(Resource resource, PutConfig config) {
+        return put(resource, ByteArrayValue.EMPTY, config);
     }
     
-    public DHTFuture<PutEntity> put(final KUID valueId, final Value value, 
+    public DHTFuture<PutEntity> put(final Resource resource, final Value value, 
             final PutConfig config) {
         
         final Object lock = new Object();
@@ -82,7 +83,8 @@ public class StoreManager {
             
             // Start the lookup for the given KUID
             final DHTFuture<NodeEntity> lookupFuture 
-                = dht.lookup(valueId, config.getLookupConfig());
+                = dht.lookup(resource.getId(), 
+                        config.getLookupConfig());
             
             // Let's wait for the result of the FIND_NODE operation. On success we're 
             // going to initialize the storeFutureRef and do the actual STOREing.
@@ -106,7 +108,7 @@ public class StoreManager {
                     Contact[] contacts = nodeEntity.getContacts();
                     DHTFuture<StoreEntity> storeFuture 
                         = storeFutureRef.make(store(contacts, 
-                                valueId, value, config.getStoreConfig()));
+                                resource, value, config.getStoreConfig()));
                     
                     storeFuture.addAsyncFutureListener(new AsyncFutureListener<StoreEntity>() {
                         @Override
@@ -155,11 +157,12 @@ public class StoreManager {
     }
     
     public DHTFuture<StoreEntity> store(Contact[] dst, 
-            KUID valueId, Value value, StoreConfig config) {
+            Resource resource, Value value, StoreConfig config) {
         
         Contact localhost = dht.getLocalhost();
         
-        Descriptor descriptor = new DefaultDescriptor(localhost, valueId);
+        Descriptor descriptor = new DefaultDescriptor(
+                localhost, resource);
         ValueTuple valueTuple = new DefaultValueTuple(
                 descriptor, value);
         

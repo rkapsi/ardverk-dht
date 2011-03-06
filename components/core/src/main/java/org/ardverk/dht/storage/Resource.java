@@ -16,30 +16,22 @@
 
 package org.ardverk.dht.storage;
 
+import org.ardverk.dht.KUID;
 import org.ardverk.dht.lang.Identifier;
-import org.ardverk.dht.routing.Contact;
-import org.ardverk.lang.Age;
-import org.ardverk.lang.Epoch;
 
 /**
- * A {@link Descriptor} describes a {@link Value}'s {@link Resource}, its 
- * creator and sender (possibly the same), its creation time (local time)
- * and its age.
+ * 
  */
-public interface Descriptor extends Identifier, Epoch, Age {
+public class Resource implements Identifier {
 
-    /**
-     * Returns the sender of the {@link ValueTuple}.
-     */
-    public Contact getSender();
+    private final KUID valueId;
     
-    /**
-     * Returns the creator of the {@link ValueTuple}.
-     */
-    public Contact getCreator();
+    public Resource(KUID valueId) {
+        this.valueId = valueId;
+    }
     
-    /**
-     * Returns the {@link Resource} of the {@link ValueTuple}.
-     */
-    public Resource getResource();
+    @Override
+    public KUID getId() {
+        return valueId;
+    }
 }

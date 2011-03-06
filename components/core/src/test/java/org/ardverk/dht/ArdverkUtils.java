@@ -46,6 +46,7 @@ import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.DefaultRouteTable;
 import org.ardverk.dht.storage.ByteArrayValue;
 import org.ardverk.dht.storage.Database;
+import org.ardverk.dht.storage.Resource;
 import org.ardverk.io.IoUtils;
 import org.ardverk.security.MessageDigestUtils;
 import org.ardverk.utils.StringUtils;
@@ -202,7 +203,8 @@ public class ArdverkUtils {
             final byte[] value = StringUtils.getBytes("World-" + i);
             
             int rnd = (int)(dhts.size() * Math.random());
-            future = dhts.get(rnd).put(key, new ByteArrayValue(value), putConfig);
+            future = dhts.get(rnd).put(new Resource(key), 
+                    new ByteArrayValue(value), putConfig);
             
             if (i % 1000 == 0) {
                 System.out.println("PROGRESS: " + i);

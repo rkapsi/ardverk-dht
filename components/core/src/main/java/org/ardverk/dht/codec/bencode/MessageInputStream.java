@@ -53,6 +53,7 @@ import org.ardverk.dht.storage.DefaultCondition;
 import org.ardverk.dht.storage.DefaultDescriptor;
 import org.ardverk.dht.storage.DefaultValueTuple;
 import org.ardverk.dht.storage.Descriptor;
+import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.Value;
 import org.ardverk.dht.storage.ValueTuple;
 import org.ardverk.net.NetworkUtils;
@@ -121,6 +122,11 @@ class MessageInputStream extends BencodingInputStream {
         return NetworkUtils.createUnresolved(host, port);
     }
     
+    public Resource readResource() throws IOException {
+        KUID valueId = readKUID();
+        return new Resource(valueId);
+    }
+    
     public Contact readSender(Contact.Type type, SocketAddress src) throws IOException {
         KUID contactId = readKUID();
         int instanceId = readInt();
@@ -154,8 +160,8 @@ class MessageInputStream extends BencodingInputStream {
     
     public Descriptor readDescriptor(Contact contact) throws IOException {
         Contact creator = readContact();
-        KUID valueId = readKUID();
-        return new DefaultDescriptor(contact, creator, valueId);
+        Resource resource = readResource();
+        return new DefaultDescriptor(contact, creator, resource);
     }
     
     public ValueTuple readValueTuple(Contact contact, 
@@ -216,8 +222,8 @@ class MessageInputStream extends BencodingInputStream {
     
     private NodeRequest readNodeRequest(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
-        KUID key = readKUID();
-        return new DefaultNodeRequest(messageId, contact, address, key);
+        KUID lookupId = readKUID();
+        return new DefaultNodeRequest(messageId, contact, address, lookupId);
     }
     
     private NodeResponse readNodeResponse(MessageId messageId, 
@@ -230,8 +236,8 @@ class MessageInputStream extends BencodingInputStream {
     private ValueRequest readValueRequest(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
         
-        KUID key = readKUID();
-        return new DefaultValueRequest(messageId, contact, address, key);
+        Resource resource = readResource();
+        return new DefaultValueRequest(messageId, contact, address, resource);
     }
     
     private ValueResponse readValueResponse(MessageId messageId, 

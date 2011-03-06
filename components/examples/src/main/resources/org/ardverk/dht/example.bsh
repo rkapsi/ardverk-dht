@@ -40,6 +40,10 @@ kuid(String value) {
 	return KUID.create(hash(value));
 }
 
+rsrc(String value) {
+	return new Resource(kuid(value));
+}
+
 // Creates a SHA-1 from a String
 hash(String value) {
 	MessageDigest md = MessageDigestUtils.createSHA1();
@@ -134,7 +138,7 @@ put(String key, String value) {
 
 // Stores the given key-value
 put(DHT dht, String key, String value) {
-	DHTFuture future = dht.put(kuid(key), toValue(value));
+	DHTFuture future = dht.put(rsrc(key), toValue(value));
 		
 	PutEntity entity = future.get();
 	for (StoreResponse response : entity.getStoreResponses()) {
@@ -149,7 +153,7 @@ get(String key) {
 
 // Retrieves the given key-value
 get(DHT dht, String key) {
-	DHTFuture future = dht.get(kuid(key));
+	DHTFuture future = dht.get(rsrc(key));
 	
 	ValueEntity entity = future.get();
 	String value = toString(entity.getValue());

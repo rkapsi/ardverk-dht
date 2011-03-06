@@ -18,7 +18,6 @@ package org.ardverk.dht.io;
 
 import java.io.IOException;
 
-import org.ardverk.dht.KUID;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.message.RequestMessage;
@@ -27,8 +26,8 @@ import org.ardverk.dht.message.ValueRequest;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Database;
+import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ValueTuple;
-import org.ardverk.lang.Arguments;
 
 
 /**
@@ -47,16 +46,16 @@ public class ValueRequestHandler extends AbstractRequestHandler {
             Database database) {
         super(messageDispatcher);
         
-        this.routeTable = Arguments.notNull(routeTable, "routeTable");
-        this.database = Arguments.notNull(database, "database");
+        this.routeTable = routeTable;
+        this.database = database;
     }
 
     @Override
     public void handleRequest(RequestMessage message) throws IOException {
         ValueRequest request = (ValueRequest)message;
         
-        KUID valueId = request.getId();
-        ValueTuple value = database.get(valueId);
+        Resource resource = request.getResource();
+        ValueTuple value = database.get(resource);
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
         ResponseMessage response = null;
@@ -64,7 +63,7 @@ public class ValueRequestHandler extends AbstractRequestHandler {
         if (value != null) {
             response = factory.createValueResponse(request, value);
         } else {
-            Contact[] contacts = routeTable.select(valueId);
+            Contact[] contacts = routeTable.select(resource.getId());
             response = factory.createNodeResponse(request, contacts);
         }
         

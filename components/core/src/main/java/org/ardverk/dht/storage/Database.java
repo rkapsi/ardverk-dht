@@ -43,9 +43,9 @@ public interface Database {
     public Condition store(ValueTuple tuple);
     
     /**
-     * Returns a {@link ValueTuple} for the given {@link KUID}.
+     * Returns a {@link ValueTuple} for the given {@link Resource}.
      */
-    public ValueTuple get(KUID valueId);
+    public ValueTuple get(Resource resource);
     
     /**
      * Returns all {@link ValueTuple}s.

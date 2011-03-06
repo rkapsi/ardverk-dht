@@ -33,6 +33,7 @@ import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Database;
+import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.Value;
 
 
@@ -72,18 +73,18 @@ public class DefaultEasyDHT extends ArdverkDHT implements EasyDHT {
     }
 
     @Override
-    public DHTFuture<ValueEntity> get(KUID valueId) {
-        return get(valueId, config.getGetConfig());
+    public DHTFuture<ValueEntity> get(Resource resource) {
+        return get(resource, config.getGetConfig());
     }
 
     @Override
-    public DHTFuture<PutEntity> put(KUID valueId, Value value) {
-        return put(valueId, value, config.getPutConfig());
+    public DHTFuture<PutEntity> put(Resource resource, Value value) {
+        return put(resource, value, config.getPutConfig());
     }
 
     @Override
-    public DHTFuture<PutEntity> remove(KUID valueId) {
-        return remove(valueId, config.getPutConfig());
+    public DHTFuture<PutEntity> remove(Resource resource) {
+        return remove(resource, config.getPutConfig());
     }
     
     @Override

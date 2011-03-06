@@ -21,6 +21,7 @@ import java.net.SocketAddress;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.storage.Database.Condition;
+import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ValueTuple;
 
 /**
@@ -68,7 +69,7 @@ public interface MessageFactory {
     /**
      * Creates and returns a {@link ValueRequest}.
      */
-    public ValueRequest createValueRequest(Contact dst, KUID key);
+    public ValueRequest createValueRequest(Contact dst, Resource resource);
     
     /**
      * Creates and returns a {@link ValueResponse}.

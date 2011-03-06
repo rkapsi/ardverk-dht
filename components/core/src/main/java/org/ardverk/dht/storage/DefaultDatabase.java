@@ -24,7 +24,6 @@ import org.ardverk.collection.Cursor;
 import org.ardverk.collection.PatriciaTrie;
 import org.ardverk.collection.Trie;
 import org.ardverk.dht.KUID;
-import org.ardverk.lang.Arguments;
 
 
 public class DefaultDatabase extends AbstractDatabase {
@@ -39,7 +38,7 @@ public class DefaultDatabase extends AbstractDatabase {
     }
     
     public DefaultDatabase(DatabaseConfig config) {
-        this.config = Arguments.notNull(config, "config");
+        this.config = config;
     }
     
     @Override
@@ -61,7 +60,8 @@ public class DefaultDatabase extends AbstractDatabase {
     }
     
     @Override
-    public synchronized ValueTuple get(KUID valueId) {
+    public synchronized ValueTuple get(Resource resource) {
+        KUID valueId = resource.getId();
         return database.get(valueId);
     }
     

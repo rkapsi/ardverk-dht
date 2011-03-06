@@ -25,22 +25,27 @@ public class DefaultDescriptor extends AbstractDescriptor {
     
     private final Contact creator;
     
-    private final KUID valueId;
+    private final Resource resource;
     
-    public DefaultDescriptor(Contact contact, KUID valueId) {
-        this (contact, contact, valueId);
+    public DefaultDescriptor(Contact contact, Resource resource) {
+        this (contact, contact, resource);
     }
     
     public DefaultDescriptor(Contact sender, 
-            Contact creator, KUID valueId) {
+            Contact creator, Resource resource) {
         this.sender = sender;
         this.creator = pickCreator(sender, creator);
-        this.valueId = valueId;
+        this.resource = resource;
     }
 
     @Override
     public KUID getId() {
-        return valueId;
+        return resource.getId();
+    }
+    
+    @Override
+    public Resource getResource() {
+        return resource;
     }
 
     @Override
