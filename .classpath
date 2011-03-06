@@ -15,6 +15,6 @@
 	<classpathentry kind="lib" path="lib/slf4j/slf4j-simple/jars/slf4j-simple-1.6.1.jar"/>
 	<classpathentry kind="lib" path="lib/ardverk/patricia-trie/jars/patricia-trie-0.5.jar"/>
 	<classpathentry kind="lib" path="lib/ardverk/ardverk-base/jars/ardverk-base-0.1.jar"/>
-	<classpathentry kind="lib" path="lib/jboss/netty/jars/netty-3.2.4.jar"/>
+	<classpathentry kind="lib" path="lib/jboss/netty/jars/netty-3.2.4.jar" sourcepath="/netty"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

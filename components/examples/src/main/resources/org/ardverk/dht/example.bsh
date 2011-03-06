@@ -17,6 +17,8 @@ import org.ardverk.dht.storage.*;
 import org.ardverk.dht.utils.*;
 import org.ardverk.dht.ui.*;
 
+import org.ardverk.dht.http.*;
+
 import org.ardverk.coding.*;
 import org.ardverk.collection.*;
 import org.ardverk.concurrent.*;
@@ -62,8 +64,9 @@ createDHT(int port) {
 	
 	MessageCodec codec = new DefaultMessageCodec(SECRET_KEY, INIT_VECTOR);
 	//dht.bind(new SocketTransport(codec, port));
-	dht.bind(new DatagramTransport(codec, port));
+	//dht.bind(new DatagramTransport(codec, port));
 	//dht.bind(new HybridTransport(codec, port));
+	dht.bind(new HttpTransport(port));
 	
 	return dht;
 }
