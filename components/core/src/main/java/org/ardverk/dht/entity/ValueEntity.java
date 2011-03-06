@@ -16,11 +16,13 @@
 
 package org.ardverk.dht.entity;
 
+import org.ardverk.dht.KUID;
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.storage.Descriptor;
 import org.ardverk.dht.storage.Value;
 import org.ardverk.dht.storage.ValueTuple;
+import org.ardverk.version.VectorClock;
 
 /**
  * The result of a {@link MessageType#FIND_VALUE} operation.
@@ -44,19 +46,26 @@ public interface ValueEntity extends LookupEntity {
     public Contact getCreator();
     
     /**
+     * Returns the first {@link ValueTuple}'s {@link Descriptor}.
+     * 
+     * @see #getValueTuple()
+     */
+    public Descriptor getDescriptor();
+    
+    /**
+     * Returns the first {@link ValueTuple}'s {@link VectorClock}.
+     * 
+     * @see #getValueTuple()
+     */
+    public VectorClock<KUID> getVectorClock();
+    
+    /**
      * Returns first {@link ValueTuple}'s {@link Value}.
      * 
      * @see #getValueTuple()
      * @see ValueTuple#getValue()
      */
     public Value getValue();
-    
-    /**
-     * Returns the first {@link ValueTuple}'s {@link Descriptor}.
-     * 
-     * @see #getValueTuple()
-     */
-    public Descriptor getDescriptor();
     
     /**
      * Returns the first {@link ValueTuple}.

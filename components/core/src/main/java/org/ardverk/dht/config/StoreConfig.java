@@ -53,4 +53,14 @@ public interface StoreConfig extends Config {
      * operations should run in parallel.
      */
     public void setS(int value);
+    
+    /**
+     * 
+     */
+    public void setSloppy(boolean sloppy);
+    
+    /**
+     * 
+     */
+    public boolean isSloppy();
 }

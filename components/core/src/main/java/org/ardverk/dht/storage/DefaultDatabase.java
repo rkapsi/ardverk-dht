@@ -24,6 +24,8 @@ import org.ardverk.collection.Cursor;
 import org.ardverk.collection.PatriciaTrie;
 import org.ardverk.collection.Trie;
 import org.ardverk.dht.KUID;
+import org.ardverk.version.Occured;
+import org.ardverk.version.VectorClock;
 
 
 public class DefaultDatabase extends AbstractDatabase {
@@ -48,15 +50,38 @@ public class DefaultDatabase extends AbstractDatabase {
 
     @Override
     public synchronized Condition store(ValueTuple tuple) {
-        Value value = tuple.getValue();
         
-        if (!value.isEmpty()) {
-            add(tuple);
-        } else {
+        Value value = tuple.getValue();
+        if (value.isEmpty()) {
             remove(tuple.getId());
+            return DefaultCondition.SUCCESS;
         }
         
-        return DefaultCondition.SUCCESS;
+        Descriptor descriptor = tuple.getDescriptor();
+        Resource resource = descriptor.getResource();        
+        
+        VectorClock<KUID> clock = tuple.getVectorClock();
+        VectorClock<KUID> existingClock = null;
+        
+        ValueTuple existing = get(resource);
+        if (existing != null) {
+            existingClock = existing.getVectorClock();
+        }
+        
+        if (existingClock == null || existingClock.isEmpty() 
+                || clock == null || clock.isEmpty()) {
+            add(tuple);
+            return DefaultCondition.SUCCESS;
+        }
+        
+        Occured occured = clock.compareTo(existingClock);
+        System.out.println(occured);
+        if (occured == Occured.AFTER) {
+            add(tuple);
+            return DefaultCondition.SUCCESS;
+        }
+        
+        return DefaultCondition.FAILURE;
     }
     
     @Override

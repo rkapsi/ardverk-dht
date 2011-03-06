@@ -26,7 +26,9 @@ public class DefaultStoreConfig extends DefaultConfig
     private static final long DEFAULT_STORE_TIMEOUT
         = TimeUtils.convert(60L, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
     
-    public volatile int s = 5;
+    private volatile int s = 5;
+    
+    private volatile boolean sloppy = true;
     
     public DefaultStoreConfig() {
         super(DEFAULT_STORE_TIMEOUT, TimeUnit.MILLISECONDS);
@@ -59,5 +61,15 @@ public class DefaultStoreConfig extends DefaultConfig
     @Override
     public void setS(int s) {
         this.s = s;
+    }
+
+    @Override
+    public boolean isSloppy() {
+        return sloppy;
+    }
+
+    @Override
+    public void setSloppy(boolean sloppy) {
+        this.sloppy = sloppy;
     }
 }

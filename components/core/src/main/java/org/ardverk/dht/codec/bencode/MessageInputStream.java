@@ -22,6 +22,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.SocketAddress;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.ardverk.coding.BencodingInputStream;
 import org.ardverk.dht.KUID;
@@ -57,6 +59,8 @@ import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.Value;
 import org.ardverk.dht.storage.ValueTuple;
 import org.ardverk.net.NetworkUtils;
+import org.ardverk.version.Vector;
+import org.ardverk.version.VectorClock;
 
 
 /**
@@ -127,6 +131,33 @@ class MessageInputStream extends BencodingInputStream {
         return new Resource(valueId);
     }
     
+    public VectorClock<KUID> readVectorClock() throws IOException {
+        int count = readUnsignedShort();
+        if (count == 0) {
+            return null;
+        }
+        
+        long creationTime = readLong();
+        Map<KUID, Vector> dst = new HashMap<KUID, Vector>(count);
+        
+        while (0 < count--) {
+            KUID contactId = readKUID();
+            Vector vector = readVector();
+            
+            if (!vector.isEmpty()) {
+                dst.put(contactId, vector);
+            }
+        }
+        
+        return VectorClock.create(creationTime, dst);
+    }
+    
+    private Vector readVector() throws IOException {
+        long timeStamp = readLong();
+        int value = readInt();
+        return new Vector(timeStamp, value);
+    }
+    
     public Contact readSender(Contact.Type type, SocketAddress src) throws IOException {
         KUID contactId = readKUID();
         int instanceId = readInt();
@@ -167,8 +198,9 @@ class MessageInputStream extends BencodingInputStream {
     public ValueTuple readValueTuple(Contact contact, 
             SocketAddress address) throws IOException {
         Descriptor descriptor = readDescriptor(contact);
+        VectorClock<KUID> clock = readVectorClock();
         Value value = readValue();
-        return new DefaultValueTuple(descriptor, value);
+        return new DefaultValueTuple(descriptor, clock, value);
     }
     
     public Value readValue() throws IOException {

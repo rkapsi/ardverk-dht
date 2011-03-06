@@ -21,6 +21,7 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.Map;
 
 import org.ardverk.coding.BencodingOutputStream;
 import org.ardverk.dht.KUID;
@@ -42,6 +43,8 @@ import org.ardverk.dht.storage.Descriptor;
 import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.Value;
 import org.ardverk.dht.storage.ValueTuple;
+import org.ardverk.version.Vector;
+import org.ardverk.version.VectorClock;
 
 
 /**
@@ -97,6 +100,32 @@ class MessageOutputStream extends BencodingOutputStream {
         writeKUID(resource.getId());
     }
     
+    public void writeVectorClock(VectorClock<? extends KUID> clock) throws IOException {
+        int size = 0;
+        if (clock != null) {
+            size = clock.size();
+        }
+        
+        writeShort(size);
+        
+        if (0 < size) {
+            writeLong(clock.getCreationTime());
+            for (Map.Entry<? extends KUID, ? extends Vector> entry 
+                    : clock.entrySet()) {
+                KUID contactId = entry.getKey();
+                Vector vector = entry.getValue();
+                
+                writeKUID(contactId);
+                writeVector(vector);
+            }
+        }
+    }
+    
+    private void writeVector(Vector vector) throws IOException {
+        writeLong(vector.getTimeStamp());
+        writeInt(vector.getValue());
+    }
+    
     public void writeKUID(KUID kuid) throws IOException {
         writeBytes(kuid.getBytes());
     }
@@ -133,6 +162,7 @@ class MessageOutputStream extends BencodingOutputStream {
     
     public void writeValueTuple(ValueTuple tuple) throws IOException {
         writeDescriptor(tuple.getDescriptor());
+        writeVectorClock(tuple.getVectorClock());
         writeValue(tuple.getValue());
     }
     

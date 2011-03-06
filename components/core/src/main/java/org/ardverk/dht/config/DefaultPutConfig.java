@@ -27,11 +27,14 @@ public class DefaultPutConfig extends AbstractConfig implements PutConfig {
     
     private volatile StoreConfig storeConfig = new DefaultStoreConfig();
     
+    private volatile GetConfig getConfig = new DefaultGetConfig();
+    
     @Override
     public void setExecutorKey(ExecutorKey executorKey) {
         super.setExecutorKey(executorKey);
         lookupConfig.setExecutorKey(executorKey);
         storeConfig.setExecutorKey(executorKey);
+        getConfig.setExecutorKey(executorKey);
     }
     
     @Override
@@ -52,6 +55,16 @@ public class DefaultPutConfig extends AbstractConfig implements PutConfig {
     @Override
     public void setStoreConfig(StoreConfig storeConfig) {
         this.storeConfig = storeConfig;
+    }
+    
+    @Override
+    public GetConfig getGetConfig() {
+        return getConfig;
+    }
+
+    @Override
+    public void setGetConfig(GetConfig getConfig) {
+        this.getConfig = getConfig;
     }
 
     @Override

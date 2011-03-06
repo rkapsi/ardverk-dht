@@ -35,6 +35,16 @@ public interface PutConfig extends Config {
     public void setLookupConfig(LookupConfig lookupConfig);
     
     /**
+     * Returns the {@link LookupConfig}.
+     */
+    public GetConfig getGetConfig();
+    
+    /**
+     * Sets the {@link LookupConfig}.
+     */
+    public void setGetConfig(GetConfig getConfig);
+    
+    /**
      * Returns the {@link StoreConfig}.
      */
     public StoreConfig getStoreConfig();
