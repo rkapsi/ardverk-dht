@@ -58,24 +58,11 @@ public class DefaultDatabase extends AbstractDatabase {
         }
         
         Descriptor descriptor = tuple.getDescriptor();
-        Resource resource = descriptor.getResource();        
-        VectorClock<KUID> clock = descriptor.getVectorClock();
-        
-        VectorClock<KUID> existingClock = null;
+        Resource resource = descriptor.getResource();
         
         ValueTuple existing = get(resource);
-        if (existing != null) {
-            existingClock = existing.getDescriptor().getVectorClock();
-        }
         
-        if (existingClock == null || existingClock.isEmpty() 
-                || clock == null || clock.isEmpty()) {
-            add(tuple);
-            return DefaultCondition.SUCCESS;
-        }
-        
-        Occured occured = clock.compareTo(existingClock);
-        System.out.println(occured);
+        Occured occured = compare(existing, tuple);
         if (occured == Occured.AFTER) {
             add(tuple);
             return DefaultCondition.SUCCESS;
@@ -153,5 +140,26 @@ public class DefaultDatabase extends AbstractDatabase {
         }
         
         return buffer.toString();
+    }
+    
+    private static Occured compare(ValueTuple existing, ValueTuple tuple) {
+        if (existing == null) {
+            return Occured.AFTER;
+        }
+        
+        VectorClock<KUID> clock1 = existing.getDescriptor().getVectorClock();
+        VectorClock<KUID> clock2 = tuple.getDescriptor().getVectorClock();
+        
+        return compare(clock1, clock2);
+    }
+    
+    private static Occured compare(VectorClock<KUID> existing, 
+            VectorClock<KUID> clock) {
+        if (existing == null || existing.isEmpty()
+                || clock == null || clock.isEmpty()) {
+            return Occured.AFTER;
+        }
+        
+        return clock.compareTo(existing);
     }
 }
