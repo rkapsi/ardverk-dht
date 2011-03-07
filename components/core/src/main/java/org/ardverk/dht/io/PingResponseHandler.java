@@ -31,7 +31,6 @@ import org.ardverk.dht.message.PingRequest;
 import org.ardverk.dht.message.PingResponse;
 import org.ardverk.dht.message.ResponseMessage;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.lang.Arguments;
 
 
 /**
@@ -99,7 +98,7 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
         public SocketAddressPingSender(KUID contactId, 
                 SocketAddress address) {
             this.contactId = contactId;
-            this.address = Arguments.notNull(address, "address");
+            this.address = address;
         }
     
         @Override
@@ -120,7 +119,7 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
         private final Contact contact;
         
         public ContactPingSender(Contact contact) {
-            this.contact = Arguments.notNull(contact, "contact");
+            this.contact = contact;
         }
         
         @Override

@@ -6,6 +6,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.dht.codec.MessageCodec;
@@ -40,6 +41,12 @@ public class HttpTransport extends AbstractTransport {
     private static final HttpResponse OK = new DefaultHttpResponse(
             HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
     
+    private static final Executor EXECUTOR = Executors.newCachedThreadPool();
+    
+    static {
+        ((ThreadPoolExecutor)EXECUTOR).setKeepAliveTime(10L, TimeUnit.SECONDS);
+    }
+    
     private final MessageCodec codec = new BencodeMessageCodec();
     
     private final HttpRequestHandler requestHandler 
@@ -71,17 +78,15 @@ public class HttpTransport extends AbstractTransport {
     public HttpTransport(SocketAddress bindaddr) {
         this.bindaddr = bindaddr;
         
-        Executor executor = Executors.newCachedThreadPool();
-        
         server = new ServerBootstrap(
                 new NioServerSocketChannelFactory(
-                    executor,executor));
+                    EXECUTOR, EXECUTOR));
         server.setPipelineFactory(
                 new HttpServerPipelineFactory(requestHandler));
         
         client = new ClientBootstrap(
                 new NioClientSocketChannelFactory(
-                    executor, executor));
+                    EXECUTOR, EXECUTOR));
         client.setPipelineFactory(
                 new HttpClientPipelineFactory(responseHandler));
     }

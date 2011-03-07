@@ -115,8 +115,8 @@ public abstract class MessageDispatcher
      */
     public MessageDispatcher(ScheduledExecutorService executor, 
             MessageFactory factory) {
-        this.executor = Arguments.notNull(executor, "executor");
-        this.factory = Arguments.notNull(factory, "factory");
+        this.executor = executor;
+        this.factory = factory;
         
         // TODO: Is memorizing the 512 most recently received MessageIds
         // too much or too little? 
