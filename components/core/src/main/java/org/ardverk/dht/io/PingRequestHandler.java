@@ -18,6 +18,7 @@ package org.ardverk.dht.io;
 
 import java.io.IOException;
 
+import org.ardverk.dht.io.transport.Endpoint;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.message.PingRequest;
@@ -36,11 +37,11 @@ public class PingRequestHandler extends AbstractRequestHandler {
     }
 
     @Override
-    public void handleRequest(RequestMessage message) throws IOException {
+    public void handleRequest(Endpoint endpoint, RequestMessage message) throws IOException {
         PingRequest request = (PingRequest)message;
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
         PingResponse response = factory.createPingResponse(request);
-        send(request, response);
+        send(endpoint, request, response);
     }
 }

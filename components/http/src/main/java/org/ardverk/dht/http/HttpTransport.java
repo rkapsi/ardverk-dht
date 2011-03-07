@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import org.ardverk.dht.codec.MessageCodec;
 import org.ardverk.dht.codec.bencode.BencodeMessageCodec;
 import org.ardverk.dht.io.transport.AbstractTransport;
+import org.ardverk.dht.io.transport.Endpoint;
 import org.ardverk.dht.io.transport.TransportCallback.Inbound;
 import org.ardverk.dht.io.transport.TransportCallback.Outbound;
 import org.ardverk.dht.message.Message;
@@ -174,7 +175,13 @@ public class HttpTransport extends AbstractTransport {
             ChannelFuture future = channel.write(OK);
             future.addListener(ChannelFutureListener.CLOSE);
             
-            HttpTransport.this.messageReceived(message);
+            HttpTransport.this.messageReceived(new Endpoint<Message>() {
+                @Override
+                public void send(Message message, Outbound callback,
+                        long timeout, TimeUnit unit) throws IOException {
+                    
+                }
+            }, message);
         }
     }
     

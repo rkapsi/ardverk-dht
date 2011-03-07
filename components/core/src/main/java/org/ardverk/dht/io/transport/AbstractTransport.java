@@ -54,10 +54,10 @@ public abstract class AbstractTransport implements Transport {
     /**
      * A helper method to notify the {@link TransportCallback.Inbound} callback.
      */
-    protected boolean messageReceived(Message message) throws IOException {
+    protected boolean messageReceived(Message message, Endpoint endpoint) throws IOException {
         TransportCallback.Inbound callback = callbackRef.get();
         if (callback != null) {
-            callback.messageReceived(message);
+            callback.messageReceived(endpoint, message);
             return true;
         }
         return false;

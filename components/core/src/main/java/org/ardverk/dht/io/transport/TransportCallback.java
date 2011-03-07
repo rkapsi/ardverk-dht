@@ -36,7 +36,7 @@ public class TransportCallback {
         /**
          * Called by {@link Transport} for every message that's being received.
          */
-        public void messageReceived(Message message) throws IOException;
+        public void messageReceived(Endpoint endpoint, Message message) throws IOException;
     }
     
     /**

@@ -19,6 +19,7 @@ package org.ardverk.dht.io;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.dht.io.transport.Endpoint;
 import org.ardverk.dht.message.Message;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.message.NodeRequest;
@@ -105,20 +106,20 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
     }
 
     @Override
-    protected void handleRequest(RequestMessage request) throws IOException {
+    protected void handleRequest(Endpoint endpoint, RequestMessage request) throws IOException {
         
         defaultHandler.handleRequest(request);
         
         if (request instanceof PingRequest) {
-            ping.handleRequest(request);
+            ping.handleRequest(endpoint, request);
         } else if (request instanceof NodeRequest) {
-            node.handleRequest(request);
+            node.handleRequest(endpoint, request);
         } else if (request instanceof ValueRequest) {
-            value.handleRequest(request);
+            value.handleRequest(endpoint, request);
         } else if (request instanceof StoreRequest) {
-            store.handleRequest(request);
+            store.handleRequest(endpoint, request);
         } else {
-            unhandledRequest(request);
+            unhandledRequest(request, endpoint);
         }
     }
     
@@ -145,7 +146,8 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
         defaultHandler.handleLateResponse(response);
     }
 
-    protected void unhandledRequest(RequestMessage message) throws IOException {
+    protected void unhandledRequest(RequestMessage message, 
+            Endpoint endpoint) throws IOException {
         if (LOG.isErrorEnabled()) {
             LOG.error("Unhandled Request: " + message);
         }

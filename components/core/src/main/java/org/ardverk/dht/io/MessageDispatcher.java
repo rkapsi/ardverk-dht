@@ -34,6 +34,7 @@ import org.ardverk.collection.FixedSizeHashSet;
 import org.ardverk.concurrent.ExecutorUtils;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.event.EventUtils;
+import org.ardverk.dht.io.transport.Endpoint;
 import org.ardverk.dht.io.transport.Transport;
 import org.ardverk.dht.io.transport.TransportCallback;
 import org.ardverk.dht.message.Message;
@@ -68,8 +69,8 @@ public abstract class MessageDispatcher
     private final TransportCallback.Inbound inbound 
             = new TransportCallback.Inbound() {
         @Override
-        public void messageReceived(Message message) throws IOException {
-            MessageDispatcher.this.handleMessage(message);
+        public void messageReceived(Endpoint endpoint, Message message) throws IOException {
+            MessageDispatcher.this.handleMessage(endpoint, message);
         }
     };
     
@@ -185,25 +186,22 @@ public abstract class MessageDispatcher
     /**
      * Sends the given {@link Message}.
      */
-    protected void send(Message message, long timeout, TimeUnit unit) throws IOException {
+    protected void send(Endpoint endpoint, Message message, 
+            long timeout, TimeUnit unit) throws IOException {
         
-        Transport transport = null;
-        synchronized (this) {
-            transport = this.transport;
-        }
-        
-        if (transport == null) {
+        if (endpoint == null) {
             throw new IOException();
         }
         
-        transport.send(message, outbound, timeout, unit);
+        endpoint.send(message, outbound, timeout, unit);
     }
     
     /**
      * Sends a {@link ResponseMessage} to the given {@link Contact}.
      */
-    public void send(Contact dst, ResponseMessage message) throws IOException {
-        send(message, -1L, TimeUnit.MILLISECONDS);
+    public void send(Endpoint endpoint, Contact dst, 
+            ResponseMessage message) throws IOException {
+        send(endpoint, message, -1L, TimeUnit.MILLISECONDS);
         fireMessageSent(dst, message);
     }
     
@@ -236,7 +234,12 @@ public abstract class MessageDispatcher
             entityManager.add(callback, entity, timeout, unit);
         }
         
-        send(request, timeout, unit);
+        Transport transport = null;
+        synchronized (this) {
+            transport = this.transport;
+        }
+        
+        send(transport, request, timeout, unit);
         fireMessageSent(contactId, request);
     }
     
@@ -264,9 +267,9 @@ public abstract class MessageDispatcher
     /**
      * Callback method for incoming {@link Message}s.
      */
-    public void handleMessage(Message message) throws IOException {
+    public void handleMessage(Endpoint endpoint, Message message) throws IOException {
         if (message instanceof RequestMessage) {
-            handleRequest((RequestMessage)message);
+            handleRequest(endpoint, (RequestMessage)message);
         } else {
             handleResponse((ResponseMessage)message);
         }
@@ -294,7 +297,8 @@ public abstract class MessageDispatcher
     /**
      * Callback method for incoming {@link RequestMessage}s.
      */
-    protected abstract void handleRequest(RequestMessage request) throws IOException;
+    protected abstract void handleRequest(Endpoint endpoint, 
+            RequestMessage request) throws IOException;
     
     /**
      * Callback method for late incoming {@link ResponseMessage}s.

@@ -16,18 +16,16 @@
 
 package org.ardverk.dht.io.transport;
 
-import java.net.SocketAddress;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
-import org.ardverk.io.Bindable;
+import org.ardverk.dht.message.Message;
 
-/**
- * The {@link Transport} provides a generic interface for the DHT to 
- * send and receive messages over UDP or any other transport layer.
- */
-public interface Transport extends Endpoint, Bindable<TransportCallback.Inbound> {
-
+public interface Endpoint {
+    
     /**
-     * Returns the local {@link SocketAddress}
+     * Sends the given {@link Message}.
      */
-    public SocketAddress getSocketAddress();
+    public void send(Message message, TransportCallback.Outbound callback, 
+            long timeout, TimeUnit unit) throws IOException;
 }

@@ -19,6 +19,7 @@ package org.ardverk.dht.io;
 import java.io.IOException;
 
 import org.ardverk.dht.KUID;
+import org.ardverk.dht.io.transport.Endpoint;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.message.RequestMessage;
@@ -55,7 +56,7 @@ public class StoreRequestHandler extends AbstractRequestHandler {
     }
 
     @Override
-    public void handleRequest(RequestMessage message) throws IOException {
+    public void handleRequest(Endpoint endpoint, RequestMessage message) throws IOException {
         
         StoreRequest request = (StoreRequest)message;
         ValueTuple tuple = request.getValueTuple();
@@ -78,6 +79,6 @@ public class StoreRequestHandler extends AbstractRequestHandler {
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
         ResponseMessage response = factory.createStoreResponse(request, condition);
-        send(request, response);
+        send(endpoint, request, response);
     }
 }

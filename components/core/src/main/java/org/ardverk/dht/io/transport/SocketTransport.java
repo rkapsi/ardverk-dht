@@ -173,7 +173,7 @@ public class SocketTransport extends AbstractTransport implements Closeable {
                     in.readFully(data);
                     
                     Message message = codec.decode(src, data);
-                    messageReceived(message);
+                    messageReceived(message, SocketTransport.this);
                 } catch (IOException err) {
                     uncaughtException(socket, err);
                 } finally {

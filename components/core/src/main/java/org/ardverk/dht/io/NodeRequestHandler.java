@@ -19,6 +19,7 @@ package org.ardverk.dht.io;
 import java.io.IOException;
 
 import org.ardverk.dht.KUID;
+import org.ardverk.dht.io.transport.Endpoint;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.message.NodeRequest;
@@ -46,7 +47,7 @@ public class NodeRequestHandler extends AbstractRequestHandler {
     }
 
     @Override
-    public void handleRequest(RequestMessage message) throws IOException {
+    public void handleRequest(Endpoint endpoint, RequestMessage message) throws IOException {
         
         NodeRequest request = (NodeRequest)message;
         KUID lookupId = request.getId();
@@ -83,6 +84,6 @@ public class NodeRequestHandler extends AbstractRequestHandler {
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
         NodeResponse response = factory.createNodeResponse(request, contacts);
-        send(request, response);
+        send(endpoint, request, response);
     }
 }
