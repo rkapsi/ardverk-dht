@@ -166,7 +166,7 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
             public void run() {
                 try {
                     Message message = codec.decode(src, data);
-                    messageReceived(message, DatagramTransport.this);
+                    messageReceived(DatagramTransport.this, message);
                 } catch (IOException err) {
                     uncaughtException(socket, err);
                 }
