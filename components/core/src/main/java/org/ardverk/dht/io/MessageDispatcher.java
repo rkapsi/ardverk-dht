@@ -66,24 +66,19 @@ public abstract class MessageDispatcher
         = ExecutorUtils.newSingleThreadScheduledExecutor(
             "MessageDispatcherThread");
     
-    private final TransportCallback.Inbound inbound 
-            = new TransportCallback.Inbound() {
+    private final TransportCallback callback = new TransportCallback() {
         @Override
         public void messageReceived(Endpoint endpoint, Message message) throws IOException {
             MessageDispatcher.this.handleMessage(endpoint, message);
         }
-    };
-    
-    private final TransportCallback.Outbound outbound 
-            = new TransportCallback.Outbound() {
         
         @Override
-        public void messageSent(Message message) {
+        public void messageSent(Endpoint endpoint, Message message) {
             MessageDispatcher.this.messageSent(message);
         }
         
         @Override
-        public void handleException(Message message, Throwable t) {
+        public void handleException(Endpoint endpoint, Message message, Throwable t) {
             MessageDispatcher.this.handleException(message, t);
         }
     };
@@ -146,7 +141,7 @@ public abstract class MessageDispatcher
             throw new IOException();
         }
         
-        transport.bind(inbound);
+        transport.bind(callback);
         this.transport = transport;
     }
     
@@ -193,7 +188,7 @@ public abstract class MessageDispatcher
             throw new IOException();
         }
         
-        endpoint.send(message, outbound, timeout, unit);
+        endpoint.send(message, timeout, unit);
     }
     
     /**

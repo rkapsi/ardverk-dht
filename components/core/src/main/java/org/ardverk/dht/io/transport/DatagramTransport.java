@@ -33,7 +33,6 @@ import org.ardverk.dht.codec.DefaultMessageCodec;
 import org.ardverk.dht.codec.MessageCodec;
 import org.ardverk.dht.message.Message;
 import org.ardverk.io.IoUtils;
-import org.ardverk.lang.Arguments;
 import org.ardverk.net.NetworkUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,8 +83,8 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
     
     public DatagramTransport(MessageCodec codec, 
             SocketAddress bindaddr) {
-        this.codec = Arguments.notNull(codec, "codec");
-        this.bindaddr = Arguments.notNull(bindaddr, "bindaddr");
+        this.codec = codec;
+        this.bindaddr = bindaddr;
     }
     
     @Override
@@ -94,7 +93,7 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
     }
 
     @Override
-    public synchronized void bind(TransportCallback.Inbound callback) throws IOException {
+    public synchronized void bind(TransportCallback callback) throws IOException {
         if (!open) {
             throw new IOException();
         }
@@ -166,7 +165,7 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
             public void run() {
                 try {
                     Message message = codec.decode(src, data);
-                    messageReceived(DatagramTransport.this, message);
+                    messageReceived(message);
                 } catch (IOException err) {
                     uncaughtException(socket, err);
                 }
@@ -177,8 +176,8 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
     }
     
     @Override
-    public void send(final Message message, final TransportCallback.Outbound callback,
-            long timeout, TimeUnit unit) 
+    public void send(final Message message, long timeout,
+            TimeUnit unit) 
                 throws IOException {
         
         final DatagramSocket socket = this.socket;
@@ -199,11 +198,11 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
                             encoded, 0, encoded.length, endpoint);
                     
                     socket.send(packet);
-                    messageSent(callback, message);
+                    messageSent(message);
                     
                 } catch (IOException err) {
                     uncaughtException(socket, err);
-                    handleException(callback, message, err);
+                    handleException(message, err);
                 }
             }
         };

@@ -24,7 +24,7 @@ import org.ardverk.io.Bindable;
  * The {@link Transport} provides a generic interface for the DHT to 
  * send and receive messages over UDP or any other transport layer.
  */
-public interface Transport extends Endpoint, Bindable<TransportCallback.Inbound> {
+public interface Transport extends Endpoint, Bindable<TransportCallback> {
 
     /**
      * Returns the local {@link SocketAddress}

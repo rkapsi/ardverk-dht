@@ -99,7 +99,7 @@ public class SocketTransport extends AbstractTransport implements Closeable {
     }
     
     @Override
-    public synchronized void bind(TransportCallback.Inbound callback) throws IOException {
+    public synchronized void bind(TransportCallback callback) throws IOException {
         if (!open) {
             throw new IOException();
         }
@@ -173,7 +173,7 @@ public class SocketTransport extends AbstractTransport implements Closeable {
                     in.readFully(data);
                     
                     Message message = codec.decode(src, data);
-                    messageReceived(SocketTransport.this, message);
+                    messageReceived(message);
                 } catch (IOException err) {
                     uncaughtException(socket, err);
                 } finally {
@@ -187,8 +187,8 @@ public class SocketTransport extends AbstractTransport implements Closeable {
     }
     
     @Override
-    public void send(final Message message, final TransportCallback.Outbound callback, 
-            final long timeout, final TimeUnit unit)
+    public void send(final Message message, final long timeout, 
+            final TimeUnit unit)
                 throws IOException {
         
         if (socket == null) {
@@ -223,11 +223,11 @@ public class SocketTransport extends AbstractTransport implements Closeable {
                     
                     out.writeInt(encoded.length);
                     out.write(encoded);
-                    messageSent(callback, message);
+                    messageSent(message);
                     
                 } catch (IOException err) {
                     uncaughtException(socket, err);
-                    handleException(callback, message, err);
+                    handleException(message, err);
                     
                 } finally {
                     IoUtils.close(out);

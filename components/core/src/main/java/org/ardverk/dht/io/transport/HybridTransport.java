@@ -22,8 +22,6 @@ import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.dht.codec.MessageCodec;
-import org.ardverk.dht.io.transport.TransportCallback.Inbound;
-import org.ardverk.dht.io.transport.TransportCallback.Outbound;
 import org.ardverk.dht.message.Message;
 import org.ardverk.dht.message.StoreRequest;
 import org.ardverk.dht.message.StoreResponse;
@@ -62,7 +60,7 @@ public class HybridTransport extends DatagramTransport {
     }
     
     @Override
-    public void bind(Inbound callback) throws IOException {
+    public void bind(TransportCallback callback) throws IOException {
         super.bind(callback);
         socket.bind(callback);
     }
@@ -84,13 +82,13 @@ public class HybridTransport extends DatagramTransport {
     }
     
     @Override
-    public void send(Message message, Outbound callback, 
-            long timeout, TimeUnit unit) throws IOException {
+    public void send(Message message, long timeout, 
+            TimeUnit unit) throws IOException {
         
         if (isUseTCP(message)) {
-            socket.send(message, callback, timeout, unit);
+            socket.send(message, timeout, unit);
         } else {
-            super.send(message, callback, timeout, unit);
+            super.send(message, timeout, unit);
         }
     }
 }

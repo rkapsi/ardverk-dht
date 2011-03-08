@@ -27,11 +27,11 @@ import org.ardverk.lang.NullArgumentException;
  */
 public abstract class AbstractTransport implements Transport {
     
-    private final AtomicReference<TransportCallback.Inbound> callbackRef 
-        = new AtomicReference<TransportCallback.Inbound>();
+    private final AtomicReference<TransportCallback> callbackRef 
+        = new AtomicReference<TransportCallback>();
     
     @Override
-    public void bind(TransportCallback.Inbound callback) throws IOException {
+    public void bind(TransportCallback callback) throws IOException {
         if (callback == null) {
             throw new NullArgumentException("callback");
         }
@@ -54,8 +54,15 @@ public abstract class AbstractTransport implements Transport {
     /**
      * A helper method to notify the {@link TransportCallback.Inbound} callback.
      */
+    protected boolean messageReceived(Message message) throws IOException {
+        return messageReceived(this, message);
+    }
+    
+    /**
+     * A helper method to notify the {@link TransportCallback.Inbound} callback.
+     */
     protected boolean messageReceived(Endpoint endpoint, Message message) throws IOException {
-        TransportCallback.Inbound callback = callbackRef.get();
+        TransportCallback callback = callbackRef.get();
         if (callback != null) {
             callback.messageReceived(endpoint, message);
             return true;
@@ -63,26 +70,35 @@ public abstract class AbstractTransport implements Transport {
         return false;
     }
     
-    /**
-     * A helper method to notify the {@link TransportCallback.Outbound} callback.
-     */
-    protected static boolean messageSent(
-            TransportCallback.Outbound callback, Message message) {
-        if (callback != null) {
-            callback.messageSent(message);
-            return true;
-        }
-        return false;
+    protected boolean messageSent(Message message) {
+        return messageSent(this, message);
     }
     
     /**
      * A helper method to notify the {@link TransportCallback.Outbound} callback.
      */
-    protected static boolean handleException(
-            TransportCallback.Outbound callback, 
-            Message message, Throwable t) {
+    protected boolean messageSent(Endpoint endpoint, Message message) {
+        TransportCallback callback = callbackRef.get();
         if (callback != null) {
-            callback.handleException(message, t);
+            callback.messageSent(endpoint, message);
+            return true;
+        }
+        return false;
+    }
+    
+    protected boolean handleException(Message message, Throwable t) {
+        return handleException(this, message, t);
+    }
+    
+    /**
+     * A helper method to notify the {@link TransportCallback.Outbound} callback.
+     */
+    protected boolean handleException(Endpoint endpoint, 
+            Message message, Throwable t) {
+        
+        TransportCallback callback = callbackRef.get();
+        if (callback != null) {
+            callback.handleException(endpoint, message, t);
             return true;
         }
         return false;

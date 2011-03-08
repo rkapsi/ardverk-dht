@@ -26,6 +26,5 @@ public interface Endpoint {
     /**
      * Sends the given {@link Message}.
      */
-    public void send(Message message, TransportCallback.Outbound callback, 
-            long timeout, TimeUnit unit) throws IOException;
+    public void send(Message message, long timeout, TimeUnit unit) throws IOException;
 }

@@ -97,9 +97,10 @@ bootstrapAll() {
 
 // Bootstraps a list of DHTs
 bootstrap(DHT root, java.util.List dhts) {
+	SocketAddress foo = new InetSocketAddress("localhost", 12000);
 	for (DHT dht : dhts) {
 		if (dht != root) {
-			dht.bootstrap(root.getLocalhost()).get();
+			dht.bootstrap(foo).get();
 		}
 	}
 }
