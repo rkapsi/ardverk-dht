@@ -20,6 +20,9 @@ import java.io.IOException;
 
 import org.ardverk.dht.message.Message;
 
+/**
+ * The {@link TransportCallback} is called by {@link Transport}.
+ */
 public interface TransportCallback {
 
     /**
@@ -33,7 +36,7 @@ public interface TransportCallback {
     public void messageSent(Endpoint endpoint, Message message);
     
     /**
-     * Called for every message that failed to be sent.
+     * Called by {@link Transport} for every {@link Message} that failed to be sent.
      */
     public void handleException(Endpoint endpoint, Message message, Throwable t);
 }

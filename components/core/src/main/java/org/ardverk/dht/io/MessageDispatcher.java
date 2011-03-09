@@ -74,12 +74,12 @@ public abstract class MessageDispatcher
         
         @Override
         public void messageSent(Endpoint endpoint, Message message) {
-            MessageDispatcher.this.messageSent(message);
+            MessageDispatcher.this.messageSent(endpoint, message);
         }
         
         @Override
         public void handleException(Endpoint endpoint, Message message, Throwable t) {
-            MessageDispatcher.this.handleException(message, t);
+            MessageDispatcher.this.handleException(endpoint, message, t);
         }
     };
     
@@ -185,7 +185,7 @@ public abstract class MessageDispatcher
             long timeout, TimeUnit unit) throws IOException {
         
         if (endpoint == null) {
-            throw new IOException();
+            throw new IOException("endpoint=null");
         }
         
         endpoint.send(message, timeout, unit);
@@ -242,7 +242,8 @@ public abstract class MessageDispatcher
      * Callback method for outgoing {@link Message} that failed to be sent.
      * Returns {@code true} if the {@link Throwable} was handled or not.
      */
-    public boolean handleException(Message message, Throwable t) {
+    public boolean handleException(Endpoint endpoint, 
+            Message message, Throwable t) {
         MessageId messageId = message.getMessageId();
         MessageEntity entity = entityManager.get(messageId);
         
@@ -256,7 +257,7 @@ public abstract class MessageDispatcher
     /**
      * Callback method for all outgoing {@link Message}s that have been sent.
      */
-    public void messageSent(Message message) {
+    public void messageSent(Endpoint endpoint, Message message) {
     }
     
     /**

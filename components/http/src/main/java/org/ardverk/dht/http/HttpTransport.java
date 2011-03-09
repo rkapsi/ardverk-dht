@@ -26,23 +26,24 @@ import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.socket.ClientSocketChannelFactory;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
-import org.jboss.netty.handler.codec.http.HttpClientCodec;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.handler.codec.http.HttpVersion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HttpTransport extends AbstractTransport {
+    
+    private static final Logger LOG 
+        = LoggerFactory.getLogger(HttpTransport.class);
     
     private static final Executor EXECUTOR = Executors.newCachedThreadPool();
     
@@ -55,11 +56,14 @@ public class HttpTransport extends AbstractTransport {
     private final HttpRequestHandler requestHandler 
         = new DefaultHttpRequestHandler();
     
+    private final HttpResponseHandler responseHandler 
+        = new DefaultHttpResponseHandler();
+    
     private final SocketAddress bindaddr;
     
     private final ServerBootstrap server;
     
-    private final ClientSocketChannelFactory channelFactory;
+    private final ClientBootstrap client;
     
     private Channel acceptor;
     
@@ -84,8 +88,11 @@ public class HttpTransport extends AbstractTransport {
         server.setPipelineFactory(
                 new HttpServerPipelineFactory(requestHandler));
         
-        channelFactory = new NioClientSocketChannelFactory(
-                EXECUTOR, EXECUTOR);
+        client = new ClientBootstrap(
+                new NioClientSocketChannelFactory(
+                    EXECUTOR, EXECUTOR));
+        client.setPipelineFactory(
+                new HttpClientPipelineFactory(responseHandler));
     }
     
     @Override
@@ -107,16 +114,6 @@ public class HttpTransport extends AbstractTransport {
         
         super.unbind();
     }
-
-    private ChannelFuture connect(SocketAddress dst) {
-        ChannelPipeline pipeline = Channels.pipeline();
-        pipeline.addLast("codec", new HttpClientCodec());
-        pipeline.addLast("handler", new DefaultHttpResponseHandler(dst));
-        
-        ClientBootstrap client = new ClientBootstrap(channelFactory);
-        client.setPipeline(pipeline);
-        return client.connect(dst);
-    }
     
     @Override
     public void send(final Message message, long timeout, 
@@ -126,12 +123,19 @@ public class HttpTransport extends AbstractTransport {
         
         SocketAddress dst = NetworkUtils.getResolved(
                 message.getAddress());
-        System.out.println("SENDING: " + dst);
-        ChannelFuture future = connect(dst);
+        
+        ChannelFuture future = null;
+        try {
+            future = client.connect(dst);
+        } catch (Exception err) {
+            LOG.error("Exception", err);
+            handleException(message, err);
+            return;
+        }
         
         future.addListener(new ChannelFutureListener() {
             @Override
-            public void operationComplete(final ChannelFuture connectFuture) throws IOException {
+            public void operationComplete(ChannelFuture connectFuture) throws IOException {
                 if (!connectFuture.isSuccess()) {
                     handleException(message, connectFuture.getCause());
                     return;
@@ -164,15 +168,10 @@ public class HttpTransport extends AbstractTransport {
             HttpRequest request = (HttpRequest)e.getMessage();
             
             SocketAddress src = e.getRemoteAddress();
-            
-            System.out.println("RECEIVED #1: " + src);
-            
             ChannelBuffer content = request.getContent();
             
             Message message = codec.decode(src, content.array());
             assert (message instanceof RequestMessage);
-            
-            System.out.println("RECEIVED #1: " + message.getContact());
             
             HttpTransport.this.messageReceived(new Endpoint() {
                 @Override
@@ -203,12 +202,6 @@ public class HttpTransport extends AbstractTransport {
     
     private class DefaultHttpResponseHandler extends HttpResponseHandler {
         
-        private final SocketAddress dst;
-        
-        public DefaultHttpResponseHandler(SocketAddress dst) {
-            this.dst = dst;
-        }
-        
         @Override
         public void messageReceived(ChannelHandlerContext ctx, MessageEvent e)
                 throws Exception {
@@ -216,11 +209,8 @@ public class HttpTransport extends AbstractTransport {
             
             SocketAddress src = e.getRemoteAddress();
             
-            System.out.println("RECEIVED #2: " + src + " vs. " + e.getChannel().getLocalAddress());
-            
             ChannelBuffer content = response.getContent();
-            
-            Message message = codec.decode(dst, content.array());
+            Message message = codec.decode(src, content.array());
             
             HttpTransport.this.messageReceived(message);
         }

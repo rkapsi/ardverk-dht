@@ -206,9 +206,15 @@ public class DefaultContact extends AbstractContact {
      */
     private static SocketAddress combine(SocketAddress socketAddress, 
             SocketAddress contactAddress) {
-        String host = NetworkUtils.getHostName(socketAddress);
-        int port = NetworkUtils.getPort(contactAddress);
-        return NetworkUtils.createUnresolved(host, port);
+        
+        if (NetworkUtils.isAnyLocalAddress(socketAddress)) {
+            if (NetworkUtils.isAnyLocalAddress(contactAddress)) {
+                return NetworkUtils.createUnresolved("localhost", contactAddress);
+            }
+            return contactAddress;
+        }
+        
+        return NetworkUtils.create(socketAddress, contactAddress);
     }
     
     /**
