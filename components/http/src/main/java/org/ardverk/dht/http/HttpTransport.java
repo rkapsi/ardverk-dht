@@ -175,7 +175,7 @@ public class HttpTransport extends AbstractTransport {
             
             HttpTransport.this.messageReceived(new Endpoint() {
                 @Override
-                public void send(final Message message, long timeout,
+                public void send(Message message, long timeout,
                         TimeUnit unit) throws IOException {
                     
                     assert (message instanceof ResponseMessage);
@@ -194,7 +194,6 @@ public class HttpTransport extends AbstractTransport {
                     ChannelFuture future = channel.write(response);
                     future.addListener(ChannelFutureListener.CLOSE);
                     future.addListener(new MessageListener(this, message));
-                    
                 }
             }, message);
         }
@@ -213,6 +212,8 @@ public class HttpTransport extends AbstractTransport {
             Message message = codec.decode(src, content.array());
             
             HttpTransport.this.messageReceived(message);
+            
+            e.getChannel().close();
         }
     }
     
