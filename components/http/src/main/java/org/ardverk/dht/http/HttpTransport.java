@@ -27,6 +27,7 @@ import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.channel.SimpleChannelHandler;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
@@ -37,6 +38,8 @@ import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.handler.codec.http.HttpVersion;
+import org.jboss.netty.handler.timeout.IdleStateAwareChannelHandler;
+import org.jboss.netty.handler.timeout.IdleStateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,17 +56,22 @@ public class HttpTransport extends AbstractTransport {
     
     private final MessageCodec codec = new BencodeMessageCodec();
     
-    private final HttpRequestHandler requestHandler 
+    private final SimpleChannelHandler requestHandler 
         = new DefaultHttpRequestHandler();
     
-    private final HttpResponseHandler responseHandler 
+    private final SimpleChannelHandler responseHandler 
         = new DefaultHttpResponseHandler();
+    
+    private final HttpClientPipelineFactory pipelineFactory 
+        = new HttpClientPipelineFactory(responseHandler);
     
     private final SocketAddress bindaddr;
     
     private final ServerBootstrap server;
     
-    private final ClientBootstrap client;
+    //private final ClientBootstrap client;
+    
+    private final NioClientSocketChannelFactory channelFactory;
     
     private Channel acceptor;
     
@@ -88,11 +96,14 @@ public class HttpTransport extends AbstractTransport {
         server.setPipelineFactory(
                 new HttpServerPipelineFactory(requestHandler));
         
-        client = new ClientBootstrap(
+        /*client = new ClientBootstrap(
                 new NioClientSocketChannelFactory(
                     EXECUTOR, EXECUTOR));
         client.setPipelineFactory(
-                new HttpClientPipelineFactory(responseHandler));
+                new HttpClientPipelineFactory(responseHandler));*/
+        
+        channelFactory = new NioClientSocketChannelFactory(
+                EXECUTOR, EXECUTOR);
     }
     
     @Override
@@ -115,6 +126,15 @@ public class HttpTransport extends AbstractTransport {
         super.unbind();
     }
     
+    private ChannelFuture connect(SocketAddress addr, long timeout, TimeUnit unit) {
+        ClientBootstrap client 
+            = new ClientBootstrap(channelFactory);
+        client.setOption("connectTimeoutMillis", 
+                Integer.valueOf((int)unit.toMillis(timeout)));
+        client.setPipelineFactory(pipelineFactory);
+        return client.connect(addr);
+    }
+    
     @Override
     public void send(final Message message, long timeout, 
             TimeUnit unit) throws IOException {
@@ -126,7 +146,7 @@ public class HttpTransport extends AbstractTransport {
         
         ChannelFuture future = null;
         try {
-            future = client.connect(dst);
+            future = connect(dst, timeout, unit);
         } catch (Exception err) {
             LOG.error("Exception", err);
             handleException(message, err);
@@ -160,7 +180,15 @@ public class HttpTransport extends AbstractTransport {
         });
     }
     
-    private class DefaultHttpRequestHandler extends HttpRequestHandler {
+    private static class HttpHandler extends IdleStateAwareChannelHandler {
+
+        @Override
+        public void channelIdle(ChannelHandlerContext ctx, IdleStateEvent e) {
+            e.getChannel().close();
+        }
+    }
+    
+    private class DefaultHttpRequestHandler extends HttpHandler {
         
         @Override
         public void messageReceived(ChannelHandlerContext ctx, final MessageEvent e)
@@ -199,7 +227,7 @@ public class HttpTransport extends AbstractTransport {
         }
     }
     
-    private class DefaultHttpResponseHandler extends HttpResponseHandler {
+    private class DefaultHttpResponseHandler extends HttpHandler {
         
         @Override
         public void messageReceived(ChannelHandlerContext ctx, MessageEvent e)
