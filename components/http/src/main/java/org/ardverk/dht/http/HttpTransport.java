@@ -26,6 +26,7 @@ import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
@@ -184,6 +185,17 @@ public class HttpTransport extends AbstractTransport {
 
         @Override
         public void channelIdle(ChannelHandlerContext ctx, IdleStateEvent e) {
+            e.getChannel().close();
+        }
+
+        @Override
+        public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e)
+                throws Exception {
+            
+            if (LOG.isErrorEnabled()) {
+                LOG.error("Exception", e.getCause());
+            }
+            
             e.getChannel().close();
         }
     }
