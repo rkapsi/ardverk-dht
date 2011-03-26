@@ -43,7 +43,7 @@ import org.ardverk.dht.storage.Descriptor;
 import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.Value;
 import org.ardverk.dht.storage.ValueTuple;
-import org.ardverk.utils.ExceptionUtils;
+import org.ardverk.lang.ExceptionUtils;
 import org.ardverk.version.VectorClock;
 
 
