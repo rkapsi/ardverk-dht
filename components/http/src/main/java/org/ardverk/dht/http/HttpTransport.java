@@ -1,14 +1,29 @@
+/*
+ * Copyright 2009-2011 Roger Kapsi
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.ardverk.dht.http;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.concurrent.ExecutorUtils;
 import org.ardverk.dht.codec.MessageCodec;
 import org.ardverk.dht.codec.bencode.BencodeMessageCodec;
 import org.ardverk.dht.io.transport.AbstractTransport;
@@ -49,10 +64,11 @@ public class HttpTransport extends AbstractTransport {
     private static final Logger LOG 
         = LoggerFactory.getLogger(HttpTransport.class);
     
-    private static final Executor EXECUTOR = Executors.newCachedThreadPool();
+    private static final ThreadPoolExecutor EXECUTOR 
+        = ExecutorUtils.newCachedThreadPool("HttpTransportThread");
     
     static {
-        ((ThreadPoolExecutor)EXECUTOR).setKeepAliveTime(10L, TimeUnit.SECONDS);
+        EXECUTOR.setKeepAliveTime(10L, TimeUnit.SECONDS);
     }
     
     private final MessageCodec codec = new BencodeMessageCodec();
@@ -69,8 +85,6 @@ public class HttpTransport extends AbstractTransport {
     private final SocketAddress bindaddr;
     
     private final ServerBootstrap server;
-    
-    //private final ClientBootstrap client;
     
     private final NioClientSocketChannelFactory channelFactory;
     
@@ -96,12 +110,6 @@ public class HttpTransport extends AbstractTransport {
                     EXECUTOR, EXECUTOR));
         server.setPipelineFactory(
                 new HttpServerPipelineFactory(requestHandler));
-        
-        /*client = new ClientBootstrap(
-                new NioClientSocketChannelFactory(
-                    EXECUTOR, EXECUTOR));
-        client.setPipelineFactory(
-                new HttpClientPipelineFactory(responseHandler));*/
         
         channelFactory = new NioClientSocketChannelFactory(
                 EXECUTOR, EXECUTOR);
@@ -185,18 +193,17 @@ public class HttpTransport extends AbstractTransport {
 
         @Override
         public void channelIdle(ChannelHandlerContext ctx, IdleStateEvent e) {
-            e.getChannel().close();
+            HttpUtils.close(e);
         }
 
         @Override
-        public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e)
-                throws Exception {
+        public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
             
             if (LOG.isErrorEnabled()) {
                 LOG.error("Exception", e.getCause());
             }
             
-            e.getChannel().close();
+            HttpUtils.close(e);
         }
     }
     
@@ -204,7 +211,7 @@ public class HttpTransport extends AbstractTransport {
         
         @Override
         public void messageReceived(ChannelHandlerContext ctx, final MessageEvent e)
-                throws Exception {
+                throws IOException {
             HttpRequest request = (HttpRequest)e.getMessage();
             
             SocketAddress src = e.getRemoteAddress();
@@ -242,18 +249,21 @@ public class HttpTransport extends AbstractTransport {
     private class DefaultHttpResponseHandler extends HttpHandler {
         
         @Override
-        public void messageReceived(ChannelHandlerContext ctx, MessageEvent e)
-                throws Exception {
-            HttpResponse response = (HttpResponse)e.getMessage();
+        public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) 
+                throws IOException {
             
-            SocketAddress src = e.getRemoteAddress();
-            
-            ChannelBuffer content = response.getContent();
-            Message message = codec.decode(src, content.array());
-            
-            HttpTransport.this.messageReceived(message);
-            
-            e.getChannel().close();
+            try {
+                HttpResponse response = (HttpResponse)e.getMessage();
+                
+                SocketAddress src = e.getRemoteAddress();
+                
+                ChannelBuffer content = response.getContent();
+                Message message = codec.decode(src, content.array());
+                
+                HttpTransport.this.messageReceived(message);
+            } finally {
+                HttpUtils.close(e);
+            }
         }
     }
     
@@ -269,7 +279,7 @@ public class HttpTransport extends AbstractTransport {
         }
 
         @Override
-        public void operationComplete(ChannelFuture future) throws Exception {
+        public void operationComplete(ChannelFuture future) {
             if (future.isSuccess()) {
                 HttpTransport.this.messageSent(endpoint, message);
             } else {
