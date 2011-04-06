@@ -51,10 +51,7 @@ public class ValueRequestHandler extends AbstractRequestHandler {
         this.database = database;
     }
 
-    @Override
-    public void handleRequest(Endpoint endpoint, RequestMessage message) throws IOException {
-        ValueRequest request = (ValueRequest)message;
-        
+    public ResponseMessage createResponse(ValueRequest request) {
         Resource resource = request.getResource();
         ValueTuple value = database.get(resource);
         
@@ -68,6 +65,12 @@ public class ValueRequestHandler extends AbstractRequestHandler {
             response = factory.createNodeResponse(request, contacts);
         }
         
+        return response;
+    }
+    
+    @Override
+    public void handleRequest(Endpoint endpoint, RequestMessage request) throws IOException {
+        ResponseMessage response = createResponse((ValueRequest)request);
         send(endpoint, request, response);
     }
 }

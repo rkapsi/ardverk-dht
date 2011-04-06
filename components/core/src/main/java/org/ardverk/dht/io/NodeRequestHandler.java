@@ -46,10 +46,7 @@ public class NodeRequestHandler extends AbstractRequestHandler {
         this.routeTable = Arguments.notNull(routeTable, "routeTable");
     }
 
-    @Override
-    public void handleRequest(Endpoint endpoint, RequestMessage message) throws IOException {
-        
-        NodeRequest request = (NodeRequest)message;
+    public NodeResponse createResponse(NodeRequest request) {
         KUID lookupId = request.getId();
         
         // This is an idea where I'm not sure if it's improving anything 
@@ -83,7 +80,13 @@ public class NodeRequestHandler extends AbstractRequestHandler {
         Contact[] contacts = routeTable.select(lookupId);
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
-        NodeResponse response = factory.createNodeResponse(request, contacts);
+        return factory.createNodeResponse(request, contacts);
+    }
+    
+    @Override
+    public void handleRequest(Endpoint endpoint, 
+            RequestMessage request) throws IOException {
+        NodeResponse response = createResponse((NodeRequest)request);
         send(endpoint, request, response);
     }
 }

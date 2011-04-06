@@ -106,7 +106,8 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
     }
 
     @Override
-    protected void handleRequest(Endpoint endpoint, RequestMessage request) throws IOException {
+    protected void handleRequest(Endpoint endpoint, 
+            RequestMessage request) throws IOException {
         
         defaultHandler.handleRequest(request);
         
@@ -119,7 +120,7 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
         } else if (request instanceof StoreRequest) {
             store.handleRequest(endpoint, request);
         } else {
-            unhandledRequest(request, endpoint);
+            unhandledRequest(endpoint, request);
         }
     }
     
@@ -146,8 +147,8 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
         defaultHandler.handleLateResponse(response);
     }
 
-    protected void unhandledRequest(RequestMessage message, 
-            Endpoint endpoint) throws IOException {
+    protected void unhandledRequest(Endpoint endpoint, 
+            RequestMessage message) throws IOException {
         if (LOG.isErrorEnabled()) {
             LOG.error("Unhandled Request: " + message);
         }

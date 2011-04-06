@@ -36,12 +36,14 @@ public class PingRequestHandler extends AbstractRequestHandler {
         super(messageDispatcher);
     }
 
-    @Override
-    public void handleRequest(Endpoint endpoint, RequestMessage message) throws IOException {
-        PingRequest request = (PingRequest)message;
-        
+    public PingResponse createResponse(PingRequest request) {
         MessageFactory factory = messageDispatcher.getMessageFactory();
-        PingResponse response = factory.createPingResponse(request);
+        return factory.createPingResponse(request);
+    }
+    
+    @Override
+    public void handleRequest(Endpoint endpoint, RequestMessage request) throws IOException {
+        PingResponse response = createResponse((PingRequest)request);
         send(endpoint, request, response);
     }
 }

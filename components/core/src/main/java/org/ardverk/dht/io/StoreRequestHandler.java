@@ -23,8 +23,8 @@ import org.ardverk.dht.io.transport.Endpoint;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.message.RequestMessage;
-import org.ardverk.dht.message.ResponseMessage;
 import org.ardverk.dht.message.StoreRequest;
+import org.ardverk.dht.message.StoreResponse;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Database;
@@ -55,10 +55,7 @@ public class StoreRequestHandler extends AbstractRequestHandler {
         this.database = Arguments.notNull(database, "database");
     }
 
-    @Override
-    public void handleRequest(Endpoint endpoint, RequestMessage message) throws IOException {
-        
-        StoreRequest request = (StoreRequest)message;
+    public StoreResponse createResponse(StoreRequest request) {
         ValueTuple tuple = request.getValueTuple();
         Condition condition = null;
         
@@ -78,7 +75,12 @@ public class StoreRequestHandler extends AbstractRequestHandler {
         }
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
-        ResponseMessage response = factory.createStoreResponse(request, condition);
+        return factory.createStoreResponse(request, condition);
+    }
+    
+    @Override
+    public void handleRequest(Endpoint endpoint, RequestMessage request) throws IOException {
+        StoreResponse response = createResponse((StoreRequest)request);
         send(endpoint, request, response);
     }
 }
