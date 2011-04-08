@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<ivy-module version="1.0"> 
+	<info organisation="ardverk" module="ardverk-dht-outer-core" status="integration"/>
+	<configurations> 
+		<include file="${config.dir}/configurations.xml"/>
+	</configurations> 
+	<publications>
+		<artifact name="ardverk-dht-outer-core" type="jar" conf="compile" /> 
+	</publications> 
+	<dependencies>
+		<dependency org="ardverk" name="ardverk-dht-core" rev="latest.integration"/>
+	</dependencies>
+</ivy-module>

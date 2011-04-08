@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<project name="ardverk-dht-outer-core" default="compile">
+	<property file="build.properties"/>
+	<import file="${config.dir}/common.xml"/>
+</project>
