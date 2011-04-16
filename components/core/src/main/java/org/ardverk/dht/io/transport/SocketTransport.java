@@ -31,7 +31,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.concurrent.ExecutorGroup;
+import org.ardverk.concurrent.DefaultExecutorQueue;
+import org.ardverk.concurrent.ExecutorQueue;
 import org.ardverk.concurrent.ExecutorUtils;
 import org.ardverk.dht.codec.DefaultMessageCodec;
 import org.ardverk.dht.codec.MessageCodec;
@@ -56,8 +57,8 @@ public class SocketTransport extends AbstractTransport implements Closeable {
     
     private static final int DEFAULT_TIMEOUT = 10000;
     
-    private final ExecutorGroup executor 
-        = new ExecutorGroup(EXECUTOR);
+    private final ExecutorQueue<Runnable> executor 
+        = new DefaultExecutorQueue(EXECUTOR);
     
     private final MessageCodec codec;
     

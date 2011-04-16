@@ -27,7 +27,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.concurrent.ExecutorGroup;
+import org.ardverk.concurrent.DefaultExecutorQueue;
+import org.ardverk.concurrent.ExecutorQueue;
 import org.ardverk.concurrent.ExecutorUtils;
 import org.ardverk.dht.codec.DefaultMessageCodec;
 import org.ardverk.dht.codec.MessageCodec;
@@ -50,8 +51,8 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
     
     private final int MAX_SIZE = 8 * 1024;
     
-    private final ExecutorGroup executor 
-        = new ExecutorGroup(EXECUTOR);
+    private final ExecutorQueue<Runnable> executor 
+        = new DefaultExecutorQueue(EXECUTOR);
     
     private final MessageCodec codec;
     

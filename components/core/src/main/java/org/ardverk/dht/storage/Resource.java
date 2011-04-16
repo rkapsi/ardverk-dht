@@ -20,7 +20,7 @@ import org.ardverk.dht.KUID;
 import org.ardverk.dht.lang.Identifier;
 
 /**
- * 
+ * A {@link Resource} is an unique identifier of a {@link Value}.
  */
 public class Resource implements Identifier {
 
