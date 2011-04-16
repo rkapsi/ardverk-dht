@@ -8,7 +8,6 @@
 		<artifact name="ardverk-dht-core" type="jar" conf="compile" /> 
 	</publications> 
 	<dependencies>
-		<dependency org="ardverk" name="ardverk-commons" rev="0.1"/>
 		<dependency org="ardverk" name="ardverk-concurrent" rev="0.2"/>
 		<dependency org="ardverk" name="ardverk-base" rev="0.2"/>
 		<dependency org="ardverk" name="bee-encode" rev="0.2"/>
