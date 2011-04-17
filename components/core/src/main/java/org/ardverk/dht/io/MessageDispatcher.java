@@ -46,7 +46,6 @@ import org.ardverk.dht.routing.Contact;
 import org.ardverk.io.Bindable;
 import org.ardverk.io.IoUtils;
 import org.ardverk.lang.Arguments;
-import org.ardverk.lang.NullArgumentException;
 import org.ardverk.lang.TimeStamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -134,7 +133,7 @@ public abstract class MessageDispatcher
     @Override
     public synchronized void bind(Transport transport) throws IOException {
         if (transport == null) {
-            throw new NullArgumentException("transport");
+            throw new NullPointerException("transport");
         }
         
         if (isBound()) {

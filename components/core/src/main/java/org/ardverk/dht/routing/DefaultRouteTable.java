@@ -41,7 +41,6 @@ import org.ardverk.dht.lang.Identifier;
 import org.ardverk.dht.routing.ContactEntry.Update;
 import org.ardverk.dht.utils.ContactKey;
 import org.ardverk.lang.Arguments;
-import org.ardverk.lang.NullArgumentException;
 import org.ardverk.net.NetworkCounter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -133,7 +132,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
     @Override
     public synchronized void add(Contact contact) {
         if (contact == null) {
-            throw new NullArgumentException("contact");
+            throw new NullPointerException("contact");
         }
         
         // Make sure the KUIDs of all Contacts have the
@@ -449,7 +448,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
     @Override
     public synchronized Contact get(KUID contactId) {
         if (contactId == null) {
-            throw new NullArgumentException("contactId");
+            throw new NullPointerException("contactId");
         }
         
         DefaultBucket bucket = buckets.selectValue(contactId);
@@ -473,7 +472,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
             final Collection<Contact> dst, final int count) {
         
         if (contactId == null) {
-            throw new NullArgumentException("contactId");
+            throw new NullPointerException("contactId");
         }
         
         if (dst.size() >= count) {

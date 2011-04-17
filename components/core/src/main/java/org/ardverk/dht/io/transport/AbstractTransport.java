@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.ardverk.dht.message.Message;
-import org.ardverk.lang.NullArgumentException;
 
 /**
  * An abstract implementation of {@link Transport}.
@@ -33,7 +32,7 @@ public abstract class AbstractTransport implements Transport {
     @Override
     public void bind(TransportCallback callback) throws IOException {
         if (callback == null) {
-            throw new NullArgumentException("callback");
+            throw new NullPointerException("callback");
         }
         
         if (!callbackRef.compareAndSet(null, callback)) {

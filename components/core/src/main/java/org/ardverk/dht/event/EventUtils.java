@@ -23,7 +23,6 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.ardverk.concurrent.DefaultThreadFactory;
-import org.ardverk.lang.NullArgumentException;
 
 /**
  * The {@link EventUtils} class provides a simple interface to fire
@@ -100,7 +99,7 @@ public class EventUtils {
         @Override
         public void fireEvent(Runnable event) {
             if (event == null) {
-                throw new NullArgumentException("event");
+                throw new NullPointerException("event");
             }
             
             executor.execute(event);

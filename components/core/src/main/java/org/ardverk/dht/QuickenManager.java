@@ -17,12 +17,13 @@
 package org.ardverk.dht;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.concurrent.AsyncCompletionService;
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
-import org.ardverk.concurrent.CountDown;
 import org.ardverk.concurrent.FutureUtils;
 import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.concurrent.DHTValueFuture;
@@ -129,15 +130,12 @@ public class QuickenManager {
     
     public static class QuickenFuture extends DHTValueFuture<QuickenEntity> {
         
-        private final CountDown countDown;
-        
         private final TimeStamp timeStamp;
         
         private final DHTFuture<PingEntity>[] pingFutures;
         
         private final DHTFuture<NodeEntity>[] lookupFutures;
         
-        @SuppressWarnings("unchecked")
         private QuickenFuture(TimeStamp timeStamp, 
                 DHTFuture<PingEntity>[] pingFutures, 
                 DHTFuture<NodeEntity>[] lookupFutures) {
@@ -145,30 +143,17 @@ public class QuickenManager {
             this.pingFutures = pingFutures;
             this.lookupFutures = lookupFutures;
             
-            countDown = new CountDown(pingFutures.length + lookupFutures.length);
+            List<AsyncFuture<?>> futures = new ArrayList<AsyncFuture<?>>();
+            futures.addAll(Arrays.asList(pingFutures));
+            futures.addAll(Arrays.asList(lookupFutures));
             
-            // It's possible that countdown is 0!
-            if (0 < countDown.get()) {
-                AsyncFutureListener<?> listener 
-                        = new AsyncFutureListener<Object>() {
-                    @Override
-                    public void operationComplete(AsyncFuture<Object> future) {
-                        coutdown();
-                    }
-                };
-                
-                for (DHTFuture<PingEntity> future : pingFutures) {
-                    future.addAsyncFutureListener(
-                            (AsyncFutureListener<PingEntity>)listener);
+            AsyncFuture<List<AsyncFuture<?>>> complete = AsyncCompletionService.create(futures);
+            complete.addAsyncFutureListener(new AsyncFutureListener<List<AsyncFuture<?>>>() {
+                @Override
+                public void operationComplete(AsyncFuture<List<AsyncFuture<?>>> future) {
+                    complete();   
                 }
-                
-                for (DHTFuture<NodeEntity> future : lookupFutures) {
-                    future.addAsyncFutureListener(
-                            (AsyncFutureListener<NodeEntity>)listener);
-                }
-            } else {
-                complete();
-            }
+            });
         }
         
         public DHTFuture<PingEntity>[] getPingFutures() {
@@ -185,12 +170,6 @@ public class QuickenManager {
             
             FutureUtils.cancelAll(pingFutures, true);
             FutureUtils.cancelAll(lookupFutures, true);
-        }
-        
-        private void coutdown() {
-            if (countDown.countDown()) {
-                complete();
-            }
         }
         
         private void complete() {
