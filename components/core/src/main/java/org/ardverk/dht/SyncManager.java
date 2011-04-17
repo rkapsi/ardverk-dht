@@ -24,6 +24,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.ardverk.concurrent.AsyncCompletionService;
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.CountDown;
@@ -254,8 +255,6 @@ public class SyncManager {
     
     private static class PingFuture extends DHTValueFuture<Sync> {
         
-        private final CountDown countDown;
-        
         private final List<DHTFuture<PingEntity>> futures;
         
         private final int index;
@@ -264,24 +263,14 @@ public class SyncManager {
             this.futures = futures;
             this.index = index;
             
-            countDown = new CountDown(futures.size());
-            
-            // It's possible that countdown is 0!
-            if (0 < countDown.get()) {
-                AsyncFutureListener<PingEntity> listener 
-                        = new AsyncFutureListener<PingEntity>() {
-                    @Override
-                    public void operationComplete(AsyncFuture<PingEntity> future) {
-                        coutdown();
-                    }
-                };
-                
-                for (DHTFuture<PingEntity> future : futures) {
-                    future.addAsyncFutureListener(listener);
+            AsyncFuture<List<DHTFuture<PingEntity>>> complete 
+                = AsyncCompletionService.create(futures);
+            complete.addAsyncFutureListener(new AsyncFutureListener<List<DHTFuture<PingEntity>>>() {
+                @Override
+                public void operationComplete(AsyncFuture<List<DHTFuture<PingEntity>>> future) {
+                    complete();
                 }
-            } else {
-                complete();
-            }
+            });
         }
         
         @Override
@@ -289,12 +278,6 @@ public class SyncManager {
             super.done();
             
             FutureUtils.cancelAll(futures, true);
-        }
-        
-        private void coutdown() {
-            if (countDown.countDown()) {
-                complete();
-            }
         }
         
         private void complete() {
