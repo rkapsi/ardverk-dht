@@ -263,11 +263,11 @@ public class SyncManager {
             this.futures = futures;
             this.index = index;
             
-            AsyncFuture<List<DHTFuture<PingEntity>>> complete 
-                = AsyncCompletionService.create(futures);
-            complete.addAsyncFutureListener(new AsyncFutureListener<List<DHTFuture<PingEntity>>>() {
+            AsyncFuture<Void> complete 
+                = AsyncCompletionService.createVoid(futures);
+            complete.addAsyncFutureListener(new AsyncFutureListener<Void>() {
                 @Override
-                public void operationComplete(AsyncFuture<List<DHTFuture<PingEntity>>> future) {
+                public void operationComplete(AsyncFuture<Void> future) {
                     complete();
                 }
             });

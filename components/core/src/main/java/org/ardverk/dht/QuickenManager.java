@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.collection.Iterables;
 import org.ardverk.concurrent.AsyncCompletionService;
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
@@ -143,14 +144,16 @@ public class QuickenManager {
             this.pingFutures = pingFutures;
             this.lookupFutures = lookupFutures;
             
-            List<AsyncFuture<?>> futures = new ArrayList<AsyncFuture<?>>();
-            futures.addAll(Arrays.asList(pingFutures));
-            futures.addAll(Arrays.asList(lookupFutures));
+            @SuppressWarnings("unchecked")
+            Iterable<? extends AsyncFuture<?>> futures 
+                    = Iterables.fromIterables(
+                            Arrays.asList(pingFutures), 
+                            Arrays.asList(lookupFutures));
             
-            AsyncFuture<List<AsyncFuture<?>>> complete = AsyncCompletionService.create(futures);
-            complete.addAsyncFutureListener(new AsyncFutureListener<List<AsyncFuture<?>>>() {
+            AsyncFuture<Void> complete = AsyncCompletionService.createVoid(futures);
+            complete.addAsyncFutureListener(new AsyncFutureListener<Void>() {
                 @Override
-                public void operationComplete(AsyncFuture<List<AsyncFuture<?>>> future) {
+                public void operationComplete(AsyncFuture<Void> future) {
                     complete();   
                 }
             });
