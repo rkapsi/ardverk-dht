@@ -204,7 +204,7 @@ public class ArdverkUtils {
             
             int rnd = (int)(dhts.size() * Math.random());
             future = dhts.get(rnd).put(new DefaultResource(valueId), 
-                    new ByteArrayValue(value), putConfig);
+                    new ByteArrayValue(value), null, putConfig);
             
             if (i % 1000 == 0) {
                 System.out.println("PROGRESS: " + i);

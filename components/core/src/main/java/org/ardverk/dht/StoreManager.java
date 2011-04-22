@@ -65,12 +65,32 @@ public class StoreManager {
         this.messageDispatcher = messageDispatcher;
     }
     
-    public DHTFuture<PutEntity> remove(Resource resource, PutConfig config) {
-        return put(resource, ByteArrayValue.EMPTY, config);
+    public DHTFuture<PutEntity> remove(Resource resource, 
+            VectorClock<KUID> clock, PutConfig config) {
+        return put(resource, ByteArrayValue.EMPTY, clock, config);
+    }
+    
+    public DHTFuture<PutEntity> remove(ValueTuple tuple, PutConfig config) {
+        
+        Descriptor descriptor = tuple.getDescriptor();
+        Resource resource = descriptor.getResource();
+        VectorClock<KUID> clock = descriptor.getVectorClock();
+        
+        return remove(resource, clock, config);
+    }
+
+    public DHTFuture<PutEntity> update(ValueTuple tuple, Value value,
+            PutConfig config) {
+        
+        Descriptor descriptor = tuple.getDescriptor();
+        Resource resource = descriptor.getResource();
+        VectorClock<KUID> clock = descriptor.getVectorClock();
+        
+        return put(resource, value, clock, config);
     }
     
     public DHTFuture<PutEntity> put(final Resource resource, final Value value, 
-            final PutConfig config) {
+            final VectorClock<KUID> clock, final PutConfig config) {
         
         final Object lock = new Object();
         synchronized (lock) {
@@ -115,8 +135,9 @@ public class StoreManager {
                 }
                 
                 private void handleNodeEntity(NodeEntity nodeEntity) {
-                    if (config.getStoreConfig().isSloppy()) {
-                        doStore(nodeEntity, null);
+                    StoreConfig store = config.getStoreConfig();
+                    if (clock != null || store.isSloppy()) {
+                        doStore(nodeEntity, clock);
                     } else {
                         doGetVectorClock(nodeEntity);
                     }
@@ -153,7 +174,7 @@ public class StoreManager {
                         private void handleVectorClockException(Throwable t) {
                             if (ExceptionUtils.isCausedBy(
                                     t, NoSuchValueException.class)) {
-                                doStore(nodeEntity, null);
+                                doStore(nodeEntity, clock);
                             } else {
                                 handleException(t);
                             }
@@ -228,17 +249,16 @@ public class StoreManager {
         
         Contact localhost = dht.getLocalhost();
         
-        VectorClock<KUID> update = null;
-        if (!config.isSloppy()) {
-            if (clock == null) {
-                clock = VectorClock.create();
-            }
-            
-            update = clock.append(localhost.getId());
+        if (!config.isSloppy() && clock == null) {
+            clock = VectorClock.create();
+        }
+        
+        if (clock != null) {
+            clock = clock.append(localhost.getId());
         }
         
         Descriptor descriptor = new DefaultDescriptor(
-                localhost, resource, update);
+                localhost, resource, clock);
         
         ValueTuple valueTuple = new DefaultValueTuple(
                 descriptor, value);

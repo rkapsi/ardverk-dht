@@ -53,6 +53,7 @@ import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.StoreForward;
 import org.ardverk.dht.storage.Value;
 import org.ardverk.dht.storage.ValueTuple;
+import org.ardverk.version.VectorClock;
 
 
 /**
@@ -267,15 +268,28 @@ public class ArdverkDHT extends AbstractDHT {
     }
 
     @Override
-    public DHTFuture<PutEntity> put(Resource resource, Value value, PutConfig config) {
-        return storeManager.put(resource, value, config);
+    public DHTFuture<PutEntity> put(Resource resource, Value value, 
+            VectorClock<KUID> clock, PutConfig config) {
+        return storeManager.put(resource, value, clock, config);
     }
     
     @Override
-    public DHTFuture<PutEntity> remove(Resource resource, PutConfig config) {
-        return storeManager.remove(resource, config);
+    public DHTFuture<PutEntity> remove(Resource resource, 
+            VectorClock<KUID> clock, PutConfig config) {
+        return storeManager.remove(resource, clock, config);
     }
     
+    @Override
+    public DHTFuture<PutEntity> update(ValueTuple tuple, Value value,
+            PutConfig config) {
+        return storeManager.update(tuple, value, config);
+    }
+    
+    @Override
+    public DHTFuture<PutEntity> remove(ValueTuple tuple, PutConfig config) {
+        return storeManager.remove(tuple, config);
+    }
+
     @Override
     public DHTFuture<QuickenEntity> quicken(QuickenConfig config) {
         return quickenManager.quicken(config);

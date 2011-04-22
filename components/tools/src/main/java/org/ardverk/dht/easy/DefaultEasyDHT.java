@@ -79,12 +79,12 @@ public class DefaultEasyDHT extends ArdverkDHT implements EasyDHT {
 
     @Override
     public DHTFuture<PutEntity> put(Resource resource, Value value) {
-        return put(resource, value, config.getPutConfig());
+        return put(resource, value, null, config.getPutConfig());
     }
 
     @Override
     public DHTFuture<PutEntity> remove(Resource resource) {
-        return remove(resource, config.getPutConfig());
+        return remove(resource, null, config.getPutConfig());
     }
     
     @Override
