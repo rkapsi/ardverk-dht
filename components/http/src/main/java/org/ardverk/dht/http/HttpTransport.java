@@ -16,6 +16,8 @@
 
 package org.ardverk.dht.http;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -25,6 +27,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.ExecutorUtils;
 import org.ardverk.dht.codec.MessageCodec;
+import org.ardverk.dht.codec.MessageCodec.Decoder;
+import org.ardverk.dht.codec.MessageCodec.Encoder;
 import org.ardverk.dht.codec.bencode.BencodeMessageCodec;
 import org.ardverk.dht.io.transport.AbstractTransport;
 import org.ardverk.dht.io.transport.Endpoint;
@@ -170,13 +174,18 @@ public class HttpTransport extends AbstractTransport {
                     return;
                 }
                 
-                byte[] data = codec.encode(message);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                Encoder encoder = codec.createEncoder(baos);
+                encoder.write(message);
+                encoder.close();
+                
+                byte[] encoded = baos.toByteArray();
                 
                 HttpRequest request = new DefaultHttpRequest(
                         HttpVersion.HTTP_1_1, 
                         HttpMethod.POST, "/ardverk");
-                request.setContent(ChannelBuffers.copiedBuffer(data));
-                request.setHeader(HttpHeaders.Names.CONTENT_LENGTH, data.length);
+                request.setContent(ChannelBuffers.copiedBuffer(encoded));
+                request.setHeader(HttpHeaders.Names.CONTENT_LENGTH, encoded.length);
                 request.setHeader(HttpHeaders.Names.CONNECTION, 
                         HttpHeaders.Values.CLOSE);
                 
@@ -217,7 +226,11 @@ public class HttpTransport extends AbstractTransport {
             SocketAddress src = e.getRemoteAddress();
             ChannelBuffer content = request.getContent();
             
-            Message message = codec.decode(src, content.array());
+            ByteArrayInputStream bais = new ByteArrayInputStream(content.array());
+            Decoder decoder = codec.createDecoder(src, bais);
+            Message message = decoder.read();
+            decoder.close();
+            
             assert (message instanceof RequestMessage);
             
             HttpTransport.this.messageReceived(new Endpoint() {
@@ -227,13 +240,18 @@ public class HttpTransport extends AbstractTransport {
                     
                     assert (message instanceof ResponseMessage);
                     
-                    byte[] data = codec.encode(message);
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    Encoder encoder = codec.createEncoder(baos);
+                    encoder.write(message);
+                    encoder.close();
+                    
+                    byte[] encoded = baos.toByteArray();
                     
                     HttpResponse response = new DefaultHttpResponse(
                             HttpVersion.HTTP_1_1, 
                             HttpResponseStatus.OK);
-                    response.setContent(ChannelBuffers.copiedBuffer(data));
-                    response.setHeader(HttpHeaders.Names.CONTENT_LENGTH, data.length);
+                    response.setContent(ChannelBuffers.copiedBuffer(encoded));
+                    response.setHeader(HttpHeaders.Names.CONTENT_LENGTH, encoded.length);
                     response.setHeader(HttpHeaders.Names.CONNECTION, 
                             HttpHeaders.Values.CLOSE);
                     
@@ -258,7 +276,11 @@ public class HttpTransport extends AbstractTransport {
                 SocketAddress src = e.getRemoteAddress();
                 
                 ChannelBuffer content = response.getContent();
-                Message message = codec.decode(src, content.array());
+                
+                ByteArrayInputStream bais = new ByteArrayInputStream(content.array());
+                Decoder decoder = codec.createDecoder(src, bais);
+                Message message = decoder.read();
+                decoder.close();
                 
                 HttpTransport.this.messageReceived(message);
             } finally {

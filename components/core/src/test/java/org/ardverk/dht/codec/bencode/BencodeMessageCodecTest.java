@@ -16,11 +16,17 @@
 
 package org.ardverk.dht.codec.bencode;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
+import junit.framework.TestCase;
+
 import org.ardverk.dht.KUID;
+import org.ardverk.dht.codec.MessageCodec.Decoder;
+import org.ardverk.dht.codec.MessageCodec.Encoder;
 import org.ardverk.dht.message.DefaultPingRequest;
 import org.ardverk.dht.message.Message;
 import org.ardverk.dht.message.MessageId;
@@ -48,9 +54,16 @@ public class BencodeMessageCodecTest {
         SocketAddress address = new InetSocketAddress("localhost", 6666);
         PingRequest request = new DefaultPingRequest(messageId, contact, address);
         
-        byte[] data = codec.encode(request);
-        Message message = codec.decode(address, data);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Encoder encoder = codec.createEncoder(baos);
+        encoder.write(request);
+        encoder.close();
         
-        System.out.println(message);
+        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+        Decoder decoder = codec.createDecoder(address, bais);
+        Message message = decoder.read();
+        decoder.close();
+        
+        TestCase.assertTrue(message instanceof PingRequest);
     }
 }

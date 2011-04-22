@@ -19,8 +19,6 @@ package org.ardverk.dht.io.transport;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.Closeable;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -34,8 +32,10 @@ import java.util.concurrent.TimeUnit;
 import org.ardverk.concurrent.DefaultExecutorQueue;
 import org.ardverk.concurrent.ExecutorQueue;
 import org.ardverk.concurrent.ExecutorUtils;
-import org.ardverk.dht.codec.DefaultMessageCodec;
 import org.ardverk.dht.codec.MessageCodec;
+import org.ardverk.dht.codec.MessageCodec.Decoder;
+import org.ardverk.dht.codec.MessageCodec.Encoder;
+import org.ardverk.dht.codec.bencode.BencodeMessageCodec;
 import org.ardverk.dht.message.Message;
 import org.ardverk.io.IoUtils;
 import org.ardverk.lang.Arguments;
@@ -85,7 +85,7 @@ public class SocketTransport extends AbstractTransport implements Closeable {
     }
     
     public SocketTransport(SocketAddress bindaddr) {
-        this(new DefaultMessageCodec(), bindaddr);
+        this(new BencodeMessageCodec(), bindaddr);
     }
     
     public SocketTransport(MessageCodec codec, 
@@ -162,23 +162,19 @@ public class SocketTransport extends AbstractTransport implements Closeable {
             public void run() {
                 SocketAddress src = socket.getRemoteSocketAddress();
                 
-                DataInputStream in = null;
+                Decoder decoder = null;
                 try {
-                    in = new DataInputStream(
+                    decoder = codec.createDecoder(src, 
                             new BufferedInputStream(
-                                    socket.getInputStream()));
+                                socket.getInputStream()));
                     socket.shutdownOutput();
                     
-                    int length = in.readInt();
-                    byte[] data = new byte[length];
-                    in.readFully(data);
-                    
-                    Message message = codec.decode(src, data);
+                    Message message = decoder.read();
                     messageReceived(message);
                 } catch (IOException err) {
                     uncaughtException(socket, err);
                 } finally {
-                    IoUtils.close(in);
+                    IoUtils.close(decoder);
                     IoUtils.close(socket);
                 }
             }
@@ -197,13 +193,12 @@ public class SocketTransport extends AbstractTransport implements Closeable {
         }
         
         final SocketAddress dst = message.getAddress();
-        final byte[] encoded = codec.encode(message);
         
         Runnable task = new Runnable() {
             @Override
             public void run() {
                 Socket socket = null;
-                DataOutputStream out = null;
+                Encoder encoder = null;
                 try {
                     socket = new Socket();
                     
@@ -218,12 +213,11 @@ public class SocketTransport extends AbstractTransport implements Closeable {
                     socket.connect(endpoint, timeoutInMillis);
                     
                     socket.shutdownInput();
-                    out = new DataOutputStream(
-                            new BufferedOutputStream(
-                                socket.getOutputStream()));
+                    encoder = codec.createEncoder(
+                                new BufferedOutputStream(
+                                    socket.getOutputStream()));
                     
-                    out.writeInt(encoded.length);
-                    out.write(encoded);
+                    encoder.write(message);
                     messageSent(message);
                     
                 } catch (IOException err) {
@@ -231,7 +225,7 @@ public class SocketTransport extends AbstractTransport implements Closeable {
                     handleException(message, err);
                     
                 } finally {
-                    IoUtils.close(out);
+                    IoUtils.close(encoder);
                     IoUtils.close(socket);
                 }
             }

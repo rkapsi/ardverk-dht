@@ -27,8 +27,8 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.dht.codec.DefaultMessageCodec;
 import org.ardverk.dht.codec.MessageCodec;
+import org.ardverk.dht.codec.bencode.BencodeMessageCodec;
 import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.concurrent.ExecutorKey;
 import org.ardverk.dht.config.BootstrapConfig;
@@ -53,12 +53,9 @@ import org.ardverk.utils.StringUtils;
 
 
 public class ArdverkUtils {
-
-    private static final String SECRET_KEY = "90fb237cbec71523ba9d883a8ec6ae9f";
-    private static final String INIT_VECTOR = "6fd7bda068bf2425980e5c9b1c9e2097";
     
     private static final MessageCodec CODEC 
-        = new DefaultMessageCodec(SECRET_KEY, INIT_VECTOR);
+        = new BencodeMessageCodec();
     
     private static final EasyConfig CONFIG = new EasyConfig();
     

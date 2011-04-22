@@ -16,6 +16,8 @@
 
 package org.ardverk.dht.io.transport;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -30,8 +32,10 @@ import java.util.concurrent.TimeUnit;
 import org.ardverk.concurrent.DefaultExecutorQueue;
 import org.ardverk.concurrent.ExecutorQueue;
 import org.ardverk.concurrent.ExecutorUtils;
-import org.ardverk.dht.codec.DefaultMessageCodec;
 import org.ardverk.dht.codec.MessageCodec;
+import org.ardverk.dht.codec.MessageCodec.Decoder;
+import org.ardverk.dht.codec.MessageCodec.Encoder;
+import org.ardverk.dht.codec.bencode.BencodeMessageCodec;
 import org.ardverk.dht.message.Message;
 import org.ardverk.io.IoUtils;
 import org.ardverk.net.NetworkUtils;
@@ -79,7 +83,7 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
     }
     
     public DatagramTransport(SocketAddress bindaddr) {
-        this(new DefaultMessageCodec(), bindaddr);
+        this(new BencodeMessageCodec(), bindaddr);
     }
     
     public DatagramTransport(MessageCodec codec, 
@@ -164,11 +168,16 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
         Runnable task = new Runnable() {
             @Override
             public void run() {
+                Decoder decoder = null;
                 try {
-                    Message message = codec.decode(src, data);
+                    decoder = codec.createDecoder(src, 
+                            new ByteArrayInputStream(data));
+                    Message message = decoder.read();
                     messageReceived(message);
                 } catch (IOException err) {
                     uncaughtException(socket, err);
+                } finally {
+                    IoUtils.close(decoder);
                 }
             }
         };
@@ -193,8 +202,13 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
                     
                     SocketAddress endpoint = NetworkUtils.getResolved(
                             message.getAddress());
-                    byte[] encoded = codec.encode(message);
                     
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    Encoder encoder = codec.createEncoder(baos);
+                    encoder.write(message);
+                    encoder.close();
+                    
+                    byte[] encoded = baos.toByteArray();
                     DatagramPacket packet = new DatagramPacket(
                             encoded, 0, encoded.length, endpoint);
                     

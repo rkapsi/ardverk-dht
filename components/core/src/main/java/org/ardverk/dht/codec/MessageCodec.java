@@ -16,7 +16,11 @@
 
 package org.ardverk.dht.codec;
 
+import java.io.Closeable;
+import java.io.Flushable;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.SocketAddress;
 
 import org.ardverk.dht.message.Message;
@@ -28,18 +32,32 @@ import org.ardverk.dht.message.Message;
 public interface MessageCodec {
     
     /**
-     * Encodes the given {@link Message}.
+     * Creates and returns a {@link Decoder}.
      */
-    public abstract byte[] encode(Message message) throws IOException;
+    public Decoder createDecoder(SocketAddress src, InputStream in) throws IOException;
     
     /**
-     * Decodes the given bytes and returns it as a {@link Message}.
+     * Creates and retruns an {@link Encoder}.
      */
-    public Message decode(SocketAddress src, byte[] data) throws IOException;
+    public Encoder createEncoder(OutputStream out) throws IOException;
     
     /**
-     * Decodes the given bytes and returns it as a {@link Message}.
+     * A {@link Decoder} decodes {@link Message}s.
      */
-    public abstract Message decode(SocketAddress src, 
-            byte[] data, int offset, int length) throws IOException;
+    public static interface Decoder extends Closeable {
+        /**
+         * Reads and returns a {@link Message}.
+         */
+        public Message read() throws IOException;
+    }
+    
+    /**
+     * A {@link Encoder} encodes {@link Message}s.
+     */
+    public static interface Encoder extends Flushable, Closeable {
+        /**
+         * Writes the given {@link Message}.
+         */
+        public void write(Message message) throws IOException;
+    }
 }
