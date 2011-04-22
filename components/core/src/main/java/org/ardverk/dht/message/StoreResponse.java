@@ -16,7 +16,7 @@
 
 package org.ardverk.dht.message;
 
-import org.ardverk.dht.storage.Database.Condition;
+import org.ardverk.dht.storage.Status;
 
 /**
  * A {@link MessageType#STORE} response.
@@ -24,7 +24,7 @@ import org.ardverk.dht.storage.Database.Condition;
 public interface StoreResponse extends ResponseMessage {
 
     /**
-     * Returns the remote host's {@link Condition}.
+     * Returns the remote host's {@link Status}.
      */
-    public Condition getCondition();
+    public Status getStatus();
 }

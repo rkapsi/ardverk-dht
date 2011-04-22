@@ -147,7 +147,7 @@ put(DHT dht, String key, String value) {
 		
 	PutEntity entity = future.get();
 	for (StoreResponse response : entity.getStoreResponses()) {
-		print("PUT: " + response.getContact().getId() + " -> " + response.getCondition());
+		print("PUT: " + response.getContact().getId() + " -> " + response.getStatus());
 	}
 }
 

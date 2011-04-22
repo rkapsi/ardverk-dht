@@ -17,7 +17,6 @@
 package org.ardverk.dht.storage;
 
 import org.ardverk.dht.KUID;
-import org.ardverk.dht.lang.Identifier;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.lang.Age;
 import org.ardverk.lang.Epoch;
@@ -28,7 +27,7 @@ import org.ardverk.version.VectorClock;
  * creator and sender (possibly the same), its creation time (local time)
  * and its age.
  */
-public interface Descriptor extends Identifier, Epoch, Age {
+public interface Descriptor extends Epoch, Age {
 
     /**
      * Returns the sender of the {@link ValueTuple}.

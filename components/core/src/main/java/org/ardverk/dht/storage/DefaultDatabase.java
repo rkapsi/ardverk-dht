@@ -17,10 +17,13 @@
 package org.ardverk.dht.storage;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.ardverk.collection.Cursor;
 import org.ardverk.collection.PatriciaTrie;
@@ -51,32 +54,36 @@ public class DefaultDatabase extends AbstractDatabase {
     }
 
     @Override
-    public synchronized Condition store(ValueTuple tuple) {
+    public synchronized Status store(ValueTuple tuple) {
         
         Descriptor descriptor = tuple.getDescriptor();
         Resource resource = descriptor.getResource();
-        
-        Value value = tuple.getValue();
-        if (value.isEmpty()) {
-            remove(resource);
-            return DefaultCondition.SUCCESS;
-        }
         
         ValueTuple existing = get(resource);
         
         Occured occured = compare(existing, tuple);
         if (occured == Occured.AFTER) {
-            add(tuple);
-            return DefaultCondition.SUCCESS;
+            Value value = tuple.getValue();
+            if (value.isEmpty()) {
+                remove(resource);
+            } else {
+                add(tuple);
+            }
+            return DefaultStatus.SUCCESS;
         }
         
-        return DefaultCondition.FAILURE;
+        return DefaultStatus.conflict(existing);
     }
     
     @Override
+    public synchronized Set<KUID> getBuckets() {
+        return new HashSet<KUID>(database.keySet());
+    }
+
+    @Override
     public synchronized ValueTuple get(Resource resource) {
-        KUID valueId = resource.getId();
-        Map<Resource, ValueTuple> bucket = database.get(valueId);
+        KUID bucketId = resource.getId();
+        Map<Resource, ValueTuple> bucket = database.get(bucketId);
         return bucket != null ? bucket.get(resource) : null;
     }
     
@@ -88,12 +95,12 @@ public class DefaultDatabase extends AbstractDatabase {
         
         Descriptor descriptor = tuple.getDescriptor();
         Resource resource = descriptor.getResource();
-        KUID valueId = resource.getId();
+        KUID bucketId = resource.getId();
         
-        Map<Resource, ValueTuple> bucket = database.get(valueId);
+        Map<Resource, ValueTuple> bucket = database.get(bucketId);
         if (bucket == null) {
             bucket = new HashMap<Resource, ValueTuple>();
-            database.put(valueId, bucket);
+            database.put(bucketId, bucket);
         }
         
         return bucket.put(resource, tuple);
@@ -103,13 +110,13 @@ public class DefaultDatabase extends AbstractDatabase {
      * Removes and returns a {@link ValueTuple}.
      */
     public synchronized ValueTuple remove(Resource resource) {
-        KUID valueId = resource.getId();
+        KUID bucketId = resource.getId();
         
-        Map<Resource, ValueTuple> bucket = database.get(valueId);
+        Map<Resource, ValueTuple> bucket = database.get(bucketId);
         if (bucket != null) {
             ValueTuple removed = bucket.remove(resource);
             if (bucket.isEmpty()) {
-                database.remove(valueId);
+                database.remove(bucketId);
             }
             return removed;
         }
@@ -120,8 +127,8 @@ public class DefaultDatabase extends AbstractDatabase {
     /**
      * Removes and returns a {@link ValueTuple}.
      */
-    public synchronized Map<Resource, ValueTuple> remove(KUID valueId) {
-        return database.remove(valueId);
+    public synchronized Map<Resource, ValueTuple> remove(KUID bucketId) {
+        return database.remove(bucketId);
     }
     
     @Override
@@ -141,6 +148,15 @@ public class DefaultDatabase extends AbstractDatabase {
         }
         return values;
     }
+    
+    @Override
+    public synchronized Iterable<ValueTuple> values(KUID bucketId) {
+        Map<?, ValueTuple> bucket = database.get(bucketId);
+        if (bucket != null) {
+            return new ArrayList<ValueTuple>(bucket.values());
+        }
+        return Collections.emptyList();
+    }
 
     @Override
     public synchronized Iterable<ValueTuple> values(
@@ -151,8 +167,8 @@ public class DefaultDatabase extends AbstractDatabase {
             @Override
             public Decision select(Entry<? extends KUID, 
                     ? extends Map<?, ? extends ValueTuple>> entry) {
-                KUID valueId = entry.getKey();
-                if (lookupId.isCloserTo(valueId, lastId)) {
+                KUID bucketId = entry.getKey();
+                if (lookupId.isCloserTo(bucketId, lastId)) {
                     values.addAll(entry.getValue().values());
                     return Decision.CONTINUE;
                 }

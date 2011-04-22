@@ -20,8 +20,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.dht.message.StoreResponse;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.storage.Database.Condition;
-import org.ardverk.dht.storage.DefaultCondition;
+import org.ardverk.dht.storage.Status;
+import org.ardverk.dht.storage.DefaultStatus;
 import org.ardverk.dht.storage.ValueTuple;
 
 /**
@@ -71,8 +71,8 @@ public class DefaultStoreEntity extends AbstractEntity implements StoreEntity {
     @Override
     public boolean isSuccess() {
         for (StoreResponse response : responses) {
-            Condition condition = response.getCondition();
-            if (!condition.equals(DefaultCondition.SUCCESS)) {
+            Status status = response.getStatus();
+            if (!status.equals(DefaultStatus.SUCCESS)) {
                 return false;
             }
         }

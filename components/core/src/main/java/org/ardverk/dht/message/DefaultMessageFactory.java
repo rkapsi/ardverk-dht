@@ -21,7 +21,7 @@ import java.net.SocketAddress;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.Localhost;
-import org.ardverk.dht.storage.Database.Condition;
+import org.ardverk.dht.storage.Status;
 import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ValueTuple;
 import org.ardverk.lang.Arguments;
@@ -98,7 +98,7 @@ public class DefaultMessageFactory extends AbstractMessageFactory {
     }
 
     @Override
-    public StoreResponse createStoreResponse(StoreRequest request, Condition condition) {
+    public StoreResponse createStoreResponse(StoreRequest request, Status condition) {
         Contact dst = request.getContact();
         SocketAddress address = dst.getRemoteAddress();
         MessageId messageId = request.getMessageId();

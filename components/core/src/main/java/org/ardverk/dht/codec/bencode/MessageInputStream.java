@@ -51,13 +51,13 @@ import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.DefaultContact;
 import org.ardverk.dht.storage.ByteArrayValue;
-import org.ardverk.dht.storage.Database.Condition;
-import org.ardverk.dht.storage.DefaultCondition;
 import org.ardverk.dht.storage.DefaultDescriptor;
 import org.ardverk.dht.storage.DefaultResource;
+import org.ardverk.dht.storage.DefaultStatus;
 import org.ardverk.dht.storage.DefaultValueTuple;
 import org.ardverk.dht.storage.Descriptor;
 import org.ardverk.dht.storage.Resource;
+import org.ardverk.dht.storage.Status;
 import org.ardverk.dht.storage.Value;
 import org.ardverk.dht.storage.ValueTuple;
 import org.ardverk.net.NetworkUtils;
@@ -185,10 +185,16 @@ class MessageInputStream extends BencodingInputStream {
         return contacts;
     }
     
-    public Condition readCondition() throws IOException {
+    public Status readStatus(Contact contact, SocketAddress address) throws IOException {
         int code = readInt();
         String value = readString();
-        return DefaultCondition.valueOf(code, value);
+        
+        ValueTuple tuple = null;
+        if (readBoolean()) {
+            tuple = readValueTuple(contact, address);
+        }
+        
+        return DefaultStatus.valueOf(code, value, tuple);
     }
     
     public Descriptor readDescriptor(Contact contact) throws IOException {
@@ -290,7 +296,7 @@ class MessageInputStream extends BencodingInputStream {
     
     private StoreResponse readStoreResponse(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
-        Condition condition = readCondition();
-        return new DefaultStoreResponse(messageId, contact, address, condition);
+        Status status = readStatus(contact, address);
+        return new DefaultStoreResponse(messageId, contact, address, status);
     }
 }

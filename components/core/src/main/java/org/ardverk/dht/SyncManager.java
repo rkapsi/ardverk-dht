@@ -42,6 +42,8 @@ import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.Localhost;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Database;
+import org.ardverk.dht.storage.Descriptor;
+import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ValueTuple;
 import org.ardverk.dht.utils.ContactKey;
 import org.ardverk.lang.TimeStamp;
@@ -101,8 +103,11 @@ public class SyncManager {
             final CountDown storeCounter = new CountDown();
             
             for (final ValueTuple tuple : database.values()) {
-                KUID valueId = tuple.getId();
-                Contact[] contacts = routeTable.select(valueId);
+                Descriptor descriptor = tuple.getDescriptor();
+                Resource resource = descriptor.getResource();
+                
+                KUID bucketId = resource.getId();
+                Contact[] contacts = routeTable.select(bucketId);
                 
                 // Skip all values for which we're not in the k-closest.
                 // This can happen in caching scenarios!

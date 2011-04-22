@@ -16,9 +16,9 @@
 
 package org.ardverk.dht.storage;
 
+import java.util.Set;
+
 import org.ardverk.dht.KUID;
-import org.ardverk.dht.lang.IntegerValue;
-import org.ardverk.dht.lang.StringValue;
 
 /**
  * A simple and minimum interface of a {@link Database} 
@@ -27,20 +27,19 @@ import org.ardverk.dht.lang.StringValue;
 public interface Database {
     
     /**
-     * Returned by {@link Database#store(ValueTuple)}.
-     */
-    public static interface Condition extends IntegerValue, StringValue {
-    }
-    
-    /**
      * Returns the {@link DatabaseConfig}.
      */
     public DatabaseConfig getDatabaseConfig();
     
     /**
-     * Stores the given {@link ValueTuple} and returns a {@link Condition}.
+     * Stores the given {@link ValueTuple} and returns a {@link Status}.
      */
-    public Condition store(ValueTuple tuple);
+    public Status store(ValueTuple tuple);
+    
+    /**
+     * Returns all bucket {@link KUID}s.
+     */
+    public Set<KUID> getBuckets();
     
     /**
      * Returns a {@link ValueTuple} for the given {@link Resource}.
@@ -51,6 +50,11 @@ public interface Database {
      * Returns all {@link ValueTuple}s.
      */
     public Iterable<ValueTuple> values();
+    
+    /**
+     * Retruns all {@link ValueTuple}s in the given bucket.
+     */
+    public Iterable<ValueTuple> values(KUID bucketId);
     
     /**
      * Returns all {@link ValueTuple}s that are close to the lookup 

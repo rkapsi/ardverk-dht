@@ -43,11 +43,6 @@ public class DefaultDescriptor extends AbstractDescriptor {
         this.resource = resource;
         this.clock = clock;
     }
-
-    @Override
-    public KUID getId() {
-        return resource.getId();
-    }
     
     @Override
     public Resource getResource() {

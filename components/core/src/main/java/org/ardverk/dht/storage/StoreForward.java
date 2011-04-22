@@ -100,8 +100,10 @@ public class StoreForward {
         
         for (ValueTuple tuple : tuples) {
             if (LOG.isDebugEnabled()) {
+                
+                Descriptor descriptor = tuple.getDescriptor();
                 LOG.debug(routeTable.getLocalhost().getId() 
-                        + " foward " + tuple.getId() 
+                        + " foward " + descriptor.getResource()
                         + " to " + contact.getId());
             }
             

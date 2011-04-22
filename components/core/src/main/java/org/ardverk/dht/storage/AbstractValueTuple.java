@@ -16,15 +16,8 @@
 
 package org.ardverk.dht.storage;
 
-import org.ardverk.dht.KUID;
-
 /**
  * An abstract implementation of {@link ValueTuple}.
  */
-public abstract class AbstractValueTuple implements ValueTuple {
-    
-    @Override
-    public KUID getId() {
-        return getDescriptor().getId();
-    }
+abstract class AbstractValueTuple implements ValueTuple {
 }

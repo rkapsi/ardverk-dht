@@ -28,9 +28,11 @@ import org.ardverk.dht.message.StoreResponse;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Database;
-import org.ardverk.dht.storage.Database.Condition;
 import org.ardverk.dht.storage.DatabaseConfig;
-import org.ardverk.dht.storage.DefaultCondition;
+import org.ardverk.dht.storage.DefaultStatus;
+import org.ardverk.dht.storage.Descriptor;
+import org.ardverk.dht.storage.Resource;
+import org.ardverk.dht.storage.Status;
 import org.ardverk.dht.storage.ValueTuple;
 import org.ardverk.lang.Arguments;
 import org.ardverk.utils.ArrayUtils;
@@ -57,25 +59,28 @@ public class StoreRequestHandler extends AbstractRequestHandler {
 
     public StoreResponse createResponse(StoreRequest request) {
         ValueTuple tuple = request.getValueTuple();
-        Condition condition = null;
+        Status status = null;
         
         DatabaseConfig config = database.getDatabaseConfig();
         if (config.isCheckBucket()) {
-            KUID valueId = tuple.getId();
-            Contact[] contacts = routeTable.select(valueId);
+            Descriptor descriptor = tuple.getDescriptor();
+            Resource resource = descriptor.getResource();
+            
+            KUID bucketId = resource.getId();
+            Contact[] contacts = routeTable.select(bucketId);
             Contact localhost = routeTable.getLocalhost();
             
             if (!ArrayUtils.contains(localhost, contacts)) {
-                condition = DefaultCondition.FAILURE;
+                status = DefaultStatus.FAILURE;
             } else {
-                condition = database.store(tuple);
+                status = database.store(tuple);
             }
         } else {
-            condition = database.store(tuple);
+            status = database.store(tuple);
         }
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
-        return factory.createStoreResponse(request, condition);
+        return factory.createStoreResponse(request, status);
     }
     
     @Override

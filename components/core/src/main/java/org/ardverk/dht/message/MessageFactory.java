@@ -20,7 +20,7 @@ import java.net.SocketAddress;
 
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.storage.Database.Condition;
+import org.ardverk.dht.storage.Status;
 import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ValueTuple;
 
@@ -84,5 +84,5 @@ public interface MessageFactory {
     /**
      * Creates and returns a {@link StoreResponse}.
      */
-    public StoreResponse createStoreResponse(StoreRequest request, Condition status);
+    public StoreResponse createStoreResponse(StoreRequest request, Status status);
 }

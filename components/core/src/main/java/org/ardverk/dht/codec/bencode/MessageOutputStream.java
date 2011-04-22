@@ -38,9 +38,9 @@ import org.ardverk.dht.message.StoreResponse;
 import org.ardverk.dht.message.ValueRequest;
 import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.storage.Database.Condition;
 import org.ardverk.dht.storage.Descriptor;
 import org.ardverk.dht.storage.Resource;
+import org.ardverk.dht.storage.Status;
 import org.ardverk.dht.storage.Value;
 import org.ardverk.dht.storage.ValueTuple;
 import org.ardverk.version.Vector;
@@ -150,9 +150,17 @@ class MessageOutputStream extends BencodingOutputStream {
         writeArray(contacts);
     }
     
-    public void writeCondition(Condition condition) throws IOException {
-        writeInt(condition.intValue());
-        writeString(condition.stringValue());
+    public void writeStatus(Status status) throws IOException {
+        writeInt(status.intValue());
+        writeString(status.stringValue());
+        
+        ValueTuple tuple = status.getValueTuple();
+        if (tuple != null) {
+            writeBoolean(true);
+            writeValueTuple(tuple);
+        } else {
+            writeBoolean(false);
+        }
     }
     
     public void writeDescriptor(Descriptor descriptor) throws IOException {
@@ -245,6 +253,6 @@ class MessageOutputStream extends BencodingOutputStream {
     }
     
     private void writeStoreResponse(StoreResponse message) throws IOException {
-        writeCondition(message.getCondition());
+        writeStatus(message.getStatus());
     }
 }
