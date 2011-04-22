@@ -24,7 +24,10 @@ import org.ardverk.dht.lang.Identifier;
 /**
  * A {@link Resource} is an unique identifier of a {@link Value}.
  */
-public interface Resource extends Identifier {
+public interface Resource extends Comparable<Resource>, Identifier {
     
+    /**
+     * Returns the resource's {@link URI}.
+     */
     public URI getURI();
 }

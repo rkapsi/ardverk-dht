@@ -22,8 +22,13 @@ package org.ardverk.dht.storage;
 public abstract class AbstractResource implements Resource {
 
     @Override
+    public int compareTo(Resource o) {
+        return getURI().compareTo(o.getURI());
+    }
+
+    @Override
     public int hashCode() {
-        return 31*getId().hashCode() + getURI().hashCode();
+        return getURI().hashCode();
     }
     
     @Override
@@ -35,8 +40,7 @@ public abstract class AbstractResource implements Resource {
         }
         
         Resource other = (Resource)o;
-        return getId().equals(other.getId()) 
-                && getURI().equals(other.getURI());
+        return getURI().equals(other.getURI());
     }
     
     @Override
