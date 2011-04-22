@@ -51,12 +51,12 @@ public class DefaultStatus implements Status {
         if (tuple == null) {
             switch (code) {
                 case 100:
-                    if (SUCCESS.stringValue().equals(message)) {
+                    if (SUCCESS.stringValue().equalsIgnoreCase(message)) {
                         return SUCCESS;
                     }
                     break;
                 case 200:
-                    if (FAILURE.stringValue().equals(message)) {
+                    if (FAILURE.stringValue().equalsIgnoreCase(message)) {
                         return FAILURE;
                     }
                     break;
