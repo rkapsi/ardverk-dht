@@ -97,7 +97,7 @@ class MessageOutputStream extends BencodingOutputStream {
     }
     
     public void writeResource(Resource resource) throws IOException {
-        writeKUID(resource.getId());
+        writeString(resource.getURI().toString());
     }
     
     public void writeVectorClock(VectorClock<? extends KUID> clock) throws IOException {

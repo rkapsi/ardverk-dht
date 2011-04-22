@@ -46,7 +46,7 @@ import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.DefaultRouteTable;
 import org.ardverk.dht.storage.ByteArrayValue;
 import org.ardverk.dht.storage.Database;
-import org.ardverk.dht.storage.Resource;
+import org.ardverk.dht.storage.DefaultResource;
 import org.ardverk.io.IoUtils;
 import org.ardverk.security.MessageDigestUtils;
 import org.ardverk.utils.StringUtils;
@@ -199,11 +199,11 @@ public class ArdverkUtils {
             MessageDigest md = MessageDigestUtils.createSHA1();
             md.update(StringUtils.getBytes("Hello-" + i));
             
-            final KUID key = KUID.create(md.digest());
+            final KUID valueId = KUID.create(md.digest());
             final byte[] value = StringUtils.getBytes("World-" + i);
             
             int rnd = (int)(dhts.size() * Math.random());
-            future = dhts.get(rnd).put(new Resource(key), 
+            future = dhts.get(rnd).put(new DefaultResource(valueId), 
                     new ByteArrayValue(value), putConfig);
             
             if (i % 1000 == 0) {

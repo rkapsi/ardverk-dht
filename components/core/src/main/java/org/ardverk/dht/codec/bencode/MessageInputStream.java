@@ -22,6 +22,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.SocketAddress;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,6 +54,7 @@ import org.ardverk.dht.storage.ByteArrayValue;
 import org.ardverk.dht.storage.Database.Condition;
 import org.ardverk.dht.storage.DefaultCondition;
 import org.ardverk.dht.storage.DefaultDescriptor;
+import org.ardverk.dht.storage.DefaultResource;
 import org.ardverk.dht.storage.DefaultValueTuple;
 import org.ardverk.dht.storage.Descriptor;
 import org.ardverk.dht.storage.Resource;
@@ -127,8 +129,8 @@ class MessageInputStream extends BencodingInputStream {
     }
     
     public Resource readResource() throws IOException {
-        KUID valueId = readKUID();
-        return new Resource(valueId);
+        URI uri = URI.create(readString());
+        return new DefaultResource(uri);
     }
     
     public VectorClock<KUID> readVectorClock() throws IOException {

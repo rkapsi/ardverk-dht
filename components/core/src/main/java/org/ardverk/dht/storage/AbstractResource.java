@@ -16,15 +16,28 @@
 
 package org.ardverk.dht.storage;
 
-import java.net.URI;
+public abstract class AbstractResource implements Resource {
 
-import org.ardverk.dht.lang.Identifier;
-
-
-/**
- * A {@link Resource} is an unique identifier of a {@link Value}.
- */
-public interface Resource extends Identifier {
+    @Override
+    public int hashCode() {
+        return 31*getId().hashCode() + getURI().hashCode();
+    }
     
-    public URI getURI();
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        } else if (!(o instanceof Resource)) {
+            return false;
+        }
+        
+        Resource other = (Resource)o;
+        return getId().equals(other.getId()) 
+                && getURI().equals(other.getURI());
+    }
+    
+    @Override
+    public String toString() {
+        return getURI().toString();
+    }
 }
