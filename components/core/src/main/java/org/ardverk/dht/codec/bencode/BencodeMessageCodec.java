@@ -21,21 +21,33 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.SocketAddress;
 
-import org.ardverk.dht.codec.MessageCodec;
+import org.ardverk.dht.codec.AbstractMessageCodec;
 import org.ardverk.dht.message.Message;
+import org.ardverk.dht.storage.DefaultResourceFactory;
+import org.ardverk.dht.storage.ResourceFactory;
 
 
 /**
  * The {@link BencodeMessageCodec} encodes and decodes {@link Message}s
  * from Bencode.
  */
-public class BencodeMessageCodec implements MessageCodec {
-
+public class BencodeMessageCodec extends AbstractMessageCodec {
+    
+    public BencodeMessageCodec() {
+        super(DefaultResourceFactory.FACTORY);
+    }
+    
+    public BencodeMessageCodec(ResourceFactory resourceFactory) {
+        super(resourceFactory);
+    }
+    
     @Override
     public Decoder createDecoder(final SocketAddress src, final InputStream in) {
         Decoder decoder = new Decoder() {
             
-            private final MessageInputStream mis = new MessageInputStream(in);
+            private final MessageInputStream mis 
+                = new MessageInputStream(in, 
+                        getResourceFactory());
             
             @Override
             public Message read() throws IOException {

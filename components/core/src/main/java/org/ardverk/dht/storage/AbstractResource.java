@@ -16,6 +16,9 @@
 
 package org.ardverk.dht.storage;
 
+/**
+ * An abstract implementation of {@link Resource}.
+ */
 public abstract class AbstractResource implements Resource {
 
     @Override

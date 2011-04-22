@@ -24,12 +24,18 @@ import java.io.OutputStream;
 import java.net.SocketAddress;
 
 import org.ardverk.dht.message.Message;
+import org.ardverk.dht.storage.ResourceFactory;
 
 
 /**
  * A {@link MessageCodec} encodes and decodes {@link Message}s.
  */
 public interface MessageCodec {
+    
+    /**
+     * Returns the {@link ResourceFactory}.
+     */
+    public ResourceFactory getResourceFactory();
     
     /**
      * Creates and returns a {@link Decoder}.

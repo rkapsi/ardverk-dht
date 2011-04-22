@@ -20,33 +20,22 @@ import java.net.URI;
 
 import org.ardverk.dht.KUID;
 
-public class DefaultResource extends AbstractResource {
+public class DefaultResourceFactory implements ResourceFactory {
 
-    private final KUID valueId;
-
-    private final URI uri;
-    
-    public DefaultResource(KUID valueId) {
-        this(valueId, create(valueId));
-    }
-    
-    public DefaultResource(URI uri) {
-        this(parse(uri), uri);
-    }
-
-    private DefaultResource(KUID valueId, URI uri) {
-        this.valueId = valueId;
-        this.uri = uri;
-    }
+    public static final ResourceFactory FACTORY 
+        = new DefaultResourceFactory();
     
     @Override
-    public KUID getId() {
-        return valueId;
+    public Resource createResource(URI uri) {
+        return valueOf(uri);
     }
-
-    @Override
-    public URI getURI() {
-        return uri;
+    
+    public static Resource valueOf(URI uri) {
+        return new DefaultResource(parse(uri), uri);
+    }
+    
+    public static Resource valueOf(KUID valueId) {
+        return new DefaultResource(valueId, create(valueId));
     }
     
     private static URI create(KUID valueId) {
@@ -66,5 +55,27 @@ public class DefaultResource extends AbstractResource {
         
         String valueId = ssp.substring("kuid:".length());
         return KUID.create(valueId, 16);
+    }
+    
+    private static class DefaultResource extends AbstractResource {
+
+        private final KUID valueId;
+
+        private final URI uri;
+        
+        private DefaultResource(KUID valueId, URI uri) {
+            this.valueId = valueId;
+            this.uri = uri;
+        }
+        
+        @Override
+        public KUID getId() {
+            return valueId;
+        }
+
+        @Override
+        public URI getURI() {
+            return uri;
+        }
     }
 }
