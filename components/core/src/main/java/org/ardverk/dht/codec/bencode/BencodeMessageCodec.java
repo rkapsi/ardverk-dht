@@ -32,8 +32,7 @@ import org.ardverk.dht.message.Message;
 public class BencodeMessageCodec implements MessageCodec {
 
     @Override
-    public Decoder createDecoder(final SocketAddress src, final InputStream in)
-            throws IOException {
+    public Decoder createDecoder(final SocketAddress src, final InputStream in) {
         Decoder decoder = new Decoder() {
             
             private final MessageInputStream mis = new MessageInputStream(in);
@@ -52,7 +51,7 @@ public class BencodeMessageCodec implements MessageCodec {
     }
 
     @Override
-    public Encoder createEncoder(final OutputStream out) throws IOException {
+    public Encoder createEncoder(final OutputStream out) {
         Encoder encoder = new Encoder() {
             
             private final MessageOutputStream mos = new MessageOutputStream(out);
