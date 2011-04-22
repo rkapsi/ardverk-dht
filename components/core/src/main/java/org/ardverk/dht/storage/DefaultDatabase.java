@@ -141,35 +141,35 @@ public class DefaultDatabase extends AbstractDatabase {
     }
     
     @Override
-    public synchronized Iterable<ValueTuple> values() {
-        List<ValueTuple> values = new ArrayList<ValueTuple>();
-        for (Map<?, ValueTuple> bucket : database.values()) {
-            values.addAll(bucket.values());
+    public synchronized Iterable<Resource> values() {
+        List<Resource> values = new ArrayList<Resource>();
+        for (Map<Resource, ValueTuple> bucket : database.values()) {
+            values.addAll(bucket.keySet());
         }
         return values;
     }
     
     @Override
-    public synchronized Iterable<ValueTuple> values(KUID bucketId) {
-        Map<?, ValueTuple> bucket = database.get(bucketId);
+    public synchronized Iterable<Resource> values(KUID bucketId) {
+        Map<Resource, ValueTuple> bucket = database.get(bucketId);
         if (bucket != null) {
-            return new ArrayList<ValueTuple>(bucket.values());
+            return new ArrayList<Resource>(bucket.keySet());
         }
         return Collections.emptyList();
     }
 
     @Override
-    public synchronized Iterable<ValueTuple> values(
+    public synchronized Iterable<Resource> values(
             final KUID lookupId, final KUID lastId) {
         
-        final List<ValueTuple> values = new ArrayList<ValueTuple>();
-        database.select(lookupId, new Cursor<KUID, Map<?, ? extends ValueTuple>>() {
+        final List<Resource> values = new ArrayList<Resource>();
+        database.select(lookupId, new Cursor<KUID, Map<? extends Resource, ? extends ValueTuple>>() {
             @Override
             public Decision select(Entry<? extends KUID, 
-                    ? extends Map<?, ? extends ValueTuple>> entry) {
+                    ? extends Map<? extends Resource, ? extends ValueTuple>> entry) {
                 KUID bucketId = entry.getKey();
                 if (lookupId.isCloserTo(bucketId, lastId)) {
-                    values.addAll(entry.getValue().values());
+                    values.addAll(entry.getValue().keySet());
                     return Decision.CONTINUE;
                 }
                 return Decision.EXIT;

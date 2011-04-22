@@ -49,18 +49,18 @@ public interface Database {
     /**
      * Returns all {@link ValueTuple}s.
      */
-    public Iterable<ValueTuple> values();
+    public Iterable<Resource> values();
     
     /**
      * Retruns all {@link ValueTuple}s in the given bucket.
      */
-    public Iterable<ValueTuple> values(KUID bucketId);
+    public Iterable<Resource> values(KUID bucketId);
     
     /**
      * Returns all {@link ValueTuple}s that are close to the lookup 
      * {@link KUID} but not any further than the last {@link KUID}.
      */
-    public Iterable<ValueTuple> values(KUID lookupId, KUID lastId);
+    public Iterable<Resource> values(KUID lookupId, KUID lastId);
     
     /**
      * Returns the size of the {@link Database}.

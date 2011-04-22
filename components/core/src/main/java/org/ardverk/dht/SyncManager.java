@@ -42,7 +42,6 @@ import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.Localhost;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Database;
-import org.ardverk.dht.storage.Descriptor;
 import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ValueTuple;
 import org.ardverk.dht.utils.ContactKey;
@@ -102,9 +101,9 @@ public class SyncManager {
             // The number of STOREs we've sent
             final CountDown storeCounter = new CountDown();
             
-            for (final ValueTuple tuple : database.values()) {
-                Descriptor descriptor = tuple.getDescriptor();
-                Resource resource = descriptor.getResource();
+            for (Resource resource : database.values()) {
+                
+                final ValueTuple tuple = database.get(resource);
                 
                 KUID bucketId = resource.getId();
                 Contact[] contacts = routeTable.select(bucketId);

@@ -93,20 +93,20 @@ public class StoreForward {
             return;
         }
         
-        Contact last = CollectionUtils.last(contacts);    
-        Iterable<ValueTuple> tuples = database.values(contactId, last.getId());
-        
         StoreConfig storeConfig = config.getStoreConfig();
         
-        for (ValueTuple tuple : tuples) {
+        Contact last = CollectionUtils.last(contacts);    
+        Iterable<Resource> resources 
+            = database.values(contactId, last.getId());
+        
+        for (Resource resource : resources) {
             if (LOG.isDebugEnabled()) {
-                
-                Descriptor descriptor = tuple.getDescriptor();
                 LOG.debug(routeTable.getLocalhost().getId() 
-                        + " foward " + descriptor.getResource()
+                        + " foward " + resource
                         + " to " + contact.getId());
             }
             
+            ValueTuple tuple = database.get(resource);
             callback.store(contact, tuple, storeConfig);
         }
     }
