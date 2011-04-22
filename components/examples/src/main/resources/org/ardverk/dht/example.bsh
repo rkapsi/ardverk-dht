@@ -143,7 +143,7 @@ put(String key, String value) {
 
 // Stores the given key-value
 put(DHT dht, String key, String value) {
-	DHTFuture future = dht.put(rsrc(key), toValue(value));
+	DHTFuture future = dht.put(rsrc(key), toValue(value), null);
 		
 	PutEntity entity = future.get();
 	for (StoreResponse response : entity.getStoreResponses()) {
