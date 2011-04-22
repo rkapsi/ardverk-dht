@@ -50,11 +50,11 @@ import org.ardverk.dht.message.ValueRequest;
 import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.DefaultContact;
-import org.ardverk.dht.storage.ByteArrayValue;
 import org.ardverk.dht.storage.DefaultDescriptor;
 import org.ardverk.dht.storage.DefaultStatus;
 import org.ardverk.dht.storage.DefaultValueTuple;
 import org.ardverk.dht.storage.Descriptor;
+import org.ardverk.dht.storage.InputStreamValue;
 import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ResourceFactory;
 import org.ardverk.dht.storage.Status;
@@ -215,8 +215,8 @@ class MessageInputStream extends BencodingInputStream {
     }
     
     public Value readValue() throws IOException {
-        byte[] value = readBytes();
-        return new ByteArrayValue(value);
+        ContentInputStream cis = readContent();
+        return new InputStreamValue(cis);
     }
     
     public Message readMessage(SocketAddress src) throws IOException {

@@ -17,6 +17,7 @@
 package org.ardverk.dht.codec.bencode;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -43,6 +44,7 @@ import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.Status;
 import org.ardverk.dht.storage.Value;
 import org.ardverk.dht.storage.ValueTuple;
+import org.ardverk.io.IoUtils;
 import org.ardverk.version.Vector;
 import org.ardverk.version.VectorClock;
 
@@ -175,8 +177,13 @@ class MessageOutputStream extends BencodingOutputStream {
     }
     
     public void writeValue(Value value) throws IOException {
-        // We assume all Values support this.
-        writeBytes(value.getContentAsBytes());
+        InputStream in = value.getContent();
+        try {
+            long contentLength = value.getContentLength();
+            writeContent(contentLength, in);
+        } finally {
+            IoUtils.close(in);
+        }
     }
     
     public void writeMessage(Message message) throws IOException {
