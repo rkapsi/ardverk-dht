@@ -16,9 +16,6 @@
 
 package org.ardverk.dht.storage;
 
-
-
-
 /**
  * A default implementation of {@link ValueTuple}.
  */
