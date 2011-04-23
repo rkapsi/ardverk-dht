@@ -24,7 +24,7 @@ import java.io.OutputStream;
 import java.net.SocketAddress;
 
 import org.ardverk.dht.message.Message;
-import org.ardverk.dht.storage.ResourceFactory;
+import org.ardverk.dht.storage.ResourceIdFactory;
 
 
 /**
@@ -33,9 +33,9 @@ import org.ardverk.dht.storage.ResourceFactory;
 public interface MessageCodec {
     
     /**
-     * Returns the {@link ResourceFactory}.
+     * Returns the {@link ResourceIdFactory}.
      */
-    public ResourceFactory getResourceFactory();
+    public ResourceIdFactory getResourceFactory();
     
     /**
      * Creates and returns a {@link Decoder}.

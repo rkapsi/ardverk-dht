@@ -23,8 +23,8 @@ import java.net.SocketAddress;
 
 import org.ardverk.dht.codec.AbstractMessageCodec;
 import org.ardverk.dht.message.Message;
-import org.ardverk.dht.storage.DefaultResourceFactory;
-import org.ardverk.dht.storage.ResourceFactory;
+import org.ardverk.dht.storage.DefaultResourceIdFactory;
+import org.ardverk.dht.storage.ResourceIdFactory;
 
 
 /**
@@ -34,10 +34,10 @@ import org.ardverk.dht.storage.ResourceFactory;
 public class BencodeMessageCodec extends AbstractMessageCodec {
     
     public BencodeMessageCodec() {
-        super(DefaultResourceFactory.FACTORY);
+        super(DefaultResourceIdFactory.FACTORY);
     }
     
-    public BencodeMessageCodec(ResourceFactory resourceFactory) {
+    public BencodeMessageCodec(ResourceIdFactory resourceFactory) {
         super(resourceFactory);
     }
     

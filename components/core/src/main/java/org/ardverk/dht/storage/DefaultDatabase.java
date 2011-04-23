@@ -58,7 +58,7 @@ public class DefaultDatabase extends AbstractDatabase {
     public synchronized Status store(ValueTuple tuple) {
         
         Descriptor descriptor = tuple.getDescriptor();
-        Resource resource = descriptor.getResource();
+        ResourceId resource = descriptor.getResource();
         
         ValueTuple existing = get(resource);
         
@@ -82,7 +82,7 @@ public class DefaultDatabase extends AbstractDatabase {
     }
 
     @Override
-    public synchronized ValueTuple get(Resource resource) {
+    public synchronized ValueTuple get(ResourceId resource) {
         Bucket bucket = database.get(resource.getId());
         return bucket != null ? bucket.get(resource) : null;
     }
@@ -94,7 +94,7 @@ public class DefaultDatabase extends AbstractDatabase {
         assert (!tuple.getValue().isEmpty());
         
         Descriptor descriptor = tuple.getDescriptor();
-        Resource resource = descriptor.getResource();
+        ResourceId resource = descriptor.getResource();
         KUID bucketId = resource.getId();
         
         Bucket bucket = database.get(bucketId);
@@ -109,7 +109,7 @@ public class DefaultDatabase extends AbstractDatabase {
     /**
      * Removes and returns a {@link ValueTuple}.
      */
-    public synchronized ValueTuple remove(Resource resource) {
+    public synchronized ValueTuple remove(ResourceId resource) {
         KUID bucketId = resource.getId();
         
         Bucket bucket = database.get(bucketId);
@@ -141,8 +141,8 @@ public class DefaultDatabase extends AbstractDatabase {
     }
     
     @Override
-    public synchronized Iterable<Resource> values() {
-        List<Resource> values = new ArrayList<Resource>();
+    public synchronized Iterable<ResourceId> values() {
+        List<ResourceId> values = new ArrayList<ResourceId>();
         for (Bucket bucket : database.values()) {
             values.addAll(bucket.keySet());
         }
@@ -150,19 +150,19 @@ public class DefaultDatabase extends AbstractDatabase {
     }
     
     @Override
-    public synchronized Iterable<Resource> values(KUID bucketId) {
+    public synchronized Iterable<ResourceId> values(KUID bucketId) {
         Bucket bucket = database.get(bucketId);
         if (bucket != null) {
-            return new ArrayList<Resource>(bucket.keySet());
+            return new ArrayList<ResourceId>(bucket.keySet());
         }
         return Collections.emptyList();
     }
 
     @Override
-    public synchronized Iterable<Resource> values(
+    public synchronized Iterable<ResourceId> values(
             final KUID lookupId, final KUID lastId) {
         
-        final List<Resource> values = new ArrayList<Resource>();
+        final List<ResourceId> values = new ArrayList<ResourceId>();
         database.select(lookupId, new Cursor<KUID, Bucket>() {
             @Override
             public Decision select(Entry<? extends KUID, 
@@ -209,7 +209,7 @@ public class DefaultDatabase extends AbstractDatabase {
         return clock.compareTo(existing);
     }
     
-    private static class Bucket extends HashMap<Resource, ValueTuple> 
+    private static class Bucket extends HashMap<ResourceId, ValueTuple> 
             implements Identifier {
         
         private static final long serialVersionUID = -8794611016380746313L;
@@ -230,7 +230,7 @@ public class DefaultDatabase extends AbstractDatabase {
             StringBuilder sb = new StringBuilder();
             
             sb.append(getId()).append("={\n");
-            for (Map.Entry<Resource, ValueTuple> entry : entrySet()) {
+            for (Map.Entry<ResourceId, ValueTuple> entry : entrySet()) {
                 sb.append("  ").append(entry);
             }
             sb.append("}");

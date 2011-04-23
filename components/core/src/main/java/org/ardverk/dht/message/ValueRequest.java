@@ -16,12 +16,12 @@
 
 package org.ardverk.dht.message;
 
-import org.ardverk.dht.storage.Resource;
+import org.ardverk.dht.storage.ResourceId;
 
 /**
  * A {@link MessageType#FIND_VALUE} request.
  */
 public interface ValueRequest extends LookupRequest {
     
-    public Resource getResource();
+    public ResourceId getResource();
 }

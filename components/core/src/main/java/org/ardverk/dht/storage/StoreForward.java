@@ -96,10 +96,10 @@ public class StoreForward {
         StoreConfig storeConfig = config.getStoreConfig();
         
         Contact last = CollectionUtils.last(contacts);    
-        Iterable<Resource> resources 
+        Iterable<ResourceId> resources 
             = database.values(contactId, last.getId());
         
-        for (Resource resource : resources) {
+        for (ResourceId resource : resources) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(routeTable.getLocalhost().getId() 
                         + " foward " + resource

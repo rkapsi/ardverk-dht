@@ -49,7 +49,7 @@ import org.ardverk.dht.routing.Localhost;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Database;
 import org.ardverk.dht.storage.DefaultDatabase;
-import org.ardverk.dht.storage.Resource;
+import org.ardverk.dht.storage.ResourceId;
 import org.ardverk.dht.storage.StoreForward;
 import org.ardverk.dht.storage.Value;
 import org.ardverk.dht.storage.ValueTuple;
@@ -263,18 +263,18 @@ public class ArdverkDHT extends AbstractDHT {
     }
     
     @Override
-    public DHTFuture<ValueEntity> get(Resource resource, GetConfig config) {
+    public DHTFuture<ValueEntity> get(ResourceId resource, GetConfig config) {
         return lookupManager.get(resource, config);
     }
 
     @Override
-    public DHTFuture<PutEntity> put(Resource resource, Value value, 
+    public DHTFuture<PutEntity> put(ResourceId resource, Value value, 
             VectorClock<KUID> clock, PutConfig config) {
         return storeManager.put(resource, value, clock, config);
     }
     
     @Override
-    public DHTFuture<PutEntity> remove(Resource resource, 
+    public DHTFuture<PutEntity> remove(ResourceId resource, 
             VectorClock<KUID> clock, PutConfig config) {
         return storeManager.remove(resource, clock, config);
     }

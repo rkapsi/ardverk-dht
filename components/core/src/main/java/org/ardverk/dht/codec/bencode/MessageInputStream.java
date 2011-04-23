@@ -55,8 +55,8 @@ import org.ardverk.dht.storage.DefaultStatus;
 import org.ardverk.dht.storage.DefaultValueTuple;
 import org.ardverk.dht.storage.Descriptor;
 import org.ardverk.dht.storage.InputStreamValue;
-import org.ardverk.dht.storage.Resource;
-import org.ardverk.dht.storage.ResourceFactory;
+import org.ardverk.dht.storage.ResourceId;
+import org.ardverk.dht.storage.ResourceIdFactory;
 import org.ardverk.dht.storage.Status;
 import org.ardverk.dht.storage.Value;
 import org.ardverk.dht.storage.ValueTuple;
@@ -71,9 +71,9 @@ import org.ardverk.version.VectorClock;
  */
 class MessageInputStream extends BencodingInputStream {
     
-    private final ResourceFactory resourceFactory;
+    private final ResourceIdFactory resourceFactory;
     
-    public MessageInputStream(InputStream in, ResourceFactory resourceFactory) {
+    public MessageInputStream(InputStream in, ResourceIdFactory resourceFactory) {
         super(in);
         this.resourceFactory = resourceFactory;
     }
@@ -131,9 +131,9 @@ class MessageInputStream extends BencodingInputStream {
         return NetworkUtils.createUnresolved(host, port);
     }
     
-    public Resource readResource() throws IOException {
+    public ResourceId readResource() throws IOException {
         URI uri = URI.create(readString());
-        return resourceFactory.createResource(uri);
+        return resourceFactory.createResourceId(uri);
     }
     
     public VectorClock<KUID> readVectorClock() throws IOException {
@@ -202,7 +202,7 @@ class MessageInputStream extends BencodingInputStream {
     
     public Descriptor readDescriptor(Contact contact) throws IOException {
         Contact creator = readContact();
-        Resource resource = readResource();
+        ResourceId resource = readResource();
         VectorClock<KUID> clock = readVectorClock();
         return new DefaultDescriptor(contact, creator, resource, clock);
     }
@@ -279,7 +279,7 @@ class MessageInputStream extends BencodingInputStream {
     private ValueRequest readValueRequest(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
         
-        Resource resource = readResource();
+        ResourceId resource = readResource();
         return new DefaultValueRequest(messageId, contact, address, resource);
     }
     

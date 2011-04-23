@@ -18,10 +18,10 @@ package org.ardverk.dht.storage;
 
 import java.net.URI;
 
-public interface ResourceFactory {
+public interface ResourceIdFactory {
 
     /**
-     * Creates and returns a {@link Resource} for the given {@link URI}.
+     * Creates and returns a {@link ResourceId} for the given {@link URI}.
      */
-    public Resource createResource(URI uri);
+    public ResourceId createResourceId(URI uri);
 }

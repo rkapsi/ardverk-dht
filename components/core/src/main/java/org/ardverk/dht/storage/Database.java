@@ -42,25 +42,25 @@ public interface Database {
     public Set<KUID> getBuckets();
     
     /**
-     * Returns a {@link ValueTuple} for the given {@link Resource}.
+     * Returns a {@link ValueTuple} for the given {@link ResourceId}.
      */
-    public ValueTuple get(Resource resource);
+    public ValueTuple get(ResourceId resource);
     
     /**
      * Returns all {@link ValueTuple}s.
      */
-    public Iterable<Resource> values();
+    public Iterable<ResourceId> values();
     
     /**
      * Retruns all {@link ValueTuple}s in the given bucket.
      */
-    public Iterable<Resource> values(KUID bucketId);
+    public Iterable<ResourceId> values(KUID bucketId);
     
     /**
      * Returns all {@link ValueTuple}s that are close to the lookup 
      * {@link KUID} but not any further than the last {@link KUID}.
      */
-    public Iterable<Resource> values(KUID lookupId, KUID lastId);
+    public Iterable<ResourceId> values(KUID lookupId, KUID lastId);
     
     /**
      * Returns the size of the {@link Database}.

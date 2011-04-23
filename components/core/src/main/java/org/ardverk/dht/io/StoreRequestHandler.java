@@ -31,7 +31,7 @@ import org.ardverk.dht.storage.Database;
 import org.ardverk.dht.storage.DatabaseConfig;
 import org.ardverk.dht.storage.DefaultStatus;
 import org.ardverk.dht.storage.Descriptor;
-import org.ardverk.dht.storage.Resource;
+import org.ardverk.dht.storage.ResourceId;
 import org.ardverk.dht.storage.Status;
 import org.ardverk.dht.storage.ValueTuple;
 import org.ardverk.lang.Arguments;
@@ -64,7 +64,7 @@ public class StoreRequestHandler extends AbstractRequestHandler {
         DatabaseConfig config = database.getDatabaseConfig();
         if (config.isCheckBucket()) {
             Descriptor descriptor = tuple.getDescriptor();
-            Resource resource = descriptor.getResource();
+            ResourceId resource = descriptor.getResource();
             
             KUID bucketId = resource.getId();
             Contact[] contacts = routeTable.select(bucketId);

@@ -17,12 +17,12 @@
 package org.ardverk.dht.storage;
 
 /**
- * An abstract implementation of {@link Resource}.
+ * An abstract implementation of {@link ResourceId}.
  */
-public abstract class AbstractResource implements Resource {
+public abstract class AbstractResourceId implements ResourceId {
 
     @Override
-    public int compareTo(Resource o) {
+    public int compareTo(ResourceId o) {
         return getURI().compareTo(o.getURI());
     }
 
@@ -35,11 +35,11 @@ public abstract class AbstractResource implements Resource {
     public boolean equals(Object o) {
         if (o == this) {
             return true;
-        } else if (!(o instanceof Resource)) {
+        } else if (!(o instanceof ResourceId)) {
             return false;
         }
         
-        Resource other = (Resource)o;
+        ResourceId other = (ResourceId)o;
         return getURI().equals(other.getURI());
     }
     

@@ -32,7 +32,7 @@ import org.ardverk.dht.message.ValueRequest;
 import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
-import org.ardverk.dht.storage.Resource;
+import org.ardverk.dht.storage.ResourceId;
 import org.ardverk.dht.storage.ValueTuple;
 
 
@@ -44,11 +44,11 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     
     private final FixedSizeArrayList<ValueTuple> tuples;
     
-    private final Resource resource;
+    private final ResourceId resource;
     
     public ValueResponseHandler(MessageDispatcher messageDispatcher,
             Contact[] contacts, RouteTable routeTable, 
-            Resource resource, GetConfig config) {
+            ResourceId resource, GetConfig config) {
         super(messageDispatcher, contacts, routeTable, 
                 resource.getId(), config);
         

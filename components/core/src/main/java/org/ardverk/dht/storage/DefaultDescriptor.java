@@ -26,17 +26,17 @@ public class DefaultDescriptor extends AbstractDescriptor {
     
     private final Contact creator;
     
-    private final Resource resource;
+    private final ResourceId resource;
     
     private final VectorClock<KUID> clock;
     
-    public DefaultDescriptor(Contact contact, Resource resource,
+    public DefaultDescriptor(Contact contact, ResourceId resource,
             VectorClock<KUID> clock) {
         this (contact, contact, resource, clock);
     }
     
     public DefaultDescriptor(Contact sender, 
-            Contact creator, Resource resource,
+            Contact creator, ResourceId resource,
             VectorClock<KUID> clock) {
         this.sender = sender;
         this.creator = pickCreator(sender, creator);
@@ -45,7 +45,7 @@ public class DefaultDescriptor extends AbstractDescriptor {
     }
     
     @Override
-    public Resource getResource() {
+    public ResourceId getResource() {
         return resource;
     }
     

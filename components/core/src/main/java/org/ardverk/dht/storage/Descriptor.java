@@ -23,7 +23,7 @@ import org.ardverk.lang.Epoch;
 import org.ardverk.version.VectorClock;
 
 /**
- * A {@link Descriptor} describes a {@link Value}'s {@link Resource}, its 
+ * A {@link Descriptor} describes a {@link Value}'s {@link ResourceId}, its 
  * creator and sender (possibly the same), its creation time (local time)
  * and its age.
  */
@@ -40,9 +40,9 @@ public interface Descriptor extends Epoch, Age {
     public Contact getCreator();
     
     /**
-     * Returns the {@link Resource} of the {@link ValueTuple}.
+     * Returns the {@link ResourceId} of the {@link ValueTuple}.
      */
-    public Resource getResource();
+    public ResourceId getResource();
     
     /**
      * Returns the {@link Value}'s {@link VectorClock}.

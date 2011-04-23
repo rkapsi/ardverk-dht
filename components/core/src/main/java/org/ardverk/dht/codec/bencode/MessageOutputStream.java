@@ -40,7 +40,7 @@ import org.ardverk.dht.message.ValueRequest;
 import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.storage.Descriptor;
-import org.ardverk.dht.storage.Resource;
+import org.ardverk.dht.storage.ResourceId;
 import org.ardverk.dht.storage.Status;
 import org.ardverk.dht.storage.Value;
 import org.ardverk.dht.storage.ValueTuple;
@@ -98,7 +98,7 @@ class MessageOutputStream extends BencodingOutputStream {
         writeString(isa.getHostName() + ":" + isa.getPort());
     }
     
-    public void writeResource(Resource resource) throws IOException {
+    public void writeResource(ResourceId resource) throws IOException {
         writeString(resource.getURI().toString());
     }
     

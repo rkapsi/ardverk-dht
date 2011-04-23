@@ -22,7 +22,7 @@ import org.ardverk.dht.KUID;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.Localhost;
 import org.ardverk.dht.storage.Status;
-import org.ardverk.dht.storage.Resource;
+import org.ardverk.dht.storage.ResourceId;
 import org.ardverk.dht.storage.ValueTuple;
 import org.ardverk.lang.Arguments;
 
@@ -75,7 +75,7 @@ public class DefaultMessageFactory extends AbstractMessageFactory {
     }
 
     @Override
-    public ValueRequest createValueRequest(Contact dst, Resource resource) {
+    public ValueRequest createValueRequest(Contact dst, ResourceId resource) {
         SocketAddress address = dst.getRemoteAddress();
         MessageId messageId = createMessageId(address);
         return new DefaultValueRequest(messageId, localhost, address, resource);

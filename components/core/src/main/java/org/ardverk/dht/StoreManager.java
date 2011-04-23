@@ -40,7 +40,7 @@ import org.ardverk.dht.storage.ByteArrayValue;
 import org.ardverk.dht.storage.DefaultDescriptor;
 import org.ardverk.dht.storage.DefaultValueTuple;
 import org.ardverk.dht.storage.Descriptor;
-import org.ardverk.dht.storage.Resource;
+import org.ardverk.dht.storage.ResourceId;
 import org.ardverk.dht.storage.Value;
 import org.ardverk.dht.storage.ValueTuple;
 import org.ardverk.lang.ExceptionUtils;
@@ -65,7 +65,7 @@ public class StoreManager {
         this.messageDispatcher = messageDispatcher;
     }
     
-    public DHTFuture<PutEntity> remove(Resource resource, 
+    public DHTFuture<PutEntity> remove(ResourceId resource, 
             VectorClock<KUID> clock, PutConfig config) {
         return put(resource, ByteArrayValue.EMPTY, clock, config);
     }
@@ -73,7 +73,7 @@ public class StoreManager {
     public DHTFuture<PutEntity> remove(ValueTuple tuple, PutConfig config) {
         
         Descriptor descriptor = tuple.getDescriptor();
-        Resource resource = descriptor.getResource();
+        ResourceId resource = descriptor.getResource();
         VectorClock<KUID> clock = descriptor.getVectorClock();
         
         return remove(resource, clock, config);
@@ -83,13 +83,13 @@ public class StoreManager {
             PutConfig config) {
         
         Descriptor descriptor = tuple.getDescriptor();
-        Resource resource = descriptor.getResource();
+        ResourceId resource = descriptor.getResource();
         VectorClock<KUID> clock = descriptor.getVectorClock();
         
         return put(resource, value, clock, config);
     }
     
-    public DHTFuture<PutEntity> put(final Resource resource, final Value value, 
+    public DHTFuture<PutEntity> put(final ResourceId resource, final Value value, 
             final VectorClock<KUID> clock, final PutConfig config) {
         
         final Object lock = new Object();
@@ -238,13 +238,13 @@ public class StoreManager {
     }
     
     private DHTFuture<ValueEntity> clock(Contact[] src, 
-            Resource resource, GetConfig config) {
+            ResourceId resource, GetConfig config) {
         LookupManager lookupManager = dht.getLookupManager();
         return lookupManager.get(src, resource, config);
     }
     
     public DHTFuture<StoreEntity> store(Contact[] dst, 
-            Resource resource, VectorClock<KUID> clock, 
+            ResourceId resource, VectorClock<KUID> clock, 
             Value value, StoreConfig config) {
         
         Contact localhost = dht.getLocalhost();

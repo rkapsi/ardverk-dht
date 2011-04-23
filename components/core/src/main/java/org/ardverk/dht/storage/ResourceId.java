@@ -22,9 +22,9 @@ import org.ardverk.dht.lang.Identifier;
 
 
 /**
- * A {@link Resource} is an unique identifier of a {@link Value}.
+ * A {@link ResourceId} is an unique identifier of a {@link Value}.
  */
-public interface Resource extends Comparable<Resource>, Identifier {
+public interface ResourceId extends Comparable<ResourceId>, Identifier {
     
     /**
      * Returns the resource's {@link URI}.

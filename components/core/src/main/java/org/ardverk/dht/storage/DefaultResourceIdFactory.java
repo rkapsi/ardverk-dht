@@ -20,22 +20,22 @@ import java.net.URI;
 
 import org.ardverk.dht.KUID;
 
-public class DefaultResourceFactory implements ResourceFactory {
+public class DefaultResourceIdFactory implements ResourceIdFactory {
 
-    public static final ResourceFactory FACTORY 
-        = new DefaultResourceFactory();
+    public static final ResourceIdFactory FACTORY 
+        = new DefaultResourceIdFactory();
     
     @Override
-    public Resource createResource(URI uri) {
+    public ResourceId createResourceId(URI uri) {
         return valueOf(uri);
     }
     
-    public static Resource valueOf(URI uri) {
-        return new DefaultResource(parse(uri), uri);
+    public static ResourceId valueOf(URI uri) {
+        return new DefaultResourceId(parse(uri), uri);
     }
     
-    public static Resource valueOf(KUID valueId) {
-        return new DefaultResource(valueId, create(valueId));
+    public static ResourceId valueOf(KUID valueId) {
+        return new DefaultResourceId(valueId, create(valueId));
     }
     
     private static URI create(KUID valueId) {
@@ -57,13 +57,13 @@ public class DefaultResourceFactory implements ResourceFactory {
         return KUID.create(valueId, 16);
     }
     
-    private static class DefaultResource extends AbstractResource {
+    private static class DefaultResourceId extends AbstractResourceId {
 
         private final KUID valueId;
 
         private final URI uri;
         
-        private DefaultResource(KUID valueId, URI uri) {
+        private DefaultResourceId(KUID valueId, URI uri) {
             this.valueId = valueId;
             this.uri = uri;
         }
