@@ -107,7 +107,9 @@ public class StoreForward {
             }
             
             ValueTuple tuple = database.get(resource);
-            callback.store(contact, tuple, storeConfig);
+            if (tuple != null) {
+                callback.store(contact, tuple, storeConfig);
+            }
         }
     }
     
