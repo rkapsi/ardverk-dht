@@ -20,7 +20,7 @@ import org.ardverk.dht.lang.IntegerValue;
 import org.ardverk.dht.lang.StringValue;
 
 /**
- * Returned by {@link Database#store(ValueTuple)}.
+ * Returned by {@link Database#store(Resource)}.
  */
 public interface Status extends IntegerValue, StringValue {
     

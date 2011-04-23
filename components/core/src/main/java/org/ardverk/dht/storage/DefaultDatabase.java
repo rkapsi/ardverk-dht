@@ -55,20 +55,18 @@ public class DefaultDatabase extends AbstractDatabase {
     }
 
     @Override
-    public synchronized Status store(ValueTuple tuple) {
+    public synchronized Status store(Resource resource) {
         
-        Descriptor descriptor = tuple.getDescriptor();
-        ResourceId resource = descriptor.getResource();
+        ResourceId resourceId = resource.getResourceId();
+        ValueTuple existing = get(resourceId);
         
-        ValueTuple existing = get(resource);
-        
-        Occured occured = compare(existing, tuple);
+        Occured occured = compare(existing, resourceId);
         if (occured == Occured.AFTER) {
-            Value value = tuple.getValue();
+            Value value = resource.getValue();
             if (value.isEmpty()) {
                 remove(resource);
             } else {
-                add(tuple);
+                add(resource);
             }
             return DefaultStatus.SUCCESS;
         }
@@ -82,20 +80,19 @@ public class DefaultDatabase extends AbstractDatabase {
     }
 
     @Override
-    public synchronized ValueTuple get(ResourceId resource) {
-        Bucket bucket = database.get(resource.getId());
-        return bucket != null ? bucket.get(resource) : null;
+    public synchronized Resource get(ResourceId resourceId) {
+        Bucket bucket = database.get(resourceId.getId());
+        return bucket != null ? bucket.get(resourceId) : null;
     }
     
     /**
      * Adds the given {@link ValueTuple}.
      */
-    public synchronized ValueTuple add(ValueTuple tuple) {
-        assert (!tuple.getValue().isEmpty());
+    public synchronized Resource add(Resource resource) {
+        assert (!resource.getValue().isEmpty());
         
-        Descriptor descriptor = tuple.getDescriptor();
-        ResourceId resource = descriptor.getResource();
-        KUID bucketId = resource.getId();
+        ResourceId resourceId = resource.getResourceId();
+        KUID bucketId = resourceId.getId();
         
         Bucket bucket = database.get(bucketId);
         if (bucket == null) {
@@ -103,18 +100,18 @@ public class DefaultDatabase extends AbstractDatabase {
             database.put(bucketId, bucket);
         }
         
-        return bucket.put(resource, tuple);
+        return bucket.put(resourceId, resourceId);
     }
     
     /**
      * Removes and returns a {@link ValueTuple}.
      */
-    public synchronized ValueTuple remove(ResourceId resource) {
-        KUID bucketId = resource.getId();
+    public synchronized Resource remove(ResourceId resourceId) {
+        KUID bucketId = resourceId.getId();
         
         Bucket bucket = database.get(bucketId);
         if (bucket != null) {
-            ValueTuple removed = bucket.remove(resource);
+            Resource removed = bucket.remove(resourceId);
             if (bucket.isEmpty()) {
                 database.remove(bucketId);
             }
@@ -209,11 +206,11 @@ public class DefaultDatabase extends AbstractDatabase {
         return clock.compareTo(existing);
     }
     
-    private static class Bucket extends HashMap<ResourceId, ValueTuple> 
+    private static class Bucket extends HashMap<ResourceId, Resource> 
             implements Identifier {
         
         private static final long serialVersionUID = -8794611016380746313L;
-
+        
         private final KUID bucketId;
         
         public Bucket(KUID bucketId) {
@@ -230,7 +227,7 @@ public class DefaultDatabase extends AbstractDatabase {
             StringBuilder sb = new StringBuilder();
             
             sb.append(getId()).append("={\n");
-            for (Map.Entry<ResourceId, ValueTuple> entry : entrySet()) {
+            for (Map.Entry<ResourceId, Resource> entry : entrySet()) {
                 sb.append("  ").append(entry);
             }
             sb.append("}");

@@ -34,7 +34,7 @@ public interface Database {
     /**
      * Stores the given {@link ValueTuple} and returns a {@link Status}.
      */
-    public Status store(ValueTuple tuple);
+    public Status store(Resource resource);
     
     /**
      * Returns all bucket {@link KUID}s.
@@ -44,7 +44,7 @@ public interface Database {
     /**
      * Returns a {@link ValueTuple} for the given {@link ResourceId}.
      */
-    public ValueTuple get(ResourceId resource);
+    public Resource get(ResourceId resource);
     
     /**
      * Returns all {@link ValueTuple}s.

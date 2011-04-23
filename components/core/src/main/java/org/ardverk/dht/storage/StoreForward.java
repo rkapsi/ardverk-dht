@@ -96,19 +96,19 @@ public class StoreForward {
         StoreConfig storeConfig = config.getStoreConfig();
         
         Contact last = CollectionUtils.last(contacts);    
-        Iterable<ResourceId> resources 
+        Iterable<ResourceId> resourcesIds 
             = database.values(contactId, last.getId());
         
-        for (ResourceId resource : resources) {
+        for (ResourceId resourceId : resourcesIds) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(routeTable.getLocalhost().getId() 
-                        + " foward " + resource
+                        + " foward " + resourceId
                         + " to " + contact.getId());
             }
             
-            ValueTuple tuple = database.get(resource);
-            if (tuple != null) {
-                callback.store(contact, tuple, storeConfig);
+            Resource resource = database.get(resourceId);
+            if (resource != null) {
+                callback.store(contact, resource, storeConfig);
             }
         }
     }
