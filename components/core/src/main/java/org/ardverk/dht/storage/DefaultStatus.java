@@ -47,8 +47,8 @@ public class DefaultStatus implements Status {
     /**
      * Factory method to create {@link Status}.
      */
-    public static Status valueOf(int code, String message, ValueTuple tuple) {
-        if (tuple == null) {
+    public static Status valueOf(int code, String message, Resource resource) {
+        if (resource == null) {
             switch (code) {
                 case 100:
                     if (SUCCESS.stringValue().equalsIgnoreCase(message)) {
@@ -63,13 +63,13 @@ public class DefaultStatus implements Status {
             }
         }
         
-        return new DefaultStatus(code, message, tuple);
+        return new DefaultStatus(code, message, resource);
     }
     
     /**
      * Creates a {@link Status} for the case there was a conflict.
      */
-    public static Status conflict(ValueTuple tuple) {
+    public static Status conflict(Resource tuple) {
         return new DefaultStatus(Code.CONFLICT, tuple);
     }
     
@@ -77,16 +77,16 @@ public class DefaultStatus implements Status {
     
     private final String message;
     
-    private final ValueTuple tuple;
+    private final Resource resource;
     
-    private DefaultStatus(Code code, ValueTuple tuple) {
-        this(code.value, code.name(), tuple);
+    private DefaultStatus(Code code, Resource resource) {
+        this(code.value, code.name(), resource);
     }
     
-    private DefaultStatus(int code, String message, ValueTuple tuple) {
+    private DefaultStatus(int code, String message, Resource resource) {
         this.code = code;
         this.message = message;
-        this.tuple = tuple;
+        this.resource = resource;
     }
     
     @Override
@@ -100,8 +100,8 @@ public class DefaultStatus implements Status {
     }
     
     @Override
-    public ValueTuple getValueTuple() {
-        return tuple;
+    public Resource getResource() {
+        return resource;
     }
 
     @Override

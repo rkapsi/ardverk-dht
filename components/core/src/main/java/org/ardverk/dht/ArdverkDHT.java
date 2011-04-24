@@ -49,6 +49,7 @@ import org.ardverk.dht.routing.Localhost;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Database;
 import org.ardverk.dht.storage.DefaultDatabase;
+import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ResourceId;
 import org.ardverk.dht.storage.StoreForward;
 import org.ardverk.dht.storage.Value;
@@ -130,8 +131,8 @@ public class ArdverkDHT extends AbstractDHT {
         storeForward.bind(new StoreForward.Callback() {
             @Override
             public DHTFuture<StoreEntity> store(Contact dst, 
-                    ValueTuple valueTuple, StoreConfig config) {
-                return storeManager.store(new Contact[] { dst }, valueTuple, config);
+                    Resource resource, StoreConfig config) {
+                return storeManager.store(new Contact[] { dst }, resource, config);
             }
         });
     }

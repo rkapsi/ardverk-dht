@@ -33,8 +33,7 @@ import org.ardverk.dht.message.ResponseMessage;
 import org.ardverk.dht.message.StoreRequest;
 import org.ardverk.dht.message.StoreResponse;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.storage.ValueTuple;
-import org.ardverk.lang.Arguments;
+import org.ardverk.dht.storage.Resource;
 import org.ardverk.lang.TimeStamp;
 
 
@@ -56,22 +55,22 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     
     private final int k;
     
-    private final ValueTuple tuple;
+    private final Resource resource;
     
     private final StoreConfig config;
     
     public StoreResponseHandler(
             MessageDispatcher messageDispatcher, 
             Contact[] contacts, int k,
-            ValueTuple tuple, StoreConfig config) {
+            Resource resource, StoreConfig config) {
         super(messageDispatcher);
         
         this.contacts = contacts;
         this.it = Iterators.fromArray(contacts);
         this.k = k;
         
-        this.tuple = Arguments.notNull(tuple, "tuple");
-        this.config = Arguments.notNull(config, "config");
+        this.resource = resource;
+        this.config = config;
         
         counter = new ProcessCounter(config.getS());
     }
@@ -113,9 +112,9 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
             
             StoreResponse[] values = responses.toArray(new StoreResponse[0]);
             if (values.length == 0) {
-                setException(new StoreException(tuple, time, TimeUnit.MILLISECONDS));
+                setException(new StoreException(resource, time, TimeUnit.MILLISECONDS));
             } else {
-                setValue(new DefaultStoreEntity(contacts, tuple, values, 
+                setValue(new DefaultStoreEntity(contacts, resource, values, 
                         time, TimeUnit.MILLISECONDS));
             }
         }
@@ -123,7 +122,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     
     private synchronized void store(Contact dst) throws IOException {
         MessageFactory factory = messageDispatcher.getMessageFactory();
-        StoreRequest request = factory.createStoreRequest(dst, tuple);
+        StoreRequest request = factory.createStoreRequest(dst, resource);
         
         long defaultTimeout = config.getStoreTimeoutInMillis();
         long adaptiveTimeout = config.getAdaptiveTimeout(

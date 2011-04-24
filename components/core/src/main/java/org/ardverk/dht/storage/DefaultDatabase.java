@@ -57,10 +57,18 @@ public class DefaultDatabase extends AbstractDatabase {
     @Override
     public synchronized Status store(Resource resource) {
         
-        ResourceId resourceId = resource.getResourceId();
-        ValueTuple existing = get(resourceId);
+        if (!(resource instanceof ValueResource)) {
+            throw new IllegalArgumentException();
+        }
         
-        Occured occured = compare(existing, resourceId);
+        return store((ValueResource)resource);
+    }
+    
+    private synchronized Status store(ValueResource resource) {
+        ResourceId resourceId = resource.getResourceId();
+        ValueResource existing = (ValueResource)get(resourceId);
+        
+        Occured occured = compare(existing, resource);
         if (occured == Occured.AFTER) {
             Value value = resource.getValue();
             if (value.isEmpty()) {
@@ -86,9 +94,9 @@ public class DefaultDatabase extends AbstractDatabase {
     }
     
     /**
-     * Adds the given {@link ValueTuple}.
+     * Adds the given {@link ValueResource}.
      */
-    public synchronized Resource add(Resource resource) {
+    public synchronized Resource add(ValueResource resource) {
         assert (!resource.getValue().isEmpty());
         
         ResourceId resourceId = resource.getResourceId();
@@ -100,7 +108,11 @@ public class DefaultDatabase extends AbstractDatabase {
             database.put(bucketId, bucket);
         }
         
-        return bucket.put(resourceId, resourceId);
+        return bucket.put(resourceId, resource);
+    }
+    
+    private synchronized Resource remove(Resource resource) {
+        return remove(resource.getResourceId());
     }
     
     /**
@@ -185,13 +197,13 @@ public class DefaultDatabase extends AbstractDatabase {
         return sb.toString();
     }
     
-    private static Occured compare(ValueTuple existing, ValueTuple tuple) {
+    private static Occured compare(ValueResource existing, ValueResource resource) {
         if (existing == null) {
             return Occured.AFTER;
         }
         
-        VectorClock<KUID> clock1 = existing.getDescriptor().getVectorClock();
-        VectorClock<KUID> clock2 = tuple.getDescriptor().getVectorClock();
+        VectorClock<KUID> clock1 = existing.getVectorClock();
+        VectorClock<KUID> clock2 = resource.getVectorClock();
         
         return compare(clock1, clock2);
     }

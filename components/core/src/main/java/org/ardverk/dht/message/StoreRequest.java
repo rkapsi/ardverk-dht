@@ -16,7 +16,7 @@
 
 package org.ardverk.dht.message;
 
-import org.ardverk.dht.storage.ValueTuple;
+import org.ardverk.dht.storage.Resource;
 
 /**
  * A {@link MessageType#STORE} request.
@@ -24,7 +24,7 @@ import org.ardverk.dht.storage.ValueTuple;
 public interface StoreRequest extends RequestMessage {
     
     /**
-     * Returns the found {@link ValueTuple}.
+     * Returns the found {@link Resource}.
      */
-    public ValueTuple getValueTuple();
+    public Resource getResource();
 }

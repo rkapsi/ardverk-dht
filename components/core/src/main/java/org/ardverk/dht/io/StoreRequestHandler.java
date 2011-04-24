@@ -30,10 +30,9 @@ import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Database;
 import org.ardverk.dht.storage.DatabaseConfig;
 import org.ardverk.dht.storage.DefaultStatus;
-import org.ardverk.dht.storage.Descriptor;
+import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ResourceId;
 import org.ardverk.dht.storage.Status;
-import org.ardverk.dht.storage.ValueTuple;
 import org.ardverk.lang.Arguments;
 import org.ardverk.utils.ArrayUtils;
 
@@ -58,25 +57,24 @@ public class StoreRequestHandler extends AbstractRequestHandler {
     }
 
     public StoreResponse createResponse(StoreRequest request) {
-        ValueTuple tuple = request.getValueTuple();
+        Resource resource = request.getResource();
         Status status = null;
         
         DatabaseConfig config = database.getDatabaseConfig();
         if (config.isCheckBucket()) {
-            Descriptor descriptor = tuple.getDescriptor();
-            ResourceId resource = descriptor.getResource();
+            ResourceId resourceId = resource.getResourceId();
             
-            KUID bucketId = resource.getId();
+            KUID bucketId = resourceId.getId();
             Contact[] contacts = routeTable.select(bucketId);
             Contact localhost = routeTable.getLocalhost();
             
             if (!ArrayUtils.contains(localhost, contacts)) {
                 status = DefaultStatus.FAILURE;
             } else {
-                status = database.store(tuple);
+                status = database.store(resource);
             }
         } else {
-            status = database.store(tuple);
+            status = database.store(resource);
         }
         
         MessageFactory factory = messageDispatcher.getMessageFactory();

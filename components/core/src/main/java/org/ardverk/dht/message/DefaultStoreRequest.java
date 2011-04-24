@@ -19,24 +19,22 @@ package org.ardverk.dht.message;
 import java.net.SocketAddress;
 
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.storage.ValueTuple;
-import org.ardverk.lang.Arguments;
-
+import org.ardverk.dht.storage.Resource;
 
 public class DefaultStoreRequest extends AbstractRequestMessage 
         implements StoreRequest {
 
-    private final ValueTuple tuple;
+    private final Resource resource;
     
     public DefaultStoreRequest(MessageId messageId, Contact contact, 
-            SocketAddress address, ValueTuple tuple) {
+            SocketAddress address, Resource resource) {
         super(messageId, contact, address);
         
-        this.tuple = Arguments.notNull(tuple, "tuple");
+        this.resource = resource;
     }
     
     @Override
-    public ValueTuple getValueTuple() {
-        return tuple;
+    public Resource getResource() {
+        return resource;
     }
 }

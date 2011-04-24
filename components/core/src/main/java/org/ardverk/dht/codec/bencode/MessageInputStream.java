@@ -131,7 +131,7 @@ class MessageInputStream extends BencodingInputStream {
         return NetworkUtils.createUnresolved(host, port);
     }
     
-    public ResourceId readResource() throws IOException {
+    public ResourceId readResourceId() throws IOException {
         URI uri = URI.create(readString());
         return resourceFactory.createResourceId(uri);
     }
@@ -202,7 +202,7 @@ class MessageInputStream extends BencodingInputStream {
     
     public Descriptor readDescriptor(Contact contact) throws IOException {
         Contact creator = readContact();
-        ResourceId resource = readResource();
+        ResourceId resource = readResourceId();
         VectorClock<KUID> clock = readVectorClock();
         return new DefaultDescriptor(contact, creator, resource, clock);
     }
@@ -279,7 +279,7 @@ class MessageInputStream extends BencodingInputStream {
     private ValueRequest readValueRequest(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
         
-        ResourceId resource = readResource();
+        ResourceId resource = readResourceId();
         return new DefaultValueRequest(messageId, contact, address, resource);
     }
     

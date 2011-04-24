@@ -25,7 +25,7 @@ import org.ardverk.dht.lang.StringValue;
 public interface Status extends IntegerValue, StringValue {
     
     /**
-     * The {@link Database} may return a {@link ValueTuple}.
+     * The {@link Database} may return a {@link Resource}.
      */
-    public ValueTuple getValueTuple();
+    public Resource getResource();
 }

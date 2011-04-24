@@ -98,7 +98,7 @@ class MessageOutputStream extends BencodingOutputStream {
         writeString(isa.getHostName() + ":" + isa.getPort());
     }
     
-    public void writeResource(ResourceId resource) throws IOException {
+    public void writeResourceId(ResourceId resource) throws IOException {
         writeString(resource.getURI().toString());
     }
     
@@ -156,7 +156,7 @@ class MessageOutputStream extends BencodingOutputStream {
         writeInt(status.intValue());
         writeString(status.stringValue());
         
-        ValueTuple tuple = status.getValueTuple();
+        ValueTuple tuple = status.getResource();
         if (tuple != null) {
             writeBoolean(true);
             writeValueTuple(tuple);
@@ -167,7 +167,7 @@ class MessageOutputStream extends BencodingOutputStream {
     
     public void writeDescriptor(Descriptor descriptor) throws IOException {
         writeContact(descriptor.getCreator());
-        writeResource(descriptor.getResource());
+        writeResourceId(descriptor.getResource());
         writeVectorClock(descriptor.getVectorClock());
     }
     
@@ -248,15 +248,15 @@ class MessageOutputStream extends BencodingOutputStream {
     }
     
     private void writeValueRequest(ValueRequest message) throws IOException {
-        writeResource(message.getResource());
+        writeResourceId(message.getResource());
     }
     
     private void writeValueResponse(ValueResponse message) throws IOException {
-        writeValueTuple(message.getValueTuple());
+        writeValueTuple(message.getResource());
     }
     
     private void writeStoreRequest(StoreRequest message) throws IOException {
-        writeValueTuple(message.getValueTuple());
+        writeValueTuple(message.getResource());
     }
     
     private void writeStoreResponse(StoreResponse message) throws IOException {

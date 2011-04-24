@@ -16,7 +16,7 @@
 
 package org.ardverk.dht.message;
 
-import org.ardverk.dht.storage.ValueTuple;
+import org.ardverk.dht.storage.Resource;
 
 /**
  * A {@link MessageType#FIND_VALUE} response.
@@ -24,7 +24,7 @@ import org.ardverk.dht.storage.ValueTuple;
 public interface ValueResponse extends LookupResponse {
     
     /**
-     * Returns the {@link ValueTuple} we were looking for.
+     * Returns the {@link Resource} we were looking for.
      */
-    public ValueTuple getValueTuple();
+    public Resource getResource();
 }

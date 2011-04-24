@@ -20,9 +20,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.dht.message.StoreResponse;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.storage.Status;
 import org.ardverk.dht.storage.DefaultStatus;
-import org.ardverk.dht.storage.ValueTuple;
+import org.ardverk.dht.storage.Resource;
+import org.ardverk.dht.storage.Status;
 
 /**
  * A default implementation of {@link StoreEntity}.
@@ -31,16 +31,16 @@ public class DefaultStoreEntity extends AbstractEntity implements StoreEntity {
 
     private final Contact[] contacts;
     
-    private final ValueTuple tuple;
+    private final Resource resource;
     
     private final StoreResponse[] responses;
     
-    public DefaultStoreEntity(Contact[] contacts, ValueTuple tuple, 
+    public DefaultStoreEntity(Contact[] contacts, Resource resource, 
             StoreResponse[] responses, long time, TimeUnit unit) {
         super(time, unit);
         
         this.contacts = contacts;
-        this.tuple = tuple;
+        this.resource = resource;
         this.responses = responses;
     }
     
@@ -50,8 +50,8 @@ public class DefaultStoreEntity extends AbstractEntity implements StoreEntity {
     }
 
     @Override
-    public ValueTuple getValueTuple() {
-        return tuple;
+    public Resource getResource() {
+        return resource;
     }
     
     @Override

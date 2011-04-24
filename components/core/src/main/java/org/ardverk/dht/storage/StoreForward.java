@@ -161,10 +161,10 @@ public class StoreForward {
     public static interface Callback {
         
         /**
-         * Called by the {@link StoreForward} service for each {@link ValueTuple}
+         * Called by the {@link StoreForward} service for each {@link Resource}
          * that needs to be sent to the given {@link Contact}.
          */
         public DHTFuture<StoreEntity> store(Contact dst, 
-                ValueTuple valueTuple, StoreConfig config);
+                Resource resource, StoreConfig config);
     }
 }

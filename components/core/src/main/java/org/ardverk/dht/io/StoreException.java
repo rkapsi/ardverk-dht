@@ -19,6 +19,7 @@ package org.ardverk.dht.io;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.dht.lang.DHTException;
+import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ValueTuple;
 
 
@@ -30,17 +31,17 @@ public class StoreException extends DHTException {
     
     private static final long serialVersionUID = -1874658787780091708L;
 
-    private final ValueTuple tuple;
+    private final Resource resource;
     
-    public StoreException(ValueTuple tuple, long time, TimeUnit unit) {
+    public StoreException(Resource resource, long time, TimeUnit unit) {
         super(time, unit);
-        this.tuple = tuple;
+        this.resource = resource;
     }
 
     /**
-     * Returns the {@link ValueTuple} that failed to be stored.
+     * Returns the {@link Resource} that failed to be stored.
      */
-    public ValueTuple getValueTuple() {
-        return tuple;
+    public Resource getResource() {
+        return resource;
     }
 }

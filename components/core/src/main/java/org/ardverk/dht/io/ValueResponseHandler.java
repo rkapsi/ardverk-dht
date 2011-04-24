@@ -32,6 +32,7 @@ import org.ardverk.dht.message.ValueRequest;
 import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
+import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ResourceId;
 import org.ardverk.dht.storage.ValueTuple;
 
@@ -42,18 +43,18 @@ import org.ardverk.dht.storage.ValueTuple;
  */
 public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     
-    private final FixedSizeArrayList<ValueTuple> tuples;
+    private final FixedSizeArrayList<Resource> resources;
     
-    private final ResourceId resource;
+    private final ResourceId resourceId;
     
     public ValueResponseHandler(MessageDispatcher messageDispatcher,
             Contact[] contacts, RouteTable routeTable, 
-            ResourceId resource, GetConfig config) {
+            ResourceId resourceId, GetConfig config) {
         super(messageDispatcher, contacts, routeTable, 
-                resource.getId(), config);
+                resourceId.getId(), config);
         
-        tuples = new FixedSizeArrayList<ValueTuple>(config.getR());
-        this.resource = resource;
+        resources = new FixedSizeArrayList<Resource>(config.getR());
+        this.resourceId = resourceId;
     }
 
     @Override
@@ -79,12 +80,12 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     private synchronized void processValueResponse(ValueResponse response, 
             long time, TimeUnit unit) throws IOException {
         
-        ValueTuple tuple = response.getValueTuple();
-        tuples.add(tuple);
+        Resource resource = response.getResource();
+        resources.add(resource);
         
-        if (tuples.isFull()) {
+        if (resources.isFull()) {
             Outcome outcome = createOutcome();
-            ValueTuple[] values = tuples.toArray(new ValueTuple[0]);
+            ValueTuple[] values = resources.toArray(new ValueTuple[0]);
             setValue(new DefaultValueEntity(outcome, values));
         }
     }
@@ -93,10 +94,10 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     protected void lookup(Contact dst, KUID lookupId, 
             long timeout, TimeUnit unit) throws IOException {
         
-        assert (lookupId.equals(resource.getId()));
+        assert (lookupId.equals(resourceId.getId()));
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
-        ValueRequest message = factory.createValueRequest(dst, resource);
+        ValueRequest message = factory.createValueRequest(dst, resourceId);
         
         send(dst, message, timeout, unit);
     }
@@ -104,10 +105,10 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     @Override
     protected void complete(Outcome outcome) {
         
-        if (tuples.isEmpty()) {
+        if (resources.isEmpty()) {
             setException(new NoSuchValueException(outcome));
         } else {
-            ValueTuple[] values = tuples.toArray(new ValueTuple[0]);
+            ValueTuple[] values = resources.toArray(new ValueTuple[0]);
             setValue(new DefaultValueEntity(outcome, values));
         }
     }

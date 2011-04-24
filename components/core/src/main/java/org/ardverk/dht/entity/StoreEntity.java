@@ -19,7 +19,7 @@ package org.ardverk.dht.entity;
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.message.StoreResponse;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.storage.ValueTuple;
+import org.ardverk.dht.storage.Resource;
 
 /**
  * The result of a {@link MessageType#STORE} operation.
@@ -32,9 +32,9 @@ public interface StoreEntity extends Entity {
     public Contact[] getContacts();
     
     /**
-     * Returns the {@link ValueTuple} that was stored.
+     * Returns the {@link Resource} that was stored.
      */
-    public ValueTuple getValueTuple();
+    public Resource getResource();
     
     /**
      * Returns all {@link StoreResponse}s.

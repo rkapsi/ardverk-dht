@@ -27,8 +27,8 @@ import org.ardverk.dht.message.ValueRequest;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Database;
+import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ResourceId;
-import org.ardverk.dht.storage.ValueTuple;
 
 
 /**
@@ -52,16 +52,16 @@ public class ValueRequestHandler extends AbstractRequestHandler {
     }
 
     public ResponseMessage createResponse(ValueRequest request) {
-        ResourceId resource = request.getResource();
-        ValueTuple value = database.get(resource);
+        ResourceId resourceId = request.getResource();
+        Resource resource = database.get(resourceId);
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
         ResponseMessage response = null;
         
-        if (value != null) {
-            response = factory.createValueResponse(request, value);
+        if (resource != null) {
+            response = factory.createValueResponse(request, resource);
         } else {
-            Contact[] contacts = routeTable.select(resource.getId());
+            Contact[] contacts = routeTable.select(resourceId.getId());
             response = factory.createNodeResponse(request, contacts);
         }
         
