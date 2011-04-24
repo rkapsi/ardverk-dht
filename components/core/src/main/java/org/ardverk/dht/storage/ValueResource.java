@@ -8,6 +8,8 @@ import org.ardverk.version.VectorClock;
 
 public interface ValueResource extends Resource, Epoch, Age {
 
+    public Contact getSender();
+    
     public Contact getCreator();
     
     public VectorClock<KUID> getVectorClock();
