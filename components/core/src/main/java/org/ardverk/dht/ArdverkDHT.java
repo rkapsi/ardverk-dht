@@ -53,7 +53,6 @@ import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ResourceId;
 import org.ardverk.dht.storage.StoreForward;
 import org.ardverk.dht.storage.Value;
-import org.ardverk.dht.storage.ValueTuple;
 import org.ardverk.version.VectorClock;
 
 
@@ -264,31 +263,31 @@ public class ArdverkDHT extends AbstractDHT {
     }
     
     @Override
-    public DHTFuture<ValueEntity> get(ResourceId resource, GetConfig config) {
-        return lookupManager.get(resource, config);
+    public DHTFuture<ValueEntity> get(ResourceId resourceId, GetConfig config) {
+        return lookupManager.get(resourceId, config);
     }
 
     @Override
-    public DHTFuture<PutEntity> put(ResourceId resource, Value value, 
+    public DHTFuture<PutEntity> put(ResourceId resourceId, Value value, 
             VectorClock<KUID> clock, PutConfig config) {
-        return storeManager.put(resource, value, clock, config);
+        return storeManager.put(resourceId, value, clock, config);
     }
     
     @Override
-    public DHTFuture<PutEntity> remove(ResourceId resource, 
+    public DHTFuture<PutEntity> remove(ResourceId resourceId, 
             VectorClock<KUID> clock, PutConfig config) {
-        return storeManager.remove(resource, clock, config);
+        return storeManager.remove(resourceId, clock, config);
     }
     
     @Override
-    public DHTFuture<PutEntity> update(ValueTuple tuple, Value value,
+    public DHTFuture<PutEntity> update(Resource resource, Value value,
             PutConfig config) {
-        return storeManager.update(tuple, value, config);
+        return storeManager.update(resource, value, config);
     }
     
     @Override
-    public DHTFuture<PutEntity> remove(ValueTuple tuple, PutConfig config) {
-        return storeManager.remove(tuple, config);
+    public DHTFuture<PutEntity> remove(Resource resource, PutConfig config) {
+        return storeManager.remove(resource, config);
     }
 
     @Override

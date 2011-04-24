@@ -43,7 +43,7 @@ kuid(String value) {
 }
 
 rsrc(String value) {
-	return DefaultResourceFactory.valueOf(kuid(value));
+	return DefaultResourceIdFactory.valueOf(kuid(value));
 }
 
 // Creates a SHA-1 from a String
@@ -60,8 +60,8 @@ createDHT(int port) {
 	DHT dht = EasyFactory.create(config);
 	
 	MessageCodec codec = new BencodeMessageCodec();
-	//dht.bind(new DatagramTransport(codec, port));
-	dht.bind(new SocketTransport(codec, port));
+	dht.bind(new DatagramTransport(codec, port));
+	//dht.bind(new SocketTransport(codec, port));
 	//dht.bind(new HybridTransport(codec, port));
 	//dht.bind(new HttpTransport(port));
 	
@@ -201,7 +201,8 @@ init() {
 }
 
 init(boolean withUI) {
-	INSTANCE_COUNT = 256;
+	//INSTANCE_COUNT = 256;
+	INSTANCE_COUNT = 30;
 	INITIAL_PORT = 12000;
 
 	print("Creating DHTs...");

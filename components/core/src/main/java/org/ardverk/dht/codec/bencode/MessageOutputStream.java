@@ -39,11 +39,11 @@ import org.ardverk.dht.message.StoreResponse;
 import org.ardverk.dht.message.ValueRequest;
 import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.storage.Descriptor;
+import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ResourceId;
 import org.ardverk.dht.storage.Status;
 import org.ardverk.dht.storage.Value;
-import org.ardverk.dht.storage.ValueTuple;
+import org.ardverk.dht.storage.ValueResource;
 import org.ardverk.io.IoUtils;
 import org.ardverk.version.Vector;
 import org.ardverk.version.VectorClock;
@@ -156,24 +156,24 @@ class MessageOutputStream extends BencodingOutputStream {
         writeInt(status.intValue());
         writeString(status.stringValue());
         
-        ValueTuple tuple = status.getResource();
-        if (tuple != null) {
+        Resource resource = status.getResource();
+        if (resource != null) {
             writeBoolean(true);
-            writeValueTuple(tuple);
+            writeResource(resource);
         } else {
             writeBoolean(false);
         }
     }
     
-    public void writeDescriptor(Descriptor descriptor) throws IOException {
-        writeContact(descriptor.getCreator());
-        writeResourceId(descriptor.getResource());
-        writeVectorClock(descriptor.getVectorClock());
+    public void writeResource(Resource resource) throws IOException {
+        writeResourceId(resource.getResourceId());
+        writeValueResource((ValueResource)resource);
     }
     
-    public void writeValueTuple(ValueTuple tuple) throws IOException {
-        writeDescriptor(tuple.getDescriptor());
-        writeValue(tuple.getValue());
+    private void writeValueResource(ValueResource resource) throws IOException {
+        writeContact(resource.getCreator());
+        writeVectorClock(resource.getVectorClock());
+        writeValue(resource.getValue());
     }
     
     public void writeValue(Value value) throws IOException {
@@ -252,11 +252,11 @@ class MessageOutputStream extends BencodingOutputStream {
     }
     
     private void writeValueResponse(ValueResponse message) throws IOException {
-        writeValueTuple(message.getResource());
+        writeResource(message.getResource());
     }
     
     private void writeStoreRequest(StoreRequest message) throws IOException {
-        writeValueTuple(message.getResource());
+        writeResource(message.getResource());
     }
     
     private void writeStoreResponse(StoreResponse message) throws IOException {

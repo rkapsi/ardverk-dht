@@ -18,9 +18,8 @@ package org.ardverk.dht.entity;
 
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.storage.Descriptor;
+import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.Value;
-import org.ardverk.dht.storage.ValueTuple;
 
 /**
  * The result of a {@link MessageType#FIND_VALUE} operation.
@@ -28,45 +27,38 @@ import org.ardverk.dht.storage.ValueTuple;
 public interface ValueEntity extends LookupEntity {
     
     /**
-     * Returns the sender who sent us the {@link ValueTuple}.
+     * Returns the sender who sent us the {@link Resource}.
      * 
-     * @see #getValueTuple()
-     * @see ValueTuple#getSender()
+     * @see #getResource()
+     * @see Resource#getSender()
      */
     public Contact getSender();
     
     /**
-     * Returns the creator who created the {@link ValueTuple}.
+     * Returns the creator who created the {@link Resource}.
      * 
-     * @see #getValueTuple()
-     * @see ValueTuple#getCreator()
+     * @see #getResource()
+     * @see Resource#getCreator()
      */
     public Contact getCreator();
     
     /**
-     * Returns the first {@link ValueTuple}'s {@link Descriptor}.
+     * Returns first {@link Resource}'s {@link Value}.
      * 
-     * @see #getValueTuple()
-     */
-    public Descriptor getDescriptor();
-    
-    /**
-     * Returns first {@link ValueTuple}'s {@link Value}.
-     * 
-     * @see #getValueTuple()
-     * @see ValueTuple#getValue()
+     * @see #getResource()
+     * @see Resource#getValue()
      */
     public Value getValue();
     
     /**
-     * Returns the first {@link ValueTuple}.
+     * Returns the first {@link Resource}.
      * 
-     * @see #getValueTuples()
+     * @see #getResources()
      */
-    public ValueTuple getValueTuple();
+    public Resource getResource();
     
     /**
-     * Returns all {@link ValueTuple}s.
+     * Returns all {@link Resource}s.
      */
-    public ValueTuple[] getValueTuples();
+    public Resource[] getResources();
 }

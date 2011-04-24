@@ -21,9 +21,9 @@ import java.util.concurrent.TimeUnit;
 import org.ardverk.collection.CollectionUtils;
 import org.ardverk.dht.io.Outcome;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.storage.Descriptor;
+import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.Value;
-import org.ardverk.dht.storage.ValueTuple;
+import org.ardverk.dht.storage.ValueResource;
 
 /**
  * A default implementation of {@link ValueEntity}.
@@ -32,44 +32,39 @@ public class DefaultValueEntity extends AbstractLookupEntity implements ValueEnt
     
     private final Outcome outcome;
     
-    private final ValueTuple[] values;
+    private final Resource[] resources;
     
-    public DefaultValueEntity(Outcome outcome, ValueTuple[] values) {
+    public DefaultValueEntity(Outcome outcome, Resource[] resources) {
         super(outcome.getId(), outcome.getTimeInMillis(), 
                 TimeUnit.MILLISECONDS);
         
         this.outcome = outcome;
-        this.values = values;
+        this.resources = resources;
     }
     
     @Override
     public Contact getSender() {
-        return getDescriptor().getSender();
+        return getResource().getSender();
     }
     
     @Override
     public Contact getCreator() {
-        return getDescriptor().getCreator();
+        return ((ValueResource)getResource()).getCreator();
     }
 
     @Override
-    public ValueTuple getValueTuple() {
-        return CollectionUtils.first(values);
-    }
-    
-    @Override
-    public Descriptor getDescriptor() {
-        return getValueTuple().getDescriptor();
+    public Resource getResource() {
+        return CollectionUtils.first(resources);
     }
     
     @Override
     public Value getValue() {
-        return getValueTuple().getValue();
+        return ((ValueResource)getResource()).getValue();
     }
     
     @Override
-    public ValueTuple[] getValueTuples() {
-        return values;
+    public Resource[] getResources() {
+        return resources;
     }
     
     public Outcome getOutcome() {

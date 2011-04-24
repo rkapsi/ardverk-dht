@@ -34,7 +34,6 @@ import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ResourceId;
-import org.ardverk.dht.storage.ValueTuple;
 
 
 /**
@@ -85,8 +84,8 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
         
         if (resources.isFull()) {
             Outcome outcome = createOutcome();
-            ValueTuple[] values = resources.toArray(new ValueTuple[0]);
-            setValue(new DefaultValueEntity(outcome, values));
+            Resource[] rsrc = resources.toArray(new Resource[0]);
+            setValue(new DefaultValueEntity(outcome, rsrc));
         }
     }
     
@@ -108,8 +107,8 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
         if (resources.isEmpty()) {
             setException(new NoSuchValueException(outcome));
         } else {
-            ValueTuple[] values = resources.toArray(new ValueTuple[0]);
-            setValue(new DefaultValueEntity(outcome, values));
+            Resource[] rsrc = resources.toArray(new Resource[0]);
+            setValue(new DefaultValueEntity(outcome, rsrc));
         }
     }
 }

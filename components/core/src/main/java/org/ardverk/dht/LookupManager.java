@@ -62,16 +62,16 @@ public class LookupManager {
         return futureService.submit(process, config);
     }
     
-    public DHTFuture<ValueEntity> get(ResourceId resource, GetConfig config) {
-        Contact[] contacts = routeTable.select(resource.getId());
-        return get(contacts, resource, config);
+    public DHTFuture<ValueEntity> get(ResourceId resourceId, GetConfig config) {
+        Contact[] contacts = routeTable.select(resourceId.getId());
+        return get(contacts, resourceId, config);
     }
     
     public DHTFuture<ValueEntity> get(Contact[] contacts, 
-            ResourceId resource, GetConfig config) {
+            ResourceId resourceId, GetConfig config) {
         DHTProcess<ValueEntity> process
             = new ValueResponseHandler(messageDispatcher, contacts, 
-                    routeTable, resource, config);
+                    routeTable, resourceId, config);
         return futureService.submit(process, config);
     }
 }

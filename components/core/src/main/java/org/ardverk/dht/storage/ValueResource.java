@@ -10,8 +10,6 @@ public interface ValueResource extends Resource, Epoch, Age {
 
     public Contact getCreator();
     
-    public Contact getSender();
-    
     public VectorClock<KUID> getVectorClock();
     
     public Value getValue();

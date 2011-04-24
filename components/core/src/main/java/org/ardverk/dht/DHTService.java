@@ -30,9 +30,9 @@ import org.ardverk.dht.entity.PutEntity;
 import org.ardverk.dht.entity.ValueEntity;
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ResourceId;
 import org.ardverk.dht.storage.Value;
-import org.ardverk.dht.storage.ValueTuple;
 import org.ardverk.version.VectorClock;
 
 
@@ -75,13 +75,13 @@ interface DHTService {
      * Performs a {@link MessageType#FIND_VALUE} lookup in the DHT.
      */
     public DHTFuture<ValueEntity> get(
-            ResourceId resource, GetConfig config);
+            ResourceId resourceId, GetConfig config);
     
     /**
      * Performs a {@link MessageType#FIND_NODE} lookup followed by 
      * a {@link MessageType#STORE} operation.
      */
-    public DHTFuture<PutEntity> put(ResourceId resource, Value value, 
+    public DHTFuture<PutEntity> put(ResourceId resourceId, Value value, 
             VectorClock<KUID> clock, PutConfig config);
     
     /**
@@ -90,17 +90,17 @@ interface DHTService {
      * <p>NOTE: It's essentially a {@link #put(ResourceId, Value, PutConfig)} 
      * operation with an empty {@link Value}.
      */
-    public DHTFuture<PutEntity> remove(ResourceId resource, 
+    public DHTFuture<PutEntity> remove(ResourceId resourceId, 
             VectorClock<KUID> clock, PutConfig config);
     
     /**
-     * Updates the given {@link ValueTuple} with the new {@link Value}.
+     * Updates the given {@link Resource} with the new {@link Value}.
      */
-    public DHTFuture<PutEntity> update(ValueTuple tuple, 
+    public DHTFuture<PutEntity> update(Resource resource, 
             Value value, PutConfig config);
     
     /**
-     * Removes the given {@link ValueTuple} from the DHT.
+     * Removes the given {@link Resource} from the DHT.
      */
-    public DHTFuture<PutEntity> remove(ValueTuple tuple, PutConfig config);
+    public DHTFuture<PutEntity> remove(Resource resource, PutConfig config);
 }

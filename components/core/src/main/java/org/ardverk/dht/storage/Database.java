@@ -32,7 +32,7 @@ public interface Database {
     public DatabaseConfig getDatabaseConfig();
     
     /**
-     * Stores the given {@link ValueTuple} and returns a {@link Status}.
+     * Stores the given {@link Resource} and returns a {@link Status}.
      */
     public Status store(Resource resource);
     
@@ -42,22 +42,22 @@ public interface Database {
     public Set<KUID> getBuckets();
     
     /**
-     * Returns a {@link ValueTuple} for the given {@link ResourceId}.
+     * Returns a {@link Resource} for the given {@link ResourceId}.
      */
-    public Resource get(ResourceId resource);
+    public Resource get(ResourceId resourceId);
     
     /**
-     * Returns all {@link ValueTuple}s.
+     * Returns all {@link Resource}s.
      */
     public Iterable<ResourceId> values();
     
     /**
-     * Retruns all {@link ValueTuple}s in the given bucket.
+     * Retruns all {@link Resource}s in the given bucket.
      */
     public Iterable<ResourceId> values(KUID bucketId);
     
     /**
-     * Returns all {@link ValueTuple}s that are close to the lookup 
+     * Returns all {@link Resource}s that are close to the lookup 
      * {@link KUID} but not any further than the last {@link KUID}.
      */
     public Iterable<ResourceId> values(KUID lookupId, KUID lastId);

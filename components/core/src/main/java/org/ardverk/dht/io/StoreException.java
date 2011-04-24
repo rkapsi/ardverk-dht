@@ -20,11 +20,10 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.dht.lang.DHTException;
 import org.ardverk.dht.storage.Resource;
-import org.ardverk.dht.storage.ValueTuple;
 
 
 /**
- * The {@link StoreException} is thrown if a {@link ValueTuple} couldn't
+ * The {@link StoreException} is thrown if a {@link Resource} couldn't
  * be stored in the DHT at all.
  */
 public class StoreException extends DHTException {

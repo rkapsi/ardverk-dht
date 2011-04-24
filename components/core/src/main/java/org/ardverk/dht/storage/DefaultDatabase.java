@@ -116,7 +116,7 @@ public class DefaultDatabase extends AbstractDatabase {
     }
     
     /**
-     * Removes and returns a {@link ValueTuple}.
+     * Removes and returns a {@link Resource}.
      */
     public synchronized Resource remove(ResourceId resourceId) {
         KUID bucketId = resourceId.getId();
@@ -134,7 +134,7 @@ public class DefaultDatabase extends AbstractDatabase {
     }
     
     /**
-     * Removes and returns a {@link ValueTuple}.
+     * Removes and returns a {@link Resource}.
      */
     public synchronized Bucket remove(KUID bucketId) {
         return database.remove(bucketId);

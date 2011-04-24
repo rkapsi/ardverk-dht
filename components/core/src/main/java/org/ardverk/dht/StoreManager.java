@@ -37,13 +37,11 @@ import org.ardverk.dht.io.StoreResponseHandler;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.ByteArrayValue;
-import org.ardverk.dht.storage.DefaultDescriptor;
-import org.ardverk.dht.storage.DefaultValueTuple;
-import org.ardverk.dht.storage.Descriptor;
+import org.ardverk.dht.storage.DefaultValueResource;
 import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ResourceId;
 import org.ardverk.dht.storage.Value;
-import org.ardverk.dht.storage.ValueTuple;
+import org.ardverk.dht.storage.ValueResource;
 import org.ardverk.lang.ExceptionUtils;
 import org.ardverk.version.VectorClock;
 
@@ -71,21 +69,19 @@ public class StoreManager {
         return put(resourceId, ByteArrayValue.EMPTY, clock, config);
     }
     
-    public DHTFuture<PutEntity> remove(ValueTuple tuple, PutConfig config) {
+    public DHTFuture<PutEntity> remove(Resource resource, PutConfig config) {
         
-        Descriptor descriptor = tuple.getDescriptor();
-        ResourceId resourceId = descriptor.getResource();
-        VectorClock<KUID> clock = descriptor.getVectorClock();
+        ResourceId resourceId = resource.getResourceId();
+        VectorClock<KUID> clock = ((ValueResource)resource).getVectorClock();
         
         return remove(resourceId, clock, config);
     }
 
-    public DHTFuture<PutEntity> update(ValueTuple tuple, Value value,
+    public DHTFuture<PutEntity> update(Resource resource, Value value,
             PutConfig config) {
         
-        Descriptor descriptor = tuple.getDescriptor();
-        ResourceId resourceId = descriptor.getResource();
-        VectorClock<KUID> clock = descriptor.getVectorClock();
+        ResourceId resourceId = resource.getResourceId();
+        VectorClock<KUID> clock = ((ValueResource)resource).getVectorClock();
         
         return put(resourceId, value, clock, config);
     }
@@ -167,8 +163,8 @@ public class StoreManager {
                         }
                         
                         private void handleVectorClock(ValueEntity entity) {
-                            Descriptor descriptor = entity.getDescriptor();
-                            VectorClock<KUID> clock = descriptor.getVectorClock();
+                            Resource resource = entity.getResource();
+                            VectorClock<KUID> clock = ((ValueResource)resource).getVectorClock();
                             doStore(nodeEntity, clock);
                         }
                         
@@ -258,13 +254,10 @@ public class StoreManager {
             clock = clock.append(localhost.getId());
         }
         
-        Descriptor descriptor = new DefaultDescriptor(
-                localhost, resourceId, clock);
+        Resource resource = new DefaultValueResource(
+                resourceId, localhost, clock, value);
         
-        ValueTuple valueTuple = new DefaultValueTuple(
-                descriptor, value);
-        
-        return store(dst, valueTuple, config);
+        return store(dst, resource, config);
     }
     
     /**

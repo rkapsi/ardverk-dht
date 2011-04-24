@@ -50,16 +50,14 @@ import org.ardverk.dht.message.ValueRequest;
 import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.DefaultContact;
-import org.ardverk.dht.storage.DefaultDescriptor;
 import org.ardverk.dht.storage.DefaultStatus;
-import org.ardverk.dht.storage.DefaultValueTuple;
-import org.ardverk.dht.storage.Descriptor;
+import org.ardverk.dht.storage.DefaultValueResource;
 import org.ardverk.dht.storage.InputStreamValue;
+import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ResourceId;
 import org.ardverk.dht.storage.ResourceIdFactory;
 import org.ardverk.dht.storage.Status;
 import org.ardverk.dht.storage.Value;
-import org.ardverk.dht.storage.ValueTuple;
 import org.ardverk.net.NetworkUtils;
 import org.ardverk.version.Vector;
 import org.ardverk.version.VectorClock;
@@ -192,26 +190,23 @@ class MessageInputStream extends BencodingInputStream {
         int code = readInt();
         String value = readString();
         
-        ValueTuple tuple = null;
+        Resource resource = null;
         if (readBoolean()) {
-            tuple = readValueTuple(contact, address);
+            resource = readResource(contact, address);
         }
         
-        return DefaultStatus.valueOf(code, value, tuple);
+        return DefaultStatus.valueOf(code, value, resource);
     }
     
-    public Descriptor readDescriptor(Contact contact) throws IOException {
-        Contact creator = readContact();
-        ResourceId resource = readResourceId();
-        VectorClock<KUID> clock = readVectorClock();
-        return new DefaultDescriptor(contact, creator, resource, clock);
-    }
-    
-    public ValueTuple readValueTuple(Contact contact, 
+    public Resource readResource(Contact contact, 
             SocketAddress address) throws IOException {
-        Descriptor descriptor = readDescriptor(contact);
+        
+        ResourceId resourceId = readResourceId();
+        Contact creator = readContact();
+        VectorClock<KUID> clock = readVectorClock();
         Value value = readValue();
-        return new DefaultValueTuple(descriptor, value);
+        
+        return new DefaultValueResource(resourceId, contact, creator, clock, value);
     }
     
     public Value readValue() throws IOException {
@@ -279,22 +274,22 @@ class MessageInputStream extends BencodingInputStream {
     private ValueRequest readValueRequest(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
         
-        ResourceId resource = readResourceId();
-        return new DefaultValueRequest(messageId, contact, address, resource);
+        ResourceId resourceId = readResourceId();
+        return new DefaultValueRequest(messageId, contact, address, resourceId);
     }
     
     private ValueResponse readValueResponse(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
         
-        ValueTuple value = readValueTuple(contact, address);
-        return new DefaultValueResponse(messageId, contact, address, value);
+        Resource resource = readResource(contact, address);
+        return new DefaultValueResponse(messageId, contact, address, resource);
     }
     
     private StoreRequest readStoreRequest(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
         
-        ValueTuple value = readValueTuple(contact, address);
-        return new DefaultStoreRequest(messageId, contact, address, value);
+        Resource resource = readResource(contact, address);
+        return new DefaultStoreRequest(messageId, contact, address, resource);
     }
     
     private StoreResponse readStoreResponse(MessageId messageId, 
