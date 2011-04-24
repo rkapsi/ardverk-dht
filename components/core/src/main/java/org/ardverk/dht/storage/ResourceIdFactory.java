@@ -23,5 +23,5 @@ public interface ResourceIdFactory {
     /**
      * Creates and returns a {@link ResourceId} for the given {@link URI}.
      */
-    public ResourceId createResourceId(URI uri);
+    public <T extends Resource> ResourceId<T> createResourceId(URI uri);
 }

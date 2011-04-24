@@ -40,19 +40,20 @@ import org.ardverk.dht.storage.ResourceId;
  * The {@link ValueResponseHandler} manages a {@link MessageType#FIND_VALUE} 
  * lookup process.
  */
-public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
+public class ValueResponseHandler<T extends Resource> 
+        extends LookupResponseHandler<ValueEntity<T>> {
     
-    private final FixedSizeArrayList<Resource> resources;
+    private final FixedSizeArrayList<T> resources;
     
-    private final ResourceId resourceId;
+    private final ResourceId<? extends T> resourceId;
     
     public ValueResponseHandler(MessageDispatcher messageDispatcher,
             Contact[] contacts, RouteTable routeTable, 
-            ResourceId resourceId, GetConfig config) {
+            ResourceId<? extends T> resourceId, GetConfig config) {
         super(messageDispatcher, contacts, routeTable, 
                 resourceId.getId(), config);
         
-        resources = new FixedSizeArrayList<Resource>(config.getR());
+        resources = new FixedSizeArrayList<T>(config.getR());
         this.resourceId = resourceId;
     }
 
@@ -79,13 +80,13 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     private synchronized void processValueResponse(ValueResponse response, 
             long time, TimeUnit unit) throws IOException {
         
-        Resource resource = response.getResource();
+        T resource = response.getResource();
         resources.add(resource);
         
         if (resources.isFull()) {
             Outcome outcome = createOutcome();
-            Resource[] rsrc = resources.toArray(new Resource[0]);
-            setValue(new DefaultValueEntity(outcome, rsrc));
+            T[] rsrc = resources.toArray(new T[0]);
+            setValue(new DefaultValueEntity<T>(outcome, rsrc));
         }
     }
     
@@ -107,8 +108,8 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
         if (resources.isEmpty()) {
             setException(new NoSuchValueException(outcome));
         } else {
-            Resource[] rsrc = resources.toArray(new Resource[0]);
-            setValue(new DefaultValueEntity(outcome, rsrc));
+            T[] rsrc = resources.toArray(new T[0]);
+            setValue(new DefaultValueEntity<T>(outcome, rsrc));
         }
     }
 }

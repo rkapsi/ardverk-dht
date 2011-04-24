@@ -26,16 +26,16 @@ public class DefaultResourceIdFactory implements ResourceIdFactory {
         = new DefaultResourceIdFactory();
     
     @Override
-    public ResourceId createResourceId(URI uri) {
+    public <T extends Resource> ResourceId<T> createResourceId(URI uri) {
         return valueOf(uri);
     }
     
-    public static ResourceId valueOf(URI uri) {
-        return new DefaultResourceId(parse(uri), uri);
+    public static <T extends Resource> ResourceId<T> valueOf(URI uri) {
+        return new DefaultResourceId<T>(parse(uri), uri);
     }
     
-    public static ResourceId valueOf(KUID valueId) {
-        return new DefaultResourceId(valueId, create(valueId));
+    public static <T extends Resource> ResourceId<T> valueOf(KUID valueId) {
+        return new DefaultResourceId<T>(valueId, create(valueId));
     }
     
     private static URI create(KUID valueId) {
@@ -57,7 +57,7 @@ public class DefaultResourceIdFactory implements ResourceIdFactory {
         return KUID.create(valueId, 16);
     }
     
-    private static class DefaultResourceId extends AbstractResourceId {
+    private static class DefaultResourceId<T extends Resource> extends AbstractResourceId<T> {
 
         private final KUID valueId;
 

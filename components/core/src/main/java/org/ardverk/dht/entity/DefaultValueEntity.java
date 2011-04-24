@@ -28,13 +28,13 @@ import org.ardverk.dht.storage.ValueResource;
 /**
  * A default implementation of {@link ValueEntity}.
  */
-public class DefaultValueEntity extends AbstractLookupEntity implements ValueEntity {
+public class DefaultValueEntity<T extends Resource> extends AbstractLookupEntity implements ValueEntity<T> {
     
     private final Outcome outcome;
     
-    private final Resource[] resources;
+    private final T[] resources;
     
-    public DefaultValueEntity(Outcome outcome, Resource[] resources) {
+    public DefaultValueEntity(Outcome outcome, T[] resources) {
         super(outcome.getId(), outcome.getTimeInMillis(), 
                 TimeUnit.MILLISECONDS);
         
@@ -53,7 +53,7 @@ public class DefaultValueEntity extends AbstractLookupEntity implements ValueEnt
     }
 
     @Override
-    public Resource getResource() {
+    public T getResource() {
         return CollectionUtils.first(resources);
     }
     
@@ -63,7 +63,7 @@ public class DefaultValueEntity extends AbstractLookupEntity implements ValueEnt
     }
     
     @Override
-    public Resource[] getResources() {
+    public T[] getResources() {
         return resources;
     }
     

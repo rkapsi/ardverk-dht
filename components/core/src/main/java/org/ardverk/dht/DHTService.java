@@ -74,14 +74,14 @@ interface DHTService {
     /**
      * Performs a {@link MessageType#FIND_VALUE} lookup in the DHT.
      */
-    public DHTFuture<ValueEntity> get(
-            ResourceId resourceId, GetConfig config);
+    public <T extends Resource> DHTFuture<ValueEntity<T>> get(
+            ResourceId<? extends T> resourceId, GetConfig config);
     
     /**
      * Performs a {@link MessageType#FIND_NODE} lookup followed by 
      * a {@link MessageType#STORE} operation.
      */
-    public DHTFuture<PutEntity> put(ResourceId resourceId, Value value, 
+    public <T> DHTFuture<PutEntity> put(ResourceId<? extends T> resourceId, Value value, 
             VectorClock<KUID> clock, PutConfig config);
     
     /**
@@ -90,7 +90,7 @@ interface DHTService {
      * <p>NOTE: It's essentially a {@link #put(ResourceId, Value, PutConfig)} 
      * operation with an empty {@link Value}.
      */
-    public DHTFuture<PutEntity> remove(ResourceId resourceId, 
+    public <T> DHTFuture<PutEntity> remove(ResourceId<? extends T> resourceId, 
             VectorClock<KUID> clock, PutConfig config);
     
     /**
