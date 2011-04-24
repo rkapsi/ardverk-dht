@@ -7,11 +7,9 @@ import org.ardverk.dht.routing.Contact;
 import org.ardverk.lang.TimeStamp;
 import org.ardverk.version.VectorClock;
 
-public class DefaultValueResource implements ValueResource {
+public class DefaultValueResource extends AbstractResource implements ValueResource {
 
     private final TimeStamp creationTime = TimeStamp.now();
-    
-    private final ResourceId resourceId;
     
     private final Contact creator;
     
@@ -28,18 +26,14 @@ public class DefaultValueResource implements ValueResource {
     
     public DefaultValueResource(ResourceId resourceId, Contact sender,
             Contact creator, VectorClock<KUID> clock, Value value) {
-        this.resourceId = resourceId;
+        super(resourceId);
+        
         this.sender = sender;
         this.creator = pickCreator(sender, creator);
         this.clock = clock;
         this.value = value;
     }
-
-    @Override
-    public ResourceId getResourceId() {
-        return resourceId;
-    }
-
+    
     @Override
     public Contact getCreator() {
         return creator;
