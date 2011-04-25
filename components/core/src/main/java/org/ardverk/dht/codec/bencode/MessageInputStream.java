@@ -51,10 +51,10 @@ import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.DefaultContact;
 import org.ardverk.dht.storage.DefaultResource;
+import org.ardverk.dht.storage.DefaultResourceId;
 import org.ardverk.dht.storage.DefaultStatus;
 import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ResourceId;
-import org.ardverk.dht.storage.ResourceIdFactory;
 import org.ardverk.dht.storage.Status;
 import org.ardverk.net.NetworkUtils;
 import org.ardverk.version.Vector;
@@ -67,11 +67,8 @@ import org.ardverk.version.VectorClock;
  */
 public class MessageInputStream extends BencodingInputStream {
     
-    private final ResourceIdFactory resourceFactory;
-    
-    public MessageInputStream(InputStream in, ResourceIdFactory resourceFactory) {
+    public MessageInputStream(InputStream in) {
         super(in);
-        this.resourceFactory = resourceFactory;
     }
 
     @Override
@@ -129,7 +126,7 @@ public class MessageInputStream extends BencodingInputStream {
     
     public ResourceId readResourceId() throws IOException {
         URI uri = URI.create(readString());
-        return resourceFactory.createResourceId(uri);
+        return DefaultResourceId.valueOf(uri);
     }
     
     public VectorClock<KUID> readVectorClock() throws IOException {

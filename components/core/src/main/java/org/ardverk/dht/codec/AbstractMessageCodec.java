@@ -16,18 +16,5 @@
 
 package org.ardverk.dht.codec;
 
-import org.ardverk.dht.storage.ResourceIdFactory;
-
 public abstract class AbstractMessageCodec implements MessageCodec {
-
-    private final ResourceIdFactory resourceFactory;
-    
-    public AbstractMessageCodec(ResourceIdFactory resourceFactory) {
-        this.resourceFactory = resourceFactory;
-    }
-
-    @Override
-    public ResourceIdFactory getResourceFactory() {
-        return resourceFactory;
-    }
 }

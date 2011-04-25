@@ -64,8 +64,7 @@ public class SimpleValue {
     public static SimpleValue fromResource(Resource resource) {
         MessageInputStream in = null;
         try {
-            in = new MessageInputStream(resource.getContent(), 
-                    DefaultResourceIdFactory.FACTORY);
+            in = new MessageInputStream(resource.getContent());
             Contact creator = in.readContact();
             VectorClock<KUID> clock = in.readVectorClock();
             byte[] value = in.readBytes();

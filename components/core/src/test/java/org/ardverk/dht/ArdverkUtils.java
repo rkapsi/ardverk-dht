@@ -45,7 +45,7 @@ import org.ardverk.dht.io.transport.DatagramTransport;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.DefaultRouteTable;
 import org.ardverk.dht.storage.Database;
-import org.ardverk.dht.storage.DefaultResourceIdFactory;
+import org.ardverk.dht.storage.DefaultResourceId;
 import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ResourceId;
 import org.ardverk.dht.storage.SimpleValue;
@@ -204,7 +204,7 @@ public class ArdverkUtils {
             
             int rnd = (int)(dhts.size() * Math.random());
             
-            ResourceId resourceId = DefaultResourceIdFactory.valueOf(valueId);
+            ResourceId resourceId = DefaultResourceId.valueOf(valueId);
             VectorClock<KUID> clock = null;
             Contact contact = dhts.get(rnd).getLocalhost();
             

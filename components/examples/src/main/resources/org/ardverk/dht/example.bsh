@@ -43,7 +43,7 @@ kuid(String value) {
 }
 
 rsrc(String value) {
-	return DefaultResourceIdFactory.valueOf(kuid(value));
+	return DefaultResourceId.valueOf(kuid(value));
 }
 
 // Creates a SHA-1 from a String
