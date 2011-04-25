@@ -8,10 +8,13 @@ import org.ardverk.dht.codec.bencode.MessageInputStream;
 import org.ardverk.dht.codec.bencode.MessageOutputStream;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.io.IoUtils;
+import org.ardverk.utils.StringUtils;
 import org.ardverk.version.VectorClock;
 
 public class ByteArrayValue {
 
+    public static final byte[] EMPTY = new byte[0];
+    
     private final Contact creator;
     
     private final VectorClock<KUID> clock;
@@ -46,6 +49,20 @@ public class ByteArrayValue {
         return size() == 0;
     }
     
+    public ByteArrayValue update(Contact contact, byte[] value) {
+        VectorClock<KUID> clock = this.clock;
+        if (clock != null) {
+            clock = clock.append(contact.getId());
+        }
+        
+        return new ByteArrayValue(creator, clock, value);
+    }
+    
+    @Override
+    public String toString() {
+        return StringUtils.toString(value);
+    }
+    
     public Resource toResource(ResourceId resourceId) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -61,7 +78,7 @@ public class ByteArrayValue {
         }
     }
     
-    public static ByteArrayValue fromResource(Resource resource) {
+    public static ByteArrayValue create(Resource resource) {
         MessageInputStream in = null;
         try {
             in = new MessageInputStream(resource.getContent());

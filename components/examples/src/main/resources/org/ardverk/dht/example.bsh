@@ -161,7 +161,7 @@ get(DHT dht, String key) {
 	DHTFuture future = dht.get(rsrc(key));
 	
 	ValueEntity entity = future.get();
-	ByteArrayValue value = ByteArrayValue.fromResource(entity.getResource());
+	ByteArrayValue value = ByteArrayValue.create(entity.getResource());
 	
 	print("GET: " + entity.getId() + " (" + key + ")" + " -> " 
 		+ toString(value)

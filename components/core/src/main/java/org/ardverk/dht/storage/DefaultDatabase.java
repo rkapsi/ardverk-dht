@@ -57,7 +57,7 @@ public class DefaultDatabase extends AbstractDatabase {
     @Override
     public synchronized Status store(Resource resource) {
         return store(resource.getResourceId(), 
-                ByteArrayValue.fromResource(resource));
+                ByteArrayValue.create(resource));
     }
     
     private synchronized Status store(ResourceId resourceId, ByteArrayValue value) {
@@ -68,7 +68,7 @@ public class DefaultDatabase extends AbstractDatabase {
             if (value.isEmpty()) {
                 remove(resourceId);
             } else {
-                add(resourceId, value);
+                put(resourceId, value);
             }
             return DefaultStatus.SUCCESS;
         }
@@ -92,10 +92,7 @@ public class DefaultDatabase extends AbstractDatabase {
         return bucket != null ? bucket.get(resourceId) : null;
     }
     
-    /**
-     * Adds the given {@link ValueResource}.
-     */
-    private synchronized ByteArrayValue add(ResourceId resourceId, ByteArrayValue value) {
+    private synchronized ByteArrayValue put(ResourceId resourceId, ByteArrayValue value) {
         KUID bucketId = resourceId.getId();
         
         Bucket bucket = database.get(bucketId);
@@ -107,9 +104,6 @@ public class DefaultDatabase extends AbstractDatabase {
         return bucket.put(resourceId, value);
     }
     
-    /**
-     * Removes and returns a {@link Resource}.
-     */
     private synchronized ByteArrayValue remove(ResourceId resourceId) {
         KUID bucketId = resourceId.getId();
         
@@ -125,9 +119,6 @@ public class DefaultDatabase extends AbstractDatabase {
         return null;
     }
     
-    /**
-     * Removes and returns a {@link Resource}.
-     */
     public synchronized Bucket remove(KUID bucketId) {
         return database.remove(bucketId);
     }
