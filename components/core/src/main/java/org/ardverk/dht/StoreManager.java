@@ -73,8 +73,8 @@ public class StoreManager {
             
             // This will get initialized once we've found the k-closest
             // Contacts to the given KUID
-            final ValueReference<DHTFuture<ValueEntity<Resource>>> clockFutureRef 
-                = new ValueReference<DHTFuture<ValueEntity<Resource>>>();
+            final ValueReference<DHTFuture<ValueEntity>> clockFutureRef 
+                = new ValueReference<DHTFuture<ValueEntity>>();
             
             // Start the lookup for the given KUID
             final DHTFuture<NodeEntity> lookupFuture 

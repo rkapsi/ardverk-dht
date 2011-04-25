@@ -73,7 +73,7 @@ public class DefaultEasyDHT extends ArdverkDHT implements EasyDHT {
     }
 
     @Override
-    public DHTFuture<ValueEntity<Resource>> get(ResourceId resourceId) {
+    public DHTFuture<ValueEntity> get(ResourceId resourceId) {
         return get(resourceId, config.getGetConfig());
     }
 

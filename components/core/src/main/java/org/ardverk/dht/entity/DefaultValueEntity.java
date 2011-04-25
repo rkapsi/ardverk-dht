@@ -21,19 +21,20 @@ import java.util.concurrent.TimeUnit;
 import org.ardverk.collection.CollectionUtils;
 import org.ardverk.dht.io.Outcome;
 import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.Value;
 import org.ardverk.dht.storage.ValueResource;
 
 /**
  * A default implementation of {@link ValueEntity}.
  */
-public class DefaultValueEntity<T> extends AbstractLookupEntity implements ValueEntity<T> {
+public class DefaultValueEntity extends AbstractLookupEntity implements ValueEntity {
     
     private final Outcome outcome;
     
-    private final T[] resources;
+    private final Resource[] resources;
     
-    public DefaultValueEntity(Outcome outcome, T[] resources) {
+    public DefaultValueEntity(Outcome outcome, Resource[] resources) {
         super(outcome.getId(), outcome.getTimeInMillis(), 
                 TimeUnit.MILLISECONDS);
         
@@ -52,7 +53,7 @@ public class DefaultValueEntity<T> extends AbstractLookupEntity implements Value
     }
 
     @Override
-    public T getResource() {
+    public Resource getResource() {
         return CollectionUtils.first(resources);
     }
     
@@ -62,7 +63,7 @@ public class DefaultValueEntity<T> extends AbstractLookupEntity implements Value
     }
     
     @Override
-    public T[] getResources() {
+    public Resource[] getResources() {
         return resources;
     }
     

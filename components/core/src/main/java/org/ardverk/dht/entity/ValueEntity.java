@@ -24,7 +24,7 @@ import org.ardverk.dht.storage.Value;
 /**
  * The result of a {@link MessageType#FIND_VALUE} operation.
  */
-public interface ValueEntity<T> extends LookupEntity {
+public interface ValueEntity extends LookupEntity {
     
     /**
      * Returns the sender who sent us the {@link Resource}.
@@ -55,10 +55,10 @@ public interface ValueEntity<T> extends LookupEntity {
      * 
      * @see #getResources()
      */
-    public T getResource();
+    public Resource getResource();
     
     /**
      * Returns all {@link Resource}s.
      */
-    public T[] getResources();
+    public Resource[] getResources();
 }

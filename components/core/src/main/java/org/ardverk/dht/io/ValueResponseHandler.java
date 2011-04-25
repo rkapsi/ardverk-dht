@@ -33,6 +33,7 @@ import org.ardverk.dht.message.ValueRequest;
 import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
+import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ResourceId;
 
 
@@ -40,23 +41,20 @@ import org.ardverk.dht.storage.ResourceId;
  * The {@link ValueResponseHandler} manages a {@link MessageType#FIND_VALUE} 
  * lookup process.
  */
-public class ValueResponseHandler<T> extends LookupResponseHandler<ValueEntity<T>> {
+public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     
-    private final FixedSizeArrayList<T> resources;
+    private final FixedSizeArrayList<Resource> resources;
     
     private final ResourceId resourceId;
     
-    private final Class<? extends T> clazz;
-    
     public ValueResponseHandler(MessageDispatcher messageDispatcher,
             Contact[] contacts, RouteTable routeTable, 
-            ResourceId resourceId, Class<? extends T> clazz, GetConfig config) {
+            ResourceId resourceId, GetConfig config) {
         super(messageDispatcher, contacts, routeTable, 
                 resourceId.getId(), config);
         
-        resources = new FixedSizeArrayList<T>(config.getR());
+        resources = new FixedSizeArrayList<Resource>(config.getR());
         this.resourceId = resourceId;
-        this.clazz = clazz;
     }
 
     @Override
@@ -82,13 +80,13 @@ public class ValueResponseHandler<T> extends LookupResponseHandler<ValueEntity<T
     private synchronized void processValueResponse(ValueResponse response, 
             long time, TimeUnit unit) throws IOException {
         
-        T resource = clazz.cast(response.getResource());
+        Resource resource = response.getResource();
         resources.add(resource);
         
         if (resources.isFull()) {
             Outcome outcome = createOutcome();
-            T[] values = CollectionUtils.toArray(resources, clazz);
-            setValue(new DefaultValueEntity<T>(outcome, values));
+            Resource[] values = CollectionUtils.toArray(resources, Resource.class);
+            setValue(new DefaultValueEntity(outcome, values));
         }
     }
     
@@ -110,8 +108,8 @@ public class ValueResponseHandler<T> extends LookupResponseHandler<ValueEntity<T
         if (resources.isEmpty()) {
             setException(new NoSuchValueException(outcome));
         } else {
-            T[] values = CollectionUtils.toArray(resources, clazz);
-            setValue(new DefaultValueEntity<T>(outcome, values));
+            Resource[] values = CollectionUtils.toArray(resources, Resource.class);
+            setValue(new DefaultValueEntity(outcome, values));
         }
     }
 }

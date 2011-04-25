@@ -50,7 +50,7 @@ public interface EasyDHT extends DHT, Closeable {
     
     public DHTFuture<NodeEntity> lookup(KUID lookupId);
 
-    public DHTFuture<ValueEntity<Resource>> get(ResourceId resourceId);
+    public DHTFuture<ValueEntity> get(ResourceId resourceId);
 
     public DHTFuture<PutEntity> put(Resource resource);
 
