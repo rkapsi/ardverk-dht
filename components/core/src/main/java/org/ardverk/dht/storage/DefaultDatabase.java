@@ -16,6 +16,7 @@
 
 package org.ardverk.dht.storage;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -83,6 +84,18 @@ public class DefaultDatabase extends AbstractDatabase {
 
     @Override
     public synchronized Resource get(ResourceId resourceId) {
+        URI uri = resourceId.getURI();
+        String query = uri.getQuery();
+        if (query != null) {
+            Bucket bucket = database.get(resourceId.getId());
+            if (bucket != null) {
+                System.out.println(bucket.size());
+                return (new Values(bucket.keySet().toArray(
+                        new ResourceId[0]))).toResource(resourceId);
+            }
+            return null;
+        }
+        
         ByteArrayValue value = getValue(resourceId);
         return value != null ? value.toResource(resourceId) : null;
     }

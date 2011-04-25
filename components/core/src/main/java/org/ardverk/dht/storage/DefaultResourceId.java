@@ -6,6 +6,8 @@ import org.ardverk.dht.KUID;
 
 public class DefaultResourceId extends AbstractResourceId {
 
+    private static final KUID BUCKET = KUID.createRandom(20);
+    
     private final KUID valueId;
 
     private final URI uri;
@@ -34,7 +36,15 @@ public class DefaultResourceId extends AbstractResourceId {
     }
     
     private static URI create(KUID valueId) {
-        return URI.create("ardverk:kuid:" + valueId.toHexString());
+        return URI.create("ardverk:///" + BUCKET.toHexString() + "/" + valueId.toHexString());
+    }
+    
+    public static ResourceId valueOf(KUID valueId, String query) {
+        return new DefaultResourceId(valueId, create(valueId, query));
+    }
+    
+    public static URI create(KUID valueId, String query) {
+        return URI.create("ardverk:///" + BUCKET.toHexString() + "/" + valueId.toHexString() + "?" + query);
     }
     
     private static KUID parse(URI uri) {
@@ -43,12 +53,16 @@ public class DefaultResourceId extends AbstractResourceId {
             throw new IllegalArgumentException();
         }
         
-        String ssp = uri.getSchemeSpecificPart();
-        if (!ssp.startsWith("kuid:")) {
-            throw new IllegalArgumentException();
+        String path = uri.getPath();
+        while (!path.isEmpty() && path.startsWith("/")) {
+            path = path.substring(1);
         }
         
-        String valueId = ssp.substring("kuid:".length());
-        return KUID.create(valueId, 16);
+        int p = path.indexOf("/");
+        if (p != -1) {
+            path = path.substring(0, p);
+        }
+        
+        return KUID.create(path, 16);
     }
 }
