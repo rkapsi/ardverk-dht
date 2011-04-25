@@ -33,7 +33,6 @@ import org.ardverk.dht.message.ValueRequest;
 import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
-import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ResourceId;
 
 
@@ -43,7 +42,7 @@ import org.ardverk.dht.storage.ResourceId;
  */
 public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     
-    private final FixedSizeArrayList<Resource> resources;
+    private final FixedSizeArrayList<ValueResponse> responses;
     
     private final ResourceId resourceId;
     
@@ -53,7 +52,7 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
         super(messageDispatcher, contacts, routeTable, 
                 resourceId.getId(), config);
         
-        resources = new FixedSizeArrayList<Resource>(config.getR());
+        responses = new FixedSizeArrayList<ValueResponse>(config.getR());
         this.resourceId = resourceId;
     }
 
@@ -80,12 +79,11 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     private synchronized void processValueResponse(ValueResponse response, 
             long time, TimeUnit unit) throws IOException {
         
-        Resource resource = response.getResource();
-        resources.add(resource);
+        responses.add(response);
         
-        if (resources.isFull()) {
+        if (responses.isFull()) {
             Outcome outcome = createOutcome();
-            Resource[] values = CollectionUtils.toArray(resources, Resource.class);
+            ValueResponse[] values = CollectionUtils.toArray(responses, ValueResponse.class);
             setValue(new DefaultValueEntity(outcome, values));
         }
     }
@@ -105,10 +103,10 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     @Override
     protected void complete(Outcome outcome) {
         
-        if (resources.isEmpty()) {
+        if (responses.isEmpty()) {
             setException(new NoSuchValueException(outcome));
         } else {
-            Resource[] values = CollectionUtils.toArray(resources, Resource.class);
+            ValueResponse[] values = CollectionUtils.toArray(responses, ValueResponse.class);
             setValue(new DefaultValueEntity(outcome, values));
         }
     }

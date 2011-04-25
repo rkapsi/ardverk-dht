@@ -20,6 +20,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.collection.CollectionUtils;
 import org.ardverk.dht.io.Outcome;
+import org.ardverk.dht.message.ValueResponse;
+import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.storage.Resource;
 
 /**
@@ -29,24 +31,34 @@ public class DefaultValueEntity extends AbstractLookupEntity implements ValueEnt
     
     private final Outcome outcome;
     
-    private final Resource[] resources;
+    private final ValueResponse[] responses;
     
-    public DefaultValueEntity(Outcome outcome, Resource[] resources) {
+    public DefaultValueEntity(Outcome outcome, ValueResponse[] responses) {
         super(outcome.getId(), outcome.getTimeInMillis(), 
                 TimeUnit.MILLISECONDS);
         
         this.outcome = outcome;
-        this.resources = resources;
+        this.responses = responses;
+    }
+    
+    @Override
+    public ValueResponse getValueResponse() {
+        return CollectionUtils.first(responses);
+    }
+    
+    @Override
+    public ValueResponse[] ValueResponses() {
+        return responses;
+    }
+    
+    @Override
+    public Contact getSender() {
+        return getValueResponse().getContact();
     }
 
     @Override
     public Resource getResource() {
-        return CollectionUtils.first(resources);
-    }
-    
-    @Override
-    public Resource[] getResources() {
-        return resources;
+        return getValueResponse().getResource();
     }
     
     public Outcome getOutcome() {
