@@ -55,7 +55,6 @@ public class ValueResponseHandler<T> extends LookupResponseHandler<ValueEntity<T
                 resourceId.getId(), config);
         
         resources = new FixedSizeArrayList<T>(config.getR());
-        
         this.resourceId = resourceId;
         this.clazz = clazz;
     }
@@ -88,7 +87,6 @@ public class ValueResponseHandler<T> extends LookupResponseHandler<ValueEntity<T
         
         if (resources.isFull()) {
             Outcome outcome = createOutcome();
-            
             T[] values = CollectionUtils.toArray(resources, clazz);
             setValue(new DefaultValueEntity<T>(outcome, values));
         }
