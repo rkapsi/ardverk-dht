@@ -105,8 +105,8 @@ public class StoreManager {
             
             // This will get initialized once we've found the k-closest
             // Contacts to the given KUID
-            final ValueReference<DHTFuture<ValueEntity>> clockFutureRef 
-                = new ValueReference<DHTFuture<ValueEntity>>();
+            final ValueReference<DHTFuture<ValueEntity<Resource>>> clockFutureRef 
+                = new ValueReference<DHTFuture<ValueEntity<Resource>>>();
             
             // Start the lookup for the given KUID
             final DHTFuture<NodeEntity> lookupFuture 
@@ -142,13 +142,13 @@ public class StoreManager {
                 
                 private void doGetVectorClock(final NodeEntity nodeEntity) {
                     Contact[] contacts = nodeEntity.getContacts();
-                    DHTFuture<ValueEntity> clockFuture 
+                    DHTFuture<ValueEntity<Resource>> clockFuture 
                         = clockFutureRef.make(clock(contacts, 
                                 resourceId, config.getGetConfig()));
                     
-                    clockFuture.addAsyncFutureListener(new AsyncFutureListener<ValueEntity>() {
+                    clockFuture.addAsyncFutureListener(new AsyncFutureListener<ValueEntity<Resource>>() {
                         @Override
-                        public void operationComplete(AsyncFuture<ValueEntity> future) {
+                        public void operationComplete(AsyncFuture<ValueEntity<Resource>> future) {
                             synchronized (lock) {
                                 try {
                                     if (!future.isCancelled()) {
@@ -162,7 +162,7 @@ public class StoreManager {
                             }
                         }
                         
-                        private void handleVectorClock(ValueEntity entity) {
+                        private void handleVectorClock(ValueEntity<Resource> entity) {
                             Resource resource = entity.getResource();
                             VectorClock<KUID> clock = ((ValueResource)resource).getVectorClock();
                             doStore(nodeEntity, clock);
@@ -234,10 +234,10 @@ public class StoreManager {
         }
     }
     
-    private DHTFuture<ValueEntity> clock(Contact[] src, 
+    private DHTFuture<ValueEntity<Resource>> clock(Contact[] src, 
             ResourceId resourceId, GetConfig config) {
         LookupManager lookupManager = dht.getLookupManager();
-        return lookupManager.get(src, resourceId, config);
+        return lookupManager.get(src, resourceId, Resource.class, config);
     }
     
     public DHTFuture<StoreEntity> store(Contact[] dst, 

@@ -269,7 +269,7 @@ public class ArdverkDHT extends AbstractDHT {
     
     @Override
     public <T> DHTFuture<ValueEntity<T>> get(ResourceId resourceId, 
-            Class<? super T> clazz, GetConfig config) {
+            Class<? extends T> clazz, GetConfig config) {
         return lookupManager.get(resourceId, clazz, config);
     }
 

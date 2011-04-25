@@ -46,11 +46,11 @@ public class ValueResponseHandler<T> extends LookupResponseHandler<ValueEntity<T
     
     private final ResourceId resourceId;
     
-    private final Class<? super T> clazz;
+    private final Class<? extends T> clazz;
     
     public ValueResponseHandler(MessageDispatcher messageDispatcher,
             Contact[] contacts, RouteTable routeTable, 
-            ResourceId resourceId, Class<? super T> clazz, GetConfig config) {
+            ResourceId resourceId, Class<? extends T> clazz, GetConfig config) {
         super(messageDispatcher, contacts, routeTable, 
                 resourceId.getId(), config);
         

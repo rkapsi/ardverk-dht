@@ -68,13 +68,13 @@ public class LookupManager {
     }
     
     public <T> DHTFuture<ValueEntity<T>> get(ResourceId resourceId, 
-            Class<? super T> clazz, GetConfig config) {
+            Class<? extends T> clazz, GetConfig config) {
         Contact[] contacts = routeTable.select(resourceId.getId());
         return get(contacts, resourceId, clazz, config);
     }
     
     public <T> DHTFuture<ValueEntity<T>> get(Contact[] contacts, 
-            ResourceId resourceId, Class<? super T> clazz, GetConfig config) {
+            ResourceId resourceId, Class<? extends T> clazz, GetConfig config) {
         DHTProcess<ValueEntity<T>> process
             = new ValueResponseHandler<T>(messageDispatcher, contacts, 
                     routeTable, resourceId, clazz, config);
