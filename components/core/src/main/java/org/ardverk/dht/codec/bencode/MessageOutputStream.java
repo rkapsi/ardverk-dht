@@ -42,8 +42,6 @@ import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ResourceId;
 import org.ardverk.dht.storage.Status;
-import org.ardverk.dht.storage.Value;
-import org.ardverk.dht.storage.ValueResource;
 import org.ardverk.io.IoUtils;
 import org.ardverk.version.Vector;
 import org.ardverk.version.VectorClock;
@@ -53,7 +51,7 @@ import org.ardverk.version.VectorClock;
  * The {@link MessageOutputStream} writes {@link Message}s to a
  * {@link BencodingOutputStream}.
  */
-class MessageOutputStream extends BencodingOutputStream {
+public class MessageOutputStream extends BencodingOutputStream {
     
     public MessageOutputStream(OutputStream out) {
         super(out);
@@ -167,19 +165,9 @@ class MessageOutputStream extends BencodingOutputStream {
     
     public void writeResource(Resource resource) throws IOException {
         writeResourceId(resource.getResourceId());
-        writeValueResource((ValueResource)resource);
-    }
-    
-    private void writeValueResource(ValueResource resource) throws IOException {
-        writeContact(resource.getCreator());
-        writeVectorClock(resource.getVectorClock());
-        writeValue(resource.getValue());
-    }
-    
-    public void writeValue(Value value) throws IOException {
-        InputStream in = value.getContent();
+        InputStream in = resource.getContent();
         try {
-            long contentLength = value.getContentLength();
+            long contentLength = resource.getContentLength();
             writeContent(contentLength, in);
         } finally {
             IoUtils.close(in);

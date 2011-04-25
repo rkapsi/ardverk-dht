@@ -44,12 +44,11 @@ import org.ardverk.dht.entity.QuickenEntity;
 import org.ardverk.dht.io.transport.DatagramTransport;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.DefaultRouteTable;
-import org.ardverk.dht.storage.ByteArrayValue;
 import org.ardverk.dht.storage.Database;
 import org.ardverk.dht.storage.DefaultResourceIdFactory;
-import org.ardverk.dht.storage.DefaultValueResource;
 import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ResourceId;
+import org.ardverk.dht.storage.SimpleValue;
 import org.ardverk.io.IoUtils;
 import org.ardverk.security.MessageDigestUtils;
 import org.ardverk.utils.StringUtils;
@@ -209,9 +208,7 @@ public class ArdverkUtils {
             VectorClock<KUID> clock = null;
             Contact contact = dhts.get(rnd).getLocalhost();
             
-            Resource resource = new DefaultValueResource(
-                    resourceId, contact, clock, 
-                    new ByteArrayValue(value));
+            Resource resource = (new SimpleValue(contact, clock, value)).toResource(resourceId);
             
             future = dhts.get(rnd).put(resource, putConfig);
             

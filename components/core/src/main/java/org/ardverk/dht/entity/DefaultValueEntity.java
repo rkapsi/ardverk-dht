@@ -20,10 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.collection.CollectionUtils;
 import org.ardverk.dht.io.Outcome;
-import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.storage.Resource;
-import org.ardverk.dht.storage.Value;
-import org.ardverk.dht.storage.ValueResource;
 
 /**
  * A default implementation of {@link ValueEntity}.
@@ -41,25 +38,10 @@ public class DefaultValueEntity extends AbstractLookupEntity implements ValueEnt
         this.outcome = outcome;
         this.resources = resources;
     }
-    
-    @Override
-    public Contact getSender() {
-        return ((ValueResource)getResource()).getSender();
-    }
-    
-    @Override
-    public Contact getCreator() {
-        return ((ValueResource)getResource()).getCreator();
-    }
 
     @Override
     public Resource getResource() {
         return CollectionUtils.first(resources);
-    }
-    
-    @Override
-    public Value getValue() {
-        return ((ValueResource)getResource()).getValue();
     }
     
     @Override

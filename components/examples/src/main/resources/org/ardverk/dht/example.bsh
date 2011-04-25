@@ -141,8 +141,7 @@ put(String key, String value) {
 // Stores the given key-value
 put(DHT dht, String key, String value) {
   ResourceId resourceId = rsrc(key);
-  Resource resource = new DefaultValueResource(
-      resourceId, dht.getLocalhost(), null, toValue(value));
+  Resource resource = toValue(value).toResource(resourceId);
       
 	DHTFuture future = dht.put(resource);
 		
@@ -162,23 +161,24 @@ get(DHT dht, String key) {
 	DHTFuture future = dht.get(rsrc(key));
 	
 	ValueEntity entity = future.get();
-	String value = toString(entity.getValue());
+	String value = toString(entity.getResource());
 	
 	print("GET: " + entity.getId() + " (" + key + ")" + " -> " 
 		+ value
-		+ "\n SENDER: " + entity.getSender().getId()
-		+ "\n CREATOR: " + entity.getCreator().getId()
+		//+ "\n SENDER: " + entity.getSender().getId()
+		//+ "\n CREATOR: " + entity.getCreator().getId()
 		+ "\n TIME: " + entity.getTimeInMillis() + "ms");
 		
 	return value;
 }
 
 toValue(String value) {
-	return new ByteArrayValue(StringUtils.getBytes(value));
+	return new SimpleValue(dhts.get(current).getLocalhost(), null, StringUtils.getBytes(value));
 }
 
-toString(Value value) {
-	return StringUtils.toString(value.getContentAsBytes());
+toString(Resource resource) {
+  SimpleValue value = SimpleValue.fromResource(resource);
+	return StringUtils.toString(value.getValue());
 }
 
 // Closes all DHTs

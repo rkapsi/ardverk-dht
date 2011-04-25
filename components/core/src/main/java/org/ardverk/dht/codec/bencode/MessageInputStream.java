@@ -50,14 +50,12 @@ import org.ardverk.dht.message.ValueRequest;
 import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.DefaultContact;
+import org.ardverk.dht.storage.DefaultResource;
 import org.ardverk.dht.storage.DefaultStatus;
-import org.ardverk.dht.storage.DefaultValueResource;
-import org.ardverk.dht.storage.InputStreamValue;
 import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ResourceId;
 import org.ardverk.dht.storage.ResourceIdFactory;
 import org.ardverk.dht.storage.Status;
-import org.ardverk.dht.storage.Value;
 import org.ardverk.net.NetworkUtils;
 import org.ardverk.version.Vector;
 import org.ardverk.version.VectorClock;
@@ -67,7 +65,7 @@ import org.ardverk.version.VectorClock;
  * The {@link MessageInputStream} reads {@link Message}s from
  * a {@link BencodingInputStream}.
  */
-class MessageInputStream extends BencodingInputStream {
+public class MessageInputStream extends BencodingInputStream {
     
     private final ResourceIdFactory resourceFactory;
     
@@ -202,16 +200,12 @@ class MessageInputStream extends BencodingInputStream {
             SocketAddress address) throws IOException {
         
         ResourceId resourceId = readResourceId();
-        Contact creator = readContact();
-        VectorClock<KUID> clock = readVectorClock();
-        Value value = readValue();
-        
-        return new DefaultValueResource(resourceId, contact, creator, clock, value);
-    }
-    
-    public Value readValue() throws IOException {
-        ContentInputStream cis = readContent();
-        return new InputStreamValue(cis);
+        InputStream in = readContent();
+        try {
+            return new DefaultResource(resourceId, in);
+        } finally {
+            in.close();
+        }
     }
     
     public Message readMessage(SocketAddress src) throws IOException {

@@ -17,38 +17,12 @@
 package org.ardverk.dht.entity;
 
 import org.ardverk.dht.message.MessageType;
-import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.storage.Resource;
-import org.ardverk.dht.storage.Value;
 
 /**
  * The result of a {@link MessageType#FIND_VALUE} operation.
  */
 public interface ValueEntity extends LookupEntity {
-    
-    /**
-     * Returns the sender who sent us the {@link Resource}.
-     * 
-     * @see #getResource()
-     * @see Resource#getSender()
-     */
-    public Contact getSender();
-    
-    /**
-     * Returns the creator who created the {@link Resource}.
-     * 
-     * @see #getResource()
-     * @see Resource#getCreator()
-     */
-    public Contact getCreator();
-    
-    /**
-     * Returns first {@link Resource}'s {@link Value}.
-     * 
-     * @see #getResource()
-     * @see Resource#getValue()
-     */
-    public Value getValue();
     
     /**
      * Returns the first {@link Resource}.
