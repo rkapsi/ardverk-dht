@@ -33,9 +33,8 @@ import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Database;
+import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ResourceId;
-import org.ardverk.dht.storage.Value;
-import org.ardverk.version.VectorClock;
 
 
 public class DefaultEasyDHT extends ArdverkDHT implements EasyDHT {
@@ -74,19 +73,13 @@ public class DefaultEasyDHT extends ArdverkDHT implements EasyDHT {
     }
 
     @Override
-    public DHTFuture<ValueEntity> get(ResourceId resource) {
-        return get(resource, config.getGetConfig());
+    public DHTFuture<ValueEntity<Resource>> get(ResourceId resourceId) {
+        return get(resourceId, config.getGetConfig());
     }
 
     @Override
-    public DHTFuture<PutEntity> put(ResourceId resource, 
-            Value value, VectorClock<KUID> clock) {
-        return put(resource, value, clock, config.getPutConfig());
-    }
-
-    @Override
-    public DHTFuture<PutEntity> remove(ResourceId resource, VectorClock<KUID> clock) {
-        return remove(resource, clock, config.getPutConfig());
+    public DHTFuture<PutEntity> put(Resource resource) {
+        return put(resource, config.getPutConfig());
     }
     
     @Override

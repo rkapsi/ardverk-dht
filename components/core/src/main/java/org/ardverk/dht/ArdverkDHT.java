@@ -52,8 +52,6 @@ import org.ardverk.dht.storage.DefaultDatabase;
 import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ResourceId;
 import org.ardverk.dht.storage.StoreForward;
-import org.ardverk.dht.storage.Value;
-import org.ardverk.version.VectorClock;
 
 
 /**
@@ -274,26 +272,8 @@ public class ArdverkDHT extends AbstractDHT {
     }
 
     @Override
-    public DHTFuture<PutEntity> put(ResourceId resourceId, Value value, 
-            VectorClock<KUID> clock, PutConfig config) {
-        return storeManager.put(resourceId, value, clock, config);
-    }
-    
-    @Override
-    public DHTFuture<PutEntity> remove(ResourceId resourceId, 
-            VectorClock<KUID> clock, PutConfig config) {
-        return storeManager.remove(resourceId, clock, config);
-    }
-    
-    @Override
-    public DHTFuture<PutEntity> update(Resource resource, Value value,
-            PutConfig config) {
-        return storeManager.update(resource, value, config);
-    }
-    
-    @Override
-    public DHTFuture<PutEntity> remove(Resource resource, PutConfig config) {
-        return storeManager.remove(resource, config);
+    public DHTFuture<PutEntity> put(Resource resource, PutConfig config) {
+        return storeManager.put(resource, config);
     }
 
     @Override

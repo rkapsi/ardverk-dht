@@ -23,7 +23,6 @@ import org.ardverk.concurrent.ValueReference;
 import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.concurrent.DHTProcess;
 import org.ardverk.dht.concurrent.NopProcess;
-import org.ardverk.dht.config.GetConfig;
 import org.ardverk.dht.config.PutConfig;
 import org.ardverk.dht.config.StoreConfig;
 import org.ardverk.dht.entity.DefaultPutEntity;
@@ -32,18 +31,10 @@ import org.ardverk.dht.entity.PutEntity;
 import org.ardverk.dht.entity.StoreEntity;
 import org.ardverk.dht.entity.ValueEntity;
 import org.ardverk.dht.io.MessageDispatcher;
-import org.ardverk.dht.io.NoSuchValueException;
 import org.ardverk.dht.io.StoreResponseHandler;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
-import org.ardverk.dht.storage.ByteArrayValue;
-import org.ardverk.dht.storage.DefaultValueResource;
 import org.ardverk.dht.storage.Resource;
-import org.ardverk.dht.storage.ResourceId;
-import org.ardverk.dht.storage.Value;
-import org.ardverk.dht.storage.ValueResource;
-import org.ardverk.lang.ExceptionUtils;
-import org.ardverk.version.VectorClock;
 
 
 /**
@@ -64,30 +55,7 @@ public class StoreManager {
         this.messageDispatcher = messageDispatcher;
     }
     
-    public DHTFuture<PutEntity> remove(ResourceId resourceId, 
-            VectorClock<KUID> clock, PutConfig config) {
-        return put(resourceId, ByteArrayValue.EMPTY, clock, config);
-    }
-    
-    public DHTFuture<PutEntity> remove(Resource resource, PutConfig config) {
-        
-        ResourceId resourceId = resource.getResourceId();
-        VectorClock<KUID> clock = ((ValueResource)resource).getVectorClock();
-        
-        return remove(resourceId, clock, config);
-    }
-
-    public DHTFuture<PutEntity> update(Resource resource, Value value,
-            PutConfig config) {
-        
-        ResourceId resourceId = resource.getResourceId();
-        VectorClock<KUID> clock = ((ValueResource)resource).getVectorClock();
-        
-        return put(resourceId, value, clock, config);
-    }
-    
-    public DHTFuture<PutEntity> put(final ResourceId resourceId, final Value value, 
-            final VectorClock<KUID> clock, final PutConfig config) {
+    public DHTFuture<PutEntity> put(final Resource resource, final PutConfig config) {
         
         final Object lock = new Object();
         synchronized (lock) {
@@ -110,7 +78,7 @@ public class StoreManager {
             
             // Start the lookup for the given KUID
             final DHTFuture<NodeEntity> lookupFuture 
-                = dht.lookup(resourceId.getId(), 
+                = dht.lookup(resource.getResourceId().getId(), 
                         config.getLookupConfig());
             
             // Let's wait for the result of the FIND_NODE operation. On success we're 
@@ -131,61 +99,11 @@ public class StoreManager {
                     }
                 }
                 
-                private void handleNodeEntity(NodeEntity nodeEntity) {
-                    StoreConfig store = config.getStoreConfig();
-                    if (clock != null || store.isSloppy()) {
-                        doStore(nodeEntity, clock);
-                    } else {
-                        doGetVectorClock(nodeEntity);
-                    }
-                }
-                
-                private void doGetVectorClock(final NodeEntity nodeEntity) {
-                    Contact[] contacts = nodeEntity.getContacts();
-                    DHTFuture<ValueEntity<Resource>> clockFuture 
-                        = clockFutureRef.make(clock(contacts, 
-                                resourceId, config.getGetConfig()));
-                    
-                    clockFuture.addAsyncFutureListener(new AsyncFutureListener<ValueEntity<Resource>>() {
-                        @Override
-                        public void operationComplete(AsyncFuture<ValueEntity<Resource>> future) {
-                            synchronized (lock) {
-                                try {
-                                    if (!future.isCancelled()) {
-                                        handleVectorClock(future.get());
-                                    } else {
-                                        handleCancelled();
-                                    }
-                                } catch (Throwable t) {
-                                    handleVectorClockException(t);
-                                }
-                            }
-                        }
-                        
-                        private void handleVectorClock(ValueEntity<Resource> entity) {
-                            Resource resource = entity.getResource();
-                            VectorClock<KUID> clock = ((ValueResource)resource).getVectorClock();
-                            doStore(nodeEntity, clock);
-                        }
-                        
-                        private void handleVectorClockException(Throwable t) {
-                            if (ExceptionUtils.isCausedBy(
-                                    t, NoSuchValueException.class)) {
-                                doStore(nodeEntity, clock);
-                            } else {
-                                handleException(t);
-                            }
-                        }
-                    });
-                }
-                
-                private void doStore(final NodeEntity nodeEntity, 
-                        VectorClock<KUID> clock) {
-                    
+                private void handleNodeEntity(final NodeEntity nodeEntity) {
                     Contact[] contacts = nodeEntity.getContacts();
                     DHTFuture<StoreEntity> storeFuture 
                         = storeFutureRef.make(store(contacts, 
-                                resourceId, clock, value, config.getStoreConfig()));
+                                resource, config.getStoreConfig()));
                     
                     storeFuture.addAsyncFutureListener(new AsyncFutureListener<StoreEntity>() {
                         @Override
@@ -234,13 +152,7 @@ public class StoreManager {
         }
     }
     
-    private DHTFuture<ValueEntity<Resource>> clock(Contact[] src, 
-            ResourceId resourceId, GetConfig config) {
-        LookupManager lookupManager = dht.getLookupManager();
-        return lookupManager.get(src, resourceId, Resource.class, config);
-    }
-    
-    public DHTFuture<StoreEntity> store(Contact[] dst, 
+    /*public DHTFuture<StoreEntity> store(Contact[] dst, 
             ResourceId resourceId, VectorClock<KUID> clock, 
             Value value, StoreConfig config) {
         
@@ -258,7 +170,7 @@ public class StoreManager {
                 resourceId, localhost, clock, value);
         
         return store(dst, resource, config);
-    }
+    }*/
     
     /**
      * Sends a STORE request to the given list of {@link Contact}s.
