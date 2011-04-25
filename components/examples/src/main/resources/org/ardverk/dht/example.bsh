@@ -161,7 +161,7 @@ get(DHT dht, String key) {
 	DHTFuture future = dht.get(rsrc(key));
 	
 	ValueEntity entity = future.get();
-	SimpleValue value = SimpleValue.fromResource(entity.getResource());
+	ByteArrayValue value = ByteArrayValue.fromResource(entity.getResource());
 	
 	print("GET: " + entity.getId() + " (" + key + ")" + " -> " 
 		+ toString(value)
@@ -173,10 +173,10 @@ get(DHT dht, String key) {
 }
 
 toValue(String value) {
-	return new SimpleValue(dhts.get(current).getLocalhost(), null, StringUtils.getBytes(value));
+	return new ByteArrayValue(dhts.get(current).getLocalhost(), null, StringUtils.getBytes(value));
 }
 
-toString(SimpleValue value) {
+toString(ByteArrayValue value) {
 	return StringUtils.toString(value.getValue());
 }
 

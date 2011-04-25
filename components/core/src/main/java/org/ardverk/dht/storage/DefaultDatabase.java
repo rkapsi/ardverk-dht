@@ -57,11 +57,11 @@ public class DefaultDatabase extends AbstractDatabase {
     @Override
     public synchronized Status store(Resource resource) {
         return store(resource.getResourceId(), 
-                SimpleValue.fromResource(resource));
+                ByteArrayValue.fromResource(resource));
     }
     
-    private synchronized Status store(ResourceId resourceId, SimpleValue value) {
-        SimpleValue existing = getValue(resourceId);
+    private synchronized Status store(ResourceId resourceId, ByteArrayValue value) {
+        ByteArrayValue existing = getValue(resourceId);
         
         Occured occured = compare(existing, value);
         if (occured == Occured.AFTER) {
@@ -83,11 +83,11 @@ public class DefaultDatabase extends AbstractDatabase {
 
     @Override
     public synchronized Resource get(ResourceId resourceId) {
-        SimpleValue value = getValue(resourceId);
+        ByteArrayValue value = getValue(resourceId);
         return value != null ? value.toResource(resourceId) : null;
     }
     
-    private synchronized SimpleValue getValue(ResourceId resourceId) {
+    private synchronized ByteArrayValue getValue(ResourceId resourceId) {
         Bucket bucket = database.get(resourceId.getId());
         return bucket != null ? bucket.get(resourceId) : null;
     }
@@ -95,7 +95,7 @@ public class DefaultDatabase extends AbstractDatabase {
     /**
      * Adds the given {@link ValueResource}.
      */
-    private synchronized SimpleValue add(ResourceId resourceId, SimpleValue value) {
+    private synchronized ByteArrayValue add(ResourceId resourceId, ByteArrayValue value) {
         KUID bucketId = resourceId.getId();
         
         Bucket bucket = database.get(bucketId);
@@ -110,12 +110,12 @@ public class DefaultDatabase extends AbstractDatabase {
     /**
      * Removes and returns a {@link Resource}.
      */
-    private synchronized SimpleValue remove(ResourceId resourceId) {
+    private synchronized ByteArrayValue remove(ResourceId resourceId) {
         KUID bucketId = resourceId.getId();
         
         Bucket bucket = database.get(bucketId);
         if (bucket != null) {
-            SimpleValue removed = bucket.remove(resourceId);
+            ByteArrayValue removed = bucket.remove(resourceId);
             if (bucket.isEmpty()) {
                 database.remove(bucketId);
             }
@@ -189,7 +189,7 @@ public class DefaultDatabase extends AbstractDatabase {
         return sb.toString();
     }
     
-    private static Occured compare(SimpleValue existing, SimpleValue resource) {
+    private static Occured compare(ByteArrayValue existing, ByteArrayValue resource) {
         if (existing == null) {
             return Occured.AFTER;
         }
@@ -210,7 +210,7 @@ public class DefaultDatabase extends AbstractDatabase {
         return clock.compareTo(existing);
     }
     
-    private static class Bucket extends HashMap<ResourceId, SimpleValue> 
+    private static class Bucket extends HashMap<ResourceId, ByteArrayValue> 
             implements Identifier {
         
         private static final long serialVersionUID = -8794611016380746313L;

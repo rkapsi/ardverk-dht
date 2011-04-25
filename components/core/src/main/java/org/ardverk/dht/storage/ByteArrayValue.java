@@ -10,7 +10,7 @@ import org.ardverk.dht.routing.Contact;
 import org.ardverk.io.IoUtils;
 import org.ardverk.version.VectorClock;
 
-public class SimpleValue {
+public class ByteArrayValue {
 
     private final Contact creator;
     
@@ -18,7 +18,7 @@ public class SimpleValue {
     
     private final byte[] value;
     
-    public SimpleValue(Contact creator, 
+    public ByteArrayValue(Contact creator, 
             VectorClock<KUID> clock, byte[] value) {
         
         this.creator = creator;
@@ -61,14 +61,14 @@ public class SimpleValue {
         }
     }
     
-    public static SimpleValue fromResource(Resource resource) {
+    public static ByteArrayValue fromResource(Resource resource) {
         MessageInputStream in = null;
         try {
             in = new MessageInputStream(resource.getContent());
             Contact creator = in.readContact();
             VectorClock<KUID> clock = in.readVectorClock();
             byte[] value = in.readBytes();
-            return new SimpleValue(creator, clock, value);
+            return new ByteArrayValue(creator, clock, value);
         } catch (IOException err) {
             throw new IllegalStateException("IOException", err);
         } finally {
