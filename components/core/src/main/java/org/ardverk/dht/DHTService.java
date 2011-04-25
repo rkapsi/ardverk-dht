@@ -74,8 +74,14 @@ interface DHTService {
     /**
      * Performs a {@link MessageType#FIND_VALUE} lookup in the DHT.
      */
-    public DHTFuture<ValueEntity> get(
+    public DHTFuture<ValueEntity<Resource>> get(
             ResourceId resourceId, GetConfig config);
+    
+    /**
+     * Performs a {@link MessageType#FIND_VALUE} lookup in the DHT.
+     */
+    public <T> DHTFuture<ValueEntity<T>> get(
+            ResourceId resourceId, Class<? super T> clazz, GetConfig config);
     
     /**
      * Performs a {@link MessageType#FIND_NODE} lookup followed by 

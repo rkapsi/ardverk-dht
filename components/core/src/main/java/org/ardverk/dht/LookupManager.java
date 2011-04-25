@@ -27,6 +27,7 @@ import org.ardverk.dht.io.NodeResponseHandler;
 import org.ardverk.dht.io.ValueResponseHandler;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
+import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ResourceId;
 
 /**
@@ -62,16 +63,21 @@ public class LookupManager {
         return futureService.submit(process, config);
     }
     
-    public DHTFuture<ValueEntity> get(ResourceId resourceId, GetConfig config) {
-        Contact[] contacts = routeTable.select(resourceId.getId());
-        return get(contacts, resourceId, config);
+    public DHTFuture<ValueEntity<Resource>> get(ResourceId resourceId, GetConfig config) {
+        return get(resourceId, Resource.class, config);
     }
     
-    public DHTFuture<ValueEntity> get(Contact[] contacts, 
-            ResourceId resourceId, GetConfig config) {
-        DHTProcess<ValueEntity> process
-            = new ValueResponseHandler(messageDispatcher, contacts, 
-                    routeTable, resourceId, config);
+    public <T> DHTFuture<ValueEntity<T>> get(ResourceId resourceId, 
+            Class<? super T> clazz, GetConfig config) {
+        Contact[] contacts = routeTable.select(resourceId.getId());
+        return get(contacts, resourceId, clazz, config);
+    }
+    
+    public <T> DHTFuture<ValueEntity<T>> get(Contact[] contacts, 
+            ResourceId resourceId, Class<? super T> clazz, GetConfig config) {
+        DHTProcess<ValueEntity<T>> process
+            = new ValueResponseHandler<T>(messageDispatcher, contacts, 
+                    routeTable, resourceId, clazz, config);
         return futureService.submit(process, config);
     }
 }
