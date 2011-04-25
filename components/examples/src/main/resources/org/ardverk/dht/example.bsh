@@ -140,7 +140,11 @@ put(String key, String value) {
 
 // Stores the given key-value
 put(DHT dht, String key, String value) {
-	DHTFuture future = dht.put(rsrc(key), toValue(value), null);
+  ResourceId resourceId = rsrc(key);
+  Resource resource = new DefaultValueResource(
+      resourceId, dht.getLocalhost(), null, toValue(value));
+      
+	DHTFuture future = dht.put(resource);
 		
 	PutEntity entity = future.get();
 	for (StoreResponse response : entity.getStoreResponses()) {
@@ -197,12 +201,12 @@ quit() {
 print("\nHello, please type init(); and press Enter. For further instructions and examples see 'example.bsh' and www.beanshell.org.\n");
 
 init() {
-	init(true);
+	init(false);
 }
 
 init(boolean withUI) {
-	//INSTANCE_COUNT = 256;
-	INSTANCE_COUNT = 30;
+	INSTANCE_COUNT = 256;
+	//INSTANCE_COUNT = 30;
 	INITIAL_PORT = 12000;
 
 	print("Creating DHTs...");
