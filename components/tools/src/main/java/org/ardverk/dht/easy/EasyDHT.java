@@ -52,7 +52,7 @@ public interface EasyDHT extends DHT, Closeable {
 
     public DHTFuture<ValueEntity> get(ResourceId resourceId);
 
-    public DHTFuture<PutEntity> put(Resource resource);
+    public DHTFuture<PutEntity> put(ResourceId resourceId, Resource resource);
 
     public DHTFuture<BootstrapEntity> bootstrap(String host, int port);
 

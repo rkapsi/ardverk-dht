@@ -91,10 +91,12 @@ public class DefaultMessageFactory extends AbstractMessageFactory {
     }
 
     @Override
-    public StoreRequest createStoreRequest(Contact dst, Resource resource) {
+    public StoreRequest createStoreRequest(Contact dst, ResourceId resourceId, 
+            Resource resource) {
         SocketAddress address = dst.getRemoteAddress();
         MessageId messageId = createMessageId(address);
-        return new DefaultStoreRequest(messageId, localhost, address, resource);
+        return new DefaultStoreRequest(messageId, localhost, address, 
+                resourceId, resource);
     }
 
     @Override

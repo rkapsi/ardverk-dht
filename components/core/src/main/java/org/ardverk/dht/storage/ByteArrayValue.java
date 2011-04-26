@@ -63,7 +63,7 @@ public class ByteArrayValue {
         return StringUtils.toString(value);
     }
     
-    public Resource toResource(ResourceId resourceId) {
+    public Resource toResource() {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             MessageOutputStream out = new MessageOutputStream(baos);
@@ -72,7 +72,7 @@ public class ByteArrayValue {
             out.writeBytes(value);
             out.close();
             
-            return new DefaultResource(resourceId, baos.toByteArray());
+            return new DefaultResource(baos.toByteArray());
         } catch (IOException err) {
             throw new IllegalStateException("IOException", err);
         }

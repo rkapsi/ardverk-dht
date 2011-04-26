@@ -79,7 +79,8 @@ public interface MessageFactory {
     /**
      * Creates and returns a {@link StoreRequest}.
      */
-    public StoreRequest createStoreRequest(Contact dst, Resource resource);
+    public StoreRequest createStoreRequest(Contact dst, 
+            ResourceId resourceId, Resource resource);
     
     /**
      * Creates and returns a {@link StoreResponse}.

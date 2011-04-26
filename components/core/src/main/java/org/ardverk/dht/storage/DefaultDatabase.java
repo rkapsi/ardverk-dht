@@ -56,9 +56,8 @@ public class DefaultDatabase extends AbstractDatabase {
     }
 
     @Override
-    public synchronized Status store(Resource resource) {
-        return store(resource.getResourceId(), 
-                ByteArrayValue.create(resource));
+    public synchronized Status store(ResourceId resourceId, Resource resource) {
+        return store(resourceId, ByteArrayValue.create(resource));
     }
     
     private synchronized Status store(ResourceId resourceId, ByteArrayValue value) {
@@ -74,7 +73,7 @@ public class DefaultDatabase extends AbstractDatabase {
             return DefaultStatus.SUCCESS;
         }
         
-        return DefaultStatus.conflict(existing.toResource(resourceId));
+        return DefaultStatus.conflict(existing.toResource());
     }
     
     @Override
@@ -91,13 +90,13 @@ public class DefaultDatabase extends AbstractDatabase {
             if (bucket != null) {
                 System.out.println(bucket.size());
                 return (new Values(bucket.keySet().toArray(
-                        new ResourceId[0]))).toResource(resourceId);
+                        new ResourceId[0]))).toResource();
             }
             return null;
         }
         
         ByteArrayValue value = getValue(resourceId);
-        return value != null ? value.toResource(resourceId) : null;
+        return value != null ? value.toResource() : null;
     }
     
     private synchronized ByteArrayValue getValue(ResourceId resourceId) {

@@ -164,7 +164,6 @@ public class MessageOutputStream extends BencodingOutputStream {
     }
     
     public void writeResource(Resource resource) throws IOException {
-        writeResourceId(resource.getResourceId());
         InputStream in = resource.getContent();
         try {
             long contentLength = resource.getContentLength();
@@ -244,6 +243,7 @@ public class MessageOutputStream extends BencodingOutputStream {
     }
     
     private void writeStoreRequest(StoreRequest message) throws IOException {
+        writeResourceId(message.getResourceId());
         writeResource(message.getResource());
     }
     

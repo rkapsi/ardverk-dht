@@ -108,7 +108,7 @@ public class StoreForward {
             
             Resource resource = database.get(resourceId);
             if (resource != null) {
-                callback.store(contact, resource, storeConfig);
+                callback.store(contact, resourceId, resource, storeConfig);
             }
         }
     }
@@ -163,8 +163,9 @@ public class StoreForward {
         /**
          * Called by the {@link StoreForward} service for each {@link Resource}
          * that needs to be sent to the given {@link Contact}.
+         * @param resourceId TODO
          */
         public DHTFuture<StoreEntity> store(Contact dst, 
-                Resource resource, StoreConfig config);
+                ResourceId resourceId, Resource resource, StoreConfig config);
     }
 }

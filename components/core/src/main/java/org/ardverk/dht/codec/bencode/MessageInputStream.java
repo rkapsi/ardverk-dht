@@ -195,11 +195,9 @@ public class MessageInputStream extends BencodingInputStream {
     
     public Resource readResource(Contact contact, 
             SocketAddress address) throws IOException {
-        
-        ResourceId resourceId = readResourceId();
         InputStream in = readContent();
         try {
-            return new DefaultResource(resourceId, in);
+            return new DefaultResource(in);
         } finally {
             in.close();
         }
@@ -279,8 +277,10 @@ public class MessageInputStream extends BencodingInputStream {
     private StoreRequest readStoreRequest(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
         
+        ResourceId resourceId = readResourceId();
         Resource resource = readResource(contact, address);
-        return new DefaultStoreRequest(messageId, contact, address, resource);
+        return new DefaultStoreRequest(messageId, contact, 
+                address, resourceId, resource);
     }
     
     private StoreResponse readStoreResponse(MessageId messageId, 

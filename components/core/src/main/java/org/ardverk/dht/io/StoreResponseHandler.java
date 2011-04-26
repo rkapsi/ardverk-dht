@@ -34,6 +34,7 @@ import org.ardverk.dht.message.StoreRequest;
 import org.ardverk.dht.message.StoreResponse;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.storage.Resource;
+import org.ardverk.dht.storage.ResourceId;
 import org.ardverk.lang.TimeStamp;
 
 
@@ -55,6 +56,8 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     
     private final int k;
     
+    private final ResourceId resourceId;
+    
     private final Resource resource;
     
     private final StoreConfig config;
@@ -62,13 +65,15 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     public StoreResponseHandler(
             MessageDispatcher messageDispatcher, 
             Contact[] contacts, int k,
-            Resource resource, StoreConfig config) {
+            ResourceId resourceId, Resource resource, 
+            StoreConfig config) {
         super(messageDispatcher);
         
         this.contacts = contacts;
         this.it = Iterators.fromArray(contacts);
         this.k = k;
         
+        this.resourceId = resourceId;
         this.resource = resource;
         this.config = config;
         
@@ -122,7 +127,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     
     private synchronized void store(Contact dst) throws IOException {
         MessageFactory factory = messageDispatcher.getMessageFactory();
-        StoreRequest request = factory.createStoreRequest(dst, resource);
+        StoreRequest request = factory.createStoreRequest(dst, resourceId, resource);
         
         long defaultTimeout = config.getStoreTimeoutInMillis();
         long adaptiveTimeout = config.getAdaptiveTimeout(

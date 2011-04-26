@@ -79,5 +79,6 @@ interface DHTService {
      * Performs a {@link MessageType#FIND_NODE} lookup followed by 
      * a {@link MessageType#STORE} operation.
      */
-    public DHTFuture<PutEntity> put(Resource resource, PutConfig config);
+    public DHTFuture<PutEntity> put(ResourceId resourceId, 
+            Resource resource, PutConfig config);
 }

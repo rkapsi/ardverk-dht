@@ -47,7 +47,7 @@ rsrc(String value) {
 }
 
 rsrc2(String value) {
-	return DefaultResourceId.valueOf(kuid(value), "list");
+	return DefaultResourceId.valueOf("list");
 }
 
 // Creates a SHA-1 from a String
@@ -64,8 +64,8 @@ createDHT(int port) {
 	DHT dht = EasyFactory.create(config);
 	
 	MessageCodec codec = new BencodeMessageCodec();
-	dht.bind(new DatagramTransport(codec, port));
-	//dht.bind(new SocketTransport(codec, port));
+	//dht.bind(new DatagramTransport(codec, port));
+	dht.bind(new SocketTransport(codec, port));
 	//dht.bind(new HybridTransport(codec, port));
 	//dht.bind(new HttpTransport(port));
 	
@@ -145,9 +145,9 @@ put(String key, String value) {
 // Stores the given key-value
 put(DHT dht, String key, String value) {
   ResourceId resourceId = rsrc(key);
-  Resource resource = toValue(value).toResource(resourceId);
+  Resource resource = toValue(value).toResource();
       
-	DHTFuture future = dht.put(resource);
+	DHTFuture future = dht.put(resourceId, resource);
 		
 	PutEntity entity = future.get();
 	for (StoreResponse response : entity.getStoreResponses()) {
@@ -216,7 +216,7 @@ quit() {
 print("\nHello, please type init(); and press Enter. For further instructions and examples see 'example.bsh' and www.beanshell.org.\n");
 
 init() {
-	init(false);
+	init(true);
 }
 
 init(boolean withUI) {
@@ -235,6 +235,8 @@ init(boolean withUI) {
 	print("Bootstrapping all DHTs...");
 	bootstrapAll();
 
+  quicken();
+  
 	print("\nStoring a Key-Value...");
 	put("Hello", "World");
 

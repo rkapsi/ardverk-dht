@@ -101,7 +101,7 @@ public class SyncManager {
             // The number of STOREs we've sent
             final CountDown storeCounter = new CountDown();
             
-            for (ResourceId resourceId : database.values()) {
+            for (final ResourceId resourceId : database.values()) {
                 
                 final Resource resource = database.get(resourceId);
                 if (resource == null) {
@@ -163,7 +163,9 @@ public class SyncManager {
                         }
                         
                         DHTFuture<StoreEntity> storeFuture 
-                            = store(resource, syncConfig.getStoreConfig());
+                            = store(resourceId, resource, 
+                                    syncConfig.getStoreConfig());
+                        
                         storeCounter.incrementAndGet();
                         storeFuture.addAsyncFutureListener(
                                 new AsyncFutureListener<StoreEntity>() {
@@ -225,7 +227,8 @@ public class SyncManager {
         }
     }
     
-    private DHTFuture<StoreEntity> store(Resource resource, StoreConfig storeConfig) {
+    private DHTFuture<StoreEntity> store(ResourceId resourceId, 
+            Resource resource, StoreConfig storeConfig) {
         Localhost localhost = routeTable.getLocalhost();
         Contact[] contacts = routeTable.select(localhost.getId());
         assert (localhost.equals(contacts[0]));
@@ -235,7 +238,7 @@ public class SyncManager {
         //System.arraycopy(contacts, 1, dst, 0, dst.length);
         //return storeManager.store(dst, tuple, storeConfig);
         
-        return storeManager.store(contacts, resource, storeConfig);
+        return storeManager.store(contacts, resourceId, resource, storeConfig);
     }
     
     private PingFuture ping(Map<ContactKey, DHTFuture<PingEntity>> futures, 

@@ -9,9 +9,7 @@ public class DefaultResource extends AbstractResource {
     
     private final byte[] content;
     
-    public DefaultResource(ResourceId resourceId, InputStream in) throws IOException {
-        super(resourceId);
-        
+    public DefaultResource(InputStream in) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         
         byte[] buffer = new byte[4 * 1024];
@@ -23,8 +21,7 @@ public class DefaultResource extends AbstractResource {
         this.content = baos.toByteArray();
     }
     
-    public DefaultResource(ResourceId resourceId, byte[] content) {
-        super(resourceId);
+    public DefaultResource(byte[] content) {
         this.content = content;
     }
     

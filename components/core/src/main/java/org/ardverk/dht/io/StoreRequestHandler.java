@@ -57,12 +57,12 @@ public class StoreRequestHandler extends AbstractRequestHandler {
     }
 
     public StoreResponse createResponse(StoreRequest request) {
+        ResourceId resourceId = request.getResourceId();
         Resource resource = request.getResource();
         Status status = null;
         
         DatabaseConfig config = database.getDatabaseConfig();
         if (config.isCheckBucket()) {
-            ResourceId resourceId = resource.getResourceId();
             
             KUID bucketId = resourceId.getId();
             Contact[] contacts = routeTable.select(bucketId);
@@ -71,10 +71,10 @@ public class StoreRequestHandler extends AbstractRequestHandler {
             if (!ArrayUtils.contains(localhost, contacts)) {
                 status = DefaultStatus.FAILURE;
             } else {
-                status = database.store(resource);
+                status = database.store(resourceId, resource);
             }
         } else {
-            status = database.store(resource);
+            status = database.store(resourceId, resource);
         }
         
         MessageFactory factory = messageDispatcher.getMessageFactory();

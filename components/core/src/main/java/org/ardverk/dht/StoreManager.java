@@ -35,6 +35,7 @@ import org.ardverk.dht.io.StoreResponseHandler;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Resource;
+import org.ardverk.dht.storage.ResourceId;
 
 
 /**
@@ -55,7 +56,8 @@ public class StoreManager {
         this.messageDispatcher = messageDispatcher;
     }
     
-    public DHTFuture<PutEntity> put(final Resource resource, final PutConfig config) {
+    public DHTFuture<PutEntity> put(final ResourceId resourceId, 
+            final Resource resource, final PutConfig config) {
         
         final Object lock = new Object();
         synchronized (lock) {
@@ -78,7 +80,7 @@ public class StoreManager {
             
             // Start the lookup for the given KUID
             final DHTFuture<NodeEntity> lookupFuture 
-                = dht.lookup(resource.getResourceId().getId(), 
+                = dht.lookup(resourceId.getId(), 
                         config.getLookupConfig());
             
             // Let's wait for the result of the FIND_NODE operation. On success we're 
@@ -103,7 +105,8 @@ public class StoreManager {
                     Contact[] contacts = nodeEntity.getContacts();
                     DHTFuture<StoreEntity> storeFuture 
                         = storeFutureRef.make(store(contacts, 
-                                resource, config.getStoreConfig()));
+                                resourceId, resource, 
+                                config.getStoreConfig()));
                     
                     storeFuture.addAsyncFutureListener(new AsyncFutureListener<StoreEntity>() {
                         @Override
@@ -178,14 +181,14 @@ public class StoreManager {
      * NOTE: It's being assumed the {@link Contact}s are already sorted by
      * their XOR distance to the given {@link KUID}.
      */
-    public DHTFuture<StoreEntity> store(Contact[] dst, 
+    public DHTFuture<StoreEntity> store(Contact[] dst, ResourceId resourceId, 
             Resource resource, StoreConfig config) {
         
         int k = routeTable.getK();
         
         DHTProcess<StoreEntity> process 
             = new StoreResponseHandler(messageDispatcher, 
-                dst, k, resource, config);
+                dst, k, resourceId, resource, config);
         
         return dht.submit(process, config);
     }

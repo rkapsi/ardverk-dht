@@ -34,7 +34,7 @@ public interface Database {
     /**
      * Stores the given {@link Resource} and returns a {@link Status}.
      */
-    public Status store(Resource resource);
+    public Status store(ResourceId resourceId, Resource resource);
     
     /**
      * Returns all bucket {@link KUID}s.

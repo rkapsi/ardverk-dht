@@ -128,8 +128,9 @@ public class ArdverkDHT extends AbstractDHT {
         storeForward.bind(new StoreForward.Callback() {
             @Override
             public DHTFuture<StoreEntity> store(Contact dst, 
-                    Resource resource, StoreConfig config) {
-                return storeManager.store(new Contact[] { dst }, resource, config);
+                    ResourceId resourceId, Resource resource, StoreConfig config) {
+                return storeManager.store(new Contact[] { dst }, 
+                        resourceId, resource, config);
             }
         });
     }
@@ -266,8 +267,9 @@ public class ArdverkDHT extends AbstractDHT {
     }
 
     @Override
-    public DHTFuture<PutEntity> put(Resource resource, PutConfig config) {
-        return storeManager.put(resource, config);
+    public DHTFuture<PutEntity> put(ResourceId resourceId, 
+            Resource resource, PutConfig config) {
+        return storeManager.put(resourceId, resource, config);
     }
 
     @Override

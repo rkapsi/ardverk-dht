@@ -32,19 +32,35 @@ public class DefaultResourceId extends AbstractResourceId {
     }
     
     public static ResourceId valueOf(KUID valueId) {
-        return new DefaultResourceId(valueId, create(valueId));
+        return valueOf(BUCKET, valueId);
     }
     
-    private static URI create(KUID valueId) {
-        return URI.create("ardverk:///" + BUCKET.toHexString() + "/" + valueId.toHexString());
+    public static ResourceId valueOf(KUID bucketId, KUID valueId) {
+        return new DefaultResourceId(bucketId, create(bucketId, valueId, null));
     }
     
-    public static ResourceId valueOf(KUID valueId, String query) {
-        return new DefaultResourceId(valueId, create(valueId, query));
+    public static ResourceId valueOf(String query) {
+        return valueOf(BUCKET, query);
     }
     
-    public static URI create(KUID valueId, String query) {
-        return URI.create("ardverk:///" + BUCKET.toHexString() + "/" + valueId.toHexString() + "?" + query);
+    public static ResourceId valueOf(KUID bucketId, String query) {
+        return new DefaultResourceId(bucketId, create(bucketId, null, query));
+    }
+    
+    private static URI create(KUID bucketId, KUID valueId, String query) {
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append("ardverk:///").append(bucketId.toHexString());
+        
+        if (valueId != null) {
+            sb.append("/").append(valueId.toHexString());
+        }
+        
+        if (query != null && !query.isEmpty()) {
+            sb.append("?").append(query);
+        }
+        
+        return URI.create(sb.toString());
     }
     
     private static KUID parse(URI uri) {

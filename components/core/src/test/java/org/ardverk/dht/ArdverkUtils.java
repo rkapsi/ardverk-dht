@@ -208,9 +208,9 @@ public class ArdverkUtils {
             VectorClock<KUID> clock = null;
             Contact contact = dhts.get(rnd).getLocalhost();
             
-            Resource resource = (new ByteArrayValue(contact, clock, value)).toResource(resourceId);
+            Resource resource = (new ByteArrayValue(contact, clock, value)).toResource();
             
-            future = dhts.get(rnd).put(resource, putConfig);
+            future = dhts.get(rnd).put(resourceId, resource, putConfig);
             
             if (i % 1000 == 0) {
                 System.out.println("PROGRESS: " + i);
