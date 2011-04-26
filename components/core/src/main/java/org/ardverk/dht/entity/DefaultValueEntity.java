@@ -55,7 +55,7 @@ public class DefaultValueEntity extends AbstractLookupEntity implements ValueEnt
     public Contact getSender() {
         return getValueResponse().getContact();
     }
-
+    
     @Override
     public Resource getResource() {
         return getValueResponse().getResource();
