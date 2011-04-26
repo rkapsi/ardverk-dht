@@ -16,10 +16,10 @@
 
 package org.ardverk.dht.entity;
 
+import org.ardverk.dht.message.Content;
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.storage.Resource;
 
 /**
  * The result of a {@link MessageType#FIND_VALUE} operation.
@@ -34,11 +34,11 @@ public interface ValueEntity extends LookupEntity {
     public Contact getSender();
     
     /**
-     * Returns the first {@link Resource}.
+     * Returns the first {@link Content}.
      * 
      * @see #getValueResponse()
      */
-    public Resource getResource();
+    public Content getContent();
     
     public ValueResponse getValueResponse();
     

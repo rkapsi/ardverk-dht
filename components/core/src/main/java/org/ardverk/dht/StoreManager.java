@@ -32,9 +32,9 @@ import org.ardverk.dht.entity.StoreEntity;
 import org.ardverk.dht.entity.ValueEntity;
 import org.ardverk.dht.io.MessageDispatcher;
 import org.ardverk.dht.io.StoreResponseHandler;
+import org.ardverk.dht.message.Content;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
-import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ResourceId;
 
 
@@ -57,7 +57,7 @@ public class StoreManager {
     }
     
     public DHTFuture<PutEntity> put(final ResourceId resourceId, 
-            final Resource resource, final PutConfig config) {
+            final Content content, final PutConfig config) {
         
         final Object lock = new Object();
         synchronized (lock) {
@@ -105,7 +105,7 @@ public class StoreManager {
                     Contact[] contacts = nodeEntity.getContacts();
                     DHTFuture<StoreEntity> storeFuture 
                         = storeFutureRef.make(store(contacts, 
-                                resourceId, resource, 
+                                resourceId, content, 
                                 config.getStoreConfig()));
                     
                     storeFuture.addAsyncFutureListener(new AsyncFutureListener<StoreEntity>() {
@@ -155,26 +155,6 @@ public class StoreManager {
         }
     }
     
-    /*public DHTFuture<StoreEntity> store(Contact[] dst, 
-            ResourceId resourceId, VectorClock<KUID> clock, 
-            Value value, StoreConfig config) {
-        
-        Contact localhost = dht.getLocalhost();
-        
-        if (!config.isSloppy() && clock == null) {
-            clock = VectorClock.create();
-        }
-        
-        if (clock != null) {
-            clock = clock.append(localhost.getId());
-        }
-        
-        Resource resource = new DefaultValueResource(
-                resourceId, localhost, clock, value);
-        
-        return store(dst, resource, config);
-    }*/
-    
     /**
      * Sends a STORE request to the given list of {@link Contact}s.
      * 
@@ -182,13 +162,13 @@ public class StoreManager {
      * their XOR distance to the given {@link KUID}.
      */
     public DHTFuture<StoreEntity> store(Contact[] dst, ResourceId resourceId, 
-            Resource resource, StoreConfig config) {
+            Content content, StoreConfig config) {
         
         int k = routeTable.getK();
         
         DHTProcess<StoreEntity> process 
             = new StoreResponseHandler(messageDispatcher, 
-                dst, k, resourceId, resource, config);
+                dst, k, resourceId, content, config);
         
         return dht.submit(process, config);
     }

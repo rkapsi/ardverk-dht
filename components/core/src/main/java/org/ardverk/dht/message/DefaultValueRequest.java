@@ -26,21 +26,21 @@ import org.ardverk.dht.storage.ResourceId;
 public class DefaultValueRequest extends AbstractLookupRequest 
         implements ValueRequest {
     
-    private final ResourceId recource;
+    private final ResourceId recourceId;
     
     public DefaultValueRequest(MessageId messageId, Contact contact, 
-            SocketAddress address, ResourceId recource) {
-        super(messageId, contact, address);
-        this.recource = recource;
+            SocketAddress address, ResourceId recourceId) {
+        super(messageId, contact, address, NoContent.EMPTY);
+        this.recourceId = recourceId;
     }
     
     @Override
     public KUID getId() {
-        return recource.getId();
+        return recourceId.getId();
     }
 
     @Override
-    public ResourceId getResource() {
-        return recource;
+    public ResourceId getResourceId() {
+        return recourceId;
     }
 }

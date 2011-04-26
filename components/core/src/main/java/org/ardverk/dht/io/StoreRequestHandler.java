@@ -20,6 +20,7 @@ import java.io.IOException;
 
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.io.transport.Endpoint;
+import org.ardverk.dht.message.Content;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.message.RequestMessage;
@@ -29,11 +30,8 @@ import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Database;
 import org.ardverk.dht.storage.DatabaseConfig;
-import org.ardverk.dht.storage.DefaultStatus;
-import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ResourceId;
 import org.ardverk.dht.storage.Status;
-import org.ardverk.lang.Arguments;
 import org.ardverk.utils.ArrayUtils;
 
 
@@ -52,14 +50,15 @@ public class StoreRequestHandler extends AbstractRequestHandler {
             RouteTable routeTable, Database database) {
         super(messageDispatcher);
         
-        this.routeTable = Arguments.notNull(routeTable, "routeTable");
-        this.database = Arguments.notNull(database, "database");
+        this.routeTable = routeTable;
+        this.database = database;
     }
 
-    public StoreResponse createResponse(StoreRequest request) {
+    public StoreResponse createResponse(StoreRequest request) throws IOException {
         ResourceId resourceId = request.getResourceId();
-        Resource resource = request.getResource();
-        Status status = null;
+        Content content = request.getContent();
+        
+        Content result = null;
         
         DatabaseConfig config = database.getDatabaseConfig();
         if (config.isCheckBucket()) {
@@ -69,16 +68,16 @@ public class StoreRequestHandler extends AbstractRequestHandler {
             Contact localhost = routeTable.getLocalhost();
             
             if (!ArrayUtils.contains(localhost, contacts)) {
-                status = DefaultStatus.FAILURE;
+                result = Status.FAILURE;
             } else {
-                status = database.store(resourceId, resource);
+                result = database.store(resourceId, content);
             }
         } else {
-            status = database.store(resourceId, resource);
+            result = database.store(resourceId, content);
         }
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
-        return factory.createStoreResponse(request, status);
+        return factory.createStoreResponse(request, result);
     }
     
     @Override

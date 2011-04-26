@@ -28,6 +28,7 @@ import org.ardverk.coding.BencodingOutputStream;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.lang.IntegerValue;
 import org.ardverk.dht.lang.StringValue;
+import org.ardverk.dht.message.Content;
 import org.ardverk.dht.message.Message;
 import org.ardverk.dht.message.MessageId;
 import org.ardverk.dht.message.NodeRequest;
@@ -39,10 +40,7 @@ import org.ardverk.dht.message.StoreResponse;
 import org.ardverk.dht.message.ValueRequest;
 import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ResourceId;
-import org.ardverk.dht.storage.Status;
-import org.ardverk.io.IoUtils;
 import org.ardverk.version.Vector;
 import org.ardverk.version.VectorClock;
 
@@ -150,27 +148,14 @@ public class MessageOutputStream extends BencodingOutputStream {
         writeArray(contacts);
     }
     
-    public void writeStatus(Status status) throws IOException {
-        writeInt(status.intValue());
-        writeString(status.stringValue());
+    public void writeContent(Content content) throws IOException {
+        long contentLength = content.getContentLength();
+        InputStream in = null;
+        if (contentLength != 0L) {
+            in = content.getContent();
+        }
         
-        Resource resource = status.getResource();
-        if (resource != null) {
-            writeBoolean(true);
-            writeResource(resource);
-        } else {
-            writeBoolean(false);
-        }
-    }
-    
-    public void writeResource(Resource resource) throws IOException {
-        InputStream in = resource.getContent();
-        try {
-            long contentLength = resource.getContentLength();
-            writeContent(contentLength, in);
-        } finally {
-            IoUtils.close(in);
-        }
+        writeContent(contentLength, in);
     }
     
     public void writeMessage(Message message) throws IOException {
@@ -213,6 +198,8 @@ public class MessageOutputStream extends BencodingOutputStream {
             default:
                 throw new IllegalArgumentException("opcode=" + opcode);
         }
+        
+        writeContent(message.getContent());
     }
     
     private void writePingRequest(PingRequest message) throws IOException {
@@ -235,19 +222,16 @@ public class MessageOutputStream extends BencodingOutputStream {
     }
     
     private void writeValueRequest(ValueRequest message) throws IOException {
-        writeResourceId(message.getResource());
+        writeResourceId(message.getResourceId());
     }
     
     private void writeValueResponse(ValueResponse message) throws IOException {
-        writeResource(message.getResource());
     }
     
     private void writeStoreRequest(StoreRequest message) throws IOException {
         writeResourceId(message.getResourceId());
-        writeResource(message.getResource());
     }
     
     private void writeStoreResponse(StoreResponse message) throws IOException {
-        writeStatus(message.getStatus());
     }
 }

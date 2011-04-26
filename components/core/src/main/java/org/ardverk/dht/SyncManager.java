@@ -38,11 +38,11 @@ import org.ardverk.dht.entity.DefaultSyncEntity;
 import org.ardverk.dht.entity.PingEntity;
 import org.ardverk.dht.entity.StoreEntity;
 import org.ardverk.dht.entity.SyncEntity;
+import org.ardverk.dht.message.Content;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.Localhost;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Database;
-import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ResourceId;
 import org.ardverk.dht.utils.ContactKey;
 import org.ardverk.lang.TimeStamp;
@@ -103,8 +103,8 @@ public class SyncManager {
             
             for (final ResourceId resourceId : database.values()) {
                 
-                final Resource resource = database.get(resourceId);
-                if (resource == null) {
+                final Content content = database.get(resourceId);
+                if (content == null) {
                     continue;
                 }
                 
@@ -163,7 +163,7 @@ public class SyncManager {
                         }
                         
                         DHTFuture<StoreEntity> storeFuture 
-                            = store(resourceId, resource, 
+                            = store(resourceId, content, 
                                     syncConfig.getStoreConfig());
                         
                         storeCounter.incrementAndGet();
@@ -228,7 +228,7 @@ public class SyncManager {
     }
     
     private DHTFuture<StoreEntity> store(ResourceId resourceId, 
-            Resource resource, StoreConfig storeConfig) {
+            Content content, StoreConfig storeConfig) {
         Localhost localhost = routeTable.getLocalhost();
         Contact[] contacts = routeTable.select(localhost.getId());
         assert (localhost.equals(contacts[0]));
@@ -238,7 +238,7 @@ public class SyncManager {
         //System.arraycopy(contacts, 1, dst, 0, dst.length);
         //return storeManager.store(dst, tuple, storeConfig);
         
-        return storeManager.store(contacts, resourceId, resource, storeConfig);
+        return storeManager.store(contacts, resourceId, content, storeConfig);
     }
     
     private PingFuture ping(Map<ContactKey, DHTFuture<PingEntity>> futures, 

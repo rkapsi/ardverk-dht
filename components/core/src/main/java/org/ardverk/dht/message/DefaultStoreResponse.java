@@ -19,24 +19,12 @@ package org.ardverk.dht.message;
 import java.net.SocketAddress;
 
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.storage.Status;
-import org.ardverk.lang.Arguments;
-
 
 public class DefaultStoreResponse extends AbstractResponseMessage 
         implements StoreResponse {
-
-    private final Status status;
     
     public DefaultStoreResponse(MessageId messageId, Contact contact, 
-            SocketAddress address, Status status) {
-        super(messageId, contact, address);
-        
-        this.status = Arguments.notNull(status, "status");
-    }
-    
-    @Override
-    public Status getStatus() {
-        return status;
+            SocketAddress address, Content content) {
+        super(messageId, contact, address, content);
     }
 }

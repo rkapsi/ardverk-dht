@@ -21,9 +21,7 @@ import java.net.SocketAddress;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.Localhost;
-import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ResourceId;
-import org.ardverk.dht.storage.Status;
 import org.ardverk.lang.Arguments;
 
 
@@ -82,28 +80,28 @@ public class DefaultMessageFactory extends AbstractMessageFactory {
     }
 
     @Override
-    public ValueResponse createValueResponse(LookupRequest request, Resource resource) {
+    public ValueResponse createValueResponse(LookupRequest request, Content content) {
         Contact dst = request.getContact();
         SocketAddress address = dst.getRemoteAddress();
         MessageId messageId = request.getMessageId();
-        
-        return new DefaultValueResponse(messageId, localhost, address, resource);
+        return new DefaultValueResponse(messageId, localhost, address, content);
     }
 
     @Override
     public StoreRequest createStoreRequest(Contact dst, ResourceId resourceId, 
-            Resource resource) {
+            Content content) {
         SocketAddress address = dst.getRemoteAddress();
         MessageId messageId = createMessageId(address);
-        return new DefaultStoreRequest(messageId, localhost, address, 
-                resourceId, resource);
+        
+        return new DefaultStoreRequest(messageId, localhost, 
+                address, resourceId, content);
     }
 
     @Override
-    public StoreResponse createStoreResponse(StoreRequest request, Status condition) {
+    public StoreResponse createStoreResponse(StoreRequest request, Content content) {
         Contact dst = request.getContact();
         SocketAddress address = dst.getRemoteAddress();
         MessageId messageId = request.getMessageId();
-        return new DefaultStoreResponse(messageId, localhost, address, condition);
+        return new DefaultStoreResponse(messageId, localhost, address, content);
     }
 }

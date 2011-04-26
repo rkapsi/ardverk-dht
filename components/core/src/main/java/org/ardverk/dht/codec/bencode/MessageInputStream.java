@@ -30,6 +30,8 @@ import org.ardverk.coding.BencodingInputStream;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.lang.IntegerValue;
 import org.ardverk.dht.lang.StringValue;
+import org.ardverk.dht.message.ByteArrayContent;
+import org.ardverk.dht.message.Content;
 import org.ardverk.dht.message.DefaultNodeRequest;
 import org.ardverk.dht.message.DefaultNodeResponse;
 import org.ardverk.dht.message.DefaultPingRequest;
@@ -50,12 +52,8 @@ import org.ardverk.dht.message.ValueRequest;
 import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.DefaultContact;
-import org.ardverk.dht.storage.DefaultResource;
 import org.ardverk.dht.storage.DefaultResourceId;
-import org.ardverk.dht.storage.DefaultStatus;
-import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ResourceId;
-import org.ardverk.dht.storage.Status;
 import org.ardverk.net.NetworkUtils;
 import org.ardverk.version.Vector;
 import org.ardverk.version.VectorClock;
@@ -181,23 +179,11 @@ public class MessageInputStream extends BencodingInputStream {
         return contacts;
     }
     
-    public Status readStatus(Contact contact, SocketAddress address) throws IOException {
-        int code = readInt();
-        String value = readString();
-        
-        Resource resource = null;
-        if (readBoolean()) {
-            resource = readResource(contact, address);
-        }
-        
-        return DefaultStatus.valueOf(code, value, resource);
-    }
-    
-    public Resource readResource(Contact contact, 
-            SocketAddress address) throws IOException {
-        InputStream in = readContent();
+    public Content readRemoteContent() throws IOException {
+        ContentInputStream in = readContent();
+        //return new ExternalContent(in.getContentLength(), in);
         try {
-            return new DefaultResource(in);
+            return ByteArrayContent.valueOf(in);
         } finally {
             in.close();
         }
@@ -270,22 +256,22 @@ public class MessageInputStream extends BencodingInputStream {
     private ValueResponse readValueResponse(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
         
-        Resource resource = readResource(contact, address);
-        return new DefaultValueResponse(messageId, contact, address, resource);
+        Content content = readRemoteContent();
+        return new DefaultValueResponse(messageId, contact, address, content);
     }
     
     private StoreRequest readStoreRequest(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
         
         ResourceId resourceId = readResourceId();
-        Resource resource = readResource(contact, address);
+        Content content = readRemoteContent();
         return new DefaultStoreRequest(messageId, contact, 
-                address, resourceId, resource);
+                address, resourceId, content);
     }
     
     private StoreResponse readStoreResponse(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
-        Status status = readStatus(contact, address);
-        return new DefaultStoreResponse(messageId, contact, address, status);
+        Content content = readRemoteContent();
+        return new DefaultStoreResponse(messageId, contact, address, content);
     }
 }

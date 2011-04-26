@@ -16,15 +16,8 @@
 
 package org.ardverk.dht.message;
 
-import org.ardverk.dht.storage.Status;
-
 /**
  * A {@link MessageType#STORE} response.
  */
 public interface StoreResponse extends ResponseMessage {
-
-    /**
-     * Returns the remote host's {@link Status}.
-     */
-    public Status getStatus();
 }

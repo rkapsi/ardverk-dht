@@ -16,15 +16,9 @@
 
 package org.ardverk.dht.message;
 
-import org.ardverk.dht.storage.Resource;
 
 /**
  * A {@link MessageType#FIND_VALUE} response.
  */
 public interface ValueResponse extends LookupResponse {
-    
-    /**
-     * Returns the {@link Resource} we were looking for.
-     */
-    public Resource getResource();
 }

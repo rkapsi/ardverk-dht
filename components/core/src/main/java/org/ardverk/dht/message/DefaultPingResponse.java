@@ -26,6 +26,6 @@ public class DefaultPingResponse extends AbstractResponseMessage
 
     public DefaultPingResponse(MessageId messageId, 
             Contact contact, SocketAddress address) {
-        super(messageId, contact, address);
+        super(messageId, contact, address, NoContent.EMPTY);
     }
 }

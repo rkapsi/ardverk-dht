@@ -1,17 +1,21 @@
 package org.ardverk.dht.storage;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.codec.bencode.MessageInputStream;
 import org.ardverk.dht.codec.bencode.MessageOutputStream;
+import org.ardverk.dht.message.AbstractContent;
+import org.ardverk.dht.message.Content;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.io.IoUtils;
 import org.ardverk.utils.StringUtils;
 import org.ardverk.version.VectorClock;
 
-public class ByteArrayValue {
+public class ByteArrayValue extends AbstractContent {
 
     public static final byte[] EMPTY = new byte[0];
     
@@ -20,6 +24,8 @@ public class ByteArrayValue {
     private final VectorClock<KUID> clock;
     
     private final byte[] value;
+    
+    private byte[] payload = null;
     
     public ByteArrayValue(Contact creator, 
             VectorClock<KUID> clock, byte[] value) {
@@ -63,25 +69,39 @@ public class ByteArrayValue {
         return StringUtils.toString(value);
     }
     
-    public Resource toResource() {
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            MessageOutputStream out = new MessageOutputStream(baos);
-            out.writeContact(creator);
-            out.writeVectorClock(clock);
-            out.writeBytes(value);
-            out.close();
-            
-            return new DefaultResource(baos.toByteArray());
-        } catch (IOException err) {
-            throw new IllegalStateException("IOException", err);
-        }
+    @Override
+    public long getContentLength() {
+        return payload().length;
+    }
+
+    @Override
+    public InputStream getContent() throws IOException {
+        return new ByteArrayInputStream(payload());
     }
     
-    public static ByteArrayValue create(Resource resource) {
+    private synchronized byte[] payload() {
+        if (payload == null) {
+            try {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                MessageOutputStream out = new MessageOutputStream(baos);
+                out.writeContact(creator);
+                out.writeVectorClock(clock);
+                out.writeBytes(value);
+                out.close();
+                
+                payload = baos.toByteArray();
+                
+            } catch (IOException err) {
+                throw new IllegalStateException("IOException", err);
+            }
+        }
+        return payload;
+    }
+    
+    public static ByteArrayValue create(Content content) {
         MessageInputStream in = null;
         try {
-            in = new MessageInputStream(resource.getContent());
+            in = new MessageInputStream(content.getContent());
             Contact creator = in.readContact();
             VectorClock<KUID> clock = in.readVectorClock();
             byte[] value = in.readBytes();

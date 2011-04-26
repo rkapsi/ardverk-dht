@@ -39,4 +39,9 @@ public interface Message {
      * Returns the receiver's {@link SocketAddress}.
      */
     public SocketAddress getAddress();
+    
+    /**
+     * Returns the {@link Message}'s {@link Content}.
+     */
+    public Content getContent();
 }

@@ -19,28 +19,41 @@ package org.ardverk.dht.io;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.dht.lang.DHTException;
-import org.ardverk.dht.storage.Resource;
+import org.ardverk.dht.message.Content;
+import org.ardverk.dht.storage.ResourceId;
 
 
 /**
- * The {@link StoreException} is thrown if a {@link Resource} couldn't
+ * The {@link StoreException} is thrown if a {@link Content} couldn't
  * be stored in the DHT at all.
  */
 public class StoreException extends DHTException {
     
     private static final long serialVersionUID = -1874658787780091708L;
 
-    private final Resource resource;
+    private final ResourceId resourceId;
     
-    public StoreException(Resource resource, long time, TimeUnit unit) {
+    private final Content content;
+    
+    public StoreException(ResourceId resourceId, Content content, 
+            long time, TimeUnit unit) {
         super(time, unit);
-        this.resource = resource;
+        
+        this.resourceId = resourceId;
+        this.content = content;
     }
 
     /**
-     * Returns the {@link Resource} that failed to be stored.
+     * Returns the {@link ResourceId} that failed to be stored.
      */
-    public Resource getResource() {
-        return resource;
+    public ResourceId getResourceId() {
+        return resourceId;
+    }
+    
+    /**
+     * Returns the {@link Content} that failed to be stored.
+     */
+    public Content getContent() {
+        return content;
     }
 }

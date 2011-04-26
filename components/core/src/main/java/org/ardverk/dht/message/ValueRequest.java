@@ -23,5 +23,5 @@ import org.ardverk.dht.storage.ResourceId;
  */
 public interface ValueRequest extends LookupRequest {
     
-    public ResourceId getResource();
+    public ResourceId getResourceId();
 }

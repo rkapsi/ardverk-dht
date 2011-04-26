@@ -19,7 +19,6 @@ package org.ardverk.dht.message;
 import java.net.SocketAddress;
 
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.lang.Arguments;
 import org.ardverk.lang.Epoch;
 
 /**
@@ -35,12 +34,15 @@ public abstract class AbstractMessage implements Message, Epoch {
     
     private final SocketAddress address;
     
-    public AbstractMessage(MessageId messageId, 
-            Contact contact, SocketAddress address) {
+    private final Content content;
+    
+    public AbstractMessage(MessageId messageId, Contact contact, 
+            SocketAddress address, Content content) {
         
-        this.messageId = Arguments.notNull(messageId, "messageId");
-        this.contact = Arguments.notNull(contact, "contact");
-        this.address = Arguments.notNull(address, "address");
+        this.messageId = messageId;
+        this.contact = contact;
+        this.address = address;
+        this.content = content;
     }
     
     @Override
@@ -61,6 +63,11 @@ public abstract class AbstractMessage implements Message, Epoch {
     @Override
     public SocketAddress getAddress() {
         return address;
+    }
+    
+    @Override
+    public Content getContent() {
+        return content;
     }
 
     @Override

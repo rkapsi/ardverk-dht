@@ -19,7 +19,6 @@ package org.ardverk.dht.message;
 import java.net.SocketAddress;
 
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ResourceId;
 
 public class DefaultStoreRequest extends AbstractRequestMessage 
@@ -27,23 +26,15 @@ public class DefaultStoreRequest extends AbstractRequestMessage
 
     private final ResourceId resourceId;
     
-    private final Resource resource;
-    
     public DefaultStoreRequest(MessageId messageId, Contact contact, 
-            SocketAddress address, ResourceId resourceId, Resource resource) {
-        super(messageId, contact, address);
+            SocketAddress address, ResourceId resourceId, Content content) {
+        super(messageId, contact, address, content);
         
         this.resourceId = resourceId;
-        this.resource = resource;
     }
     
     @Override
     public ResourceId getResourceId() {
         return resourceId;
-    }
-
-    @Override
-    public Resource getResource() {
-        return resource;
     }
 }

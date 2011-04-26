@@ -26,8 +26,8 @@ import org.ardverk.dht.routing.Contact;
 abstract class AbstractLookupResponse extends AbstractResponseMessage 
         implements LookupResponse {
     
-    public AbstractLookupResponse(MessageId messageId, 
-            Contact contact, SocketAddress address) {
-        super(messageId, contact, address);
+    public AbstractLookupResponse(MessageId messageId, Contact contact, 
+            SocketAddress address, Content content) {
+        super(messageId, contact, address, content);
     }
 }

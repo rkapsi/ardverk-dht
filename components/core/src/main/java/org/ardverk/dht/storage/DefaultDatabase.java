@@ -31,6 +31,7 @@ import org.ardverk.collection.PatriciaTrie;
 import org.ardverk.collection.Trie;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.lang.Identifier;
+import org.ardverk.dht.message.Content;
 import org.ardverk.version.Occured;
 import org.ardverk.version.VectorClock;
 
@@ -56,11 +57,11 @@ public class DefaultDatabase extends AbstractDatabase {
     }
 
     @Override
-    public synchronized Status store(ResourceId resourceId, Resource resource) {
-        return store(resourceId, ByteArrayValue.create(resource));
+    public synchronized Content store(ResourceId resourceId, Content content) {
+        return store(resourceId, ByteArrayValue.create(content));
     }
     
-    private synchronized Status store(ResourceId resourceId, ByteArrayValue value) {
+    private synchronized Content store(ResourceId resourceId, ByteArrayValue value) {
         ByteArrayValue existing = getValue(resourceId);
         
         Occured occured = compare(existing, value);
@@ -70,10 +71,10 @@ public class DefaultDatabase extends AbstractDatabase {
             } else {
                 put(resourceId, value);
             }
-            return DefaultStatus.SUCCESS;
+            return Status.SUCCESS;
         }
         
-        return DefaultStatus.conflict(existing.toResource());
+        return Status.conflict(existing);
     }
     
     @Override
@@ -82,21 +83,18 @@ public class DefaultDatabase extends AbstractDatabase {
     }
 
     @Override
-    public synchronized Resource get(ResourceId resourceId) {
+    public synchronized Content get(ResourceId resourceId) {
         URI uri = resourceId.getURI();
         String query = uri.getQuery();
         if (query != null) {
             Bucket bucket = database.get(resourceId.getId());
             if (bucket != null) {
-                System.out.println(bucket.size());
-                return (new Values(bucket.keySet().toArray(
-                        new ResourceId[0]))).toResource();
+                return new ValueList(bucket.keySet());
             }
             return null;
         }
         
-        ByteArrayValue value = getValue(resourceId);
-        return value != null ? value.toResource() : null;
+        return getValue(resourceId);
     }
     
     private synchronized ByteArrayValue getValue(ResourceId resourceId) {

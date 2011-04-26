@@ -16,7 +16,6 @@
 
 package org.ardverk.dht.message;
 
-import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ResourceId;
 
 /**
@@ -28,9 +27,4 @@ public interface StoreRequest extends RequestMessage {
      * Returns the {@link ResourceId}.
      */
     public ResourceId getResourceId();
-    
-    /**
-     * Returns the {@link Resource}.
-     */
-    public Resource getResource();
 }

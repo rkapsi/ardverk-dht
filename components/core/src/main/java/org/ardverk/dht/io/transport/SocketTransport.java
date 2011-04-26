@@ -29,6 +29,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.concurrent.AsyncFuture;
+import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.DefaultExecutorQueue;
 import org.ardverk.concurrent.ExecutorQueue;
 import org.ardverk.concurrent.ExecutorUtils;
@@ -36,9 +38,10 @@ import org.ardverk.dht.codec.MessageCodec;
 import org.ardverk.dht.codec.MessageCodec.Decoder;
 import org.ardverk.dht.codec.MessageCodec.Encoder;
 import org.ardverk.dht.codec.bencode.BencodeMessageCodec;
+import org.ardverk.dht.concurrent.DHTFuture;
+import org.ardverk.dht.message.Content;
 import org.ardverk.dht.message.Message;
 import org.ardverk.io.IoUtils;
-import org.ardverk.lang.Arguments;
 import org.ardverk.net.NetworkUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +57,9 @@ public class SocketTransport extends AbstractTransport implements Closeable {
     
     private static final ExecutorService EXECUTOR 
         = ExecutorUtils.newCachedThreadPool("SocketTransportThread");
+    
+    private static final ExecutorService CLOSE
+        = ExecutorUtils.newSingleThreadExecutor("");
     
     private static final int DEFAULT_TIMEOUT = 10000;
     
@@ -90,8 +96,8 @@ public class SocketTransport extends AbstractTransport implements Closeable {
     
     public SocketTransport(MessageCodec codec, 
             SocketAddress bindaddr) {
-        this.codec = Arguments.notNull(codec, "codec");
-        this.bindaddr = Arguments.notNull(bindaddr, "bindaddr");
+        this.codec = codec;
+        this.bindaddr = bindaddr;
     }
     
     @Override
@@ -163,6 +169,8 @@ public class SocketTransport extends AbstractTransport implements Closeable {
                 SocketAddress src = socket.getRemoteSocketAddress();
                 
                 Decoder decoder = null;
+                boolean hasContent = false;
+                
                 try {
                     decoder = codec.createDecoder(src, 
                             new BufferedInputStream(
@@ -171,11 +179,15 @@ public class SocketTransport extends AbstractTransport implements Closeable {
                     
                     Message message = decoder.read();
                     messageReceived(message);
+                    
+                    hasContent = hasContent(message, socket, decoder);
+                    
                 } catch (IOException err) {
                     uncaughtException(socket, err);
                 } finally {
-                    IoUtils.close(decoder);
-                    IoUtils.close(socket);
+                    if (!hasContent) {
+                        close(socket, decoder);
+                    }
                 }
             }
         };
@@ -185,12 +197,13 @@ public class SocketTransport extends AbstractTransport implements Closeable {
     
     @Override
     public void send(final Message message, final long timeout, 
-            final TimeUnit unit)
-                throws IOException {
+            final TimeUnit unit) throws IOException {
         
         if (socket == null) {
             throw new IOException();
         }
+        
+        final Exception state = new Exception();
         
         final SocketAddress dst = message.getAddress();
         
@@ -218,15 +231,16 @@ public class SocketTransport extends AbstractTransport implements Closeable {
                                     socket.getOutputStream()));
                     
                     encoder.write(message);
+                    encoder.flush();
+                    
                     messageSent(message);
                     
-                } catch (IOException err) {
+                } catch (IOException err) {state.printStackTrace();
                     uncaughtException(socket, err);
                     handleException(message, err);
                     
                 } finally {
-                    IoUtils.close(encoder);
-                    IoUtils.close(socket);
+                    close(socket, encoder);
                 }
             }
         };
@@ -248,5 +262,37 @@ public class SocketTransport extends AbstractTransport implements Closeable {
         } else {
             LOG.error("Exception", t);
         }
+    }
+    
+    private static boolean hasContent(Message message, 
+            final Socket socket, final Decoder decoder) {
+        
+        Content content = message.getContent();
+        if (content.getContentLength() != 0L) {
+            DHTFuture<Void> future = content.getContentFuture();
+            future.addAsyncFutureListener(new AsyncFutureListener<Void>() {
+                @Override
+                public void operationComplete(AsyncFuture<Void> future) {
+                    close(socket, decoder);
+                }
+            });
+            return true;
+        }
+        return false;
+    }
+    
+    private static void close(final Socket socket, final Closeable closeable) {
+        /*Runnable task = new Runnable() {
+            @Override
+            public void run() {
+                IoUtils.close(closeable);
+                IoUtils.close(socket);
+            }
+        };
+        
+        CLOSE.execute(task);*/
+        
+        IoUtils.close(closeable);
+        IoUtils.close(socket);
     }
 }

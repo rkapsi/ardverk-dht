@@ -30,8 +30,8 @@ import org.ardverk.dht.entity.PutEntity;
 import org.ardverk.dht.entity.QuickenEntity;
 import org.ardverk.dht.entity.SyncEntity;
 import org.ardverk.dht.entity.ValueEntity;
+import org.ardverk.dht.message.Content;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ResourceId;
 
 
@@ -52,7 +52,7 @@ public interface EasyDHT extends DHT, Closeable {
 
     public DHTFuture<ValueEntity> get(ResourceId resourceId);
 
-    public DHTFuture<PutEntity> put(ResourceId resourceId, Resource resource);
+    public DHTFuture<PutEntity> put(ResourceId resourceId, Content content);
 
     public DHTFuture<BootstrapEntity> bootstrap(String host, int port);
 

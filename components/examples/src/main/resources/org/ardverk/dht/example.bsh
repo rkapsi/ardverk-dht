@@ -145,13 +145,14 @@ put(String key, String value) {
 // Stores the given key-value
 put(DHT dht, String key, String value) {
   ResourceId resourceId = rsrc(key);
-  Resource resource = toValue(value).toResource();
+  Content content = toValue(value);
       
-	DHTFuture future = dht.put(resourceId, resource);
+	DHTFuture future = dht.put(resourceId, content);
 		
 	PutEntity entity = future.get();
 	for (StoreResponse response : entity.getStoreResponses()) {
-		print("PUT: " + response.getContact().getId() + " -> " + response.getStatus());
+	  Status2 status = Status2.create(response.getContent());
+		print("PUT: " + response.getContact().getId() + " -> " + status);
 	}
 }
 
@@ -165,7 +166,7 @@ get(DHT dht, String key) {
 	DHTFuture future = dht.get(rsrc(key));
 	
 	ValueEntity entity = future.get();
-	ByteArrayValue value = ByteArrayValue.create(entity.getResource());
+	ByteArrayValue value = ByteArrayValue.create(entity.getContent());
 	
 	print("GET: " + entity.getId() + " (" + key + ")" + " -> " 
 		+ toString(value)
@@ -180,7 +181,7 @@ get2(String key) {
 	DHTFuture future = dhts.get(current).get(rsrc2(key));
 	
 	ValueEntity entity = future.get();
-	Values value = Values.create(entity.getResource());
+	ValueList value = ValueList.valueOf(entity.getContent());
 	
 	print("GET: " + entity.getId() + " (" + key + ")" + " -> " 
 		+ value
@@ -216,7 +217,7 @@ quit() {
 print("\nHello, please type init(); and press Enter. For further instructions and examples see 'example.bsh' and www.beanshell.org.\n");
 
 init() {
-	init(true);
+	init(false);
 }
 
 init(boolean withUI) {

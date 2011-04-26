@@ -16,10 +16,11 @@
 
 package org.ardverk.dht.entity;
 
+import org.ardverk.dht.message.Content;
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.message.StoreResponse;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.storage.Resource;
+import org.ardverk.dht.storage.ResourceId;
 
 /**
  * The result of a {@link MessageType#STORE} operation.
@@ -32,9 +33,14 @@ public interface StoreEntity extends Entity {
     public Contact[] getContacts();
     
     /**
-     * Returns the {@link Resource} that was stored.
+     * Returns the {@link ResourceId} that was stored.
      */
-    public Resource getResource();
+    public ResourceId getResourceId();
+    
+    /**
+     * Returns the {@link Content} that was stored.
+     */
+    public Content getContent();
     
     /**
      * Returns all {@link StoreResponse}s.

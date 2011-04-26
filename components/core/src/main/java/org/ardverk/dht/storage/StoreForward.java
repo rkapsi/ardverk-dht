@@ -21,6 +21,7 @@ import org.ardverk.dht.KUID;
 import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.config.StoreConfig;
 import org.ardverk.dht.entity.StoreEntity;
+import org.ardverk.dht.message.Content;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
 import org.slf4j.Logger;
@@ -106,9 +107,9 @@ public class StoreForward {
                         + " to " + contact.getId());
             }
             
-            Resource resource = database.get(resourceId);
-            if (resource != null) {
-                callback.store(contact, resourceId, resource, storeConfig);
+            Content content = database.get(resourceId);
+            if (content != null) {
+                callback.store(contact, resourceId, content, storeConfig);
             }
         }
     }
@@ -166,6 +167,6 @@ public class StoreForward {
          * @param resourceId TODO
          */
         public DHTFuture<StoreEntity> store(Contact dst, 
-                ResourceId resourceId, Resource resource, StoreConfig config);
+                ResourceId resourceId, Content content, StoreConfig config);
     }
 }

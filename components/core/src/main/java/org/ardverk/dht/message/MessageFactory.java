@@ -20,9 +20,7 @@ import java.net.SocketAddress;
 
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ResourceId;
-import org.ardverk.dht.storage.Status;
 
 /**
  * A factory interface to create various {@link Message}es such as
@@ -74,16 +72,16 @@ public interface MessageFactory {
     /**
      * Creates and returns a {@link ValueResponse}.
      */
-    public ValueResponse createValueResponse(LookupRequest request, Resource resource);
+    public ValueResponse createValueResponse(LookupRequest request, Content content);
     
     /**
      * Creates and returns a {@link StoreRequest}.
      */
     public StoreRequest createStoreRequest(Contact dst, 
-            ResourceId resourceId, Resource resource);
+            ResourceId resourceId, Content content);
     
     /**
      * Creates and returns a {@link StoreResponse}.
      */
-    public StoreResponse createStoreResponse(StoreRequest request, Status status);
+    public StoreResponse createStoreResponse(StoreRequest request, Content content);
 }

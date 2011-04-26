@@ -18,10 +18,10 @@ package org.ardverk.dht.entity;
 
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.dht.message.Content;
 import org.ardverk.dht.message.StoreResponse;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.storage.DefaultStatus;
-import org.ardverk.dht.storage.Resource;
+import org.ardverk.dht.storage.ResourceId;
 import org.ardverk.dht.storage.Status;
 
 /**
@@ -31,16 +31,20 @@ public class DefaultStoreEntity extends AbstractEntity implements StoreEntity {
 
     private final Contact[] contacts;
     
-    private final Resource resource;
+    private final ResourceId resourceId;
+    
+    private final Content content;
     
     private final StoreResponse[] responses;
     
-    public DefaultStoreEntity(Contact[] contacts, Resource resource, 
-            StoreResponse[] responses, long time, TimeUnit unit) {
+    public DefaultStoreEntity(Contact[] contacts, ResourceId resourceId, 
+            Content content, StoreResponse[] responses, 
+            long time, TimeUnit unit) {
         super(time, unit);
         
         this.contacts = contacts;
-        this.resource = resource;
+        this.resourceId = resourceId;
+        this.content = content;
         this.responses = responses;
     }
     
@@ -50,8 +54,13 @@ public class DefaultStoreEntity extends AbstractEntity implements StoreEntity {
     }
 
     @Override
-    public Resource getResource() {
-        return resource;
+    public ResourceId getResourceId() {
+        return resourceId;
+    }
+
+    @Override
+    public Content getContent() {
+        return content;
     }
     
     @Override
@@ -71,8 +80,8 @@ public class DefaultStoreEntity extends AbstractEntity implements StoreEntity {
     @Override
     public boolean isSuccess() {
         for (StoreResponse response : responses) {
-            Status status = response.getStatus();
-            if (!status.equals(DefaultStatus.SUCCESS)) {
+            Status status = Status.create(response.getContent());
+            if (!status.equals(Status.SUCCESS)) {
                 return false;
             }
         }

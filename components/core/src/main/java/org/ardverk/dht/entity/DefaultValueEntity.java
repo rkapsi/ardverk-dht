@@ -20,9 +20,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.collection.CollectionUtils;
 import org.ardverk.dht.io.Outcome;
+import org.ardverk.dht.message.Content;
 import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.storage.Resource;
 
 /**
  * A default implementation of {@link ValueEntity}.
@@ -57,8 +57,8 @@ public class DefaultValueEntity extends AbstractLookupEntity implements ValueEnt
     }
     
     @Override
-    public Resource getResource() {
-        return getValueResponse().getResource();
+    public Content getContent() {
+        return getValueResponse().getContent();
     }
     
     public Outcome getOutcome() {

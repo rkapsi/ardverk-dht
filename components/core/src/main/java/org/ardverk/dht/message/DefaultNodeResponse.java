@@ -19,7 +19,6 @@ package org.ardverk.dht.message;
 import java.net.SocketAddress;
 
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.lang.Arguments;
 
 
 public class DefaultNodeResponse extends AbstractLookupResponse 
@@ -29,9 +28,9 @@ public class DefaultNodeResponse extends AbstractLookupResponse
     
     public DefaultNodeResponse(MessageId messageId, Contact contact, 
             SocketAddress address, Contact[] contacts) {
-        super(messageId, contact, address);
+        super(messageId, contact, address, NoContent.EMPTY);
         
-        this.contacts = Arguments.notNull(contacts, "contacts");
+        this.contacts = contacts;
     }
 
     @Override

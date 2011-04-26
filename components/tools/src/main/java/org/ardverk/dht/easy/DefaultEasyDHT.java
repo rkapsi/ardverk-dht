@@ -29,11 +29,11 @@ import org.ardverk.dht.entity.PutEntity;
 import org.ardverk.dht.entity.QuickenEntity;
 import org.ardverk.dht.entity.SyncEntity;
 import org.ardverk.dht.entity.ValueEntity;
+import org.ardverk.dht.message.Content;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Database;
-import org.ardverk.dht.storage.Resource;
 import org.ardverk.dht.storage.ResourceId;
 
 
@@ -78,8 +78,8 @@ public class DefaultEasyDHT extends ArdverkDHT implements EasyDHT {
     }
 
     @Override
-    public DHTFuture<PutEntity> put(ResourceId resourceId, Resource resource) {
-        return put(resourceId, resource, config.getPutConfig());
+    public DHTFuture<PutEntity> put(ResourceId resourceId, Content content) {
+        return put(resourceId, content, config.getPutConfig());
     }
     
     @Override

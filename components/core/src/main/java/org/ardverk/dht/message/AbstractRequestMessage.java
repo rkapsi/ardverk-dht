@@ -26,8 +26,8 @@ import org.ardverk.dht.routing.Contact;
 public abstract class AbstractRequestMessage extends AbstractMessage 
         implements RequestMessage {
     
-    public AbstractRequestMessage(MessageId messageId, 
-            Contact contact, SocketAddress address) {
-        super(messageId, contact, address);
+    public AbstractRequestMessage(MessageId messageId, Contact contact, 
+            SocketAddress address, Content content) {
+        super(messageId, contact, address, content);
     }
 }

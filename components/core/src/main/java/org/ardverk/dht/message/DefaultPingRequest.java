@@ -26,6 +26,6 @@ public class DefaultPingRequest extends AbstractRequestMessage
 
     public DefaultPingRequest(MessageId messageId, 
             Contact contact, SocketAddress address) {
-        super(messageId, contact, address);
+        super(messageId, contact, address, NoContent.EMPTY);
     }
 }

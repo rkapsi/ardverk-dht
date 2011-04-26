@@ -20,7 +20,6 @@ import java.net.SocketAddress;
 
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.lang.Arguments;
 
 
 public class DefaultNodeRequest extends AbstractLookupRequest 
@@ -30,9 +29,9 @@ public class DefaultNodeRequest extends AbstractLookupRequest
     
     public DefaultNodeRequest(MessageId messageId, Contact contact, 
             SocketAddress address, KUID lookupId) {
-        super(messageId, contact, address);
+        super(messageId, contact, address, NoContent.EMPTY);
         
-        this.lookupId = Arguments.notNull(lookupId, "lookupId");
+        this.lookupId = lookupId;
     }
 
     @Override
