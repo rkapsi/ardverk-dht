@@ -152,7 +152,7 @@ public class Status extends AbstractContent implements IntegerValue, StringValue
         return payload;
     }
     
-    public static Status create(Content content) {
+    public static Status valueOf(Content content) {
         MessageInputStream in = null;
         try {
             in = new MessageInputStream(content.getContent());
@@ -163,7 +163,6 @@ public class Status extends AbstractContent implements IntegerValue, StringValue
             if (in.readBoolean()) {
                 body = in.readRemoteContent();
             }
-            in.close();
             
             return valueOf(code, message, body);
         } catch (IOException err) {

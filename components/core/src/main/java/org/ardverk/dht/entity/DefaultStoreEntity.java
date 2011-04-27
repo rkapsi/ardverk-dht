@@ -80,7 +80,7 @@ public class DefaultStoreEntity extends AbstractEntity implements StoreEntity {
     @Override
     public boolean isSuccess() {
         for (StoreResponse response : responses) {
-            Status status = Status.create(response.getContent());
+            Status status = Status.valueOf(response.getContent());
             if (!status.equals(Status.SUCCESS)) {
                 return false;
             }
