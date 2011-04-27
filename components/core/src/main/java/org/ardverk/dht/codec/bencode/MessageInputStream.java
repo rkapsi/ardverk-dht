@@ -30,7 +30,6 @@ import org.ardverk.coding.BencodingInputStream;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.lang.IntegerValue;
 import org.ardverk.dht.lang.StringValue;
-import org.ardverk.dht.message.ByteArrayContent;
 import org.ardverk.dht.message.Content;
 import org.ardverk.dht.message.DefaultNodeRequest;
 import org.ardverk.dht.message.DefaultNodeResponse;
@@ -40,6 +39,7 @@ import org.ardverk.dht.message.DefaultStoreRequest;
 import org.ardverk.dht.message.DefaultStoreResponse;
 import org.ardverk.dht.message.DefaultValueRequest;
 import org.ardverk.dht.message.DefaultValueResponse;
+import org.ardverk.dht.message.ExternalContent;
 import org.ardverk.dht.message.Message;
 import org.ardverk.dht.message.MessageId;
 import org.ardverk.dht.message.NodeRequest;
@@ -181,12 +181,7 @@ public class MessageInputStream extends BencodingInputStream {
     
     public Content readRemoteContent() throws IOException {
         ContentInputStream in = readContent();
-        //return new ExternalContent(in.getContentLength(), in);
-        try {
-            return ByteArrayContent.valueOf(in);
-        } finally {
-            in.close();
-        }
+        return new ExternalContent(in.getContentLength(), in);
     }
     
     public Message readMessage(SocketAddress src) throws IOException {

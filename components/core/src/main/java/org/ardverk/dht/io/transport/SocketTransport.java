@@ -29,11 +29,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.concurrent.AsyncFuture;
+import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.ExecutorUtils;
 import org.ardverk.dht.codec.MessageCodec;
 import org.ardverk.dht.codec.MessageCodec.Decoder;
 import org.ardverk.dht.codec.MessageCodec.Encoder;
 import org.ardverk.dht.codec.bencode.BencodeMessageCodec;
+import org.ardverk.dht.concurrent.DHTFuture;
+import org.ardverk.dht.message.Content;
 import org.ardverk.dht.message.Message;
 import org.ardverk.io.IoUtils;
 import org.ardverk.net.NetworkUtils;
@@ -219,6 +223,8 @@ public class SocketTransport extends AbstractTransport implements Closeable {
                 Socket client = null;
                 Encoder encoder = null;
                 Decoder decoder = null;
+                
+                boolean hasContent = false;
                 try {
                     client = new Socket();
                     //client.setReuseAddress(true);
@@ -253,12 +259,17 @@ public class SocketTransport extends AbstractTransport implements Closeable {
                     Message message = decoder.read();
                     messageReceived(message);
                     
+                    hasContent = handleContent(message, 
+                            client, encoder, decoder);
+                    
                 } catch (IOException err) {
                     uncaughtException(client, err);
                     handleException(message, err);
                     
                 } finally {
-                    close(client, encoder, decoder);
+                    if (!hasContent) {
+                        close(client, encoder, decoder);
+                    }
                 }
             }
         };
@@ -280,6 +291,23 @@ public class SocketTransport extends AbstractTransport implements Closeable {
         } else {
             LOG.error("Exception", t);
         }
+    }
+    
+    private static boolean handleContent(Message message, 
+            final Socket client, final Closeable... closeable) {
+        
+        Content content = message.getContent();
+        if (content.getContentLength() != 0L) {
+            DHTFuture<Void> future = content.getContentFuture();
+            future.addAsyncFutureListener(new AsyncFutureListener<Void>() {
+                @Override
+                public void operationComplete(AsyncFuture<Void> future) {
+                    close(client, closeable);
+                }
+            });
+            return true;
+        }
+        return false;
     }
     
     private static void close(Socket client, Closeable... closeable) {
