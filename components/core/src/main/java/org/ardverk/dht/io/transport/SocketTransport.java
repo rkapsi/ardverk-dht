@@ -29,27 +29,17 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.concurrent.AsyncFuture;
-import org.ardverk.concurrent.AsyncFutureListener;
-import org.ardverk.concurrent.DefaultExecutorQueue;
-import org.ardverk.concurrent.ExecutorQueue;
 import org.ardverk.concurrent.ExecutorUtils;
 import org.ardverk.dht.codec.MessageCodec;
 import org.ardverk.dht.codec.MessageCodec.Decoder;
 import org.ardverk.dht.codec.MessageCodec.Encoder;
 import org.ardverk.dht.codec.bencode.BencodeMessageCodec;
-import org.ardverk.dht.concurrent.DHTFuture;
-import org.ardverk.dht.message.Content;
 import org.ardverk.dht.message.Message;
 import org.ardverk.io.IoUtils;
 import org.ardverk.net.NetworkUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * An (experimental) implementation of {@link Transport} that uses 
- * {@link Socket} and {@link ServerSocket}.
- */
 public class SocketTransport extends AbstractTransport implements Closeable {
 
     private static final Logger LOG 
@@ -59,9 +49,6 @@ public class SocketTransport extends AbstractTransport implements Closeable {
         = ExecutorUtils.newCachedThreadPool("SocketTransportThread");
     
     private static final int DEFAULT_TIMEOUT = 10000;
-    
-    private final ExecutorQueue<Runnable> executor 
-        = new DefaultExecutorQueue(EXECUTOR);
     
     private final MessageCodec codec;
     
@@ -135,16 +122,11 @@ public class SocketTransport extends AbstractTransport implements Closeable {
         if (future != null) {
             future.cancel(true);
         }
-        
-        synchronized (executor) {
-            executor.getQueue().clear();
-        }
     }
     
     @Override
     public synchronized void close() {
         open = false;
-        executor.shutdownNow();
         unbind();
     }
     
@@ -176,30 +158,49 @@ public class SocketTransport extends AbstractTransport implements Closeable {
                 SocketAddress src = client.getRemoteSocketAddress();
                 
                 Decoder decoder = null;
-                boolean hasContent = false;
-                
+                boolean success = false;
                 try {
                     decoder = codec.createDecoder(src, 
                             new BufferedInputStream(
                                 client.getInputStream()));
-                    client.shutdownOutput();
                     
                     Message message = decoder.read();
                     
-                    hasContent = hasContent(message, client, decoder);
+                    messageReceived(new Endpoint() {
+                        @Override
+                        public void send(Message message, long timeout,
+                                TimeUnit unit) throws IOException {
+                            Encoder encoder = null;
+                            try {
+                                encoder = codec.createEncoder(
+                                        new BufferedOutputStream(
+                                            client.getOutputStream()));
+                            
+                                encoder.write(message);
+                                encoder.flush();
+                                
+                                messageSent(message);
+                            } finally {
+                                close(client, encoder);
+                            }
+                        }
+                    }, message);
                     
-                    messageReceived(message);
+                    success = true;
+                    
                 } catch (IOException err) {
                     uncaughtException(client, err);
                 } finally {
-                    if (!hasContent) {
-                        close(client, decoder);
+                    IoUtils.close(decoder);
+                    
+                    if (!success) {
+                        IoUtils.close(client);
                     }
                 }
             }
         };
         
-        executor.execute(task);
+        EXECUTOR.execute(task);
         return true;
     }
     
@@ -207,17 +208,17 @@ public class SocketTransport extends AbstractTransport implements Closeable {
     public void send(final Message message, final long timeout, 
             final TimeUnit unit) throws IOException {
         
-        if (socket == null) {
+        ServerSocket socket = this.socket;
+        if (socket == null || socket.isClosed()) {
             throw new IOException();
         }
-        
-        final SocketAddress dst = message.getAddress();
         
         Runnable task = new Runnable() {
             @Override
             public void run() {
                 Socket client = null;
                 Encoder encoder = null;
+                Decoder decoder = null;
                 try {
                     client = new Socket();
                     //client.setReuseAddress(true);
@@ -228,12 +229,13 @@ public class SocketTransport extends AbstractTransport implements Closeable {
                         timeoutInMillis = DEFAULT_TIMEOUT;
                     }
                     
+                    SocketAddress dst = message.getAddress();
+                    
                     SocketAddress endpoint 
                         = NetworkUtils.getResolved(dst);
                     
                     client.connect(endpoint, timeoutInMillis);
                     
-                    client.shutdownInput();
                     encoder = codec.createEncoder(
                                 new BufferedOutputStream(
                                     client.getOutputStream()));
@@ -243,17 +245,25 @@ public class SocketTransport extends AbstractTransport implements Closeable {
                     
                     messageSent(message);
                     
+                    SocketAddress src = client.getRemoteSocketAddress();
+                    decoder = codec.createDecoder(src, 
+                            new BufferedInputStream(
+                                client.getInputStream()));
+                    
+                    Message message = decoder.read();
+                    messageReceived(message);
+                    
                 } catch (IOException err) {
                     uncaughtException(client, err);
                     handleException(message, err);
                     
                 } finally {
-                    close(client, encoder);
+                    close(client, encoder, decoder);
                 }
             }
         };
         
-        executor.execute(task);
+        EXECUTOR.execute(task);
     }
     
     private static void uncaughtException(ServerSocket socket, Throwable t) {
@@ -272,25 +282,8 @@ public class SocketTransport extends AbstractTransport implements Closeable {
         }
     }
     
-    private static boolean hasContent(Message message, 
-            final Socket socket, final Decoder decoder) {
-        
-        Content content = message.getContent();
-        if (content.getContentLength() != 0L) {
-            DHTFuture<Void> future = content.getContentFuture();
-            future.addAsyncFutureListener(new AsyncFutureListener<Void>() {
-                @Override
-                public void operationComplete(AsyncFuture<Void> future) {
-                    close(socket, decoder);
-                }
-            });
-            return true;
-        }
-        return false;
-    }
-    
-    private static void close(final Socket socket, final Closeable closeable) {
-        IoUtils.close(closeable);
-        IoUtils.close(socket);
+    private static void close(Socket client, Closeable... closeable) {
+        IoUtils.closeAll(closeable);
+        IoUtils.close(client);
     }
 }
