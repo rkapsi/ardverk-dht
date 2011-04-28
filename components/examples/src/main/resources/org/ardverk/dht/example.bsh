@@ -190,11 +190,15 @@ get2(String key) {
 }
 
 toValue(String value) {
-	return new ByteArrayValue(dhts.get(current).getLocalhost(), null, StringUtils.getBytes(value));
+  byte[] raw = StringUtils.getBytes(value);
+  byte[] data = new byte[1024 * 1024];
+  System.arraycopy(raw, 0, data, 0, raw.length);
+	return new ByteArrayValue(dhts.get(current).getLocalhost(), null, data);
 }
 
 toString(ByteArrayValue value) {
-	return StringUtils.toString(value.getValue());
+  byte[] raw = value.getValue();
+	return StringUtils.toString(raw, 0, Math.min(raw.length, 32));
 }
 
 // Closes all DHTs
