@@ -187,7 +187,7 @@ public class Status extends AbstractContent implements IntegerValue, StringValue
             
             Content body = null;
             if (in.readBoolean()) {
-                body = in.readRemoteContent();
+                body = in.readStreamingContent();
             }
             
             return valueOf(code, message, body);

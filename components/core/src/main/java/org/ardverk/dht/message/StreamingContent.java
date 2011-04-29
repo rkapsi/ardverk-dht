@@ -19,12 +19,13 @@ package org.ardverk.dht.message;
 import java.io.Closeable;
 import java.io.InputStream;
 
+import org.ardverk.coding.BencodingInputStream.ContentInputStream;
 import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.concurrent.DHTValueFuture;
 import org.ardverk.io.CloseAwareInputStream;
 import org.ardverk.io.IoUtils;
 
-public class ExternalContent extends AbstractContent implements Closeable {
+public class StreamingContent extends AbstractContent implements Closeable {
 
     private final long contentLength;
     
@@ -39,15 +40,17 @@ public class ExternalContent extends AbstractContent implements Closeable {
         }
     };
     
-    public ExternalContent(long contentLength, InputStream in) {
-        if (in != null) {
-            in = new CloseAwareInputStream(in) {
-                @Override
-                protected void complete() {
-                    ExternalContent.this.complete();
-                }
-            };
-        }
+    public StreamingContent(ContentInputStream in) {
+        this(in.getContentLength(), in);
+    }
+    
+    public StreamingContent(long contentLength, InputStream in) {
+        in = new CloseAwareInputStream(in) {
+            @Override
+            protected void complete() {
+                StreamingContent.this.complete();
+            }
+        };
         
         this.contentLength = contentLength;
         this.in = in;
