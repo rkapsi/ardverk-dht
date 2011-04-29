@@ -22,7 +22,7 @@ import org.ardverk.dht.routing.DefaultRouteTable;
 import org.ardverk.dht.routing.Localhost;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Database;
-import org.ardverk.dht.storage.DefaultDatabase;
+import org.ardverk.dht.storage.InMemoryDatabase;
 
 public class EasyFactory {
     
@@ -37,7 +37,7 @@ public class EasyFactory {
         MessageFactory messageFactory 
             = new DefaultMessageFactory(keySize, localhost);
         
-        Database database = new DefaultDatabase();
+        Database database = new InMemoryDatabase();
         RouteTable routeTable = new DefaultRouteTable(localhost);
         
         return new DefaultEasyDHT(config, messageFactory, 

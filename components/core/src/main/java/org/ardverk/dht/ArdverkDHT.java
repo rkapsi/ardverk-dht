@@ -49,7 +49,7 @@ import org.ardverk.dht.routing.DefaultRouteTable;
 import org.ardverk.dht.routing.Localhost;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Database;
-import org.ardverk.dht.storage.DefaultDatabase;
+import org.ardverk.dht.storage.InMemoryDatabase;
 import org.ardverk.dht.storage.ResourceId;
 import org.ardverk.dht.storage.StoreForward;
 
@@ -86,7 +86,7 @@ public class ArdverkDHT extends AbstractDHT {
     }
     
     public ArdverkDHT(RouteTable routeTable) {
-        this(routeTable, new DefaultDatabase());
+        this(routeTable, new InMemoryDatabase());
     }
     
     public ArdverkDHT(RouteTable routeTable, Database database) {

@@ -36,18 +36,18 @@ import org.ardverk.version.Occured;
 import org.ardverk.version.VectorClock;
 
 
-public class DefaultDatabase extends AbstractDatabase {
+public class InMemoryDatabase extends AbstractDatabase {
     
     private final Trie<KUID, Bucket> database 
         = new PatriciaTrie<KUID, Bucket>();
     
     private final DatabaseConfig config;
     
-    public DefaultDatabase() {
+    public InMemoryDatabase() {
         this(new DefaultDatabaseConfig());
     }
     
-    public DefaultDatabase(DatabaseConfig config) {
+    public InMemoryDatabase(DatabaseConfig config) {
         this.config = config;
     }
     

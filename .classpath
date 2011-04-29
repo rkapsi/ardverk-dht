@@ -2,6 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="components/core/src/main/java"/>
 	<classpathentry kind="src" path="components/core/src/test/java"/>
+	<classpathentry kind="src" path="components/store/src/main/java"/>
 	<classpathentry kind="src" path="components/http/src/main/java"/>
 	<classpathentry kind="src" path="components/http/src/test/java"/>
 	<classpathentry kind="src" path="components/examples/src/main/java"/>
