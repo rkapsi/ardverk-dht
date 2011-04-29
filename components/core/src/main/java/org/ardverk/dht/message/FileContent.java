@@ -21,12 +21,19 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * {@link FileContent} reads its data from a {@link File}.
+ */
 public class FileContent extends AbstractContent {
     
     private final File file;
     
     public FileContent(File file) {
         this.file = file;
+    }
+    
+    public File getFile() {
+        return file;
     }
     
     @Override

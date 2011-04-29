@@ -23,43 +23,48 @@ import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.concurrent.NopFuture;
 
 /**
+ * The {@link Message} content.
  * 
+ * @see Message#getContent()
  */
 public interface Content {
     
     /**
-     * 
+     * A default {@link DHTFuture} that may be returned by {@link #getContentFuture()}
      */
     public static final NopFuture<Void> DEFAULT_FUTURE 
         = NopFuture.withValue(null);
     
     /**
-     * 
+     * Returns the {@link Content}'s {@link DHTFuture}.
      */
     public DHTFuture<Void> getContentFuture();
     
     /**
-     * 
+     * Returns the length of the {@link Content}.
      */
     public long getContentLength();
     
     /**
+     * Returns the {@link Content}'s data as an {@link InputStream}.
      * 
+     * NOTE: The caller (you) is responsible for closing the {@link InputStream}.
      */
     public InputStream getContent() throws IOException;
     
     /**
-     * 
+     * Returns the {@link Content}'s data as a {@code byte[]}.
      */
     public byte[] getContentAsBytes() throws IOException;
     
     /**
-     * Tells if the entity is capable of producing its data more than once.
+     * Returns {@code true} if the {@link Content} capable of producing 
+     * its data more than once.
      */
     public boolean isRepeatable();
     
     /**
-     * Tells that this entity is streaming.
+     * Returns {@code true} if the {@link Content} is streaming.
      */
     public boolean isStreaming();
 }
