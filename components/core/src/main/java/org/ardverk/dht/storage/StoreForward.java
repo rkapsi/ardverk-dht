@@ -162,9 +162,8 @@ public class StoreForward {
     public static interface Callback {
         
         /**
-         * Called by the {@link StoreForward} service for each {@link Resource}
+         * Called by the {@link StoreForward} service for each {@link Content}
          * that needs to be sent to the given {@link Contact}.
-         * @param resourceId TODO
          */
         public DHTFuture<StoreEntity> store(Contact dst, 
                 ResourceId resourceId, Content content, StoreConfig config);

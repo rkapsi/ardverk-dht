@@ -49,7 +49,6 @@ import org.ardverk.dht.routing.DefaultRouteTable;
 import org.ardverk.dht.routing.Localhost;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Database;
-import org.ardverk.dht.storage.InMemoryDatabase;
 import org.ardverk.dht.storage.ResourceId;
 import org.ardverk.dht.storage.StoreForward;
 
@@ -77,16 +76,12 @@ public class ArdverkDHT extends AbstractDHT {
     
     private final MessageDispatcher messageDispatcher;
     
-    public ArdverkDHT(int keySize) {
-        this(new Localhost(keySize));
+    public ArdverkDHT(int keySize, Database database) {
+        this(new Localhost(keySize), database);
     }
     
-    public ArdverkDHT(Localhost localhost) {
-        this(new DefaultRouteTable(localhost));
-    }
-    
-    public ArdverkDHT(RouteTable routeTable) {
-        this(routeTable, new InMemoryDatabase());
+    public ArdverkDHT(Localhost localhost, Database database) {
+        this(new DefaultRouteTable(localhost), database);
     }
     
     public ArdverkDHT(RouteTable routeTable, Database database) {
