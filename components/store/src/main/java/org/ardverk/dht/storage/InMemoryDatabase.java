@@ -58,11 +58,11 @@ public class InMemoryDatabase extends AbstractDatabase {
 
     @Override
     public synchronized Value store(Key key, Value value) {
-        return store(key, ByteArrayValue.create(value));
+        return store(key, InMemoryValue.create(value));
     }
     
-    private synchronized Value store(Key key, ByteArrayValue value) {
-        ByteArrayValue existing = getValue(key);
+    private synchronized Value store(Key key, InMemoryValue value) {
+        InMemoryValue existing = getValue(key);
         
         Occured occured = compare(existing, value);
         if (occured == Occured.AFTER) {
@@ -97,12 +97,12 @@ public class InMemoryDatabase extends AbstractDatabase {
         return getValue(key);
     }
     
-    private synchronized ByteArrayValue getValue(Key key) {
+    private synchronized InMemoryValue getValue(Key key) {
         Bucket bucket = database.get(key.getId());
         return bucket != null ? bucket.get(key) : null;
     }
     
-    private synchronized ByteArrayValue put(Key key, ByteArrayValue value) {
+    private synchronized InMemoryValue put(Key key, InMemoryValue value) {
         KUID bucketId = key.getId();
         
         Bucket bucket = database.get(bucketId);
@@ -114,12 +114,12 @@ public class InMemoryDatabase extends AbstractDatabase {
         return bucket.put(key, value);
     }
     
-    private synchronized ByteArrayValue remove(Key key) {
+    private synchronized InMemoryValue remove(Key key) {
         KUID bucketId = key.getId();
         
         Bucket bucket = database.get(bucketId);
         if (bucket != null) {
-            ByteArrayValue removed = bucket.remove(key);
+            InMemoryValue removed = bucket.remove(key);
             if (bucket.isEmpty()) {
                 database.remove(bucketId);
             }
@@ -190,7 +190,7 @@ public class InMemoryDatabase extends AbstractDatabase {
         return sb.toString();
     }
     
-    private static Occured compare(ByteArrayValue existing, ByteArrayValue value) {
+    private static Occured compare(InMemoryValue existing, InMemoryValue value) {
         if (existing == null) {
             return Occured.AFTER;
         }
@@ -211,7 +211,7 @@ public class InMemoryDatabase extends AbstractDatabase {
         return clock.compareTo(existing);
     }
     
-    private static class Bucket extends HashMap<Key, ByteArrayValue> 
+    private static class Bucket extends HashMap<Key, InMemoryValue> 
             implements Identifier {
         
         private static final long serialVersionUID = -8794611016380746313L;

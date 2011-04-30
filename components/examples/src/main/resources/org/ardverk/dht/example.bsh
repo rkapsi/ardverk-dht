@@ -166,7 +166,7 @@ get(DHT dht, String key) {
 	DHTFuture future = dht.get(rsrc(key));
 	
 	ValueEntity entity = future.get();
-	ByteArrayValue value = ByteArrayValue.create(entity.getContent());
+	InMemoryValue value = InMemoryValue.create(entity.getValue());
 	
 	print("GET: " + entity.getId() + " (" + key + ")" + " -> " 
 		+ toString(value)
@@ -181,7 +181,7 @@ get2(String key) {
 	DHTFuture future = dhts.get(current).get(rsrc2(key));
 	
 	ValueEntity entity = future.get();
-	ValueList value = ValueList.valueOf(entity.getContent());
+	ValueList value = ValueList.valueOf(entity.getValue());
 	
 	print("GET: " + entity.getId() + " (" + key + ")" + " -> " 
 		+ value
@@ -193,10 +193,10 @@ toValue(String value) {
   //byte[] raw = StringUtils.getBytes(value);
   //byte[] data = new byte[1024 * 1024];
   //System.arraycopy(raw, 0, data, 0, raw.length);
-	return new ByteArrayValue(dhts.get(current).getLocalhost(), null, StringUtils.getBytes(value));
+	return new InMemoryValue(dhts.get(current).getLocalhost(), null, StringUtils.getBytes(value));
 }
 
-toString(ByteArrayValue value) {
+toString(InMemoryValue value) {
   //byte[] raw = value.getValue();
 	//return StringUtils.toString(raw, 0, Math.min(raw.length, 32));
 	return StringUtils.toString(value.getValue());
@@ -271,7 +271,7 @@ store(int offset, int count, boolean randomize) {
 		
 		put(dhts.get(putIndex), key, value1);
 		
-		ByteArrayValue value2 = get(dhts.get(getIndex), key);
+		InMemoryValue value2 = get(dhts.get(getIndex), key);
 		if (!value1.equals(value2.toString())) {
 			//throw new IllegalStateException(value1 + ", " + value2);
 		}

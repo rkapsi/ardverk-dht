@@ -57,7 +57,7 @@ public class DefaultValueEntity extends AbstractLookupEntity implements ValueEnt
     }
     
     @Override
-    public Value getContent() {
+    public Value getValue() {
         return getValueResponse().getValue();
     }
     

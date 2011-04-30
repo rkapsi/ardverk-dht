@@ -38,7 +38,7 @@ public interface ValueEntity extends LookupEntity {
      * 
      * @see #getValueResponse()
      */
-    public Value getContent();
+    public Value getValue();
     
     public ValueResponse getValueResponse();
     

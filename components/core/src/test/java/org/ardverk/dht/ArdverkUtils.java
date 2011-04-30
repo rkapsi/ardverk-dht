@@ -45,7 +45,7 @@ import org.ardverk.dht.io.transport.DatagramTransport;
 import org.ardverk.dht.message.Value;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.DefaultRouteTable;
-import org.ardverk.dht.storage.ByteArrayValue;
+import org.ardverk.dht.storage.InMemoryValue;
 import org.ardverk.dht.storage.Database;
 import org.ardverk.dht.storage.DefaultKey;
 import org.ardverk.dht.storage.Key;
@@ -208,7 +208,7 @@ public class ArdverkUtils {
             VectorClock<KUID> clock = null;
             Contact contact = dhts.get(rnd).getLocalhost();
             
-            Value value = new ByteArrayValue(contact, clock, data);
+            Value value = new InMemoryValue(contact, clock, data);
             
             future = dhts.get(rnd).put(key, value, putConfig);
             

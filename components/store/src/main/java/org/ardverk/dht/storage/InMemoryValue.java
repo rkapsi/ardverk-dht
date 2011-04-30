@@ -31,7 +31,7 @@ import org.ardverk.io.IoUtils;
 import org.ardverk.utils.StringUtils;
 import org.ardverk.version.VectorClock;
 
-public class ByteArrayValue extends AbstractValue {
+public class InMemoryValue extends AbstractValue {
 
     public static final byte[] EMPTY = new byte[0];
     
@@ -43,7 +43,7 @@ public class ByteArrayValue extends AbstractValue {
     
     private byte[] payload = null;
     
-    public ByteArrayValue(Contact creator, 
+    public InMemoryValue(Contact creator, 
             VectorClock<KUID> clock, byte[] value) {
         
         this.creator = creator;
@@ -71,13 +71,13 @@ public class ByteArrayValue extends AbstractValue {
         return size() == 0;
     }
     
-    public ByteArrayValue update(Contact contact, byte[] value) {
+    public InMemoryValue update(Contact contact, byte[] value) {
         VectorClock<KUID> clock = this.clock;
         if (clock != null) {
             clock = clock.append(contact.getId());
         }
         
-        return new ByteArrayValue(creator, clock, value);
+        return new InMemoryValue(creator, clock, value);
     }
     
     @Override
@@ -124,14 +124,14 @@ public class ByteArrayValue extends AbstractValue {
         return payload;
     }
     
-    public static ByteArrayValue create(Value content) {
+    public static InMemoryValue create(Value content) {
         MessageInputStream in = null;
         try {
             in = new MessageInputStream(content.getContent());
             Contact creator = in.readContact();
             VectorClock<KUID> clock = in.readVectorClock();
             byte[] value = in.readBytes();
-            return new ByteArrayValue(creator, clock, value);
+            return new InMemoryValue(creator, clock, value);
         } catch (IOException err) {
             throw new IllegalStateException("IOException", err);
         } finally {
