@@ -24,7 +24,7 @@ import java.io.InputStream;
 import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.utils.StringUtils;
 
-public class ByteArrayContent implements Content {
+public class ByteArrayValue implements Value {
     
     private final byte[] content;
     
@@ -32,11 +32,11 @@ public class ByteArrayContent implements Content {
     
     private final int length;
     
-    public ByteArrayContent(byte[] content) {
+    public ByteArrayValue(byte[] content) {
         this(content, 0, content.length);
     }
     
-    public ByteArrayContent(byte[] content, int offset, int length) {
+    public ByteArrayValue(byte[] content, int offset, int length) {
         this.content = content;
         this.offset = offset;
         this.length = length;
@@ -83,13 +83,13 @@ public class ByteArrayContent implements Content {
         return StringUtils.toString(getContentAsBytes());
     }
     
-    public static ByteArrayContent valueOf(InputStream in) throws IOException {
+    public static ByteArrayValue valueOf(InputStream in) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         byte[] buffer = new byte[4 * 1024];
         int len = -1;
         while ((len = in.read(buffer)) != -1) {
             baos.write(buffer, 0, len);
         }
-        return new ByteArrayContent(baos.toByteArray());
+        return new ByteArrayValue(baos.toByteArray());
     }
 }

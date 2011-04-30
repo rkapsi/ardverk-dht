@@ -23,8 +23,17 @@ import org.ardverk.dht.routing.Contact;
 public class DefaultValueResponse extends AbstractLookupResponse 
         implements ValueResponse {
     
+    private final Value value;
+    
     public DefaultValueResponse(MessageId messageId, Contact contact, 
-            SocketAddress address, Content content) {
-        super(messageId, contact, address, content);
+            SocketAddress address, Value value) {
+        super(messageId, contact, address);
+        
+        this.value = value;
+    }
+
+    @Override
+    public Value getValue() {
+        return value;
     }
 }

@@ -30,7 +30,7 @@ import org.ardverk.coding.BencodingInputStream;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.lang.IntegerValue;
 import org.ardverk.dht.lang.StringValue;
-import org.ardverk.dht.message.Content;
+import org.ardverk.dht.message.Value;
 import org.ardverk.dht.message.DefaultNodeRequest;
 import org.ardverk.dht.message.DefaultNodeResponse;
 import org.ardverk.dht.message.DefaultPingRequest;
@@ -47,7 +47,7 @@ import org.ardverk.dht.message.PingRequest;
 import org.ardverk.dht.message.PingResponse;
 import org.ardverk.dht.message.StoreRequest;
 import org.ardverk.dht.message.StoreResponse;
-import org.ardverk.dht.message.StreamingContent;
+import org.ardverk.dht.message.StreamingValue;
 import org.ardverk.dht.message.ValueRequest;
 import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
@@ -179,9 +179,9 @@ public class MessageInputStream extends BencodingInputStream {
         return contacts;
     }
     
-    public Content readStreamingContent() throws IOException {
+    public Value readValue() throws IOException {
         ContentInputStream in = readContent();
-        return new StreamingContent(in);
+        return new StreamingValue(in);
     }
     
     public Message readMessage(SocketAddress src) throws IOException {
@@ -251,22 +251,22 @@ public class MessageInputStream extends BencodingInputStream {
     private ValueResponse readValueResponse(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
         
-        Content content = readStreamingContent();
-        return new DefaultValueResponse(messageId, contact, address, content);
+        Value value = readValue();
+        return new DefaultValueResponse(messageId, contact, address, value);
     }
     
     private StoreRequest readStoreRequest(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
         
         Key key = readKey();
-        Content content = readStreamingContent();
+        Value value = readValue();
         return new DefaultStoreRequest(messageId, contact, 
-                address, key, content);
+                address, key, value);
     }
     
     private StoreResponse readStoreResponse(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
-        Content content = readStreamingContent();
-        return new DefaultStoreResponse(messageId, contact, address, content);
+        Value value = readValue();
+        return new DefaultStoreResponse(messageId, contact, address, value);
     }
 }

@@ -16,31 +16,10 @@
 
 package org.ardverk.dht.message;
 
-import java.net.SocketAddress;
+public interface ValueProvider {
 
-import org.ardverk.dht.KUID;
-import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.storage.Key;
-
-
-public class DefaultValueRequest extends AbstractLookupRequest 
-        implements ValueRequest {
-    
-    private final Key key;
-    
-    public DefaultValueRequest(MessageId messageId, Contact contact, 
-            SocketAddress address, Key key) {
-        super(messageId, contact, address);
-        this.key = key;
-    }
-    
-    @Override
-    public KUID getId() {
-        return key.getId();
-    }
-
-    @Override
-    public Key getKey() {
-        return key;
-    }
+    /**
+     * Returns the {@link Message}'s {@link Value}.
+     */
+    public Value getValue();
 }

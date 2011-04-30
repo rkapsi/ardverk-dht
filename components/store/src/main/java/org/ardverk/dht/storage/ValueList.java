@@ -25,11 +25,11 @@ import java.util.Collection;
 import org.ardverk.collection.CollectionUtils;
 import org.ardverk.dht.codec.bencode.MessageInputStream;
 import org.ardverk.dht.codec.bencode.MessageOutputStream;
-import org.ardverk.dht.message.AbstractContent;
-import org.ardverk.dht.message.Content;
+import org.ardverk.dht.message.AbstractValue;
+import org.ardverk.dht.message.Value;
 import org.ardverk.io.IoUtils;
 
-public class ValueList extends AbstractContent {
+public class ValueList extends AbstractValue {
 
     private final Key[] keys;
     
@@ -99,7 +99,7 @@ public class ValueList extends AbstractContent {
         return payload;
     }
     
-    public static ValueList valueOf(Content content) {
+    public static ValueList valueOf(Value content) {
         MessageInputStream in = null;
         try {
             in = new MessageInputStream(content.getContent());

@@ -20,7 +20,7 @@ import java.io.IOException;
 
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.io.transport.Endpoint;
-import org.ardverk.dht.message.Content;
+import org.ardverk.dht.message.Value;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.message.RequestMessage;
@@ -56,9 +56,9 @@ public class StoreRequestHandler extends AbstractRequestHandler {
 
     public StoreResponse createResponse(StoreRequest request) throws IOException {
         Key key = request.getKey();
-        Content content = request.getContent();
+        Value value = request.getValue();
         
-        Content result = null;
+        Value result = null;
         
         DatabaseConfig config = database.getDatabaseConfig();
         if (config.isCheckBucket()) {
@@ -70,10 +70,10 @@ public class StoreRequestHandler extends AbstractRequestHandler {
             if (!ArrayUtils.contains(localhost, contacts)) {
                 result = Status.FAILURE;
             } else {
-                result = database.store(key, content);
+                result = database.store(key, value);
             }
         } else {
-            result = database.store(key, content);
+            result = database.store(key, value);
         }
         
         MessageFactory factory = messageDispatcher.getMessageFactory();

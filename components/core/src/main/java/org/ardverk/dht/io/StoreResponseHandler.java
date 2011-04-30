@@ -27,7 +27,7 @@ import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.dht.config.StoreConfig;
 import org.ardverk.dht.entity.DefaultStoreEntity;
 import org.ardverk.dht.entity.StoreEntity;
-import org.ardverk.dht.message.Content;
+import org.ardverk.dht.message.Value;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.message.ResponseMessage;
@@ -58,14 +58,14 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     
     private final Key key;
     
-    private final Content content;
+    private final Value value;
     
     private final StoreConfig config;
     
     public StoreResponseHandler(
             MessageDispatcher messageDispatcher, 
             Contact[] contacts, int k,
-            Key key, Content content, 
+            Key key, Value value, 
             StoreConfig config) {
         super(messageDispatcher);
         
@@ -74,7 +74,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
         this.k = k;
         
         this.key = key;
-        this.content = content;
+        this.value = value;
         this.config = config;
         
         counter = new ProcessCounter(config.getS());
@@ -118,9 +118,9 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
             StoreResponse[] values = responses.toArray(new StoreResponse[0]);
             if (values.length == 0) {
                 setException(new StoreException(key, 
-                        content, time, TimeUnit.MILLISECONDS));
+                        value, time, TimeUnit.MILLISECONDS));
             } else {
-                setValue(new DefaultStoreEntity(contacts, key, content, 
+                setValue(new DefaultStoreEntity(contacts, key, value, 
                         values, time, TimeUnit.MILLISECONDS));
             }
         }
@@ -128,7 +128,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     
     private synchronized void store(Contact dst) throws IOException {
         MessageFactory factory = messageDispatcher.getMessageFactory();
-        StoreRequest request = factory.createStoreRequest(dst, key, content);
+        StoreRequest request = factory.createStoreRequest(dst, key, value);
         
         long defaultTimeout = config.getStoreTimeoutInMillis();
         long adaptiveTimeout = config.getAdaptiveTimeout(

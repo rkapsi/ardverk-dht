@@ -18,7 +18,7 @@ package org.ardverk.dht.entity;
 
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.dht.message.Content;
+import org.ardverk.dht.message.Value;
 import org.ardverk.dht.message.StoreResponse;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.storage.Key;
@@ -33,18 +33,18 @@ public class DefaultStoreEntity extends AbstractEntity implements StoreEntity {
     
     private final Key key;
     
-    private final Content content;
+    private final Value value;
     
     private final StoreResponse[] responses;
     
     public DefaultStoreEntity(Contact[] contacts, Key key, 
-            Content content, StoreResponse[] responses, 
+            Value value, StoreResponse[] responses, 
             long time, TimeUnit unit) {
         super(time, unit);
         
         this.contacts = contacts;
         this.key = key;
-        this.content = content;
+        this.value = value;
         this.responses = responses;
     }
     
@@ -54,13 +54,13 @@ public class DefaultStoreEntity extends AbstractEntity implements StoreEntity {
     }
 
     @Override
-    public Key getResourceId() {
+    public Key getKey() {
         return key;
     }
 
     @Override
-    public Content getContent() {
-        return content;
+    public Value getValue() {
+        return value;
     }
     
     @Override
@@ -80,7 +80,7 @@ public class DefaultStoreEntity extends AbstractEntity implements StoreEntity {
     @Override
     public boolean isSuccess() {
         for (StoreResponse response : responses) {
-            Status status = Status.valueOf(response.getContent());
+            Status status = Status.valueOf(response.getValue());
             if (!status.equals(Status.SUCCESS)) {
                 return false;
             }

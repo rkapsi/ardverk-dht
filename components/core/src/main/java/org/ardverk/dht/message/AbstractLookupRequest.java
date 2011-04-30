@@ -27,7 +27,7 @@ abstract class AbstractLookupRequest extends AbstractRequestMessage
         implements LookupRequest {
     
     public AbstractLookupRequest(MessageId messageId, Contact contact, 
-            SocketAddress address, Content content) {
-        super(messageId, contact, address, content);
+            SocketAddress address) {
+        super(messageId, contact, address);
     }
 }

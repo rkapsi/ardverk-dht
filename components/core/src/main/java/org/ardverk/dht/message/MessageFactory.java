@@ -72,16 +72,16 @@ public interface MessageFactory {
     /**
      * Creates and returns a {@link ValueResponse}.
      */
-    public ValueResponse createValueResponse(LookupRequest request, Content content);
+    public ValueResponse createValueResponse(LookupRequest request, Value value);
     
     /**
      * Creates and returns a {@link StoreRequest}.
      */
     public StoreRequest createStoreRequest(Contact dst, 
-            Key key, Content content);
+            Key key, Value value);
     
     /**
      * Creates and returns a {@link StoreResponse}.
      */
-    public StoreResponse createStoreResponse(StoreRequest request, Content content);
+    public StoreResponse createStoreResponse(StoreRequest request, Value value);
 }

@@ -24,14 +24,14 @@ import java.io.InputStream;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.codec.bencode.MessageInputStream;
 import org.ardverk.dht.codec.bencode.MessageOutputStream;
-import org.ardverk.dht.message.AbstractContent;
-import org.ardverk.dht.message.Content;
+import org.ardverk.dht.message.AbstractValue;
+import org.ardverk.dht.message.Value;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.io.IoUtils;
 import org.ardverk.utils.StringUtils;
 import org.ardverk.version.VectorClock;
 
-public class ByteArrayValue extends AbstractContent {
+public class ByteArrayValue extends AbstractValue {
 
     public static final byte[] EMPTY = new byte[0];
     
@@ -124,7 +124,7 @@ public class ByteArrayValue extends AbstractContent {
         return payload;
     }
     
-    public static ByteArrayValue create(Content content) {
+    public static ByteArrayValue create(Value content) {
         MessageInputStream in = null;
         try {
             in = new MessageInputStream(content.getContent());

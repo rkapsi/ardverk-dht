@@ -28,7 +28,7 @@ public class DefaultNodeResponse extends AbstractLookupResponse
     
     public DefaultNodeResponse(MessageId messageId, Contact contact, 
             SocketAddress address, Contact[] contacts) {
-        super(messageId, contact, address, NoContent.EMPTY);
+        super(messageId, contact, address);
         
         this.contacts = contacts;
     }

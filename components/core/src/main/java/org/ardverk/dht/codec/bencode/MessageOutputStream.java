@@ -28,7 +28,6 @@ import org.ardverk.coding.BencodingOutputStream;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.lang.IntegerValue;
 import org.ardverk.dht.lang.StringValue;
-import org.ardverk.dht.message.Content;
 import org.ardverk.dht.message.Message;
 import org.ardverk.dht.message.MessageId;
 import org.ardverk.dht.message.NodeRequest;
@@ -37,6 +36,8 @@ import org.ardverk.dht.message.PingRequest;
 import org.ardverk.dht.message.PingResponse;
 import org.ardverk.dht.message.StoreRequest;
 import org.ardverk.dht.message.StoreResponse;
+import org.ardverk.dht.message.Value;
+import org.ardverk.dht.message.ValueProvider;
 import org.ardverk.dht.message.ValueRequest;
 import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
@@ -148,11 +149,11 @@ public class MessageOutputStream extends BencodingOutputStream {
         writeArray(contacts);
     }
     
-    public void writeContent(Content content) throws IOException {
-        long contentLength = content.getContentLength();
+    public void writeValue(Value value) throws IOException {
+        long contentLength = value.getContentLength();
         InputStream in = null;
         if (contentLength != 0L) {
-            in = content.getContent();
+            in = value.getContent();
         }
         
         writeContent(contentLength, in);
@@ -199,7 +200,9 @@ public class MessageOutputStream extends BencodingOutputStream {
                 throw new IllegalArgumentException("opcode=" + opcode);
         }
         
-        writeContent(message.getContent());
+        if (message instanceof ValueProvider) {
+            writeValue(((ValueProvider)message).getValue());
+        }
     }
     
     private void writePingRequest(PingRequest message) throws IOException {

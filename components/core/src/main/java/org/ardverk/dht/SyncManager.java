@@ -38,7 +38,7 @@ import org.ardverk.dht.entity.DefaultSyncEntity;
 import org.ardverk.dht.entity.PingEntity;
 import org.ardverk.dht.entity.StoreEntity;
 import org.ardverk.dht.entity.SyncEntity;
-import org.ardverk.dht.message.Content;
+import org.ardverk.dht.message.Value;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.Localhost;
 import org.ardverk.dht.routing.RouteTable;
@@ -103,8 +103,8 @@ public class SyncManager {
             
             for (final Key key : database.values()) {
                 
-                final Content content = database.get(key);
-                if (content == null) {
+                final Value value = database.get(key);
+                if (value == null) {
                     continue;
                 }
                 
@@ -163,7 +163,7 @@ public class SyncManager {
                         }
                         
                         DHTFuture<StoreEntity> storeFuture 
-                            = store(key, content, 
+                            = store(key, value, 
                                     syncConfig.getStoreConfig());
                         
                         storeCounter.incrementAndGet();
@@ -228,7 +228,7 @@ public class SyncManager {
     }
     
     private DHTFuture<StoreEntity> store(Key key, 
-            Content content, StoreConfig storeConfig) {
+            Value value, StoreConfig storeConfig) {
         Localhost localhost = routeTable.getLocalhost();
         Contact[] contacts = routeTable.select(localhost.getId());
         assert (localhost.equals(contacts[0]));
@@ -238,7 +238,7 @@ public class SyncManager {
         //System.arraycopy(contacts, 1, dst, 0, dst.length);
         //return storeManager.store(dst, tuple, storeConfig);
         
-        return storeManager.store(contacts, key, content, storeConfig);
+        return storeManager.store(contacts, key, value, storeConfig);
     }
     
     private PingFuture ping(Map<ContactKey, DHTFuture<PingEntity>> futures, 

@@ -23,11 +23,11 @@ import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.concurrent.NopFuture;
 
 /**
- * The {@link Message} content.
+ * The {@link Message}'s value.
  * 
- * @see Message#getContent()
+ * @see Message#getValue()
  */
-public interface Content {
+public interface Value {
     
     /**
      * A default {@link DHTFuture} that may be returned by {@link #getContentFuture()}
@@ -36,35 +36,35 @@ public interface Content {
         = NopFuture.withValue(null);
     
     /**
-     * Returns the {@link Content}'s {@link DHTFuture}.
+     * Returns the {@link Value}'s {@link DHTFuture}.
      */
     public DHTFuture<Void> getContentFuture();
     
     /**
-     * Returns the length of the {@link Content}.
+     * Returns the length of the {@link Value}.
      */
     public long getContentLength();
     
     /**
-     * Returns the {@link Content}'s data as an {@link InputStream}.
+     * Returns the {@link Value}'s data as an {@link InputStream}.
      * 
      * NOTE: The caller (you) is responsible for closing the {@link InputStream}.
      */
     public InputStream getContent() throws IOException;
     
     /**
-     * Returns the {@link Content}'s data as a {@code byte[]}.
+     * Returns the {@link Value}'s data as a {@code byte[]}.
      */
     public byte[] getContentAsBytes() throws IOException;
     
     /**
-     * Returns {@code true} if the {@link Content} capable of producing 
+     * Returns {@code true} if the {@link Value} capable of producing 
      * its data more than once.
      */
     public boolean isRepeatable();
     
     /**
-     * Returns {@code true} if the {@link Content} is streaming.
+     * Returns {@code true} if the {@link Value} is streaming.
      */
     public boolean isStreaming();
 }

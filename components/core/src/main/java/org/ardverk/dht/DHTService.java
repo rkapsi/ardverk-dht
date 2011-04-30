@@ -28,7 +28,7 @@ import org.ardverk.dht.entity.NodeEntity;
 import org.ardverk.dht.entity.PingEntity;
 import org.ardverk.dht.entity.PutEntity;
 import org.ardverk.dht.entity.ValueEntity;
-import org.ardverk.dht.message.Content;
+import org.ardverk.dht.message.Value;
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.storage.Key;
@@ -80,5 +80,5 @@ interface DHTService {
      * a {@link MessageType#STORE} operation.
      */
     public DHTFuture<PutEntity> put(Key key, 
-            Content content, PutConfig config);
+            Value value, PutConfig config);
 }

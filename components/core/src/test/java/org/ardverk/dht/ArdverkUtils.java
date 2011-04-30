@@ -42,7 +42,7 @@ import org.ardverk.dht.entity.BootstrapEntity;
 import org.ardverk.dht.entity.PutEntity;
 import org.ardverk.dht.entity.QuickenEntity;
 import org.ardverk.dht.io.transport.DatagramTransport;
-import org.ardverk.dht.message.Content;
+import org.ardverk.dht.message.Value;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.DefaultRouteTable;
 import org.ardverk.dht.storage.ByteArrayValue;
@@ -200,7 +200,7 @@ public class ArdverkUtils {
             md.update(StringUtils.getBytes("Hello-" + i));
             
             final KUID valueId = KUID.create(md.digest());
-            final byte[] value = StringUtils.getBytes("World-" + i);
+            final byte[] data = StringUtils.getBytes("World-" + i);
             
             int rnd = (int)(dhts.size() * Math.random());
             
@@ -208,9 +208,9 @@ public class ArdverkUtils {
             VectorClock<KUID> clock = null;
             Contact contact = dhts.get(rnd).getLocalhost();
             
-            Content content = new ByteArrayValue(contact, clock, value);
+            Value value = new ByteArrayValue(contact, clock, data);
             
-            future = dhts.get(rnd).put(key, content, putConfig);
+            future = dhts.get(rnd).put(key, value, putConfig);
             
             if (i % 1000 == 0) {
                 System.out.println("PROGRESS: " + i);

@@ -31,7 +31,7 @@ import org.ardverk.collection.PatriciaTrie;
 import org.ardverk.collection.Trie;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.lang.Identifier;
-import org.ardverk.dht.message.Content;
+import org.ardverk.dht.message.Value;
 import org.ardverk.version.Occured;
 import org.ardverk.version.VectorClock;
 
@@ -57,11 +57,11 @@ public class InMemoryDatabase extends AbstractDatabase {
     }
 
     @Override
-    public synchronized Content store(Key key, Content content) {
-        return store(key, ByteArrayValue.create(content));
+    public synchronized Value store(Key key, Value value) {
+        return store(key, ByteArrayValue.create(value));
     }
     
-    private synchronized Content store(Key key, ByteArrayValue value) {
+    private synchronized Value store(Key key, ByteArrayValue value) {
         ByteArrayValue existing = getValue(key);
         
         Occured occured = compare(existing, value);
@@ -83,7 +83,7 @@ public class InMemoryDatabase extends AbstractDatabase {
     }
 
     @Override
-    public synchronized Content get(Key key) {
+    public synchronized Value get(Key key) {
         URI uri = key.getURI();
         String query = uri.getQuery();
         if (query != null) {

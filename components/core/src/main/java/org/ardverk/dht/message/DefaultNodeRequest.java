@@ -29,7 +29,7 @@ public class DefaultNodeRequest extends AbstractLookupRequest
     
     public DefaultNodeRequest(MessageId messageId, Contact contact, 
             SocketAddress address, KUID lookupId) {
-        super(messageId, contact, address, NoContent.EMPTY);
+        super(messageId, contact, address);
         
         this.lookupId = lookupId;
     }

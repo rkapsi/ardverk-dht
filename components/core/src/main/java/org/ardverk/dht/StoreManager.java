@@ -32,7 +32,7 @@ import org.ardverk.dht.entity.StoreEntity;
 import org.ardverk.dht.entity.ValueEntity;
 import org.ardverk.dht.io.MessageDispatcher;
 import org.ardverk.dht.io.StoreResponseHandler;
-import org.ardverk.dht.message.Content;
+import org.ardverk.dht.message.Value;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Key;
@@ -57,7 +57,7 @@ public class StoreManager {
     }
     
     public DHTFuture<PutEntity> put(final Key key, 
-            final Content content, final PutConfig config) {
+            final Value value, final PutConfig config) {
         
         final Object lock = new Object();
         synchronized (lock) {
@@ -105,7 +105,7 @@ public class StoreManager {
                     Contact[] contacts = nodeEntity.getContacts();
                     DHTFuture<StoreEntity> storeFuture 
                         = storeFutureRef.make(store(contacts, 
-                                key, content, 
+                                key, value, 
                                 config.getStoreConfig()));
                     
                     storeFuture.addAsyncFutureListener(new AsyncFutureListener<StoreEntity>() {
@@ -162,13 +162,13 @@ public class StoreManager {
      * their XOR distance to the given {@link KUID}.
      */
     public DHTFuture<StoreEntity> store(Contact[] dst, Key key, 
-            Content content, StoreConfig config) {
+            Value value, StoreConfig config) {
         
         int k = routeTable.getK();
         
         DHTProcess<StoreEntity> process 
             = new StoreResponseHandler(messageDispatcher, 
-                dst, k, key, content, config);
+                dst, k, key, value, config);
         
         return dht.submit(process, config);
     }

@@ -19,7 +19,7 @@ package org.ardverk.dht.io;
 import java.io.IOException;
 
 import org.ardverk.dht.io.transport.Endpoint;
-import org.ardverk.dht.message.Content;
+import org.ardverk.dht.message.Value;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.message.RequestMessage;
@@ -53,13 +53,13 @@ public class ValueRequestHandler extends AbstractRequestHandler {
 
     public ResponseMessage createResponse(ValueRequest request) {
         Key key = request.getKey();
-        Content content = database.get(key);
+        Value value = database.get(key);
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
         ResponseMessage response = null;
         
-        if (content != null) {
-            response = factory.createValueResponse(request, content);
+        if (value != null) {
+            response = factory.createValueResponse(request, value);
         } else {
             Contact[] contacts = routeTable.select(key.getId());
             response = factory.createNodeResponse(request, contacts);

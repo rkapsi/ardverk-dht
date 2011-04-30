@@ -25,11 +25,11 @@ import org.ardverk.dht.codec.bencode.MessageInputStream;
 import org.ardverk.dht.codec.bencode.MessageOutputStream;
 import org.ardverk.dht.lang.IntegerValue;
 import org.ardverk.dht.lang.StringValue;
-import org.ardverk.dht.message.AbstractContent;
-import org.ardverk.dht.message.Content;
+import org.ardverk.dht.message.AbstractValue;
+import org.ardverk.dht.message.Value;
 import org.ardverk.io.IoUtils;
 
-public class Status extends AbstractContent implements IntegerValue, StringValue {
+public class Status extends AbstractValue implements IntegerValue, StringValue {
     
     private static enum Code {
         SUCCESS(100),
@@ -56,7 +56,7 @@ public class Status extends AbstractContent implements IntegerValue, StringValue
     /**
      * Factory method to create {@link Status}.
      */
-    public static Status valueOf(int code, String message, Content content) {
+    public static Status valueOf(int code, String message, Value content) {
         if (content == null) {
             switch (code) {
                 case 100:
@@ -78,7 +78,7 @@ public class Status extends AbstractContent implements IntegerValue, StringValue
     /**
      * Creates a {@link Status} for the case there was a conflict.
      */
-    public static Status conflict(Content content) {
+    public static Status conflict(Value content) {
         return new Status(Code.CONFLICT, content);
     }
     
@@ -86,15 +86,15 @@ public class Status extends AbstractContent implements IntegerValue, StringValue
     
     private final String message;
     
-    private final Content content;
+    private final Value content;
     
     private byte[] payload = null;
     
-    private Status(Code code, Content content) {
+    private Status(Code code, Value content) {
         this(code.value, code.name(), content);
     }
     
-    private Status(int code, String message, Content content) {
+    private Status(int code, String message, Value content) {
         this.code = code;
         this.message = message;
         this.content = content;
@@ -163,7 +163,7 @@ public class Status extends AbstractContent implements IntegerValue, StringValue
                 
                 if (content != null) {
                     out.writeBoolean(true);
-                    out.writeContent(content);
+                    out.writeValue(content);
                 } else {
                     out.writeBoolean(false);
                 }
@@ -178,16 +178,16 @@ public class Status extends AbstractContent implements IntegerValue, StringValue
         return payload;
     }
     
-    public static Status valueOf(Content content) {
+    public static Status valueOf(Value content) {
         MessageInputStream in = null;
         try {
             in = new MessageInputStream(content.getContent());
             int code = in.readInt();
             String message = in.readString();
             
-            Content body = null;
+            Value body = null;
             if (in.readBoolean()) {
-                body = in.readStreamingContent();
+                body = in.readValue();
             }
             
             return valueOf(code, message, body);

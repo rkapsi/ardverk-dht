@@ -19,12 +19,12 @@ package org.ardverk.dht.io;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.dht.lang.DHTException;
-import org.ardverk.dht.message.Content;
+import org.ardverk.dht.message.Value;
 import org.ardverk.dht.storage.Key;
 
 
 /**
- * The {@link StoreException} is thrown if a {@link Content} couldn't
+ * The {@link StoreException} is thrown if a {@link Value} couldn't
  * be stored in the DHT at all.
  */
 public class StoreException extends DHTException {
@@ -33,27 +33,27 @@ public class StoreException extends DHTException {
 
     private final Key key;
     
-    private final Content content;
+    private final Value value;
     
-    public StoreException(Key key, Content content, 
+    public StoreException(Key key, Value value, 
             long time, TimeUnit unit) {
         super(time, unit);
         
         this.key = key;
-        this.content = content;
+        this.value = value;
     }
 
     /**
      * Returns the {@link Key} that failed to be stored.
      */
-    public Key getResourceId() {
+    public Key getKey() {
         return key;
     }
     
     /**
-     * Returns the {@link Content} that failed to be stored.
+     * Returns the {@link Value} that failed to be stored.
      */
-    public Content getContent() {
-        return content;
+    public Value getValue() {
+        return value;
     }
 }

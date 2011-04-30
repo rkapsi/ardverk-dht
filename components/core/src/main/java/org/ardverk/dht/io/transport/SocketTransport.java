@@ -39,8 +39,9 @@ import org.ardverk.dht.codec.MessageCodec.Decoder;
 import org.ardverk.dht.codec.MessageCodec.Encoder;
 import org.ardverk.dht.codec.bencode.BencodeMessageCodec;
 import org.ardverk.dht.concurrent.DHTFuture;
-import org.ardverk.dht.message.Content;
 import org.ardverk.dht.message.Message;
+import org.ardverk.dht.message.Value;
+import org.ardverk.dht.message.ValueProvider;
 import org.ardverk.io.IoUtils;
 import org.ardverk.net.NetworkUtils;
 import org.slf4j.Logger;
@@ -303,16 +304,18 @@ public class SocketTransport extends AbstractTransport implements Closeable {
     private static boolean handleContent(Message message, 
             final Socket client, final Closeable... closeable) {
         
-        Content content = message.getContent();
-        if (content.getContentLength() != 0L) {
-            DHTFuture<Void> future = content.getContentFuture();
-            future.addAsyncFutureListener(new AsyncFutureListener<Void>() {
-                @Override
-                public void operationComplete(AsyncFuture<Void> future) {
-                    close(client, closeable);
-                }
-            });
-            return true;
+        if (message instanceof ValueProvider) {
+            Value value = ((ValueProvider)message).getValue();
+            if (value.getContentLength() != 0L) {
+                DHTFuture<Void> future = value.getContentFuture();
+                future.addAsyncFutureListener(new AsyncFutureListener<Void>() {
+                    @Override
+                    public void operationComplete(AsyncFuture<Void> future) {
+                        close(client, closeable);
+                    }
+                });
+                return true;
+            }
         }
         return false;
     }

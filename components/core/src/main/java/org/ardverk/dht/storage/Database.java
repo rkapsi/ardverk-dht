@@ -19,7 +19,7 @@ package org.ardverk.dht.storage;
 import java.util.Set;
 
 import org.ardverk.dht.KUID;
-import org.ardverk.dht.message.Content;
+import org.ardverk.dht.message.Value;
 
 /**
  * A simple and minimum interface of a {@link Database} 
@@ -35,7 +35,7 @@ public interface Database {
     /**
      * Stores the given {@link Resource} and returns a {@link Status}.
      */
-    public Content store(Key key, Content content);
+    public Value store(Key key, Value value);
     
     /**
      * Returns all bucket {@link KUID}s.
@@ -45,7 +45,7 @@ public interface Database {
     /**
      * Returns a {@link Resource} for the given {@link Key}.
      */
-    public Content get(Key key);
+    public Value get(Key key);
     
     /**
      * Returns all {@link Resource}s.

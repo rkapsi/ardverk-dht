@@ -41,7 +41,7 @@ import org.ardverk.dht.io.DefaultMessageDispatcher;
 import org.ardverk.dht.io.MessageDispatcher;
 import org.ardverk.dht.io.transport.DatagramTransport;
 import org.ardverk.dht.io.transport.Transport;
-import org.ardverk.dht.message.Content;
+import org.ardverk.dht.message.Value;
 import org.ardverk.dht.message.DefaultMessageFactory;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.routing.Contact;
@@ -123,9 +123,9 @@ public class ArdverkDHT extends AbstractDHT {
         storeForward.bind(new StoreForward.Callback() {
             @Override
             public DHTFuture<StoreEntity> store(Contact dst, 
-                    Key key, Content content, StoreConfig config) {
+                    Key key, Value value, StoreConfig config) {
                 return storeManager.store(new Contact[] { dst }, 
-                        key, content, config);
+                        key, value, config);
             }
         });
     }
@@ -263,8 +263,8 @@ public class ArdverkDHT extends AbstractDHT {
 
     @Override
     public DHTFuture<PutEntity> put(Key key, 
-            Content content, PutConfig config) {
-        return storeManager.put(key, content, config);
+            Value value, PutConfig config) {
+        return storeManager.put(key, value, config);
     }
 
     @Override

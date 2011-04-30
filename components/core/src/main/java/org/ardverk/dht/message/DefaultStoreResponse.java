@@ -23,8 +23,17 @@ import org.ardverk.dht.routing.Contact;
 public class DefaultStoreResponse extends AbstractResponseMessage 
         implements StoreResponse {
     
+    private final Value value;
+    
     public DefaultStoreResponse(MessageId messageId, Contact contact, 
-            SocketAddress address, Content content) {
-        super(messageId, contact, address, content);
+            SocketAddress address, Value value) {
+        super(messageId, contact, address);
+        
+        this.value = value;
+    }
+
+    @Override
+    public Value getValue() {
+        return value;
     }
 }

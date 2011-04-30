@@ -26,15 +26,23 @@ public class DefaultStoreRequest extends AbstractRequestMessage
 
     private final Key key;
     
+    private final Value value;
+    
     public DefaultStoreRequest(MessageId messageId, Contact contact, 
-            SocketAddress address, Key key, Content content) {
-        super(messageId, contact, address, content);
+            SocketAddress address, Key key, Value value) {
+        super(messageId, contact, address);
         
         this.key = key;
+        this.value = value;
     }
     
     @Override
     public Key getKey() {
         return key;
+    }
+
+    @Override
+    public Value getValue() {
+        return value;
     }
 }

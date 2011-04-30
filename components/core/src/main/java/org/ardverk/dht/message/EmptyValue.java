@@ -16,34 +16,36 @@
 
 package org.ardverk.dht.message;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
-/**
- * {@link FileContent} reads its data from a {@link File}.
- */
-public class FileContent extends AbstractContent {
+import org.ardverk.dht.concurrent.DHTFuture;
+import org.ardverk.io.NopInputStream;
+import org.ardverk.lang.Bytes;
+
+public class EmptyValue implements Value {
+
+    public static final EmptyValue EMPTY = new EmptyValue();
     
-    private final File file;
-    
-    public FileContent(File file) {
-        this.file = file;
-    }
-    
-    public File getFile() {
-        return file;
-    }
+    private EmptyValue() {}
     
     @Override
-    public long getContentLength() {
-        return file.length();
+    public DHTFuture<Void> getContentFuture() {
+        return DEFAULT_FUTURE;
     }
 
     @Override
-    public InputStream getContent() throws IOException {
-        return new FileInputStream(file);
+    public long getContentLength() {
+        return 0L;
+    }
+
+    @Override
+    public InputStream getContent() {
+        return new NopInputStream();
+    }
+
+    @Override
+    public byte[] getContentAsBytes() {
+        return Bytes.EMPTY;
     }
 
     @Override
@@ -53,6 +55,6 @@ public class FileContent extends AbstractContent {
 
     @Override
     public boolean isStreaming() {
-        return true;
+        return false;
     }
 }

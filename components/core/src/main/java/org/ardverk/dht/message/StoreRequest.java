@@ -21,7 +21,7 @@ import org.ardverk.dht.storage.Key;
 /**
  * A {@link MessageType#STORE} request.
  */
-public interface StoreRequest extends RequestMessage {
+public interface StoreRequest extends RequestMessage, ValueProvider {
     
     /**
      * Returns the {@link Key}.

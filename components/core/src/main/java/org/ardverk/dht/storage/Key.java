@@ -19,11 +19,11 @@ package org.ardverk.dht.storage;
 import java.net.URI;
 
 import org.ardverk.dht.lang.Identifier;
-import org.ardverk.dht.message.Content;
+import org.ardverk.dht.message.Value;
 
 
 /**
- * A {@link Key} is an unique identifier of a {@link Content}.
+ * A {@link Key} is an unique identifier of a {@link Value}.
  */
 public interface Key extends Comparable<Key>, Identifier {
     

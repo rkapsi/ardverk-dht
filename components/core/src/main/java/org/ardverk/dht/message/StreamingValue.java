@@ -25,7 +25,7 @@ import org.ardverk.dht.concurrent.DHTValueFuture;
 import org.ardverk.io.CloseAwareInputStream;
 import org.ardverk.io.IoUtils;
 
-public class StreamingContent extends AbstractContent implements Closeable {
+public class StreamingValue extends AbstractValue implements Closeable {
 
     private final long contentLength;
     
@@ -40,15 +40,15 @@ public class StreamingContent extends AbstractContent implements Closeable {
         }
     };
     
-    public StreamingContent(ContentInputStream in) {
+    public StreamingValue(ContentInputStream in) {
         this(in.getContentLength(), in);
     }
     
-    public StreamingContent(long contentLength, InputStream in) {
+    public StreamingValue(long contentLength, InputStream in) {
         in = new CloseAwareInputStream(in) {
             @Override
             protected void complete() {
-                StreamingContent.this.complete();
+                StreamingValue.this.complete();
             }
         };
         

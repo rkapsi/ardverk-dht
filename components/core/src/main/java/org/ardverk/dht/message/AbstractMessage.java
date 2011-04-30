@@ -34,15 +34,12 @@ public abstract class AbstractMessage implements Message, Epoch {
     
     private final SocketAddress address;
     
-    private final Content content;
-    
     public AbstractMessage(MessageId messageId, Contact contact, 
-            SocketAddress address, Content content) {
+            SocketAddress address) {
         
         this.messageId = messageId;
         this.contact = contact;
         this.address = address;
-        this.content = content;
     }
     
     @Override
@@ -63,11 +60,6 @@ public abstract class AbstractMessage implements Message, Epoch {
     @Override
     public SocketAddress getAddress() {
         return address;
-    }
-    
-    @Override
-    public Content getContent() {
-        return content;
     }
 
     @Override

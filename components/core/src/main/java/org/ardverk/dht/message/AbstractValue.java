@@ -24,7 +24,7 @@ import java.io.InputStream;
 import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.io.IoUtils;
 
-public abstract class AbstractContent implements Content {
+public abstract class AbstractValue implements Value {
     
     private volatile boolean consumed = false;
     

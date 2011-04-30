@@ -80,28 +80,28 @@ public class DefaultMessageFactory extends AbstractMessageFactory {
     }
 
     @Override
-    public ValueResponse createValueResponse(LookupRequest request, Content content) {
+    public ValueResponse createValueResponse(LookupRequest request, Value value) {
         Contact dst = request.getContact();
         SocketAddress address = dst.getRemoteAddress();
         MessageId messageId = request.getMessageId();
-        return new DefaultValueResponse(messageId, localhost, address, content);
+        return new DefaultValueResponse(messageId, localhost, address, value);
     }
 
     @Override
     public StoreRequest createStoreRequest(Contact dst, Key key, 
-            Content content) {
+            Value value) {
         SocketAddress address = dst.getRemoteAddress();
         MessageId messageId = createMessageId(address);
         
         return new DefaultStoreRequest(messageId, localhost, 
-                address, key, content);
+                address, key, value);
     }
 
     @Override
-    public StoreResponse createStoreResponse(StoreRequest request, Content content) {
+    public StoreResponse createStoreResponse(StoreRequest request, Value value) {
         Contact dst = request.getContact();
         SocketAddress address = dst.getRemoteAddress();
         MessageId messageId = request.getMessageId();
-        return new DefaultStoreResponse(messageId, localhost, address, content);
+        return new DefaultStoreResponse(messageId, localhost, address, value);
     }
 }
