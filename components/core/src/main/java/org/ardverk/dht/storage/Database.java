@@ -19,7 +19,6 @@ package org.ardverk.dht.storage;
 import java.util.Set;
 
 import org.ardverk.dht.KUID;
-import org.ardverk.dht.message.Value;
 
 /**
  * A simple and minimum interface of a {@link Database} 

@@ -20,9 +20,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.collection.CollectionUtils;
 import org.ardverk.dht.io.Outcome;
-import org.ardverk.dht.message.Value;
 import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.storage.Value;
 
 /**
  * A default implementation of {@link ValueEntity}.

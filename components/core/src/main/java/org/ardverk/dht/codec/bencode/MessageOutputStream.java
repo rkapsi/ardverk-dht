@@ -36,12 +36,12 @@ import org.ardverk.dht.message.PingRequest;
 import org.ardverk.dht.message.PingResponse;
 import org.ardverk.dht.message.StoreRequest;
 import org.ardverk.dht.message.StoreResponse;
-import org.ardverk.dht.message.Value;
 import org.ardverk.dht.message.ValueProvider;
 import org.ardverk.dht.message.ValueRequest;
 import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.storage.Key;
+import org.ardverk.dht.storage.Value;
 import org.ardverk.version.Vector;
 import org.ardverk.version.VectorClock;
 

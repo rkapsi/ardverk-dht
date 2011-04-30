@@ -18,11 +18,11 @@ package org.ardverk.dht.entity;
 
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.dht.message.Value;
 import org.ardverk.dht.message.StoreResponse;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.storage.Key;
 import org.ardverk.dht.storage.Status;
+import org.ardverk.dht.storage.Value;
 
 /**
  * A default implementation of {@link StoreEntity}.

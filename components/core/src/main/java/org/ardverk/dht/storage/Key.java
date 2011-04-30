@@ -19,7 +19,6 @@ package org.ardverk.dht.storage;
 import java.net.URI;
 
 import org.ardverk.dht.lang.Identifier;
-import org.ardverk.dht.message.Value;
 
 
 /**

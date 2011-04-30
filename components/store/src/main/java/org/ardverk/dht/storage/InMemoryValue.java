@@ -24,8 +24,6 @@ import java.io.InputStream;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.codec.bencode.MessageInputStream;
 import org.ardverk.dht.codec.bencode.MessageOutputStream;
-import org.ardverk.dht.message.AbstractValue;
-import org.ardverk.dht.message.Value;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.io.IoUtils;
 import org.ardverk.utils.StringUtils;

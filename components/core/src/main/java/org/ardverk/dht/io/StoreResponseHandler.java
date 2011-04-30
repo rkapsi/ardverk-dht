@@ -27,7 +27,6 @@ import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.dht.config.StoreConfig;
 import org.ardverk.dht.entity.DefaultStoreEntity;
 import org.ardverk.dht.entity.StoreEntity;
-import org.ardverk.dht.message.Value;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.message.ResponseMessage;
@@ -35,6 +34,7 @@ import org.ardverk.dht.message.StoreRequest;
 import org.ardverk.dht.message.StoreResponse;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.storage.Key;
+import org.ardverk.dht.storage.Value;
 import org.ardverk.lang.TimeStamp;
 
 

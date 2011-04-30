@@ -25,8 +25,6 @@ import org.ardverk.dht.codec.bencode.MessageInputStream;
 import org.ardverk.dht.codec.bencode.MessageOutputStream;
 import org.ardverk.dht.lang.IntegerValue;
 import org.ardverk.dht.lang.StringValue;
-import org.ardverk.dht.message.AbstractValue;
-import org.ardverk.dht.message.Value;
 import org.ardverk.io.IoUtils;
 
 public class Status extends AbstractValue implements IntegerValue, StringValue {

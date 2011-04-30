@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.ardverk.dht.message;
+package org.ardverk.dht.storage;
 
 import java.io.InputStream;
 

@@ -20,6 +20,7 @@ import java.net.SocketAddress;
 
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.storage.Key;
+import org.ardverk.dht.storage.Value;
 
 public class DefaultStoreRequest extends AbstractRequestMessage 
         implements StoreRequest {

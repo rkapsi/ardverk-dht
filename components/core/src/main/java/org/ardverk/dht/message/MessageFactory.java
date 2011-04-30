@@ -21,6 +21,7 @@ import java.net.SocketAddress;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.storage.Key;
+import org.ardverk.dht.storage.Value;
 
 /**
  * A factory interface to create various {@link Message}es such as

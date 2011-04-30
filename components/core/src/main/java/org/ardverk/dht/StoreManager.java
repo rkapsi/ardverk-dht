@@ -32,10 +32,10 @@ import org.ardverk.dht.entity.StoreEntity;
 import org.ardverk.dht.entity.ValueEntity;
 import org.ardverk.dht.io.MessageDispatcher;
 import org.ardverk.dht.io.StoreResponseHandler;
-import org.ardverk.dht.message.Value;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Key;
+import org.ardverk.dht.storage.Value;
 
 
 /**

@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package org.ardverk.dht.message;
+package org.ardverk.dht.storage;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.concurrent.NopFuture;
+import org.ardverk.dht.message.Message;
 
 /**
  * The {@link Message}'s value.

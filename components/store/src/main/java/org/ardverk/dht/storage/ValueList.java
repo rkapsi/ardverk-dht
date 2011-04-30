@@ -25,8 +25,6 @@ import java.util.Collection;
 import org.ardverk.collection.CollectionUtils;
 import org.ardverk.dht.codec.bencode.MessageInputStream;
 import org.ardverk.dht.codec.bencode.MessageOutputStream;
-import org.ardverk.dht.message.AbstractValue;
-import org.ardverk.dht.message.Value;
 import org.ardverk.io.IoUtils;
 
 public class ValueList extends AbstractValue {

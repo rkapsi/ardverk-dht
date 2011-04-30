@@ -16,6 +16,8 @@
 
 package org.ardverk.dht.message;
 
+import org.ardverk.dht.storage.Value;
+
 public interface ValueProvider {
 
     /**

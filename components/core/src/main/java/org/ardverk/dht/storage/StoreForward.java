@@ -21,7 +21,6 @@ import org.ardverk.dht.KUID;
 import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.config.StoreConfig;
 import org.ardverk.dht.entity.StoreEntity;
-import org.ardverk.dht.message.Value;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
 import org.slf4j.Logger;

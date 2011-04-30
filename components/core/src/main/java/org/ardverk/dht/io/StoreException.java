@@ -19,8 +19,8 @@ package org.ardverk.dht.io;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.dht.lang.DHTException;
-import org.ardverk.dht.message.Value;
 import org.ardverk.dht.storage.Key;
+import org.ardverk.dht.storage.Value;
 
 
 /**

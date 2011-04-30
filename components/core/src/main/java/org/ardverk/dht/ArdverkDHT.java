@@ -41,7 +41,6 @@ import org.ardverk.dht.io.DefaultMessageDispatcher;
 import org.ardverk.dht.io.MessageDispatcher;
 import org.ardverk.dht.io.transport.DatagramTransport;
 import org.ardverk.dht.io.transport.Transport;
-import org.ardverk.dht.message.Value;
 import org.ardverk.dht.message.DefaultMessageFactory;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.routing.Contact;
@@ -51,6 +50,7 @@ import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Database;
 import org.ardverk.dht.storage.Key;
 import org.ardverk.dht.storage.StoreForward;
+import org.ardverk.dht.storage.Value;
 
 
 /**
