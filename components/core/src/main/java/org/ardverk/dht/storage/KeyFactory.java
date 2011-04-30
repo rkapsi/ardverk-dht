@@ -17,18 +17,30 @@
 package org.ardverk.dht.storage;
 
 import java.net.URI;
+import java.util.ServiceLoader;
 
-import org.ardverk.dht.lang.Identifier;
-import org.ardverk.dht.message.Content;
+public abstract class KeyFactory {
 
-
-/**
- * A {@link ResourceId} is an unique identifier of a {@link Content}.
- */
-public interface ResourceId extends Comparable<ResourceId>, Identifier {
+    private static final ServiceLoader<KeyFactory> FACTORIES 
+        = ServiceLoader.load(KeyFactory.class);
     
+    public static ResourceId parseKey(String uri) {
+        return parseKey(URI.create(uri));
+    }
+    
+    public static ResourceId parseKey(URI uri) {
+        for (KeyFactory factory : FACTORIES) {
+            ResourceId resourceId = factory.valueOf(uri);
+            if (resourceId != null) {
+                return resourceId;
+            }
+        }
+        
+        throw new IllegalArgumentException(uri.toString());
+    }
+
     /**
-     * Returns the resource's {@link URI}.
+     * 
      */
-    public URI getURI();
+    public abstract ResourceId valueOf(URI uri);
 }

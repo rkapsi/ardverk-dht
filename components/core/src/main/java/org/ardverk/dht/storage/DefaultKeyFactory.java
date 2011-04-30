@@ -18,17 +18,10 @@ package org.ardverk.dht.storage;
 
 import java.net.URI;
 
-import org.ardverk.dht.lang.Identifier;
-import org.ardverk.dht.message.Content;
+public class DefaultKeyFactory extends KeyFactory {
 
-
-/**
- * A {@link ResourceId} is an unique identifier of a {@link Content}.
- */
-public interface ResourceId extends Comparable<ResourceId>, Identifier {
-    
-    /**
-     * Returns the resource's {@link URI}.
-     */
-    public URI getURI();
+    @Override
+    public ResourceId valueOf(URI uri) {
+        return DefaultResourceId.valueOf(uri);
+    }
 }

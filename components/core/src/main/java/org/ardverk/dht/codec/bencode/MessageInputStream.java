@@ -52,7 +52,7 @@ import org.ardverk.dht.message.ValueRequest;
 import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.DefaultContact;
-import org.ardverk.dht.storage.DefaultResourceId;
+import org.ardverk.dht.storage.KeyFactory;
 import org.ardverk.dht.storage.ResourceId;
 import org.ardverk.net.NetworkUtils;
 import org.ardverk.version.Vector;
@@ -124,7 +124,7 @@ public class MessageInputStream extends BencodingInputStream {
     
     public ResourceId readResourceId() throws IOException {
         URI uri = URI.create(readString());
-        return DefaultResourceId.valueOf(uri);
+        return KeyFactory.parseKey(uri);
     }
     
     public VectorClock<KUID> readVectorClock() throws IOException {
