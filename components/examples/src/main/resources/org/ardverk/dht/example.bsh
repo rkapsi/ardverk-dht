@@ -37,26 +37,6 @@ setAccessibility(true);
 java.util.List dhts = new ArrayList();
 int current = 0;
 
-// Creates a KUID from a String
-kuid(String value) {
-	return KUID.create(hash(value));
-}
-
-rsrc(String value) {
-	return DefaultKey.valueOf(kuid(value));
-}
-
-rsrc2(String value) {
-	return DefaultKey.valueOf("list");
-}
-
-// Creates a SHA-1 from a String
-hash(String value) {
-	MessageDigest md = MessageDigestUtils.createSHA1();
-	md.update(StringUtils.getBytes(value));
-	return md.digest();
-}
-
 // Creates a DHT that is bound to the given port
 createDHT(int port) {
 	
@@ -144,7 +124,7 @@ put(String key, String value) {
 
 // Stores the given key-value
 put(DHT dht, String key, String value) {
-	DHTFuture future = dht.put(rsrc(key), toValue(value));
+	DHTFuture future = dht.put(toKey(key), toValue(value));
 		
 	PutEntity entity = future.get();
 	for (StoreResponse response : entity.getStoreResponses()) {
@@ -160,7 +140,7 @@ get(String key) {
 
 // Retrieves the given key-value
 get(DHT dht, String key) {
-	DHTFuture future = dht.get(rsrc(key));
+	DHTFuture future = dht.get(toKey(key));
 	
 	ValueEntity entity = future.get();
 	InMemoryValue value = InMemoryValue.create(entity.getValue());
@@ -175,7 +155,7 @@ get(DHT dht, String key) {
 }
 
 get2(String key) {
-	DHTFuture future = dhts.get(current).get(rsrc2(key));
+	DHTFuture future = dhts.get(current).get(toKey(key));
 	
 	ValueEntity entity = future.get();
 	ValueList value = ValueList.valueOf(entity.getValue());
@@ -184,6 +164,10 @@ get2(String key) {
 		+ value
 		+ "\n SENDER: " + entity.getSender().getId()
 		+ "\n TIME: " + entity.getTimeInMillis() + "ms");
+}
+
+toKey(String key) {
+  return org.ardverk.dht.storage.KeyFactory.parseKey("ardverk:///bucket/" + key);
 }
 
 toValue(String value) {
@@ -219,7 +203,7 @@ quit() {
 print("\nHello, please type init(); and press Enter. For further instructions and examples see 'example.bsh' and www.beanshell.org.\n");
 
 init() {
-	init(false);
+	init(true);
 }
 
 init(boolean withUI) {

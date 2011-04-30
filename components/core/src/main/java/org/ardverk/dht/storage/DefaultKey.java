@@ -17,84 +17,68 @@
 package org.ardverk.dht.storage;
 
 import java.net.URI;
+import java.security.MessageDigest;
 
 import org.ardverk.dht.KUID;
+import org.ardverk.security.MessageDigestUtils;
+import org.ardverk.utils.StringUtils;
 
 public class DefaultKey extends AbstractKey {
 
-    private static final KUID BUCKET = KUID.createRandom(20);
+    public static String SCHEME = "ardverk";
     
-    private final KUID valueId;
-
+    public static DefaultKey valueOf(String uri) {
+        return valueOf(URI.create(uri));
+    }
+    
+    public static DefaultKey valueOf(URI uri) {
+        String scheme = uri.getScheme();
+        if (!scheme.equals(SCHEME)) {
+            throw new IllegalArgumentException(uri.toString());
+        }
+        
+        String path = uri.getPath();
+        
+        int p = path.indexOf('/');
+        if (p != 0) {
+            throw new IllegalArgumentException(uri.toString());
+        }
+        
+        int q = path.indexOf('/', p + 1);
+        
+        String bucket = path;
+        if (q != -1) {
+            bucket = path.substring(p, q);
+        }
+        
+        return new DefaultKey(create(bucket), uri);
+    }
+    
+    private final KUID bucketId;
+    
     private final URI uri;
     
-    private DefaultKey(KUID valueId, URI uri) {
-        this.valueId = valueId;
+    private DefaultKey(KUID bucketId, URI uri) {
+        this.bucketId = bucketId;
         this.uri = uri;
     }
     
     @Override
     public KUID getId() {
-        return valueId;
+        return bucketId;
     }
-
+    
     @Override
     public URI getURI() {
         return uri;
     }
     
-    public static Key valueOf(URI uri) {
-        return new DefaultKey(parse(uri), uri);
+    private static byte[] digest(String bucket) {
+        MessageDigest md = MessageDigestUtils.createSHA1();
+        return md.digest(StringUtils.getBytes(bucket));
     }
     
-    public static Key valueOf(KUID valueId) {
-        return valueOf(BUCKET, valueId);
-    }
-    
-    public static Key valueOf(KUID bucketId, KUID valueId) {
-        return new DefaultKey(bucketId, create(bucketId, valueId, null));
-    }
-    
-    public static Key valueOf(String query) {
-        return valueOf(BUCKET, query);
-    }
-    
-    public static Key valueOf(KUID bucketId, String query) {
-        return new DefaultKey(bucketId, create(bucketId, null, query));
-    }
-    
-    private static URI create(KUID bucketId, KUID valueId, String query) {
-        StringBuilder sb = new StringBuilder();
-        
-        sb.append("ardverk:///").append(bucketId.toHexString());
-        
-        if (valueId != null) {
-            sb.append("/").append(valueId.toHexString());
-        }
-        
-        if (query != null && !query.isEmpty()) {
-            sb.append("?").append(query);
-        }
-        
-        return URI.create(sb.toString());
-    }
-    
-    private static KUID parse(URI uri) {
-        String scheme = uri.getScheme();
-        if (!scheme.equals("ardverk")) {
-            throw new IllegalArgumentException();
-        }
-        
-        String path = uri.getPath();
-        while (!path.isEmpty() && path.startsWith("/")) {
-            path = path.substring(1);
-        }
-        
-        int p = path.indexOf("/");
-        if (p != -1) {
-            path = path.substring(0, p);
-        }
-        
-        return KUID.create(path, 16);
+    private static KUID create(String bucket) {
+        return KUID.create(digest(bucket));
     }
 }

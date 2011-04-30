@@ -17,23 +17,24 @@
 package org.ardverk.dht.storage;
 
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ServiceLoader;
 
 public abstract class KeyFactory {
-
-    private static final ServiceLoader<KeyFactory> FACTORIES 
-        = ServiceLoader.load(KeyFactory.class);
+    
+    private static final Map<String, KeyFactory> FACTORIES = createKeyFactoryMap();
     
     public static Key parseKey(String uri) {
         return parseKey(URI.create(uri));
     }
     
     public static Key parseKey(URI uri) {
-        for (KeyFactory factory : FACTORIES) {
-            Key key = factory.valueOf(uri);
-            if (key != null) {
-                return key;
-            }
+        
+        String scheme = uri.getScheme();
+        KeyFactory factory = FACTORIES.get(scheme);
+        if (factory != null) {
+            return factory.valueOf(uri);
         }
         
         throw new IllegalArgumentException(uri.toString());
@@ -42,5 +43,30 @@ public abstract class KeyFactory {
     /**
      * 
      */
+    public abstract String getScheme();
+    
+    /**
+     * 
+     */
     public abstract Key valueOf(URI uri);
+    
+    @Override
+    public String toString() {
+        return getScheme();
+    }
+    
+    private static Map<String, KeyFactory> createKeyFactoryMap() {
+        Map<String, KeyFactory> map 
+            = new HashMap<String, KeyFactory>();
+        
+        ServiceLoader<KeyFactory> factories 
+            = ServiceLoader.load(KeyFactory.class);
+        
+        for (KeyFactory factory : factories) {
+            String scheme = factory.getScheme();
+            map.put(scheme, factory);
+        }
+        
+        return map;
+    }
 }

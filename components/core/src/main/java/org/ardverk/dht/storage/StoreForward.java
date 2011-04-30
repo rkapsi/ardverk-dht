@@ -96,8 +96,7 @@ public class StoreForward {
         StoreConfig storeConfig = config.getStoreConfig();
         
         Contact last = CollectionUtils.last(contacts);    
-        Iterable<Key> keys 
-            = database.values(contactId, last.getId());
+        Iterable<Key> keys = database.values(contactId, last.getId());
         
         for (Key key : keys) {
             if (LOG.isDebugEnabled()) {

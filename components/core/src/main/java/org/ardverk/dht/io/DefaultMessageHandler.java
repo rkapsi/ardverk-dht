@@ -29,7 +29,6 @@ import org.ardverk.dht.routing.Localhost;
 import org.ardverk.dht.routing.RoundTripTime;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.StoreForward;
-import org.ardverk.lang.Arguments;
 
 
 /**
@@ -45,8 +44,8 @@ public class DefaultMessageHandler implements MessageCallback {
     
     public DefaultMessageHandler(StoreForward storeForward, 
             RouteTable routeTable) {
-        this.storeForward = Arguments.notNull(storeForward, "storeForward");
-        this.routeTable = Arguments.notNull(routeTable, "routeTable");
+        this.storeForward = storeForward;
+        this.routeTable = routeTable;
     }
     
     public void handleRequest(RequestMessage request) throws IOException {

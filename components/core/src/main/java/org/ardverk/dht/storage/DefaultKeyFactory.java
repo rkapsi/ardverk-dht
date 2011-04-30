@@ -19,6 +19,11 @@ package org.ardverk.dht.storage;
 import java.net.URI;
 
 public class DefaultKeyFactory extends KeyFactory {
+    
+    @Override
+    public String getScheme() {
+        return DefaultKey.SCHEME;
+    }
 
     @Override
     public Key valueOf(URI uri) {

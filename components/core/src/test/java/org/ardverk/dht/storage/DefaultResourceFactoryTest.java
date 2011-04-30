@@ -18,19 +18,16 @@ package org.ardverk.dht.storage;
 
 import junit.framework.TestCase;
 
-import org.ardverk.dht.KUID;
 import org.junit.Test;
 
 public class DefaultResourceFactoryTest {
 
     @Test
     public void equals() {
-        KUID valueId1 = KUID.createRandom(20);
-        Key key1 = DefaultKey.valueOf(valueId1);
-        Key key2 = DefaultKey.valueOf(valueId1);
+        Key key1 = DefaultKey.valueOf("ardverk:///key1");
+        Key key2 = DefaultKey.valueOf("ardverk:///key1");
         
-        KUID valueId2 = KUID.createRandom(20);
-        Key key3 = DefaultKey.valueOf(valueId2);
+        Key key3 = DefaultKey.valueOf("ardverk:///key2");
         
         TestCase.assertEquals(key1, key2);
         TestCase.assertFalse(key1.equals(key3));

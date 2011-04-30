@@ -19,7 +19,6 @@ package org.ardverk.dht;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -44,13 +43,12 @@ import org.ardverk.dht.entity.QuickenEntity;
 import org.ardverk.dht.io.transport.DatagramTransport;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.DefaultRouteTable;
-import org.ardverk.dht.storage.InMemoryValue;
 import org.ardverk.dht.storage.Database;
 import org.ardverk.dht.storage.DefaultKey;
+import org.ardverk.dht.storage.InMemoryValue;
 import org.ardverk.dht.storage.Key;
 import org.ardverk.dht.storage.Value;
 import org.ardverk.io.IoUtils;
-import org.ardverk.security.MessageDigestUtils;
 import org.ardverk.utils.StringUtils;
 import org.ardverk.version.VectorClock;
 
@@ -196,16 +194,12 @@ public class ArdverkUtils {
         int count = 30000;
         DHTFuture<PutEntity> future = null;
         for (int i = 0; i < count; i++) {
-            MessageDigest md = MessageDigestUtils.createSHA1();
-            md.update(StringUtils.getBytes("Hello-" + i));
+            Key key = DefaultKey.valueOf("ardverk://Hello-" + i);
+            byte[] data = StringUtils.getBytes("World-" + i);            
             
-            final KUID valueId = KUID.create(md.digest());
-            final byte[] data = StringUtils.getBytes("World-" + i);
-            
-            int rnd = (int)(dhts.size() * Math.random());
-            
-            Key key = DefaultKey.valueOf(valueId);
             VectorClock<KUID> clock = null;
+
+            int rnd = (int)(dhts.size() * Math.random());
             Contact contact = dhts.get(rnd).getLocalhost();
             
             Value value = new InMemoryValue(contact, clock, data);

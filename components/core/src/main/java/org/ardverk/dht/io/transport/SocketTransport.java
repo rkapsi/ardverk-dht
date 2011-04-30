@@ -31,8 +31,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
-import org.ardverk.concurrent.DefaultExecutorQueue;
-import org.ardverk.concurrent.ExecutorQueue;
 import org.ardverk.concurrent.ExecutorUtils;
 import org.ardverk.dht.codec.MessageCodec;
 import org.ardverk.dht.codec.MessageCodec.Decoder;
@@ -57,8 +55,8 @@ public class SocketTransport extends AbstractTransport implements Closeable {
     
     private static final int DEFAULT_TIMEOUT = 10000;
     
-    private final ExecutorQueue<Runnable> executor 
-        = new DefaultExecutorQueue(EXECUTOR);
+    //private final ExecutorQueue<Runnable> executor 
+    //    = new DefaultExecutorQueue(EXECUTOR);
     
     private final MessageCodec codec;
     
@@ -210,8 +208,8 @@ public class SocketTransport extends AbstractTransport implements Closeable {
             }
         };
         
-        //EXECUTOR.execute(task);
-        executor.execute(task);
+        EXECUTOR.execute(task);
+        //executor.execute(task);
         return true;
     }
     
@@ -281,8 +279,8 @@ public class SocketTransport extends AbstractTransport implements Closeable {
             }
         };
         
-        //EXECUTOR.execute(task);
-        executor.execute(task);
+        EXECUTOR.execute(task);
+        //executor.execute(task);
     }
     
     private static void uncaughtException(ServerSocket socket, Throwable t) {
