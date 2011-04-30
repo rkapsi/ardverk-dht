@@ -43,11 +43,11 @@ kuid(String value) {
 }
 
 rsrc(String value) {
-	return DefaultResourceId.valueOf(kuid(value));
+	return DefaultKey.valueOf(kuid(value));
 }
 
 rsrc2(String value) {
-	return DefaultResourceId.valueOf("list");
+	return DefaultKey.valueOf("list");
 }
 
 // Creates a SHA-1 from a String
@@ -144,14 +144,11 @@ put(String key, String value) {
 
 // Stores the given key-value
 put(DHT dht, String key, String value) {
-  ResourceId resourceId = rsrc(key);
-  Content content = toValue(value);
-      
-	DHTFuture future = dht.put(resourceId, content);
+	DHTFuture future = dht.put(rsrc(key), toValue(value));
 		
 	PutEntity entity = future.get();
 	for (StoreResponse response : entity.getStoreResponses()) {
-	  Status status = Status.valueOf(response.getContent());
+	  Status status = Status.valueOf(response.getValue());
 		print("PUT: " + response.getContact().getId() + " -> " + status);
 	}
 }
