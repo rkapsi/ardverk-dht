@@ -33,7 +33,7 @@ import org.ardverk.dht.message.ValueRequest;
 import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
-import org.ardverk.dht.storage.ResourceId;
+import org.ardverk.dht.storage.Key;
 
 
 /**
@@ -44,16 +44,16 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     
     private final FixedSizeArrayList<ValueResponse> responses;
     
-    private final ResourceId resourceId;
+    private final Key key;
     
     public ValueResponseHandler(MessageDispatcher messageDispatcher,
             Contact[] contacts, RouteTable routeTable, 
-            ResourceId resourceId, GetConfig config) {
+            Key key, GetConfig config) {
         super(messageDispatcher, contacts, routeTable, 
-                resourceId.getId(), config);
+                key.getId(), config);
         
         responses = new FixedSizeArrayList<ValueResponse>(config.getR());
-        this.resourceId = resourceId;
+        this.key = key;
     }
 
     @Override
@@ -92,10 +92,10 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     protected void lookup(Contact dst, KUID lookupId, 
             long timeout, TimeUnit unit) throws IOException {
         
-        assert (lookupId.equals(resourceId.getId()));
+        assert (lookupId.equals(key.getId()));
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
-        ValueRequest message = factory.createValueRequest(dst, resourceId);
+        ValueRequest message = factory.createValueRequest(dst, key);
         
         send(dst, message, timeout, unit);
     }

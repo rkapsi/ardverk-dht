@@ -26,13 +26,13 @@ public class DefaultResourceFactoryTest {
     @Test
     public void equals() {
         KUID valueId1 = KUID.createRandom(20);
-        ResourceId resourceId1 = DefaultResourceId.valueOf(valueId1);
-        ResourceId resourceId2 = DefaultResourceId.valueOf(valueId1);
+        Key key1 = DefaultKey.valueOf(valueId1);
+        Key key2 = DefaultKey.valueOf(valueId1);
         
         KUID valueId2 = KUID.createRandom(20);
-        ResourceId resourceId3 = DefaultResourceId.valueOf(valueId2);
+        Key key3 = DefaultKey.valueOf(valueId2);
         
-        TestCase.assertEquals(resourceId1, resourceId2);
-        TestCase.assertFalse(resourceId1.equals(resourceId3));
+        TestCase.assertEquals(key1, key2);
+        TestCase.assertFalse(key1.equals(key3));
     }
 }

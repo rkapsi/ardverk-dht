@@ -20,7 +20,7 @@ import java.net.URI;
 
 import org.ardverk.dht.KUID;
 
-public class DefaultResourceId extends AbstractResourceId {
+public class DefaultKey extends AbstractKey {
 
     private static final KUID BUCKET = KUID.createRandom(20);
     
@@ -28,7 +28,7 @@ public class DefaultResourceId extends AbstractResourceId {
 
     private final URI uri;
     
-    private DefaultResourceId(KUID valueId, URI uri) {
+    private DefaultKey(KUID valueId, URI uri) {
         this.valueId = valueId;
         this.uri = uri;
     }
@@ -43,24 +43,24 @@ public class DefaultResourceId extends AbstractResourceId {
         return uri;
     }
     
-    public static ResourceId valueOf(URI uri) {
-        return new DefaultResourceId(parse(uri), uri);
+    public static Key valueOf(URI uri) {
+        return new DefaultKey(parse(uri), uri);
     }
     
-    public static ResourceId valueOf(KUID valueId) {
+    public static Key valueOf(KUID valueId) {
         return valueOf(BUCKET, valueId);
     }
     
-    public static ResourceId valueOf(KUID bucketId, KUID valueId) {
-        return new DefaultResourceId(bucketId, create(bucketId, valueId, null));
+    public static Key valueOf(KUID bucketId, KUID valueId) {
+        return new DefaultKey(bucketId, create(bucketId, valueId, null));
     }
     
-    public static ResourceId valueOf(String query) {
+    public static Key valueOf(String query) {
         return valueOf(BUCKET, query);
     }
     
-    public static ResourceId valueOf(KUID bucketId, String query) {
-        return new DefaultResourceId(bucketId, create(bucketId, null, query));
+    public static Key valueOf(KUID bucketId, String query) {
+        return new DefaultKey(bucketId, create(bucketId, null, query));
     }
     
     private static URI create(KUID bucketId, KUID valueId, String query) {

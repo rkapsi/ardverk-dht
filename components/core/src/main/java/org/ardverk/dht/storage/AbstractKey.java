@@ -16,19 +16,35 @@
 
 package org.ardverk.dht.storage;
 
-import java.net.URI;
-
-import org.ardverk.dht.lang.Identifier;
-import org.ardverk.dht.message.Content;
-
-
 /**
- * A {@link ResourceId} is an unique identifier of a {@link Content}.
+ * An abstract implementation of {@link Key}.
  */
-public interface ResourceId extends Comparable<ResourceId>, Identifier {
+public abstract class AbstractKey implements Key {
+
+    @Override
+    public int compareTo(Key o) {
+        return getURI().compareTo(o.getURI());
+    }
+
+    @Override
+    public int hashCode() {
+        return getURI().hashCode();
+    }
     
-    /**
-     * Returns the resource's {@link URI}.
-     */
-    public URI getURI();
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        } else if (!(o instanceof Key)) {
+            return false;
+        }
+        
+        Key other = (Key)o;
+        return getURI().equals(other.getURI());
+    }
+    
+    @Override
+    public String toString() {
+        return getURI().toString();
+    }
 }

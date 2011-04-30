@@ -28,7 +28,7 @@ import org.ardverk.dht.message.ValueRequest;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Database;
-import org.ardverk.dht.storage.ResourceId;
+import org.ardverk.dht.storage.Key;
 
 
 /**
@@ -52,8 +52,8 @@ public class ValueRequestHandler extends AbstractRequestHandler {
     }
 
     public ResponseMessage createResponse(ValueRequest request) {
-        ResourceId resourceId = request.getResourceId();
-        Content content = database.get(resourceId);
+        Key key = request.getKey();
+        Content content = database.get(key);
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
         ResponseMessage response = null;
@@ -61,7 +61,7 @@ public class ValueRequestHandler extends AbstractRequestHandler {
         if (content != null) {
             response = factory.createValueResponse(request, content);
         } else {
-            Contact[] contacts = routeTable.select(resourceId.getId());
+            Contact[] contacts = routeTable.select(key.getId());
             response = factory.createNodeResponse(request, contacts);
         }
         

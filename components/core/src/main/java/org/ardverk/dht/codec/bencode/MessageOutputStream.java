@@ -40,7 +40,7 @@ import org.ardverk.dht.message.StoreResponse;
 import org.ardverk.dht.message.ValueRequest;
 import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.storage.ResourceId;
+import org.ardverk.dht.storage.Key;
 import org.ardverk.version.Vector;
 import org.ardverk.version.VectorClock;
 
@@ -94,8 +94,8 @@ public class MessageOutputStream extends BencodingOutputStream {
         writeString(isa.getHostName() + ":" + isa.getPort());
     }
     
-    public void writeResourceId(ResourceId resource) throws IOException {
-        writeString(resource.getURI().toString());
+    public void writeKey(Key key) throws IOException {
+        writeString(key.getURI().toString());
     }
     
     public void writeVectorClock(VectorClock<? extends KUID> clock) throws IOException {
@@ -222,14 +222,14 @@ public class MessageOutputStream extends BencodingOutputStream {
     }
     
     private void writeValueRequest(ValueRequest message) throws IOException {
-        writeResourceId(message.getResourceId());
+        writeKey(message.getKey());
     }
     
     private void writeValueResponse(ValueResponse message) throws IOException {
     }
     
     private void writeStoreRequest(StoreRequest message) throws IOException {
-        writeResourceId(message.getResourceId());
+        writeKey(message.getKey());
     }
     
     private void writeStoreResponse(StoreResponse message) throws IOException {

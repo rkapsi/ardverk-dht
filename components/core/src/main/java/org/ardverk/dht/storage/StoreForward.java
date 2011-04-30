@@ -97,19 +97,19 @@ public class StoreForward {
         StoreConfig storeConfig = config.getStoreConfig();
         
         Contact last = CollectionUtils.last(contacts);    
-        Iterable<ResourceId> resourcesIds 
+        Iterable<Key> keys 
             = database.values(contactId, last.getId());
         
-        for (ResourceId resourceId : resourcesIds) {
+        for (Key key : keys) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(routeTable.getLocalhost().getId() 
-                        + " foward " + resourceId
+                        + " foward " + key
                         + " to " + contact.getId());
             }
             
-            Content content = database.get(resourceId);
+            Content content = database.get(key);
             if (content != null) {
-                callback.store(contact, resourceId, content, storeConfig);
+                callback.store(contact, key, content, storeConfig);
             }
         }
     }
@@ -166,6 +166,6 @@ public class StoreForward {
          * that needs to be sent to the given {@link Contact}.
          */
         public DHTFuture<StoreEntity> store(Contact dst, 
-                ResourceId resourceId, Content content, StoreConfig config);
+                Key key, Content content, StoreConfig config);
     }
 }

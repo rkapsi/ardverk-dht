@@ -27,7 +27,7 @@ import org.ardverk.dht.io.NodeResponseHandler;
 import org.ardverk.dht.io.ValueResponseHandler;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
-import org.ardverk.dht.storage.ResourceId;
+import org.ardverk.dht.storage.Key;
 
 /**
  * The {@link LookupManager} manages FIND_NODE and FIND_VALUE lookups.
@@ -62,16 +62,16 @@ public class LookupManager {
         return futureService.submit(process, config);
     }
     
-    public DHTFuture<ValueEntity> get(ResourceId resourceId, GetConfig config) {
-        Contact[] contacts = routeTable.select(resourceId.getId());
-        return get(contacts, resourceId, config);
+    public DHTFuture<ValueEntity> get(Key key, GetConfig config) {
+        Contact[] contacts = routeTable.select(key.getId());
+        return get(contacts, key, config);
     }
     
     public DHTFuture<ValueEntity> get(Contact[] contacts, 
-            ResourceId resourceId, GetConfig config) {
+            Key key, GetConfig config) {
         DHTProcess<ValueEntity> process
             = new ValueResponseHandler(messageDispatcher, contacts, 
-                    routeTable, resourceId, config);
+                    routeTable, key, config);
         return futureService.submit(process, config);
     }
 }

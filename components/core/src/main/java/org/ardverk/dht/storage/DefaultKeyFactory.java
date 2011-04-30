@@ -21,7 +21,7 @@ import java.net.URI;
 public class DefaultKeyFactory extends KeyFactory {
 
     @Override
-    public ResourceId valueOf(URI uri) {
-        return DefaultResourceId.valueOf(uri);
+    public Key valueOf(URI uri) {
+        return DefaultKey.valueOf(uri);
     }
 }

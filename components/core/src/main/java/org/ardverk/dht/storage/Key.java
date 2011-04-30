@@ -14,27 +14,21 @@
  * limitations under the License.
  */
 
-package org.ardverk.dht.message;
+package org.ardverk.dht.storage;
 
-import java.net.SocketAddress;
+import java.net.URI;
 
-import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.storage.Key;
+import org.ardverk.dht.lang.Identifier;
+import org.ardverk.dht.message.Content;
 
-public class DefaultStoreRequest extends AbstractRequestMessage 
-        implements StoreRequest {
 
-    private final Key key;
+/**
+ * A {@link Key} is an unique identifier of a {@link Content}.
+ */
+public interface Key extends Comparable<Key>, Identifier {
     
-    public DefaultStoreRequest(MessageId messageId, Contact contact, 
-            SocketAddress address, Key key, Content content) {
-        super(messageId, contact, address, content);
-        
-        this.key = key;
-    }
-    
-    @Override
-    public Key getKey() {
-        return key;
-    }
+    /**
+     * Returns the resource's {@link URI}.
+     */
+    public URI getURI();
 }

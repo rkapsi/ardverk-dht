@@ -31,20 +31,20 @@ import org.ardverk.io.IoUtils;
 
 public class ValueList extends AbstractContent {
 
-    private final ResourceId[] resourceIds;
+    private final Key[] keys;
     
     private byte[] payload = null;
     
-    public ValueList(Collection<? extends ResourceId> c) {
-        this(CollectionUtils.toArray(c, ResourceId.class));
+    public ValueList(Collection<? extends Key> c) {
+        this(CollectionUtils.toArray(c, Key.class));
     }
     
-    public ValueList(ResourceId[] resourceIds) {
-        this.resourceIds = resourceIds;
+    public ValueList(Key[] keys) {
+        this.keys = keys;
     }
     
-    public ResourceId[] getResourceIds() {
-        return resourceIds;
+    public Key[] getResourceIds() {
+        return keys;
     }
     
     @Override
@@ -52,8 +52,8 @@ public class ValueList extends AbstractContent {
         StringBuilder sb = new StringBuilder();
         
         int index = 0;
-        for (ResourceId resourceId : resourceIds) {
-            sb.append(index++).append(") ").append(resourceId).append("\n");
+        for (Key key : keys) {
+            sb.append(index++).append(") ").append(key).append("\n");
         }
         
         return sb.toString();
@@ -85,9 +85,9 @@ public class ValueList extends AbstractContent {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 MessageOutputStream out = new MessageOutputStream(baos);
                 
-                out.writeShort(resourceIds.length);
-                for (ResourceId resourceId: resourceIds) {
-                    out.writeResourceId(resourceId);
+                out.writeShort(keys.length);
+                for (Key key: keys) {
+                    out.writeKey(key);
                 }
                 out.close();
                 
@@ -105,12 +105,12 @@ public class ValueList extends AbstractContent {
             in = new MessageInputStream(content.getContent());
             
             int count = in.readUnsignedShort();
-            ResourceId[] resourceIds = new ResourceId[count];
-            for (int i = 0; i < resourceIds.length; i++) {
-                resourceIds[i] = in.readResourceId();
+            Key[] keys = new Key[count];
+            for (int i = 0; i < keys.length; i++) {
+                keys[i] = in.readKey();
             }
             
-            return new ValueList(resourceIds);
+            return new ValueList(keys);
         } catch (IOException err) {
             throw new IllegalStateException("IOException", err);
         } finally {

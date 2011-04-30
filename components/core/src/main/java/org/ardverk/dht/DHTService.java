@@ -31,7 +31,7 @@ import org.ardverk.dht.entity.ValueEntity;
 import org.ardverk.dht.message.Content;
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.storage.ResourceId;
+import org.ardverk.dht.storage.Key;
 
 
 /**
@@ -73,12 +73,12 @@ interface DHTService {
      * Performs a {@link MessageType#FIND_VALUE} lookup in the DHT.
      */
     public DHTFuture<ValueEntity> get(
-            ResourceId resourceId, GetConfig config);
+            Key key, GetConfig config);
     
     /**
      * Performs a {@link MessageType#FIND_NODE} lookup followed by 
      * a {@link MessageType#STORE} operation.
      */
-    public DHTFuture<PutEntity> put(ResourceId resourceId, 
+    public DHTFuture<PutEntity> put(Key key, 
             Content content, PutConfig config);
 }

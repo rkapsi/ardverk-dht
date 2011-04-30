@@ -21,7 +21,7 @@ import java.net.SocketAddress;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.Localhost;
-import org.ardverk.dht.storage.ResourceId;
+import org.ardverk.dht.storage.Key;
 import org.ardverk.lang.Arguments;
 
 
@@ -73,10 +73,10 @@ public class DefaultMessageFactory extends AbstractMessageFactory {
     }
 
     @Override
-    public ValueRequest createValueRequest(Contact dst, ResourceId resourceId) {
+    public ValueRequest createValueRequest(Contact dst, Key key) {
         SocketAddress address = dst.getRemoteAddress();
         MessageId messageId = createMessageId(address);
-        return new DefaultValueRequest(messageId, localhost, address, resourceId);
+        return new DefaultValueRequest(messageId, localhost, address, key);
     }
 
     @Override
@@ -88,13 +88,13 @@ public class DefaultMessageFactory extends AbstractMessageFactory {
     }
 
     @Override
-    public StoreRequest createStoreRequest(Contact dst, ResourceId resourceId, 
+    public StoreRequest createStoreRequest(Contact dst, Key key, 
             Content content) {
         SocketAddress address = dst.getRemoteAddress();
         MessageId messageId = createMessageId(address);
         
         return new DefaultStoreRequest(messageId, localhost, 
-                address, resourceId, content);
+                address, key, content);
     }
 
     @Override

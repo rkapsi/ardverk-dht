@@ -20,7 +20,7 @@ import org.ardverk.dht.message.Content;
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.message.StoreResponse;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.storage.ResourceId;
+import org.ardverk.dht.storage.Key;
 
 /**
  * The result of a {@link MessageType#STORE} operation.
@@ -33,9 +33,9 @@ public interface StoreEntity extends Entity {
     public Contact[] getContacts();
     
     /**
-     * Returns the {@link ResourceId} that was stored.
+     * Returns the {@link Key} that was stored.
      */
-    public ResourceId getResourceId();
+    public Key getResourceId();
     
     /**
      * Returns the {@link Content} that was stored.

@@ -57,19 +57,19 @@ public class InMemoryDatabase extends AbstractDatabase {
     }
 
     @Override
-    public synchronized Content store(ResourceId resourceId, Content content) {
-        return store(resourceId, ByteArrayValue.create(content));
+    public synchronized Content store(Key key, Content content) {
+        return store(key, ByteArrayValue.create(content));
     }
     
-    private synchronized Content store(ResourceId resourceId, ByteArrayValue value) {
-        ByteArrayValue existing = getValue(resourceId);
+    private synchronized Content store(Key key, ByteArrayValue value) {
+        ByteArrayValue existing = getValue(key);
         
         Occured occured = compare(existing, value);
         if (occured == Occured.AFTER) {
             if (value.isEmpty()) {
-                remove(resourceId);
+                remove(key);
             } else {
-                put(resourceId, value);
+                put(key, value);
             }
             return Status.SUCCESS;
         }
@@ -83,27 +83,27 @@ public class InMemoryDatabase extends AbstractDatabase {
     }
 
     @Override
-    public synchronized Content get(ResourceId resourceId) {
-        URI uri = resourceId.getURI();
+    public synchronized Content get(Key key) {
+        URI uri = key.getURI();
         String query = uri.getQuery();
         if (query != null) {
-            Bucket bucket = database.get(resourceId.getId());
+            Bucket bucket = database.get(key.getId());
             if (bucket != null) {
                 return new ValueList(bucket.keySet());
             }
             return null;
         }
         
-        return getValue(resourceId);
+        return getValue(key);
     }
     
-    private synchronized ByteArrayValue getValue(ResourceId resourceId) {
-        Bucket bucket = database.get(resourceId.getId());
-        return bucket != null ? bucket.get(resourceId) : null;
+    private synchronized ByteArrayValue getValue(Key key) {
+        Bucket bucket = database.get(key.getId());
+        return bucket != null ? bucket.get(key) : null;
     }
     
-    private synchronized ByteArrayValue put(ResourceId resourceId, ByteArrayValue value) {
-        KUID bucketId = resourceId.getId();
+    private synchronized ByteArrayValue put(Key key, ByteArrayValue value) {
+        KUID bucketId = key.getId();
         
         Bucket bucket = database.get(bucketId);
         if (bucket == null) {
@@ -111,15 +111,15 @@ public class InMemoryDatabase extends AbstractDatabase {
             database.put(bucketId, bucket);
         }
         
-        return bucket.put(resourceId, value);
+        return bucket.put(key, value);
     }
     
-    private synchronized ByteArrayValue remove(ResourceId resourceId) {
-        KUID bucketId = resourceId.getId();
+    private synchronized ByteArrayValue remove(Key key) {
+        KUID bucketId = key.getId();
         
         Bucket bucket = database.get(bucketId);
         if (bucket != null) {
-            ByteArrayValue removed = bucket.remove(resourceId);
+            ByteArrayValue removed = bucket.remove(key);
             if (bucket.isEmpty()) {
                 database.remove(bucketId);
             }
@@ -143,8 +143,8 @@ public class InMemoryDatabase extends AbstractDatabase {
     }
     
     @Override
-    public synchronized Iterable<ResourceId> values() {
-        List<ResourceId> values = new ArrayList<ResourceId>();
+    public synchronized Iterable<Key> values() {
+        List<Key> values = new ArrayList<Key>();
         for (Bucket bucket : database.values()) {
             values.addAll(bucket.keySet());
         }
@@ -152,19 +152,19 @@ public class InMemoryDatabase extends AbstractDatabase {
     }
     
     @Override
-    public synchronized Iterable<ResourceId> values(KUID bucketId) {
+    public synchronized Iterable<Key> values(KUID bucketId) {
         Bucket bucket = database.get(bucketId);
         if (bucket != null) {
-            return new ArrayList<ResourceId>(bucket.keySet());
+            return new ArrayList<Key>(bucket.keySet());
         }
         return Collections.emptyList();
     }
 
     @Override
-    public synchronized Iterable<ResourceId> values(
+    public synchronized Iterable<Key> values(
             final KUID lookupId, final KUID lastId) {
         
-        final List<ResourceId> values = new ArrayList<ResourceId>();
+        final List<Key> values = new ArrayList<Key>();
         database.select(lookupId, new Cursor<KUID, Bucket>() {
             @Override
             public Decision select(Entry<? extends KUID, 
@@ -190,13 +190,13 @@ public class InMemoryDatabase extends AbstractDatabase {
         return sb.toString();
     }
     
-    private static Occured compare(ByteArrayValue existing, ByteArrayValue resource) {
+    private static Occured compare(ByteArrayValue existing, ByteArrayValue value) {
         if (existing == null) {
             return Occured.AFTER;
         }
         
         VectorClock<KUID> clock1 = existing.getVectorClock();
-        VectorClock<KUID> clock2 = resource.getVectorClock();
+        VectorClock<KUID> clock2 = value.getVectorClock();
         
         return compare(clock1, clock2);
     }
@@ -211,7 +211,7 @@ public class InMemoryDatabase extends AbstractDatabase {
         return clock.compareTo(existing);
     }
     
-    private static class Bucket extends HashMap<ResourceId, ByteArrayValue> 
+    private static class Bucket extends HashMap<Key, ByteArrayValue> 
             implements Identifier {
         
         private static final long serialVersionUID = -8794611016380746313L;

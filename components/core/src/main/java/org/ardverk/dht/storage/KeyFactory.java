@@ -24,15 +24,15 @@ public abstract class KeyFactory {
     private static final ServiceLoader<KeyFactory> FACTORIES 
         = ServiceLoader.load(KeyFactory.class);
     
-    public static ResourceId parseKey(String uri) {
+    public static Key parseKey(String uri) {
         return parseKey(URI.create(uri));
     }
     
-    public static ResourceId parseKey(URI uri) {
+    public static Key parseKey(URI uri) {
         for (KeyFactory factory : FACTORIES) {
-            ResourceId resourceId = factory.valueOf(uri);
-            if (resourceId != null) {
-                return resourceId;
+            Key key = factory.valueOf(uri);
+            if (key != null) {
+                return key;
             }
         }
         
@@ -42,5 +42,5 @@ public abstract class KeyFactory {
     /**
      * 
      */
-    public abstract ResourceId valueOf(URI uri);
+    public abstract Key valueOf(URI uri);
 }

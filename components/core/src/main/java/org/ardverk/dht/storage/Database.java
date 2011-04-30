@@ -35,7 +35,7 @@ public interface Database {
     /**
      * Stores the given {@link Resource} and returns a {@link Status}.
      */
-    public Content store(ResourceId resourceId, Content content);
+    public Content store(Key key, Content content);
     
     /**
      * Returns all bucket {@link KUID}s.
@@ -43,25 +43,25 @@ public interface Database {
     public Set<KUID> getBuckets();
     
     /**
-     * Returns a {@link Resource} for the given {@link ResourceId}.
+     * Returns a {@link Resource} for the given {@link Key}.
      */
-    public Content get(ResourceId resourceId);
+    public Content get(Key key);
     
     /**
      * Returns all {@link Resource}s.
      */
-    public Iterable<ResourceId> values();
+    public Iterable<Key> values();
     
     /**
      * Retruns all {@link Resource}s in the given bucket.
      */
-    public Iterable<ResourceId> values(KUID bucketId);
+    public Iterable<Key> values(KUID bucketId);
     
     /**
      * Returns all {@link Resource}s that are close to the lookup 
      * {@link KUID} but not any further than the last {@link KUID}.
      */
-    public Iterable<ResourceId> values(KUID lookupId, KUID lastId);
+    public Iterable<Key> values(KUID lookupId, KUID lastId);
     
     /**
      * Returns the size of the {@link Database}.

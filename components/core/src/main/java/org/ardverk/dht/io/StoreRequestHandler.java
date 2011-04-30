@@ -30,7 +30,7 @@ import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Database;
 import org.ardverk.dht.storage.DatabaseConfig;
-import org.ardverk.dht.storage.ResourceId;
+import org.ardverk.dht.storage.Key;
 import org.ardverk.dht.storage.Status;
 import org.ardverk.utils.ArrayUtils;
 
@@ -55,7 +55,7 @@ public class StoreRequestHandler extends AbstractRequestHandler {
     }
 
     public StoreResponse createResponse(StoreRequest request) throws IOException {
-        ResourceId resourceId = request.getResourceId();
+        Key key = request.getKey();
         Content content = request.getContent();
         
         Content result = null;
@@ -63,17 +63,17 @@ public class StoreRequestHandler extends AbstractRequestHandler {
         DatabaseConfig config = database.getDatabaseConfig();
         if (config.isCheckBucket()) {
             
-            KUID bucketId = resourceId.getId();
+            KUID bucketId = key.getId();
             Contact[] contacts = routeTable.select(bucketId);
             Contact localhost = routeTable.getLocalhost();
             
             if (!ArrayUtils.contains(localhost, contacts)) {
                 result = Status.FAILURE;
             } else {
-                result = database.store(resourceId, content);
+                result = database.store(key, content);
             }
         } else {
-            result = database.store(resourceId, content);
+            result = database.store(key, content);
         }
         
         MessageFactory factory = messageDispatcher.getMessageFactory();

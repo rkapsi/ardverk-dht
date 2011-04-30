@@ -34,7 +34,7 @@ import org.ardverk.dht.message.ResponseMessage;
 import org.ardverk.dht.message.StoreRequest;
 import org.ardverk.dht.message.StoreResponse;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.storage.ResourceId;
+import org.ardverk.dht.storage.Key;
 import org.ardverk.lang.TimeStamp;
 
 
@@ -56,7 +56,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     
     private final int k;
     
-    private final ResourceId resourceId;
+    private final Key key;
     
     private final Content content;
     
@@ -65,7 +65,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     public StoreResponseHandler(
             MessageDispatcher messageDispatcher, 
             Contact[] contacts, int k,
-            ResourceId resourceId, Content content, 
+            Key key, Content content, 
             StoreConfig config) {
         super(messageDispatcher);
         
@@ -73,7 +73,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
         this.it = Iterators.fromArray(contacts);
         this.k = k;
         
-        this.resourceId = resourceId;
+        this.key = key;
         this.content = content;
         this.config = config;
         
@@ -117,10 +117,10 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
             
             StoreResponse[] values = responses.toArray(new StoreResponse[0]);
             if (values.length == 0) {
-                setException(new StoreException(resourceId, 
+                setException(new StoreException(key, 
                         content, time, TimeUnit.MILLISECONDS));
             } else {
-                setValue(new DefaultStoreEntity(contacts, resourceId, content, 
+                setValue(new DefaultStoreEntity(contacts, key, content, 
                         values, time, TimeUnit.MILLISECONDS));
             }
         }
@@ -128,7 +128,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     
     private synchronized void store(Contact dst) throws IOException {
         MessageFactory factory = messageDispatcher.getMessageFactory();
-        StoreRequest request = factory.createStoreRequest(dst, resourceId, content);
+        StoreRequest request = factory.createStoreRequest(dst, key, content);
         
         long defaultTimeout = config.getStoreTimeoutInMillis();
         long adaptiveTimeout = config.getAdaptiveTimeout(

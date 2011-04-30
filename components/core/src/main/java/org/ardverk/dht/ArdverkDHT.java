@@ -49,7 +49,7 @@ import org.ardverk.dht.routing.DefaultRouteTable;
 import org.ardverk.dht.routing.Localhost;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Database;
-import org.ardverk.dht.storage.ResourceId;
+import org.ardverk.dht.storage.Key;
 import org.ardverk.dht.storage.StoreForward;
 
 
@@ -123,9 +123,9 @@ public class ArdverkDHT extends AbstractDHT {
         storeForward.bind(new StoreForward.Callback() {
             @Override
             public DHTFuture<StoreEntity> store(Contact dst, 
-                    ResourceId resourceId, Content content, StoreConfig config) {
+                    Key key, Content content, StoreConfig config) {
                 return storeManager.store(new Contact[] { dst }, 
-                        resourceId, content, config);
+                        key, content, config);
             }
         });
     }
@@ -257,14 +257,14 @@ public class ArdverkDHT extends AbstractDHT {
     }
     
     @Override
-    public DHTFuture<ValueEntity> get(ResourceId resourceId, GetConfig config) {
-        return lookupManager.get(resourceId, config);
+    public DHTFuture<ValueEntity> get(Key key, GetConfig config) {
+        return lookupManager.get(key, config);
     }
 
     @Override
-    public DHTFuture<PutEntity> put(ResourceId resourceId, 
+    public DHTFuture<PutEntity> put(Key key, 
             Content content, PutConfig config) {
-        return storeManager.put(resourceId, content, config);
+        return storeManager.put(key, content, config);
     }
 
     @Override

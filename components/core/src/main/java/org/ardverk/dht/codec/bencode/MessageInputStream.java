@@ -53,7 +53,7 @@ import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.DefaultContact;
 import org.ardverk.dht.storage.KeyFactory;
-import org.ardverk.dht.storage.ResourceId;
+import org.ardverk.dht.storage.Key;
 import org.ardverk.net.NetworkUtils;
 import org.ardverk.version.Vector;
 import org.ardverk.version.VectorClock;
@@ -122,7 +122,7 @@ public class MessageInputStream extends BencodingInputStream {
         return NetworkUtils.createUnresolved(host, port);
     }
     
-    public ResourceId readResourceId() throws IOException {
+    public Key readKey() throws IOException {
         URI uri = URI.create(readString());
         return KeyFactory.parseKey(uri);
     }
@@ -244,8 +244,8 @@ public class MessageInputStream extends BencodingInputStream {
     private ValueRequest readValueRequest(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
         
-        ResourceId resourceId = readResourceId();
-        return new DefaultValueRequest(messageId, contact, address, resourceId);
+        Key key = readKey();
+        return new DefaultValueRequest(messageId, contact, address, key);
     }
     
     private ValueResponse readValueResponse(MessageId messageId, 
@@ -258,10 +258,10 @@ public class MessageInputStream extends BencodingInputStream {
     private StoreRequest readStoreRequest(MessageId messageId, 
             Contact contact, SocketAddress address) throws IOException {
         
-        ResourceId resourceId = readResourceId();
+        Key key = readKey();
         Content content = readStreamingContent();
         return new DefaultStoreRequest(messageId, contact, 
-                address, resourceId, content);
+                address, key, content);
     }
     
     private StoreResponse readStoreResponse(MessageId messageId, 

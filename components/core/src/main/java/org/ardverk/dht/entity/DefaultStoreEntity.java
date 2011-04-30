@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 import org.ardverk.dht.message.Content;
 import org.ardverk.dht.message.StoreResponse;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.storage.ResourceId;
+import org.ardverk.dht.storage.Key;
 import org.ardverk.dht.storage.Status;
 
 /**
@@ -31,19 +31,19 @@ public class DefaultStoreEntity extends AbstractEntity implements StoreEntity {
 
     private final Contact[] contacts;
     
-    private final ResourceId resourceId;
+    private final Key key;
     
     private final Content content;
     
     private final StoreResponse[] responses;
     
-    public DefaultStoreEntity(Contact[] contacts, ResourceId resourceId, 
+    public DefaultStoreEntity(Contact[] contacts, Key key, 
             Content content, StoreResponse[] responses, 
             long time, TimeUnit unit) {
         super(time, unit);
         
         this.contacts = contacts;
-        this.resourceId = resourceId;
+        this.key = key;
         this.content = content;
         this.responses = responses;
     }
@@ -54,8 +54,8 @@ public class DefaultStoreEntity extends AbstractEntity implements StoreEntity {
     }
 
     @Override
-    public ResourceId getResourceId() {
-        return resourceId;
+    public Key getResourceId() {
+        return key;
     }
 
     @Override
