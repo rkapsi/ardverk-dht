@@ -76,7 +76,6 @@ public class InMemoryDatabase extends AbstractDatabase {
         return Status.conflict(existing);
     }
     
-    @Override
     public synchronized Set<KUID> getBuckets() {
         return new HashSet<KUID>(database.keySet());
     }
@@ -150,7 +149,6 @@ public class InMemoryDatabase extends AbstractDatabase {
         return values;
     }
     
-    @Override
     public synchronized Iterable<Key> values(KUID bucketId) {
         Bucket bucket = database.get(bucketId);
         if (bucket != null) {

@@ -20,14 +20,14 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-public class DefaultResourceFactoryTest {
+public class KeyFactoryTest {
 
     @Test
     public void equals() {
-        Key key1 = DefaultKey.valueOf("ardverk:///key1");
-        Key key2 = DefaultKey.valueOf("ardverk:///key1");
+        Key key1 = KeyFactory.parseKey("ardverk:///key1");
+        Key key2 = KeyFactory.parseKey("ardverk:///key1");
         
-        Key key3 = DefaultKey.valueOf("ardverk:///key2");
+        Key key3 = KeyFactory.parseKey("ardverk:///key2");
         
         TestCase.assertEquals(key1, key2);
         TestCase.assertFalse(key1.equals(key3));

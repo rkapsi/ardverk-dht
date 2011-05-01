@@ -41,7 +41,7 @@ public class ValueList extends AbstractValue {
         this.keys = keys;
     }
     
-    public Key[] getResourceIds() {
+    public Key[] getValueIds() {
         return keys;
     }
     

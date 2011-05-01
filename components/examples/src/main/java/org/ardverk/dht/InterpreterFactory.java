@@ -50,7 +50,7 @@ public class InterpreterFactory {
     }
     
     public static Interpreter create(Class<?> clazz, String name) {
-        Reader reader = getResourceAsStream(clazz, name);
+        Reader reader = getValueAsStream(clazz, name);
         try {
             return create(reader);
         } finally {
@@ -72,7 +72,7 @@ public class InterpreterFactory {
         return interpreter;
     }
     
-    private static Reader getResourceAsStream(Class<?> clazz, String name) {
+    private static Reader getValueAsStream(Class<?> clazz, String name) {
         InputStream in = clazz.getResourceAsStream(name);
         if (in != null) {
             return new BufferedReader(new InputStreamReader(in));

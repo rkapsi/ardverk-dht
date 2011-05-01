@@ -16,8 +16,6 @@
 
 package org.ardverk.dht.storage;
 
-import java.util.Set;
-
 import org.ardverk.dht.KUID;
 
 /**
@@ -32,32 +30,22 @@ public interface Database {
     public DatabaseConfig getDatabaseConfig();
     
     /**
-     * Stores the given {@link Resource} and returns a {@link Status}.
+     * Stores the given {@link Value} and returns a {@link Status}.
      */
     public Value store(Key key, Value value);
     
     /**
-     * Returns all bucket {@link KUID}s.
-     */
-    public Set<KUID> getBuckets();
-    
-    /**
-     * Returns a {@link Resource} for the given {@link Key}.
+     * Returns a {@link Value} for the given {@link Key}.
      */
     public Value get(Key key);
     
     /**
-     * Returns all {@link Resource}s.
+     * Returns all {@link Value}s.
      */
     public Iterable<Key> values();
     
     /**
-     * Retruns all {@link Resource}s in the given bucket.
-     */
-    public Iterable<Key> values(KUID bucketId);
-    
-    /**
-     * Returns all {@link Resource}s that are close to the lookup 
+     * Returns all {@link Value}s that are close to the lookup 
      * {@link KUID} but not any further than the last {@link KUID}.
      */
     public Iterable<Key> values(KUID lookupId, KUID lastId);
