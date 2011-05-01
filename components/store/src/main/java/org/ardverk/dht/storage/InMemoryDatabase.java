@@ -54,6 +54,11 @@ public class InMemoryDatabase extends AbstractDatabase {
     public DatabaseConfig getDatabaseConfig() {
         return config;
     }
+    
+    @Override
+    public Value getFailureValue() {
+        return Status.FAILURE;
+    }
 
     @Override
     public synchronized Value store(Key key, Value value) {

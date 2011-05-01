@@ -59,4 +59,9 @@ public interface Database {
      * Returns {@code true} if the {@link Database} is empty.
      */
     public boolean isEmpty();
+    
+    /**
+     * 
+     */
+    public Value getFailureValue();
 }
