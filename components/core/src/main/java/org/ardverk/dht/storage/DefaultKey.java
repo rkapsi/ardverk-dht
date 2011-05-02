@@ -37,7 +37,7 @@ public class DefaultKey extends AbstractKey {
             throw new IllegalArgumentException(uri.toString());
         }
         
-        String path = uri.getPath();
+        String path = KeyUtils.getKeyPath(uri);
         
         int p = path.indexOf('/');
         if (p != 0) {
@@ -72,7 +72,7 @@ public class DefaultKey extends AbstractKey {
     public URI getURI() {
         return uri;
     }
-    
+
     private static byte[] digest(String bucket) {
         MessageDigest md = MessageDigestUtils.createSHA1();
         return md.digest(StringUtils.getBytes(bucket));
