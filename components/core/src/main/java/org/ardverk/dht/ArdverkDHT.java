@@ -27,14 +27,12 @@ import org.ardverk.dht.config.LookupConfig;
 import org.ardverk.dht.config.PingConfig;
 import org.ardverk.dht.config.PutConfig;
 import org.ardverk.dht.config.QuickenConfig;
-import org.ardverk.dht.config.StoreConfig;
 import org.ardverk.dht.config.SyncConfig;
 import org.ardverk.dht.entity.BootstrapEntity;
 import org.ardverk.dht.entity.NodeEntity;
 import org.ardverk.dht.entity.PingEntity;
 import org.ardverk.dht.entity.PutEntity;
 import org.ardverk.dht.entity.QuickenEntity;
-import org.ardverk.dht.entity.StoreEntity;
 import org.ardverk.dht.entity.SyncEntity;
 import org.ardverk.dht.entity.ValueEntity;
 import org.ardverk.dht.io.DefaultMessageDispatcher;
@@ -122,15 +120,6 @@ public class ArdverkDHT extends AbstractDHT {
             }
         });
         
-        IoUtils.bind(storeForward, new StoreForward.Callback() {
-            @Override
-            public DHTFuture<StoreEntity> store(Contact dst, 
-                    Key key, Value value, StoreConfig config) {
-                return storeManager.store(new Contact[] { dst }, 
-                        key, value, config);
-            }
-        });
-        
         IoUtils.bind(database, this);
     }
     
@@ -140,7 +129,6 @@ public class ArdverkDHT extends AbstractDHT {
         messageDispatcher.close();
         
         IoUtils.unbind(database);
-        IoUtils.unbind(storeForward);
         IoUtils.unbind(routeTable);
     }
     

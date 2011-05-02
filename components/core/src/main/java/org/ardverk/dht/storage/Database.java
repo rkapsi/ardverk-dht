@@ -18,6 +18,7 @@ package org.ardverk.dht.storage;
 
 import org.ardverk.dht.DHT;
 import org.ardverk.dht.KUID;
+import org.ardverk.dht.routing.Contact;
 import org.ardverk.io.Bindable;
 
 /**
@@ -61,6 +62,11 @@ public interface Database extends Bindable<DHT> {
      * Returns {@code true} if the {@link Database} is empty.
      */
     public boolean isEmpty();
+    
+    /**
+     * 
+     */
+    public void forward(Contact dst, KUID lastId);
     
     /**
      * 

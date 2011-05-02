@@ -18,50 +18,23 @@ package org.ardverk.dht.storage;
 
 import org.ardverk.collection.CollectionUtils;
 import org.ardverk.dht.KUID;
-import org.ardverk.dht.concurrent.DHTFuture;
-import org.ardverk.dht.config.StoreConfig;
-import org.ardverk.dht.entity.StoreEntity;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
-import org.ardverk.dht.storage.StoreForward.Callback;
-import org.ardverk.io.Bindable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
  * This class implements the logic that is used to determinate weather or
  * not a value should be store-forwarded.
  */
-public class StoreForward implements Bindable<Callback> {
-
-    private static final Logger LOG 
-        = LoggerFactory.getLogger(StoreForward.class);
+public class StoreForward {
     
     private final RouteTable routeTable;
     
     private final Database database;
     
-    private volatile Callback callback;
-    
     public StoreForward(RouteTable routeTable, Database database) {
         this.routeTable = routeTable;
         this.database = database;
-    }
-    
-    @Override
-    public void bind(Callback callback) {
-        this.callback = callback;
-    }
-    
-    @Override
-    public void unbind() {
-        this.callback = null;
-    }
-    
-    @Override
-    public boolean isBound() {
-        return callback != null;
     }
     
     public void handleRequest(Contact contact) {
@@ -82,47 +55,28 @@ public class StoreForward implements Bindable<Callback> {
             return;
         }
         
-        Callback callback = this.callback;
-        if (callback == null) {
-            return;
-        }
-        
         if (contact.isInvisible()) {
             return;
         }
         
         KUID contactId = contact.getId();
+
+        Contact localhost = routeTable.getLocalhost();
         Contact[] contacts = routeTable.select(contactId);
-        
-        if (!isResponsible(contact, contacts)) {
+        if (!isResponsible(localhost, contact, contacts)) {
             return;
         }
         
-        StoreConfig storeConfig = config.getStoreConfig();
-        
         Contact last = CollectionUtils.last(contacts);    
-        Iterable<Key> keys = database.values(contactId, last.getId());
-        
-        for (Key key : keys) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(routeTable.getLocalhost().getId() 
-                        + " foward " + key
-                        + " to " + contact.getId());
-            }
-            
-            Value value = database.get(key);
-            if (value != null) {
-                callback.store(contact, key, value, storeConfig);
-            }
-        }
+        database.forward(contact, last.getId());
     }
     
     /**
      * Returns {@code true} if we're responsible for store-forwarding
      * a value to the given {@link Contact}.
      */
-    private boolean isResponsible(Contact contact, Contact[] contacts) {
-        Contact localhost = routeTable.getLocalhost();
+    private static boolean isResponsible(Contact localhost, 
+            Contact contact, Contact[] contacts) {
         
         if (0 < contacts.length && !contact.equals(localhost)) {
             Contact first = CollectionUtils.first(contacts);
@@ -154,21 +108,5 @@ public class StoreForward implements Bindable<Callback> {
             return contact.getInstanceId() != existing.getInstanceId();
         }
         return true;
-    }
-    
-    /**
-     * The {@link Callback} is being called by the 
-     * {@link StoreForward} service.
-     * 
-     * @see StoreForward#bind(Callback)
-     */
-    public static interface Callback {
-        
-        /**
-         * Called by the {@link StoreForward} service for each {@link Value}
-         * that needs to be sent to the given {@link Contact}.
-         */
-        public DHTFuture<StoreEntity> store(Contact dst, 
-                Key key, Value value, StoreConfig config);
     }
 }
