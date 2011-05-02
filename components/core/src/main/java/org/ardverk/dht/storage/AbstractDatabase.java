@@ -70,7 +70,7 @@ public abstract class AbstractDatabase implements Database {
         }
         
         StoreConfig storeConfig = config.getStoreConfig();
-        Iterable<Key> keys = values(dst.getId(), lastId);
+        Iterable<Key> keys = keys(dst.getId(), lastId);
         
         DHT dht = getDHT();
         StoreManager storeManager = ((ArdverkDHT)dht).getStoreManager();

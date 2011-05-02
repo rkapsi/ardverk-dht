@@ -43,15 +43,15 @@ public interface Database extends Bindable<DHT> {
     public Value get(Key key);
     
     /**
-     * Returns all {@link Value}s.
+     * Returns all {@link Key}s.
      */
-    public Iterable<Key> values();
+    public Iterable<Key> keys();
     
     /**
-     * Returns all {@link Value}s that are close to the lookup 
+     * Returns all {@link Key}s that are close to the lookup 
      * {@link KUID} but not any further than the last {@link KUID}.
      */
-    public Iterable<Key> values(KUID lookupId, KUID lastId);
+    public Iterable<Key> keys(KUID lookupId, KUID lastId);
     
     /**
      * Returns the size of the {@link Database}.

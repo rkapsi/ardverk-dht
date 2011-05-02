@@ -145,7 +145,7 @@ public class InMemoryDatabase extends AbstractDatabase {
     }
     
     @Override
-    public synchronized Iterable<Key> values() {
+    public synchronized Iterable<Key> keys() {
         List<Key> values = new ArrayList<Key>();
         for (Bucket bucket : database.values()) {
             values.addAll(bucket.keySet());
@@ -153,7 +153,7 @@ public class InMemoryDatabase extends AbstractDatabase {
         return values;
     }
     
-    public synchronized Iterable<Key> values(KUID bucketId) {
+    public synchronized Iterable<Key> keys(KUID bucketId) {
         Bucket bucket = database.get(bucketId);
         if (bucket != null) {
             return new ArrayList<Key>(bucket.keySet());
@@ -162,7 +162,7 @@ public class InMemoryDatabase extends AbstractDatabase {
     }
 
     @Override
-    public synchronized Iterable<Key> values(
+    public synchronized Iterable<Key> keys(
             final KUID lookupId, final KUID lastId) {
         
         final List<Key> values = new ArrayList<Key>();

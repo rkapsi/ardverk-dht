@@ -101,7 +101,7 @@ public class SyncManager {
             // The number of STOREs we've sent
             final CountDown storeCounter = new CountDown();
             
-            for (final Key key : database.values()) {
+            for (final Key key : database.keys()) {
                 
                 final Value value = database.get(key);
                 if (value == null) {
@@ -113,6 +113,7 @@ public class SyncManager {
                 
                 // Skip all values for which we're not in the k-closest.
                 // This can happen in caching scenarios!
+                // TODO: This doesn't work if write availability is the goal.
                 int index = ArrayUtils.indexOf(localhost, contacts);
                 if (index == -1) {
                     continue;
