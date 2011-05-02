@@ -65,7 +65,7 @@ public abstract class AbstractDatabase implements Database {
         for (Key key : keys) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(dht.getLocalhost().getId() 
-                        + " foward " + key
+                        + " forward " + key
                         + " to " + dst.getId());
             }
             
