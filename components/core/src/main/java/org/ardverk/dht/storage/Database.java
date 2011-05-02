@@ -16,13 +16,15 @@
 
 package org.ardverk.dht.storage;
 
+import org.ardverk.dht.DHT;
 import org.ardverk.dht.KUID;
+import org.ardverk.io.Bindable;
 
 /**
  * A simple and minimum interface of a {@link Database} 
  * that is needed by the DHT.
  */
-public interface Database {
+public interface Database extends Bindable<DHT> {
     
     /**
      * Returns the {@link DatabaseConfig}.

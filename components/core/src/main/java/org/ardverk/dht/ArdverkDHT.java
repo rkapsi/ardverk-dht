@@ -51,6 +51,7 @@ import org.ardverk.dht.storage.Database;
 import org.ardverk.dht.storage.Key;
 import org.ardverk.dht.storage.StoreForward;
 import org.ardverk.dht.storage.Value;
+import org.ardverk.io.IoUtils;
 
 
 /**
@@ -76,6 +77,8 @@ public class ArdverkDHT extends AbstractDHT {
     
     private final MessageDispatcher messageDispatcher;
     
+    private final StoreForward storeForward;
+    
     public ArdverkDHT(int keySize, Database database) {
         this(new Localhost(keySize), database);
     }
@@ -95,8 +98,7 @@ public class ArdverkDHT extends AbstractDHT {
         this.routeTable = routeTable;
         this.database = database;
         
-        StoreForward storeForward 
-            = new StoreForward(routeTable, database);
+        storeForward = new StoreForward(routeTable, database);
         
         messageDispatcher = new DefaultMessageDispatcher(
                 messageFactory, storeForward, 
@@ -112,7 +114,7 @@ public class ArdverkDHT extends AbstractDHT {
         lookupManager = new LookupManager(this, 
                 messageDispatcher, routeTable);
         
-        routeTable.bind(new RouteTable.ContactPinger() {
+        IoUtils.bind(routeTable, new RouteTable.ContactPinger() {
             @Override
             public DHTFuture<PingEntity> ping(Contact contact,
                     PingConfig config) {
@@ -120,7 +122,7 @@ public class ArdverkDHT extends AbstractDHT {
             }
         });
         
-        storeForward.bind(new StoreForward.Callback() {
+        IoUtils.bind(storeForward, new StoreForward.Callback() {
             @Override
             public DHTFuture<StoreEntity> store(Contact dst, 
                     Key key, Value value, StoreConfig config) {
@@ -128,12 +130,18 @@ public class ArdverkDHT extends AbstractDHT {
                         key, value, config);
             }
         });
+        
+        IoUtils.bind(database, this);
     }
     
     @Override
     public void close() {
         super.close();
         messageDispatcher.close();
+        
+        IoUtils.unbind(database);
+        IoUtils.unbind(storeForward);
+        IoUtils.unbind(routeTable);
     }
     
     @Override

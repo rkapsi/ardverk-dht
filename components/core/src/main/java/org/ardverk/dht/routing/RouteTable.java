@@ -20,29 +20,16 @@ import org.ardverk.dht.KUID;
 import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.config.PingConfig;
 import org.ardverk.dht.entity.PingEntity;
+import org.ardverk.dht.routing.RouteTable.ContactPinger;
+import org.ardverk.io.Bindable;
 
-public interface RouteTable extends IoErrorCallback {
+public interface RouteTable extends Bindable<ContactPinger>, IoErrorCallback {
     
     /**
      * Returns the {@link RouteTable}'s K parameter as 
      * defined in the Kademlia specification.
      */
     public int getK();
-    
-    /**
-     * Binds the {@link RouteTable} to the given {@link ContactPinger}.
-     */
-    public void bind(ContactPinger pinger);
-    
-    /**
-     * Unbinds the {@link RouteTable}.
-     */
-    public void unbind();
-    
-    /**
-     * Returns true if the {@link RouteTable} is bound to a {@link ContactPinger}.
-     */
-    public boolean isBound();
     
     /**
      * Returns the localhost {@link Localhost}.

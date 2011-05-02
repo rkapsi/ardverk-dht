@@ -43,8 +43,7 @@ public abstract class AbstractRouteTable implements RouteTable {
             throw new IllegalStateException();
         }
     }
-
-
+    
     @Override
     public void unbind() {
         pingerRef.set(null);

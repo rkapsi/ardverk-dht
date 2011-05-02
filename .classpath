@@ -16,8 +16,8 @@
 	<classpathentry kind="lib" path="lib/slf4j/slf4j-simple/jars/slf4j-simple-1.6.1.jar"/>
 	<classpathentry kind="lib" path="lib/jboss/netty/jars/netty-3.2.4.jar" sourcepath="/netty"/>
 	<classpathentry kind="lib" path="lib/ardverk/patricia-trie/jars/patricia-trie-0.6.jar"/>
-	<classpathentry kind="lib" path="lib/ardverk/ardverk-commons/jars/ardverk-commons-0.1.jar"/>
 	<classpathentry kind="lib" path="lib/ardverk/ardverk-concurrent/jars/ardverk-concurrent-0.2.jar"/>
 	<classpathentry kind="lib" path="lib/ardverk/bee-encode/jars/bee-encode-0.3.jar"/>
+	<classpathentry kind="lib" path="lib/ardverk/ardverk-commons/jars/ardverk-commons-0.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

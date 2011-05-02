@@ -23,6 +23,8 @@ import org.ardverk.dht.config.StoreConfig;
 import org.ardverk.dht.entity.StoreEntity;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
+import org.ardverk.dht.storage.StoreForward.Callback;
+import org.ardverk.io.Bindable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * This class implements the logic that is used to determinate weather or
  * not a value should be store-forwarded.
  */
-public class StoreForward {
+public class StoreForward implements Bindable<Callback> {
 
     private static final Logger LOG 
         = LoggerFactory.getLogger(StoreForward.class);
@@ -47,14 +49,17 @@ public class StoreForward {
         this.database = database;
     }
     
+    @Override
     public void bind(Callback callback) {
         this.callback = callback;
     }
     
+    @Override
     public void unbind() {
         this.callback = null;
     }
     
+    @Override
     public boolean isBound() {
         return callback != null;
     }

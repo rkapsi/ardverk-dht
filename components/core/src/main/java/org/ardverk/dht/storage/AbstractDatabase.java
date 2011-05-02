@@ -16,10 +16,31 @@
 
 package org.ardverk.dht.storage;
 
+import java.util.concurrent.atomic.AtomicReference;
+
+import org.ardverk.dht.DHT;
+
 /**
  * An abstract implementation of {@link Database}.
  */
 public abstract class AbstractDatabase implements Database {
+
+    private final AtomicReference<DHT> dhtRef = new AtomicReference<DHT>();
+    
+    @Override
+    public void bind(DHT dht) {
+        dhtRef.set(dht);
+    }
+
+    @Override
+    public boolean isBound() {
+        return dhtRef.get() != null;
+    }
+
+    @Override
+    public void unbind() {
+        dhtRef.set(null);
+    }
 
     @Override
     public boolean isEmpty() {
