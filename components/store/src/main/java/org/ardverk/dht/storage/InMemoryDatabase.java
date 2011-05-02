@@ -56,12 +56,11 @@ public class InMemoryDatabase extends AbstractDatabase {
     }
     
     @Override
-    public Value getFailureValue() {
-        return Status.FAILURE;
-    }
-
-    @Override
     public synchronized Value store(Key key, Value value) {
+        if (!isInBucket(key)) {
+            return Status.FAILURE;
+        }
+        
         return store(key, InMemoryValue.create(value));
     }
     

@@ -62,7 +62,7 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
         ping = new PingRequestHandler(this);
         node = new NodeRequestHandler(this, routeTable);
         value = new ValueRequestHandler(this, routeTable, database);
-        store = new StoreRequestHandler(this, routeTable, database);
+        store = new StoreRequestHandler(this, database);
     }
     
     /**

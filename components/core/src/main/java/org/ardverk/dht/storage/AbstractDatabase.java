@@ -24,6 +24,7 @@ import org.ardverk.dht.KUID;
 import org.ardverk.dht.StoreManager;
 import org.ardverk.dht.config.StoreConfig;
 import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.RouteTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,11 +32,15 @@ import org.slf4j.LoggerFactory;
  * An abstract implementation of {@link Database}.
  */
 public abstract class AbstractDatabase implements Database {
-
+    
     private static final Logger LOG 
         = LoggerFactory.getLogger(AbstractDatabase.class);
     
     private final AtomicReference<DHT> dhtRef = new AtomicReference<DHT>();
+    
+    protected DHT getDHT() {
+        return dhtRef.get();
+    }
     
     @Override
     public void bind(DHT dht) {
@@ -53,13 +58,21 @@ public abstract class AbstractDatabase implements Database {
     }
     
     @Override
+    public boolean isEmpty() {
+        return size() == 0;
+    }
+    
+    @Override
     public void forward(Contact dst, KUID lastId) {
         DatabaseConfig config = getDatabaseConfig();
-        StoreConfig storeConfig = config.getStoreConfig();
+        if (!config.isStoreForward()) {
+            return;
+        }
         
+        StoreConfig storeConfig = config.getStoreConfig();
         Iterable<Key> keys = values(dst.getId(), lastId);
         
-        DHT dht = dhtRef.get();
+        DHT dht = getDHT();
         StoreManager storeManager = ((ArdverkDHT)dht).getStoreManager();
         
         for (Key key : keys) {
@@ -76,9 +89,13 @@ public abstract class AbstractDatabase implements Database {
             }
         }
     }
-
-    @Override
-    public boolean isEmpty() {
-        return size() == 0;
+    
+    protected boolean isInBucket(Key key) {
+        DatabaseConfig config = getDatabaseConfig();
+        if (config.isCheckBucket()) {
+            RouteTable routeTable = getDHT().getRouteTable();
+            return DatabaseUtils.isInBucket(key, routeTable);
+        }
+        return true;
     }
 }

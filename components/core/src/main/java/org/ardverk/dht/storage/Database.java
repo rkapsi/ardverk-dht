@@ -67,9 +67,4 @@ public interface Database extends Bindable<DHT> {
      * 
      */
     public void forward(Contact dst, KUID lastId);
-    
-    /**
-     * 
-     */
-    public Value getFailureValue();
 }
