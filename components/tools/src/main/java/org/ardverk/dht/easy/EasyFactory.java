@@ -38,6 +38,7 @@ public class EasyFactory {
             = new DefaultMessageFactory(keySize, localhost);
         
         Database database = new InMemoryDatabase();
+        //Database database = new SimpleDatabase(new File("database", localhost.getId().toHexString()));
         RouteTable routeTable = new DefaultRouteTable(localhost);
         
         return new DefaultEasyDHT(config, messageFactory, 

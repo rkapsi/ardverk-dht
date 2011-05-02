@@ -18,12 +18,16 @@ package org.ardverk.dht.storage;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import org.ardverk.dht.KUID;
 import org.ardverk.io.IoUtils;
@@ -54,7 +58,11 @@ public class SimpleDatabase extends AbstractDatabase {
     }
     
     private static boolean mkdirs(File file) {
-        return file.getParentFile().mkdirs();
+        File parent = file.getParentFile();
+        if (!parent.exists()) {
+            return parent.mkdirs();            
+        }
+        return true;
     }
 
     @Override
@@ -126,16 +134,50 @@ public class SimpleDatabase extends AbstractDatabase {
 
     @Override
     public Iterable<Key> keys() {
-        return null;
+        return keys(dir, dir, new ArrayList<Key>());
+    }
+    
+    private static List<Key> keys(final File root, File dir, final List<Key> dst) {
+        dir.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File path) {
+                if (path.isDirectory()) {
+                    keys(root, path, dst);
+                } else {
+                    dst.add(createKey(root, path));
+                }
+                
+                return false;
+            }
+        });
+        return dst;
     }
 
     @Override
     public Iterable<Key> keys(KUID lookupId, KUID lastId) {
-        return null;
+        List<Key> dst = new ArrayList<Key>();
+        for (Key key : keys()) {
+            if (lookupId.isCloserTo(key.getId(), lastId)) {
+                dst.add(key);
+            }
+        }
+        return dst;
     }
 
     @Override
     public int size() {
-        return 0;
+        return ((Collection<?>)keys()).size();
+    }
+    
+    private static Key createKey(File root, File file) {
+        String rootPath = root.getAbsolutePath();
+        String filePath = file.getAbsolutePath();
+        
+        String relative = filePath.substring(rootPath.length());
+        if (!relative.startsWith("/")) {
+            relative = "/" + relative;
+        }
+        
+        return KeyFactory.parseKey("ardverk://" + relative);
     }
 }
