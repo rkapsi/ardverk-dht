@@ -25,11 +25,10 @@ import org.ardverk.dht.KUID;
 import org.ardverk.dht.codec.bencode.MessageInputStream;
 import org.ardverk.dht.codec.bencode.MessageOutputStream;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.io.IoUtils;
 import org.ardverk.utils.StringUtils;
 import org.ardverk.version.VectorClock;
 
-public class InMemoryValue extends AbstractValue {
+public class InMemoryValue extends SimpleValue {
 
     public static final byte[] EMPTY = new byte[0];
     
@@ -49,6 +48,11 @@ public class InMemoryValue extends AbstractValue {
         this.value = value;
     }
     
+    @Override
+    public ValueType getValueType() {
+        return ValueType.BLOB;
+    }
+
     public Contact getCreator() {
         return creator;
     }
@@ -108,6 +112,8 @@ public class InMemoryValue extends AbstractValue {
             try {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 MessageOutputStream out = new MessageOutputStream(baos);
+                
+                writeHeader(out);
                 out.writeContact(creator);
                 out.writeVectorClock(clock);
                 out.writeBytes(value);
@@ -122,18 +128,10 @@ public class InMemoryValue extends AbstractValue {
         return payload;
     }
     
-    public static InMemoryValue create(Value content) {
-        MessageInputStream in = null;
-        try {
-            in = new MessageInputStream(content.getContent());
-            Contact creator = in.readContact();
-            VectorClock<KUID> clock = in.readVectorClock();
-            byte[] value = in.readBytes();
-            return new InMemoryValue(creator, clock, value);
-        } catch (IOException err) {
-            throw new IllegalStateException("IOException", err);
-        } finally {
-            IoUtils.close(in);
-        }
+    public static InMemoryValue valueOf(MessageInputStream in) throws IOException {
+        Contact creator = in.readContact();
+        VectorClock<KUID> clock = in.readVectorClock();
+        byte[] value = in.readBytes();
+        return new InMemoryValue(creator, clock, value);
     }
 }

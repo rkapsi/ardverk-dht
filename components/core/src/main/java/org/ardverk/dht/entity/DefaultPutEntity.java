@@ -58,9 +58,4 @@ public class DefaultPutEntity extends AbstractLookupEntity implements PutEntity 
     public Contact[] getStoreContacts() {
         return storeEntity.getStoreContacts();
     }
-
-    @Override
-    public boolean isSuccess() {
-        return storeEntity.isSuccess();
-    }
 }

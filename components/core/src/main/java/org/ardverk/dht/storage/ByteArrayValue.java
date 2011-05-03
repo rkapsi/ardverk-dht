@@ -56,8 +56,7 @@ public class ByteArrayValue implements Value {
     public InputStream getContent() {
         return new ByteArrayInputStream(content, offset, length);
     }
-
-    @Override
+    
     public byte[] getContentAsBytes() {
         if (offset == 0 && length == content.length) {
             return content;

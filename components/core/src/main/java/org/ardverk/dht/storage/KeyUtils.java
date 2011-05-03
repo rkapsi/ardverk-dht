@@ -40,7 +40,7 @@ public class KeyUtils {
         // We consider the host:port part of the path.
         if (host != null && !host.isEmpty()) {
             StringBuilder sb = new StringBuilder(
-                    host.length() + path.length() + 10);
+                    host.length() + path.length() + 6);
             sb.append('/').append(host);
             
             int port = uri.getPort();

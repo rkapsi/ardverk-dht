@@ -25,23 +25,27 @@ import java.util.Collection;
 import org.ardverk.collection.CollectionUtils;
 import org.ardverk.dht.codec.bencode.MessageInputStream;
 import org.ardverk.dht.codec.bencode.MessageOutputStream;
-import org.ardverk.io.IoUtils;
 
-public class ValueList extends AbstractValue {
+public class KeyList extends SimpleValue {
 
     private final Key[] keys;
     
     private byte[] payload = null;
     
-    public ValueList(Collection<? extends Key> c) {
+    public KeyList(Collection<? extends Key> c) {
         this(CollectionUtils.toArray(c, Key.class));
     }
     
-    public ValueList(Key[] keys) {
+    public KeyList(Key[] keys) {
         this.keys = keys;
     }
     
-    public Key[] getValueIds() {
+    @Override
+    public ValueType getValueType() {
+        return ValueType.KEY_LIST;
+    }
+
+    public Key[] getKeys() {
         return keys;
     }
     
@@ -83,6 +87,8 @@ public class ValueList extends AbstractValue {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 MessageOutputStream out = new MessageOutputStream(baos);
                 
+                writeHeader(out);
+                
                 out.writeShort(keys.length);
                 for (Key key: keys) {
                     out.writeKey(key);
@@ -97,22 +103,13 @@ public class ValueList extends AbstractValue {
         return payload;
     }
     
-    public static ValueList valueOf(Value content) {
-        MessageInputStream in = null;
-        try {
-            in = new MessageInputStream(content.getContent());
-            
-            int count = in.readUnsignedShort();
-            Key[] keys = new Key[count];
-            for (int i = 0; i < keys.length; i++) {
-                keys[i] = in.readKey();
-            }
-            
-            return new ValueList(keys);
-        } catch (IOException err) {
-            throw new IllegalStateException("IOException", err);
-        } finally {
-            IoUtils.close(in);
+    public static KeyList valueOf(MessageInputStream in) throws IOException {
+        int count = in.readUnsignedShort();
+        Key[] keys = new Key[count];
+        for (int i = 0; i < keys.length; i++) {
+            keys[i] = in.readKey();
         }
+        
+        return new KeyList(keys);
     }
 }

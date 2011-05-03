@@ -45,11 +45,6 @@ public interface PutEntity extends LookupEntity {
     public StoreResponse[] getStoreResponses();
     
     /**
-     * @see StoreEntity#isSuccess()
-     */
-    public boolean isSuccess();
-    
-    /**
      * @see StoreEntity#getStoreContacts()
      */
     public Contact[] getStoreContacts();

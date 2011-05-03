@@ -25,9 +25,14 @@ import org.ardverk.dht.codec.bencode.MessageInputStream;
 import org.ardverk.dht.codec.bencode.MessageOutputStream;
 import org.ardverk.dht.lang.IntegerValue;
 import org.ardverk.dht.lang.StringValue;
-import org.ardverk.io.IoUtils;
+import org.ardverk.dht.message.StoreResponse;
+import org.ardverk.io.SequenceInputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class Status extends AbstractValue implements IntegerValue, StringValue {
+public class Status extends SimpleValue implements IntegerValue, StringValue {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(Status.class);
     
     private static enum Code {
         SUCCESS(100),
@@ -84,18 +89,18 @@ public class Status extends AbstractValue implements IntegerValue, StringValue {
     
     private final String message;
     
-    private final Value content;
+    private final Value value;
     
     private byte[] payload = null;
     
-    private Status(Code code, Value content) {
-        this(code.value, code.name(), content);
+    private Status(Code code, Value value) {
+        this(code.value, code.name(), value);
     }
     
-    private Status(int code, String message, Value content) {
+    private Status(int code, String message, Value value) {
         this.code = code;
         this.message = message;
-        this.content = content;
+        this.value = value;
     }
     
     @Override
@@ -132,39 +137,57 @@ public class Status extends AbstractValue implements IntegerValue, StringValue {
     
     @Override
     public long getContentLength() {
-        return payload().length;
+        long contentLength = payload().length;
+        if (value != null) {
+            contentLength += value.getContentLength();
+        }
+        return contentLength;
     }
 
     @Override
     public InputStream getContent() throws IOException {
-        return new ByteArrayInputStream(payload());
+        InputStream in = new ByteArrayInputStream(payload());
+        
+        if (value != null) {
+            in = new SequenceInputStream(in, value.getContent());
+        }
+        
+        return in;
     }
     
     @Override
     public boolean isRepeatable() {
+        if (value != null) {
+            return value.isRepeatable();
+        }
         return true;
     }
 
     @Override
     public boolean isStreaming() {
+        if (value != null) {
+            return value.isStreaming();
+        }
         return false;
     }
     
+    @Override
+    public ValueType getValueType() {
+        return ValueType.STATUS;
+    }
+
     private synchronized byte[] payload() {
         if (payload == null) {
             try {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                
                 MessageOutputStream out = new MessageOutputStream(baos);
+                
+                writeHeader(out);
+                
                 out.writeInt(code);
                 out.writeString(message);
+                out.writeBoolean(value != null);
                 
-                if (content != null) {
-                    out.writeBoolean(true);
-                    out.writeValue(content);
-                } else {
-                    out.writeBoolean(false);
-                }
                 out.close();
                 
                 payload = baos.toByteArray();
@@ -176,23 +199,38 @@ public class Status extends AbstractValue implements IntegerValue, StringValue {
         return payload;
     }
     
-    public static Status valueOf(Value content) {
-        MessageInputStream in = null;
-        try {
-            in = new MessageInputStream(content.getContent());
-            int code = in.readInt();
-            String message = in.readString();
+    public static Status valueOf(MessageInputStream in) throws IOException {
+        int code = in.readInt();
+        String message = in.readString();
+        
+        Value body = null;
+        if (in.readBoolean()) {
+            body = in.readValue();
+        }
+        
+        return valueOf(code, message, body);
+    }
+    
+    public static boolean isSuccess(StoreResponse... responses) {
+        for (StoreResponse response : responses) {
             
-            Value body = null;
-            if (in.readBoolean()) {
-                body = in.readValue();
+            SimpleValue value = null;
+            try {
+                value = SimpleValue.valueOf(response.getValue());
+            } catch (IOException err) {
+                LOG.error("IOException", err);
             }
             
-            return valueOf(code, message, body);
-        } catch (IOException err) {
-            throw new IllegalStateException("IOException", err);
-        } finally {
-            IoUtils.close(in);
+            if (!(value instanceof Status)) {
+                return false;
+            }
+            
+            Status status = (Status)value;
+            if (!status.equals(Status.SUCCESS)) {
+                return false;
+            }
         }
+        
+        return true;
     }
 }

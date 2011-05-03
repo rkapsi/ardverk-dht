@@ -16,6 +16,7 @@
 
 package org.ardverk.dht.storage;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,9 +34,13 @@ import org.ardverk.dht.KUID;
 import org.ardverk.dht.lang.Identifier;
 import org.ardverk.version.Occured;
 import org.ardverk.version.VectorClock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class InMemoryDatabase extends AbstractDatabase {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(InMemoryDatabase.class);
     
     private final Trie<KUID, Bucket> database 
         = new PatriciaTrie<KUID, Bucket>();
@@ -61,7 +66,18 @@ public class InMemoryDatabase extends AbstractDatabase {
             return Status.FAILURE;
         }
         
-        return store(key, InMemoryValue.create(value));
+        SimpleValue simpleValue = null;
+        try {
+            simpleValue = SimpleValue.valueOf(value);
+        } catch (IOException err) {
+            LOG.error("IOException", err);
+        }
+        
+        if (!(simpleValue instanceof InMemoryValue)) {
+            return Status.FAILURE;
+        }
+        
+        return store(key, (InMemoryValue)simpleValue);
     }
     
     private synchronized Value store(Key key, InMemoryValue value) {
@@ -91,7 +107,7 @@ public class InMemoryDatabase extends AbstractDatabase {
         if (query != null) {
             Bucket bucket = database.get(key.getId());
             if (bucket != null) {
-                return new ValueList(bucket.keySet());
+                return new KeyList(bucket.keySet());
             }
             return null;
         }

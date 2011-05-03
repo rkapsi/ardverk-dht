@@ -59,12 +59,4 @@ public interface StoreEntity extends Entity {
      * @see #getStoreResponses()
      */
     public Contact[] getStoreContacts();
-    
-    /**
-     * Returns {@code true} if all {@link StoreResponse}s indicate
-     * that they were successful.
-     * 
-     * @see #getStoreResponses()
-     */
-    public boolean isSuccess();
 }

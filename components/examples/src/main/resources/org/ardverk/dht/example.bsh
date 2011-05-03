@@ -143,27 +143,22 @@ get(DHT dht, String key) {
 	DHTFuture future = dht.get(toKey(key));
 	
 	ValueEntity entity = future.get();
-	InMemoryValue value = InMemoryValue.create(entity.getValue());
+	SimpleValue value = SimpleValue.valueOf(entity.getValue());
 	
-	print("GET: " + entity.getId() + " (" + key + ")" + " -> " 
-		+ toString(value)
-		+ "\n SENDER: " + entity.getSender().getId()
-		+ "\n CREATOR: " + value.getCreator().getId()
-		+ "\n TIME: " + entity.getTimeInMillis() + "ms");
-		
-	return value;
-}
-
-get2(String key) {
-	DHTFuture future = dhts.get(current).get(toKey(key));
+	Contact sender = entity.getSender();
+	Contact creator = sender;
 	
-	ValueEntity entity = future.get();
-	ValueList value = ValueList.valueOf(entity.getValue());
+	if (value instanceof InMemoryValue) {
+	  creator = value.getCreator();
+	}
 	
 	print("GET: " + entity.getId() + " (" + key + ")" + " -> " 
 		+ value
-		+ "\n SENDER: " + entity.getSender().getId()
+		+ "\n SENDER: " + sender.getId()
+		+ "\n CREATOR: " + creator.getId()
 		+ "\n TIME: " + entity.getTimeInMillis() + "ms");
+		
+	return value;
 }
 
 toKey(String key) {
@@ -175,12 +170,6 @@ toValue(String value) {
   //byte[] data = new byte[1024 * 1024];
   //System.arraycopy(raw, 0, data, 0, raw.length);
 	return new InMemoryValue(dhts.get(current).getLocalhost(), null, StringUtils.getBytes(value));
-}
-
-toString(InMemoryValue value) {
-  //byte[] raw = value.getValue();
-	//return StringUtils.toString(raw, 0, Math.min(raw.length, 32));
-	return StringUtils.toString(value.getValue());
 }
 
 // Closes all DHTs

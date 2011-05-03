@@ -20,7 +20,6 @@ import java.io.InputStream;
 
 import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.io.NopInputStream;
-import org.ardverk.lang.Bytes;
 
 public class EmptyValue implements Value {
 
@@ -42,12 +41,7 @@ public class EmptyValue implements Value {
     public InputStream getContent() {
         return new NopInputStream();
     }
-
-    @Override
-    public byte[] getContentAsBytes() {
-        return Bytes.EMPTY;
-    }
-
+    
     @Override
     public boolean isRepeatable() {
         return true;

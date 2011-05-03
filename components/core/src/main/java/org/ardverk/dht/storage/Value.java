@@ -54,11 +54,6 @@ public interface Value {
     public InputStream getContent() throws IOException;
     
     /**
-     * Returns the {@link Value}'s data as a {@code byte[]}.
-     */
-    public byte[] getContentAsBytes() throws IOException;
-    
-    /**
      * Returns {@code true} if the {@link Value} capable of producing 
      * its data more than once.
      */
