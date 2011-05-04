@@ -28,7 +28,7 @@ import org.ardverk.dht.routing.Contact;
 import org.ardverk.utils.StringUtils;
 import org.ardverk.version.VectorClock;
 
-public class InMemoryValue extends SimpleValue {
+public class BlobValue extends SimpleValue {
 
     public static final byte[] EMPTY = new byte[0];
     
@@ -40,19 +40,14 @@ public class InMemoryValue extends SimpleValue {
     
     private byte[] payload = null;
     
-    public InMemoryValue(Contact creator, 
+    public BlobValue(Contact creator, 
             VectorClock<KUID> clock, byte[] value) {
-        
+        super(ValueType.BLOB);
         this.creator = creator;
         this.clock = clock;
         this.value = value;
     }
     
-    @Override
-    public ValueType getValueType() {
-        return ValueType.BLOB;
-    }
-
     public Contact getCreator() {
         return creator;
     }
@@ -73,13 +68,13 @@ public class InMemoryValue extends SimpleValue {
         return size() == 0;
     }
     
-    public InMemoryValue update(Contact contact, byte[] value) {
+    public BlobValue update(Contact contact, byte[] value) {
         VectorClock<KUID> clock = this.clock;
         if (clock != null) {
             clock = clock.append(contact.getId());
         }
         
-        return new InMemoryValue(creator, clock, value);
+        return new BlobValue(creator, clock, value);
     }
     
     @Override
@@ -128,10 +123,10 @@ public class InMemoryValue extends SimpleValue {
         return payload;
     }
     
-    public static InMemoryValue valueOf(MessageInputStream in) throws IOException {
+    public static BlobValue valueOf(MessageInputStream in) throws IOException {
         Contact creator = in.readContact();
         VectorClock<KUID> clock = in.readVectorClock();
         byte[] value = in.readBytes();
-        return new InMemoryValue(creator, clock, value);
+        return new BlobValue(creator, clock, value);
     }
 }

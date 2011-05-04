@@ -37,7 +37,15 @@ public abstract class SimpleValue extends AbstractValue {
         }
     }
     
-    public abstract ValueType getValueType();
+    private final ValueType valueType;
+    
+    public SimpleValue(ValueType valueType) {
+        this.valueType = valueType;
+    }
+    
+    public ValueType getValueType() {
+        return valueType;
+    }
     
     protected void writeHeader(MessageOutputStream out) throws IOException {
         out.writeByte(VERSION);
@@ -61,7 +69,7 @@ public abstract class SimpleValue extends AbstractValue {
                 case KEY_LIST:
                     return KeyList.valueOf(in);
                 case BLOB:
-                    return InMemoryValue.valueOf(in);
+                    return BlobValue.valueOf(in);
                 default:
                     throw new IOException();
             }

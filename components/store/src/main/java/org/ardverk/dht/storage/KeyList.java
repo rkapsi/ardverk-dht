@@ -37,12 +37,8 @@ public class KeyList extends SimpleValue {
     }
     
     public KeyList(Key[] keys) {
+        super(ValueType.KEY_LIST);
         this.keys = keys;
-    }
-    
-    @Override
-    public ValueType getValueType() {
-        return ValueType.KEY_LIST;
     }
 
     public Key[] getKeys() {

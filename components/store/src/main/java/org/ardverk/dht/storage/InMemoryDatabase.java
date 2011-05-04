@@ -73,15 +73,15 @@ public class InMemoryDatabase extends AbstractDatabase {
             LOG.error("IOException", err);
         }
         
-        if (!(simpleValue instanceof InMemoryValue)) {
+        if (!(simpleValue instanceof BlobValue)) {
             return Status.FAILURE;
         }
         
-        return store(key, (InMemoryValue)simpleValue);
+        return store(key, (BlobValue)simpleValue);
     }
     
-    private synchronized Value store(Key key, InMemoryValue value) {
-        InMemoryValue existing = getValue(key);
+    private synchronized Value store(Key key, BlobValue value) {
+        BlobValue existing = getValue(key);
         
         Occured occured = compare(existing, value);
         if (occured == Occured.AFTER) {
@@ -115,12 +115,12 @@ public class InMemoryDatabase extends AbstractDatabase {
         return getValue(key);
     }
     
-    private synchronized InMemoryValue getValue(Key key) {
+    private synchronized BlobValue getValue(Key key) {
         Bucket bucket = database.get(key.getId());
         return bucket != null ? bucket.get(key) : null;
     }
     
-    private synchronized InMemoryValue put(Key key, InMemoryValue value) {
+    private synchronized BlobValue put(Key key, BlobValue value) {
         KUID bucketId = key.getId();
         
         Bucket bucket = database.get(bucketId);
@@ -132,12 +132,12 @@ public class InMemoryDatabase extends AbstractDatabase {
         return bucket.put(key, value);
     }
     
-    private synchronized InMemoryValue remove(Key key) {
+    private synchronized BlobValue remove(Key key) {
         KUID bucketId = key.getId();
         
         Bucket bucket = database.get(bucketId);
         if (bucket != null) {
-            InMemoryValue removed = bucket.remove(key);
+            BlobValue removed = bucket.remove(key);
             if (bucket.isEmpty()) {
                 database.remove(bucketId);
             }
@@ -207,7 +207,7 @@ public class InMemoryDatabase extends AbstractDatabase {
         return sb.toString();
     }
     
-    private static Occured compare(InMemoryValue existing, InMemoryValue value) {
+    private static Occured compare(BlobValue existing, BlobValue value) {
         if (existing == null) {
             return Occured.AFTER;
         }
@@ -228,7 +228,7 @@ public class InMemoryDatabase extends AbstractDatabase {
         return clock.compareTo(existing);
     }
     
-    private static class Bucket extends HashMap<Key, InMemoryValue> 
+    private static class Bucket extends HashMap<Key, BlobValue> 
             implements Identifier {
         
         private static final long serialVersionUID = -8794611016380746313L;

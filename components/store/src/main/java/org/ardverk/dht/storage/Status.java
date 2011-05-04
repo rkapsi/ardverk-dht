@@ -98,6 +98,7 @@ public class Status extends SimpleValue implements IntegerValue, StringValue {
     }
     
     private Status(int code, String message, Value value) {
+        super(ValueType.STATUS);
         this.code = code;
         this.message = message;
         this.value = value;
@@ -169,11 +170,6 @@ public class Status extends SimpleValue implements IntegerValue, StringValue {
             return value.isStreaming();
         }
         return false;
-    }
-    
-    @Override
-    public ValueType getValueType() {
-        return ValueType.STATUS;
     }
 
     private synchronized byte[] payload() {

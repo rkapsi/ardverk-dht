@@ -45,7 +45,7 @@ import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.DefaultRouteTable;
 import org.ardverk.dht.storage.Database;
 import org.ardverk.dht.storage.DefaultKey;
-import org.ardverk.dht.storage.InMemoryValue;
+import org.ardverk.dht.storage.BlobValue;
 import org.ardverk.dht.storage.Key;
 import org.ardverk.dht.storage.Value;
 import org.ardverk.io.IoUtils;
@@ -202,7 +202,7 @@ public class ArdverkUtils {
             int rnd = (int)(dhts.size() * Math.random());
             Contact contact = dhts.get(rnd).getLocalhost();
             
-            Value value = new InMemoryValue(contact, clock, data);
+            Value value = new BlobValue(contact, clock, data);
             
             future = dhts.get(rnd).put(key, value, putConfig);
             
