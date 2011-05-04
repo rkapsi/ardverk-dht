@@ -25,6 +25,7 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.net.SocketException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -54,9 +55,6 @@ public class SocketTransport extends AbstractTransport implements Closeable {
         = ExecutorUtils.newCachedThreadPool("SocketTransportThread");
     
     private static final int DEFAULT_TIMEOUT = 10000;
-    
-    //private final ExecutorQueue<Runnable> executor 
-    //    = new DefaultExecutorQueue(EXECUTOR);
     
     private final MessageCodec codec;
     
@@ -106,10 +104,10 @@ public class SocketTransport extends AbstractTransport implements Closeable {
         super.bind(callback);
     
         socket = new ServerSocket();
-        //socket.setReuseAddress(true);
+        socket.setReuseAddress(true);
         //socket.setReceiveBufferSize(64*1024);
         //socket.bind(bindaddr, 512);
-        socket.bind(bindaddr);
+        //socket.bind(bindaddr);
         
         Runnable task = new Runnable() {
             @Override
@@ -148,7 +146,10 @@ public class SocketTransport extends AbstractTransport implements Closeable {
             boolean processing = false;
             try {
                 client = socket.accept();
+                
+                configure(client);
                 processing = process(client);
+                
             } catch (IOException err) {
                 uncaughtException(socket, err);
             } finally {
@@ -209,7 +210,6 @@ public class SocketTransport extends AbstractTransport implements Closeable {
         };
         
         EXECUTOR.execute(task);
-        //executor.execute(task);
         return true;
     }
     
@@ -232,8 +232,7 @@ public class SocketTransport extends AbstractTransport implements Closeable {
                 boolean hasContent = false;
                 try {
                     client = new Socket();
-                    //client.setReuseAddress(true);
-                    //client.setSendBufferSize(64*1024);
+                    configure(client);
                     
                     int timeoutInMillis = (int)unit.toMillis(timeout);
                     if (timeoutInMillis < 0) {
@@ -267,7 +266,7 @@ public class SocketTransport extends AbstractTransport implements Closeable {
                     hasContent = handleContent(message, 
                             client, encoder, decoder);
                     
-                } catch (IOException err) {
+                } catch (IOException err) {err.printStackTrace();
                     uncaughtException(client, err);
                     handleException(message, err);
                     
@@ -280,7 +279,10 @@ public class SocketTransport extends AbstractTransport implements Closeable {
         };
         
         EXECUTOR.execute(task);
-        //executor.execute(task);
+    }
+    
+    private static void configure(Socket client) throws SocketException {
+        client.setSoLinger(true, 0);
     }
     
     private static void uncaughtException(ServerSocket socket, Throwable t) {
