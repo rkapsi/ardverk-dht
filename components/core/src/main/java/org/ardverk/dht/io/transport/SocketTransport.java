@@ -107,7 +107,7 @@ public class SocketTransport extends AbstractTransport implements Closeable {
         socket.setReuseAddress(true);
         //socket.setReceiveBufferSize(64*1024);
         //socket.bind(bindaddr, 512);
-        socket.bind(bindaddr);
+        //socket.bind(bindaddr);
         
         Runnable task = new Runnable() {
             @Override

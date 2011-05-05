@@ -70,7 +70,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
         super(messageDispatcher);
         
         this.contacts = contacts;
-        this.it = Iterators.iterator(contacts);
+        this.it = Iterators.fromArray(contacts);
         this.k = k;
         
         this.key = key;
