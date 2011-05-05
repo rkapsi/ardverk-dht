@@ -42,6 +42,7 @@ import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.storage.Key;
 import org.ardverk.dht.storage.Value;
+import org.ardverk.io.IoUtils;
 import org.ardverk.version.Vector;
 import org.ardverk.version.VectorClock;
 
@@ -152,11 +153,15 @@ public class MessageOutputStream extends BencodingOutputStream {
     public void writeValue(Value value) throws IOException {
         long contentLength = value.getContentLength();
         InputStream in = null;
-        if (contentLength != 0L) {
-            in = value.getContent();
+        try {
+            if (contentLength != 0L) {
+                in = value.getContent();
+            }
+            
+            writeContent(contentLength, in);
+        } finally {
+            IoUtils.close(in);
         }
-        
-        writeContent(contentLength, in);
     }
     
     public void writeMessage(Message message) throws IOException {

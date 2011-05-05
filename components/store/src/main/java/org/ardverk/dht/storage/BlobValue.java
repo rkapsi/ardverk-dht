@@ -20,31 +20,39 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.SequenceInputStream;
+import java.util.Collections;
+import java.util.Map;
 
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.codec.bencode.MessageInputStream;
 import org.ardverk.dht.codec.bencode.MessageOutputStream;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.utils.StringUtils;
 import org.ardverk.version.VectorClock;
 
 public class BlobValue extends SimpleValue {
-
-    public static final byte[] EMPTY = new byte[0];
     
     private final Contact creator;
     
     private final VectorClock<KUID> clock;
     
-    private final byte[] value;
+    private final Map<String, String> properties;
+    
+    private final Value value;
     
     private byte[] payload = null;
     
-    public BlobValue(Contact creator, 
-            VectorClock<KUID> clock, byte[] value) {
+    public BlobValue(Contact creator, VectorClock<KUID> clock, Value value) {
+        this(creator, clock, Collections.<String, String>emptyMap(), value);
+    }
+    
+    public BlobValue(Contact creator, VectorClock<KUID> clock, 
+            Map<String, String> properties, Value value) {
         super(ValueType.BLOB);
+        
         this.creator = creator;
         this.clock = clock;
+        this.properties = properties;
         this.value = value;
     }
     
@@ -56,49 +64,57 @@ public class BlobValue extends SimpleValue {
         return clock;
     }
     
-    public byte[] getValue() {
+    public Value getValue() {
         return value;
     }
     
-    public int size() {
-        return value.length;
+    public long size() {
+        return value.getContentLength();
     }
     
     public boolean isEmpty() {
         return size() == 0;
     }
     
-    public BlobValue update(Contact contact, byte[] value) {
-        VectorClock<KUID> clock = this.clock;
-        if (clock != null) {
-            clock = clock.append(contact.getId());
-        }
-        
-        return new BlobValue(creator, clock, value);
-    }
-    
     @Override
     public String toString() {
-        return StringUtils.toString(value);
+        return value.toString();
     }
     
     @Override
     public long getContentLength() {
-        return payload().length;
+        long contentLength = payload().length;
+        if (value != null) {
+            contentLength += value.getContentLength();
+        }
+        return contentLength;
     }
 
     @Override
     public InputStream getContent() throws IOException {
-        return new ByteArrayInputStream(payload());
+        InputStream in = new ByteArrayInputStream(payload());
+        
+        if (value != null) {
+            //in = new SequenceInputStream(in, value.getContent());
+            in = new SequenceInputStream(in, value.getContent());
+        }
+        
+        return in;
     }
     
     @Override
     public boolean isRepeatable() {
+        if (value != null) {
+            return value.isRepeatable();
+        }
         return true;
     }
 
     @Override
     public boolean isStreaming() {
+        if (value != null) {
+            return value.isStreaming();
+        }
         return false;
     }
 
@@ -111,7 +127,14 @@ public class BlobValue extends SimpleValue {
                 writeHeader(out);
                 out.writeContact(creator);
                 out.writeVectorClock(clock);
-                out.writeBytes(value);
+                out.writeMap(properties);
+                
+                long contentLength = 0L;
+                if (value != null) {
+                    contentLength = value.getContentLength();
+                }
+                out.writeContentLength(contentLength);
+                
                 out.close();
                 
                 payload = baos.toByteArray();
@@ -123,10 +146,17 @@ public class BlobValue extends SimpleValue {
         return payload;
     }
     
+    @SuppressWarnings("unchecked")
     public static BlobValue valueOf(MessageInputStream in) throws IOException {
         Contact creator = in.readContact();
         VectorClock<KUID> clock = in.readVectorClock();
-        byte[] value = in.readBytes();
-        return new BlobValue(creator, clock, value);
+        Map<String, String> properties = (Map<String, String>)in.readMap();
+        
+        Value value = null;
+        if (in.readBoolean()) {
+            value = ByteArrayValue.valueOf(in.readValue());
+        }
+        
+        return new BlobValue(creator, clock, properties, value);
     }
 }

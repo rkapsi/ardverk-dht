@@ -21,10 +21,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.ardverk.dht.concurrent.DHTFuture;
+import org.ardverk.io.IoUtils;
 import org.ardverk.utils.StringUtils;
 
-public class ByteArrayValue implements Value {
+public class ByteArrayValue extends AbstractValue {
     
     private final byte[] content;
     
@@ -37,16 +37,16 @@ public class ByteArrayValue implements Value {
     }
     
     public ByteArrayValue(byte[] content, int offset, int length) {
+        if (offset < 0 || length < 0 || content.length < (offset+length)) {
+            throw new ArrayIndexOutOfBoundsException(
+                    "offset=" + offset + ", length=" + length);
+        }
+        
         this.content = content;
         this.offset = offset;
         this.length = length;
     }
-
-    @Override
-    public DHTFuture<Void> getContentFuture() {
-        return DEFAULT_FUTURE;
-    }
-
+    
     @Override
     public long getContentLength() {
         return length;
@@ -82,6 +82,16 @@ public class ByteArrayValue implements Value {
         return StringUtils.toString(getContentAsBytes());
     }
     
+    public static ByteArrayValue valueOf(Value value) throws IOException {
+        InputStream in = null;
+        try {
+            in = value.getContent();
+            return valueOf(in);
+        } finally {
+            IoUtils.close(in);
+        }
+    }
+    
     public static ByteArrayValue valueOf(InputStream in) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         byte[] buffer = new byte[4 * 1024];
@@ -89,6 +99,7 @@ public class ByteArrayValue implements Value {
         while ((len = in.read(buffer)) != -1) {
             baos.write(buffer, 0, len);
         }
+        baos.close();
         return new ByteArrayValue(baos.toByteArray());
     }
 }
