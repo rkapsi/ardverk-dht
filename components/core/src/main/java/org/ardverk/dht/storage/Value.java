@@ -18,6 +18,7 @@ package org.ardverk.dht.storage;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.concurrent.NopFuture;
@@ -63,4 +64,7 @@ public interface Value {
      * Returns {@code true} if the {@link Value} is streaming.
      */
     public boolean isStreaming();
+    
+    
+    public void writeTo(OutputStream out) throws IOException;
 }

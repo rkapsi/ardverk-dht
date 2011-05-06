@@ -16,12 +16,31 @@
 
 package org.ardverk.dht.storage;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import org.ardverk.dht.concurrent.DHTFuture;
+import org.ardverk.io.IoUtils;
 
 public abstract class AbstractValue implements Value {
     
     @Override
     public DHTFuture<Void> getContentFuture() {
         return DEFAULT_FUTURE;
+    }
+    
+    @Override
+    public void writeTo(OutputStream out) throws IOException {
+        InputStream in = getContent();
+        try {
+            byte[] buffer = new byte[8 * 1024];
+            int len = -1;
+            while ((len = in.read(buffer)) != -1) {
+                out.write(buffer, 0, len);
+            }
+        } finally {
+            IoUtils.close(in);
+        }
     }
 }

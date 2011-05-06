@@ -18,19 +18,13 @@ package org.ardverk.dht.storage;
 
 import java.io.InputStream;
 
-import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.io.NopInputStream;
 
-public class EmptyValue implements Value {
+public class EmptyValue extends AbstractValue {
 
     public static final EmptyValue EMPTY = new EmptyValue();
     
     private EmptyValue() {}
-    
-    @Override
-    public DHTFuture<Void> getContentFuture() {
-        return DEFAULT_FUTURE;
-    }
 
     @Override
     public long getContentLength() {

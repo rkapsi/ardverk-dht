@@ -21,10 +21,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.utils.StringUtils;
 
-public class ByteArrayValue implements Value {
+public class ByteArrayValue extends AbstractValue {
     
     private final byte[] content;
     
@@ -40,11 +39,6 @@ public class ByteArrayValue implements Value {
         this.content = content;
         this.offset = offset;
         this.length = length;
-    }
-
-    @Override
-    public DHTFuture<Void> getContentFuture() {
-        return DEFAULT_FUTURE;
     }
 
     @Override
@@ -66,7 +60,7 @@ public class ByteArrayValue implements Value {
         System.arraycopy(content, offset, copy, 0, length);
         return copy;
     }
-    
+
     @Override
     public boolean isRepeatable() {
         return true;
