@@ -146,17 +146,17 @@ get(DHT dht, String key) {
 	ValueEntity entity = future.get();
 	SimpleValue value = SimpleValue.valueOf(entity.getValue());
 	
-	Contact sender = entity.getSender();
-	Contact creator = sender;
+	KUID senderId = entity.getSender().getId();
+	KUID creatorId = sender;
 	
-	if (value instanceof InMemoryValue) {
-	  creator = value.getCreator();
+	if (value instanceof BlobValue) {
+	  creatorId = value.getCreator().getId();
 	}
 	
 	print("GET: " + entity.getId() + " (" + key + ")" + " -> " 
 		+ value
-		+ "\n SENDER: " + sender.getId()
-		+ "\n CREATOR: " + creator.getId()
+		+ "\n SENDER: " + senderId
+		+ "\n CREATOR: " + creatorId
 		+ "\n TIME: " + entity.getTimeInMillis() + "ms");
 		
 	return value;
@@ -170,7 +170,7 @@ toValue(String value) {
   //byte[] raw = StringUtils.getBytes(value);
   //byte[] data = new byte[1024 * 1024];
   //System.arraycopy(raw, 0, data, 0, raw.length);
-	return new InMemoryValue(dhts.get(current).getLocalhost(), null, StringUtils.getBytes(value));
+	return new BlobValue(dhts.get(current).getLocalhost(), null, StringUtils.getBytes(value));
 }
 
 // Closes all DHTs

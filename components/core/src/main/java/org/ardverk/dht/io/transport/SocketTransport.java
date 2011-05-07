@@ -229,7 +229,6 @@ public class SocketTransport extends AbstractTransport implements Closeable {
                     }
                     
                     SocketAddress addr = request.getAddress();
-                    
                     SocketAddress endpoint 
                         = NetworkUtils.getResolved(addr);
                     
@@ -269,7 +268,7 @@ public class SocketTransport extends AbstractTransport implements Closeable {
     }
     
     private static void configure(Socket client) throws SocketException {
-        client.setSoLinger(true, 0);
+        //client.setSoLinger(true, 0);
     }
     
     private static void uncaughtException(ServerSocket socket, Throwable t) {
