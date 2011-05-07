@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package org.ardverk.dht.storage;
+package org.ardverk.dht.rsrc;
 
 import java.net.URI;
+
 
 public class KeyUtils {
 

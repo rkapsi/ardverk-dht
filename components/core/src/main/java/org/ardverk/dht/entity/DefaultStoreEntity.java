@@ -20,8 +20,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.dht.message.StoreResponse;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.storage.Key;
-import org.ardverk.dht.storage.Value;
+import org.ardverk.dht.rsrc.Key;
+import org.ardverk.dht.rsrc.Value;
 
 /**
  * A default implementation of {@link StoreEntity}.

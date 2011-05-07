@@ -14,33 +14,46 @@
  * limitations under the License.
  */
 
-package org.ardverk.dht.storage;
+package org.ardverk.dht.rsrc;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
-import org.ardverk.dht.concurrent.DHTFuture;
-import org.ardverk.io.IoUtils;
 
-public abstract class AbstractValue implements Value {
+/**
+ * {@link FileValue} reads its data from a {@link File}.
+ */
+public class FileValue extends AbstractValue {
     
-    @Override
-    public DHTFuture<Void> getContentFuture() {
-        return DEFAULT_FUTURE;
+    private final File file;
+    
+    public FileValue(File file) {
+        this.file = file;
+    }
+    
+    public File getFile() {
+        return file;
     }
     
     @Override
-    public void writeTo(OutputStream out) throws IOException {
-        InputStream in = getContent();
-        try {
-            byte[] buffer = new byte[8 * 1024];
-            int len = -1;
-            while ((len = in.read(buffer)) != -1) {
-                out.write(buffer, 0, len);
-            }
-        } finally {
-            IoUtils.close(in);
-        }
+    public long getContentLength() {
+        return file.length();
+    }
+
+    @Override
+    public InputStream getContent() throws IOException {
+        return new FileInputStream(file);
+    }
+
+    @Override
+    public boolean isRepeatable() {
+        return true;
+    }
+
+    @Override
+    public boolean isStreaming() {
+        return true;
     }
 }

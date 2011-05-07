@@ -33,8 +33,8 @@ import org.ardverk.dht.message.ResponseMessage;
 import org.ardverk.dht.message.StoreRequest;
 import org.ardverk.dht.message.StoreResponse;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.storage.Key;
-import org.ardverk.dht.storage.Value;
+import org.ardverk.dht.rsrc.Key;
+import org.ardverk.dht.rsrc.Value;
 import org.ardverk.lang.TimeStamp;
 
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.ardverk.dht.storage;
+package org.ardverk.dht.rsrc;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -65,6 +65,8 @@ public interface Value {
      */
     public boolean isStreaming();
     
-    
+    /**
+     * 
+     */
     public void writeTo(OutputStream out) throws IOException;
 }

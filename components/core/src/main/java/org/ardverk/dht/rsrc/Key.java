@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-package org.ardverk.dht.message;
+package org.ardverk.dht.rsrc;
 
-import org.ardverk.dht.storage.Value;
+import java.net.URI;
 
-public interface ValueProvider {
+import org.ardverk.dht.lang.Identifier;
 
+
+/**
+ * A {@link Key} is an unique identifier of a {@link Value}.
+ */
+public interface Key extends Comparable<Key>, Identifier {
+    
     /**
-     * Returns the {@link Message}'s {@link Value}.
+     * Returns the resource's {@link URI}.
      */
-    public Value getValue();
+    public URI getURI();
 }

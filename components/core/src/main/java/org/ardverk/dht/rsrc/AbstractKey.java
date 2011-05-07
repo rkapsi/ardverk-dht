@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.ardverk.dht.storage;
+package org.ardverk.dht.rsrc;
 
 /**
  * An abstract implementation of {@link Key}.

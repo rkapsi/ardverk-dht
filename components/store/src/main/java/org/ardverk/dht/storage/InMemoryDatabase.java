@@ -32,6 +32,8 @@ import org.ardverk.collection.PatriciaTrie;
 import org.ardverk.collection.Trie;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.lang.Identifier;
+import org.ardverk.dht.rsrc.Key;
+import org.ardverk.dht.rsrc.Value;
 import org.ardverk.version.Occured;
 import org.ardverk.version.VectorClock;
 import org.slf4j.Logger;

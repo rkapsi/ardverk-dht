@@ -17,7 +17,6 @@
 package org.ardverk.dht.codec.bencode;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -36,12 +35,11 @@ import org.ardverk.dht.message.PingRequest;
 import org.ardverk.dht.message.PingResponse;
 import org.ardverk.dht.message.StoreRequest;
 import org.ardverk.dht.message.StoreResponse;
-import org.ardverk.dht.message.ValueProvider;
 import org.ardverk.dht.message.ValueRequest;
 import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.storage.Key;
-import org.ardverk.dht.storage.Value;
+import org.ardverk.dht.rsrc.Key;
+import org.ardverk.dht.rsrc.Value;
 import org.ardverk.version.Vector;
 import org.ardverk.version.VectorClock;
 
@@ -150,13 +148,8 @@ public class MessageOutputStream extends BencodingOutputStream {
     }
     
     public void writeValue(Value value) throws IOException {
-        long contentLength = value.getContentLength();
-        InputStream in = null;
-        if (contentLength != 0L) {
-            in = value.getContent();
-        }
-        
-        writeContent(contentLength, in);
+        writeLong(value.getContentLength());
+        value.writeTo(this);
     }
     
     public void writeMessage(Message message) throws IOException {
@@ -200,9 +193,7 @@ public class MessageOutputStream extends BencodingOutputStream {
                 throw new IllegalArgumentException("opcode=" + opcode);
         }
         
-        if (message instanceof ValueProvider) {
-            writeValue(((ValueProvider)message).getValue());
-        }
+        writeValue(message.getValue());
     }
     
     private void writePingRequest(PingRequest message) throws IOException {

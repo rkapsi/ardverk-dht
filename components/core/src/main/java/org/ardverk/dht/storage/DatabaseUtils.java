@@ -19,6 +19,7 @@ package org.ardverk.dht.storage;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
+import org.ardverk.dht.rsrc.Key;
 import org.ardverk.utils.ArrayUtils;
 
 public class DatabaseUtils {

@@ -30,8 +30,8 @@ import org.ardverk.dht.entity.PutEntity;
 import org.ardverk.dht.entity.ValueEntity;
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.storage.Key;
-import org.ardverk.dht.storage.Value;
+import org.ardverk.dht.rsrc.Key;
+import org.ardverk.dht.rsrc.Value;
 
 
 /**

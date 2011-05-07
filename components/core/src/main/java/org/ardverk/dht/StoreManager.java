@@ -34,8 +34,8 @@ import org.ardverk.dht.io.MessageDispatcher;
 import org.ardverk.dht.io.StoreResponseHandler;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
-import org.ardverk.dht.storage.Key;
-import org.ardverk.dht.storage.Value;
+import org.ardverk.dht.rsrc.Key;
+import org.ardverk.dht.rsrc.Value;
 
 
 /**

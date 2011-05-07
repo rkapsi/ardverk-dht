@@ -19,5 +19,5 @@ package org.ardverk.dht.message;
 /**
  * A {@link MessageType#STORE} response.
  */
-public interface StoreResponse extends ResponseMessage, ValueProvider {
+public interface StoreResponse extends ResponseMessage {
 }

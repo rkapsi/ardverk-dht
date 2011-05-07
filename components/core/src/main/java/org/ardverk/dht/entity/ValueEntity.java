@@ -19,7 +19,7 @@ package org.ardverk.dht.entity;
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.storage.Value;
+import org.ardverk.dht.rsrc.Value;
 
 /**
  * The result of a {@link MessageType#FIND_VALUE} operation.

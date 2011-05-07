@@ -19,6 +19,7 @@ package org.ardverk.dht.message;
 import java.net.SocketAddress;
 
 import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.rsrc.Value;
 
 /**
  * The base interface for messages.
@@ -39,4 +40,9 @@ public interface Message {
      * Returns the receiver's {@link SocketAddress}.
      */
     public SocketAddress getAddress();
+    
+    /**
+     * 
+     */
+    public Value getValue();
 }

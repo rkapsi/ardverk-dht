@@ -16,7 +16,7 @@
 
 package org.ardverk.dht.message;
 
-import org.ardverk.dht.storage.Key;
+import org.ardverk.dht.rsrc.Key;
 
 /**
  * A {@link MessageType#FIND_VALUE} request.

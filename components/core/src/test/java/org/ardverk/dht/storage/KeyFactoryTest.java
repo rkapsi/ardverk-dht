@@ -18,6 +18,8 @@ package org.ardverk.dht.storage;
 
 import junit.framework.TestCase;
 
+import org.ardverk.dht.rsrc.Key;
+import org.ardverk.dht.rsrc.KeyFactory;
 import org.junit.Test;
 
 public class KeyFactoryTest {

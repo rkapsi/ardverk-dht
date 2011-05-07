@@ -32,9 +32,9 @@ import org.ardverk.dht.entity.ValueEntity;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
+import org.ardverk.dht.rsrc.Key;
+import org.ardverk.dht.rsrc.Value;
 import org.ardverk.dht.storage.Database;
-import org.ardverk.dht.storage.Key;
-import org.ardverk.dht.storage.Value;
 
 
 public class DefaultEasyDHT extends ArdverkDHT implements EasyDHT {

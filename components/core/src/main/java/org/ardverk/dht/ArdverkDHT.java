@@ -45,10 +45,10 @@ import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.DefaultRouteTable;
 import org.ardverk.dht.routing.Localhost;
 import org.ardverk.dht.routing.RouteTable;
+import org.ardverk.dht.rsrc.Key;
+import org.ardverk.dht.rsrc.Value;
 import org.ardverk.dht.storage.Database;
-import org.ardverk.dht.storage.Key;
 import org.ardverk.dht.storage.StoreForward;
-import org.ardverk.dht.storage.Value;
 import org.ardverk.io.IoUtils;
 
 

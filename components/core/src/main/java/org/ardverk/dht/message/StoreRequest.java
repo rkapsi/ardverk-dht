@@ -16,12 +16,12 @@
 
 package org.ardverk.dht.message;
 
-import org.ardverk.dht.storage.Key;
+import org.ardverk.dht.rsrc.Key;
 
 /**
  * A {@link MessageType#STORE} request.
  */
-public interface StoreRequest extends RequestMessage, ValueProvider {
+public interface StoreRequest extends RequestMessage {
     
     /**
      * Returns the {@link Key}.

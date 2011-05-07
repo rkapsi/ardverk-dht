@@ -30,6 +30,11 @@ import java.util.Collection;
 import java.util.List;
 
 import org.ardverk.dht.KUID;
+import org.ardverk.dht.rsrc.FileValue;
+import org.ardverk.dht.rsrc.Key;
+import org.ardverk.dht.rsrc.KeyFactory;
+import org.ardverk.dht.rsrc.KeyUtils;
+import org.ardverk.dht.rsrc.Value;
 import org.ardverk.io.IoUtils;
 import org.ardverk.security.MessageDigestUtils;
 import org.slf4j.Logger;

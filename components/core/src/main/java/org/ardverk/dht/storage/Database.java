@@ -19,6 +19,8 @@ package org.ardverk.dht.storage;
 import org.ardverk.dht.DHT;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.rsrc.Key;
+import org.ardverk.dht.rsrc.Value;
 import org.ardverk.io.Bindable;
 
 /**

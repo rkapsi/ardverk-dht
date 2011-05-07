@@ -27,7 +27,7 @@ import org.ardverk.dht.io.NodeResponseHandler;
 import org.ardverk.dht.io.ValueResponseHandler;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
-import org.ardverk.dht.storage.Key;
+import org.ardverk.dht.rsrc.Key;
 
 /**
  * The {@link LookupManager} manages FIND_NODE and FIND_VALUE lookups.

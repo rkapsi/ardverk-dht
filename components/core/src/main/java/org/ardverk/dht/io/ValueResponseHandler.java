@@ -33,7 +33,7 @@ import org.ardverk.dht.message.ValueRequest;
 import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
-import org.ardverk.dht.storage.Key;
+import org.ardverk.dht.rsrc.Key;
 
 
 /**

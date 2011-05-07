@@ -19,22 +19,13 @@ package org.ardverk.dht.message;
 import java.net.SocketAddress;
 
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.storage.Value;
+import org.ardverk.dht.rsrc.Value;
 
 public class DefaultValueResponse extends AbstractLookupResponse 
         implements ValueResponse {
     
-    private final Value value;
-    
     public DefaultValueResponse(MessageId messageId, Contact contact, 
             SocketAddress address, Value value) {
-        super(messageId, contact, address);
-        
-        this.value = value;
-    }
-
-    @Override
-    public Value getValue() {
-        return value;
+        super(messageId, contact, address, value);
     }
 }

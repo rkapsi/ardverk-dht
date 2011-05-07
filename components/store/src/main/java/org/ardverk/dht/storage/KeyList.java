@@ -25,6 +25,7 @@ import java.util.Collection;
 import org.ardverk.collection.CollectionUtils;
 import org.ardverk.dht.codec.bencode.MessageInputStream;
 import org.ardverk.dht.codec.bencode.MessageOutputStream;
+import org.ardverk.dht.rsrc.Key;
 
 public class KeyList extends SimpleValue {
 

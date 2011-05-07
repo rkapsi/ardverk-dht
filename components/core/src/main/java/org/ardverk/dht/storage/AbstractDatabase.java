@@ -25,6 +25,8 @@ import org.ardverk.dht.StoreManager;
 import org.ardverk.dht.config.StoreConfig;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
+import org.ardverk.dht.rsrc.Key;
+import org.ardverk.dht.rsrc.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

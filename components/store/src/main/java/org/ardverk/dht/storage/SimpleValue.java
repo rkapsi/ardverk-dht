@@ -5,6 +5,8 @@ import java.io.IOException;
 import org.ardverk.dht.codec.bencode.MessageInputStream;
 import org.ardverk.dht.codec.bencode.MessageOutputStream;
 import org.ardverk.dht.lang.IntegerValue;
+import org.ardverk.dht.rsrc.AbstractValue;
+import org.ardverk.dht.rsrc.Value;
 import org.ardverk.io.IoUtils;
 
 public abstract class SimpleValue extends AbstractValue {

@@ -26,6 +26,7 @@ import org.ardverk.dht.codec.bencode.MessageOutputStream;
 import org.ardverk.dht.lang.IntegerValue;
 import org.ardverk.dht.lang.StringValue;
 import org.ardverk.dht.message.StoreResponse;
+import org.ardverk.dht.rsrc.Value;
 import org.ardverk.io.SequenceInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

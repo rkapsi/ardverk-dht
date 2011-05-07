@@ -20,5 +20,5 @@ package org.ardverk.dht.message;
 /**
  * A {@link MessageType#FIND_VALUE} response.
  */
-public interface ValueResponse extends LookupResponse, ValueProvider {
+public interface ValueResponse extends LookupResponse {
 }
