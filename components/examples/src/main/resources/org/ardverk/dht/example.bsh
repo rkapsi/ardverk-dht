@@ -147,7 +147,7 @@ get(DHT dht, String key) {
 	SimpleValue value = SimpleValue.valueOf(entity.getValue());
 	
 	KUID senderId = entity.getSender().getId();
-	KUID creatorId = sender;
+	KUID creatorId = null;
 	
 	if (value instanceof BlobValue) {
 	  creatorId = value.getCreator().getId();
