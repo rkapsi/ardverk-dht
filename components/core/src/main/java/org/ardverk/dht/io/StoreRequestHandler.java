@@ -18,12 +18,11 @@ package org.ardverk.dht.io;
 
 import java.io.IOException;
 
-import org.ardverk.dht.io.transport.Endpoint;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.message.RequestMessage;
+import org.ardverk.dht.message.ResponseMessage;
 import org.ardverk.dht.message.StoreRequest;
-import org.ardverk.dht.message.StoreResponse;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.Value;
 import org.ardverk.dht.storage.Database;
@@ -51,16 +50,12 @@ public class StoreRequestHandler extends AbstractRequestHandler {
         return database.store(key, value);
     }
     
-    public StoreResponse createResponse(StoreRequest request) throws IOException {
+    @Override
+    public ResponseMessage handleRequest(RequestMessage message) throws IOException {
+        StoreRequest request = (StoreRequest)message;
         Value value = store(request);
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
         return factory.createStoreResponse(request, value);
-    }
-    
-    @Override
-    public void handleRequest(Endpoint endpoint, RequestMessage request) throws IOException {
-        StoreResponse response = createResponse((StoreRequest)request);
-        send(endpoint, request, response);
     }
 }

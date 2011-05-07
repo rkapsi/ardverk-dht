@@ -26,12 +26,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.ExecutorUtils;
+import org.ardverk.dht.KUID;
 import org.ardverk.dht.codec.MessageCodec;
 import org.ardverk.dht.codec.MessageCodec.Decoder;
 import org.ardverk.dht.codec.MessageCodec.Encoder;
 import org.ardverk.dht.codec.bencode.BencodeMessageCodec;
 import org.ardverk.dht.io.transport.AbstractTransport;
-import org.ardverk.dht.io.transport.Endpoint;
 import org.ardverk.dht.io.transport.TransportCallback;
 import org.ardverk.dht.message.Message;
 import org.ardverk.dht.message.RequestMessage;
@@ -149,17 +149,15 @@ public class HttpTransport extends AbstractTransport {
     }
     
     @Override
-    public void send(final Message message, long timeout, 
-            TimeUnit unit) throws IOException {
+    public void send(final KUID contactId, final Message message, 
+            long timeout, TimeUnit unit) throws IOException {
         
-        assert (message instanceof RequestMessage);
-        
-        SocketAddress dst = NetworkUtils.getResolved(
-                message.getAddress());
+        SocketAddress addr = message.getAddress();
+        SocketAddress endpoint = NetworkUtils.getResolved(addr);
         
         ChannelFuture future = null;
         try {
-            future = connect(dst, timeout, unit);
+            future = connect(endpoint, timeout, unit);
         } catch (Exception err) {
             LOG.error("Exception", err);
             handleException(message, err);
@@ -181,19 +179,19 @@ public class HttpTransport extends AbstractTransport {
                 
                 byte[] encoded = baos.toByteArray();
                 
-                HttpRequest request = new DefaultHttpRequest(
+                HttpRequest httpRequest = new DefaultHttpRequest(
                         HttpVersion.HTTP_1_1, 
                         HttpMethod.POST, "/ardverk");
-                request.setContent(ChannelBuffers.copiedBuffer(encoded));
-                request.setHeader(HttpHeaders.Names.CONTENT_LENGTH, encoded.length);
-                request.setHeader(HttpHeaders.Names.CONNECTION, 
+                httpRequest.setContent(ChannelBuffers.copiedBuffer(encoded));
+                httpRequest.setHeader(HttpHeaders.Names.CONTENT_LENGTH, encoded.length);
+                httpRequest.setHeader(HttpHeaders.Names.CONNECTION, 
                         HttpHeaders.Values.CLOSE);
                 
                 Channel channel = connectFuture.getChannel();
-                ChannelFuture future = channel.write(request);
+                ChannelFuture future = channel.write(httpRequest);
                 
                 future.addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
-                future.addListener(new MessageListener(HttpTransport.this, message));
+                future.addListener(new MessageListener(contactId, message));
             }
         });
     }
@@ -221,46 +219,37 @@ public class HttpTransport extends AbstractTransport {
         @Override
         public void messageReceived(ChannelHandlerContext ctx, final MessageEvent e)
                 throws IOException {
-            HttpRequest request = (HttpRequest)e.getMessage();
+            HttpRequest httpRequest = (HttpRequest)e.getMessage();
             
             SocketAddress src = e.getRemoteAddress();
-            ChannelBuffer content = request.getContent();
+            ChannelBuffer content = httpRequest.getContent();
             
             ByteArrayInputStream bais = new ByteArrayInputStream(content.array());
             Decoder decoder = codec.createDecoder(src, bais);
-            Message message = decoder.read();
+            RequestMessage request = (RequestMessage)decoder.read();
             decoder.close();
             
-            assert (message instanceof RequestMessage);
+            ResponseMessage response = HttpTransport.this.handleRequest(request);
             
-            HttpTransport.this.messageReceived(new Endpoint() {
-                @Override
-                public void send(Message message, long timeout,
-                        TimeUnit unit) throws IOException {
-                    
-                    assert (message instanceof ResponseMessage);
-                    
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    Encoder encoder = codec.createEncoder(baos);
-                    encoder.write(message);
-                    encoder.close();
-                    
-                    byte[] encoded = baos.toByteArray();
-                    
-                    HttpResponse response = new DefaultHttpResponse(
-                            HttpVersion.HTTP_1_1, 
-                            HttpResponseStatus.OK);
-                    response.setContent(ChannelBuffers.copiedBuffer(encoded));
-                    response.setHeader(HttpHeaders.Names.CONTENT_LENGTH, encoded.length);
-                    response.setHeader(HttpHeaders.Names.CONNECTION, 
-                            HttpHeaders.Values.CLOSE);
-                    
-                    Channel channel = e.getChannel();
-                    ChannelFuture future = channel.write(response);
-                    future.addListener(ChannelFutureListener.CLOSE);
-                    future.addListener(new MessageListener(this, message));
-                }
-            }, message);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            Encoder encoder = codec.createEncoder(baos);
+            encoder.write(response);
+            encoder.close();
+            
+            byte[] encoded = baos.toByteArray();
+            
+            HttpResponse httpResponse = new DefaultHttpResponse(
+                    HttpVersion.HTTP_1_1, 
+                    HttpResponseStatus.OK);
+            httpResponse.setContent(ChannelBuffers.copiedBuffer(encoded));
+            httpResponse.setHeader(HttpHeaders.Names.CONTENT_LENGTH, encoded.length);
+            httpResponse.setHeader(HttpHeaders.Names.CONNECTION, 
+                    HttpHeaders.Values.CLOSE);
+            
+            Channel channel = e.getChannel();
+            ChannelFuture future = channel.write(httpResponse);
+            future.addListener(ChannelFutureListener.CLOSE);
+            future.addListener(new MessageListener(request, response));
         }
     }
     
@@ -271,18 +260,18 @@ public class HttpTransport extends AbstractTransport {
                 throws IOException {
             
             try {
-                HttpResponse response = (HttpResponse)e.getMessage();
+                HttpResponse httpResponse = (HttpResponse)e.getMessage();
                 
                 SocketAddress src = e.getRemoteAddress();
                 
-                ChannelBuffer content = response.getContent();
+                ChannelBuffer content = httpResponse.getContent();
                 
                 ByteArrayInputStream bais = new ByteArrayInputStream(content.array());
                 Decoder decoder = codec.createDecoder(src, bais);
-                Message message = decoder.read();
+                ResponseMessage response = (ResponseMessage)decoder.read();
                 decoder.close();
                 
-                HttpTransport.this.messageReceived(message);
+                HttpTransport.this.handleResponse(response);
             } finally {
                 HttpUtils.close(e);
             }
@@ -291,21 +280,25 @@ public class HttpTransport extends AbstractTransport {
     
     private class MessageListener implements ChannelFutureListener {
         
-        private final Endpoint endpoint;
+        private final KUID contactId;
         
         private final Message message;
         
-        public MessageListener(Endpoint endpoint, Message message) {
+        public MessageListener(RequestMessage request, ResponseMessage response) {
+            this(request.getContact().getId(), response);
+        }
+        
+        public MessageListener(KUID contactId, Message message) {
+            this.contactId = contactId;
             this.message = message;
-            this.endpoint = endpoint;
         }
 
         @Override
         public void operationComplete(ChannelFuture future) {
             if (future.isSuccess()) {
-                HttpTransport.this.messageSent(endpoint, message);
+                HttpTransport.this.messageSent(contactId, message);
             } else {
-                HttpTransport.this.handleException(endpoint, message, future.getCause());
+                HttpTransport.this.handleException(message, future.getCause());
             }
         }
     }

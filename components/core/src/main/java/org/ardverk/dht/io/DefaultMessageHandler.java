@@ -55,7 +55,7 @@ public class DefaultMessageHandler implements MessageCallback {
     }
     
     @Override
-    public void handleResponse(RequestEntity entity, 
+    public boolean handleResponse(RequestEntity entity, 
             ResponseMessage response, long time, TimeUnit unit) throws IOException {
         
         Contact src = response.getContact();
@@ -69,6 +69,8 @@ public class DefaultMessageHandler implements MessageCallback {
         
         storeForward.handleResponse(src);
         routeTable.add(src);
+        
+        return true;
     }
     
     public void handleLateResponse(ResponseMessage response) throws IOException {

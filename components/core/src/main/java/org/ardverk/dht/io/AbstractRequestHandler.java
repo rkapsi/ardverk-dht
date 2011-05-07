@@ -16,12 +16,6 @@
 
 package org.ardverk.dht.io;
 
-import java.io.IOException;
-
-import org.ardverk.dht.io.transport.Endpoint;
-import org.ardverk.dht.message.RequestMessage;
-import org.ardverk.dht.message.ResponseMessage;
-import org.ardverk.dht.routing.Contact;
 
 /**
  * An abstract base class for {@link RequestHandler}s.
@@ -31,11 +25,5 @@ abstract class AbstractRequestHandler
 
     public AbstractRequestHandler(MessageDispatcher messageDispatcher) {
         super(messageDispatcher);
-    }
-    
-    protected void send(Endpoint endpoint, RequestMessage request, 
-            ResponseMessage message) throws IOException {
-        Contact src = request.getContact();
-        messageDispatcher.send(endpoint, src, message);
     }
 }

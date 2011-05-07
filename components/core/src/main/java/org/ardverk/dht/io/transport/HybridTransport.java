@@ -21,6 +21,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.dht.KUID;
 import org.ardverk.dht.codec.MessageCodec;
 import org.ardverk.dht.message.Message;
 import org.ardverk.dht.message.StoreRequest;
@@ -82,13 +83,13 @@ public class HybridTransport extends DatagramTransport {
     }
     
     @Override
-    public void send(Message message, long timeout, 
-            TimeUnit unit) throws IOException {
+    public void send(KUID contactId, Message message, 
+            long timeout, TimeUnit unit) throws IOException {
         
         if (isUseTCP(message)) {
-            socket.send(message, timeout, unit);
+            socket.send(contactId, message, timeout, unit);
         } else {
-            super.send(message, timeout, unit);
+            super.send(contactId, message, timeout, unit);
         }
     }
 }

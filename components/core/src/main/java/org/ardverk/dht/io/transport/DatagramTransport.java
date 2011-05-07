@@ -32,11 +32,14 @@ import java.util.concurrent.TimeUnit;
 import org.ardverk.concurrent.DefaultExecutorQueue;
 import org.ardverk.concurrent.ExecutorQueue;
 import org.ardverk.concurrent.ExecutorUtils;
+import org.ardverk.dht.KUID;
 import org.ardverk.dht.codec.MessageCodec;
 import org.ardverk.dht.codec.MessageCodec.Decoder;
 import org.ardverk.dht.codec.MessageCodec.Encoder;
 import org.ardverk.dht.codec.bencode.BencodeMessageCodec;
 import org.ardverk.dht.message.Message;
+import org.ardverk.dht.message.RequestMessage;
+import org.ardverk.dht.message.ResponseMessage;
 import org.ardverk.io.IoUtils;
 import org.ardverk.net.NetworkUtils;
 import org.slf4j.Logger;
@@ -173,12 +176,30 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
                     decoder = codec.createDecoder(src, 
                             new ByteArrayInputStream(data));
                     Message message = decoder.read();
-                    messageReceived(message);
+                    
+                    if (message instanceof RequestMessage) {
+                        handleRequest((RequestMessage)message);
+                    } else {
+                        handleResponse((ResponseMessage)message);
+                    }
+                    
                 } catch (IOException err) {
                     uncaughtException(socket, err);
                 } finally {
                     IoUtils.close(decoder);
                 }
+            }
+            
+            private void handleRequest(RequestMessage request) throws IOException {
+                ResponseMessage response = DatagramTransport.this.handleRequest(request);
+                if (response != null) {
+                    KUID contactId = request.getContact().getId();
+                    send(contactId, response, -1L, TimeUnit.MILLISECONDS);
+                }
+            }
+            
+            private void handleResponse(ResponseMessage response) throws IOException {
+                DatagramTransport.this.handleResponse(response);
             }
         };
         
@@ -186,12 +207,11 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
     }
     
     @Override
-    public void send(final Message message, long timeout,
-            TimeUnit unit) 
-                throws IOException {
+    public void send(final KUID contactId, final Message message,
+            long timeout, TimeUnit unit) throws IOException {
         
         final DatagramSocket socket = this.socket;
-        if (socket == null) {
+        if (socket == null || socket.isClosed()) {
             throw new IOException();
         }
         
@@ -200,8 +220,8 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
             public void run() {
                 try {
                     
-                    SocketAddress endpoint = NetworkUtils.getResolved(
-                            message.getAddress());
+                    SocketAddress addr = message.getAddress();
+                    SocketAddress endpoint = NetworkUtils.getResolved(addr);
                     
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     Encoder encoder = codec.createEncoder(baos);
@@ -213,7 +233,7 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
                             encoded, 0, encoded.length, endpoint);
                     
                     socket.send(packet);
-                    messageSent(message);
+                    messageSent(contactId, message);
                     
                 } catch (IOException err) {
                     uncaughtException(socket, err);

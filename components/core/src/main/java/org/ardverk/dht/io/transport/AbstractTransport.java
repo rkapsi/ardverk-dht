@@ -19,7 +19,10 @@ package org.ardverk.dht.io.transport;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.ardverk.dht.KUID;
 import org.ardverk.dht.message.Message;
+import org.ardverk.dht.message.RequestMessage;
+import org.ardverk.dht.message.ResponseMessage;
 
 /**
  * An abstract implementation of {@link Transport}.
@@ -53,33 +56,39 @@ public abstract class AbstractTransport implements Transport {
     /**
      * A helper method to notify the {@link TransportCallback.Inbound} callback.
      */
-    protected boolean messageReceived(Message message) throws IOException {
-        return messageReceived(this, message);
+    protected boolean handleResponse(ResponseMessage response) throws IOException {
+        TransportCallback callback = callbackRef.get();
+        if (callback != null) {
+            return callback.handleResponse(response);
+        }
+        return false;
     }
     
     /**
      * A helper method to notify the {@link TransportCallback.Inbound} callback.
      */
-    protected boolean messageReceived(Endpoint endpoint, Message message) throws IOException {
+    protected ResponseMessage handleRequest(RequestMessage request) throws IOException {
         TransportCallback callback = callbackRef.get();
         if (callback != null) {
-            callback.messageReceived(endpoint, message);
-            return true;
+            return callback.handleRequest(request);
         }
-        return false;
+        
+        throw new IOException();
     }
     
-    protected boolean messageSent(Message message) {
-        return messageSent(this, message);
+    protected boolean messageSent(RequestMessage request, 
+            ResponseMessage response) {
+        KUID contactId = request.getContact().getId();
+        return messageSent(contactId, response);
     }
     
     /**
      * A helper method to notify the {@link TransportCallback.Outbound} callback.
      */
-    protected boolean messageSent(Endpoint endpoint, Message message) {
+    protected boolean messageSent(KUID contactId, Message message) {
         TransportCallback callback = callbackRef.get();
         if (callback != null) {
-            callback.messageSent(endpoint, message);
+            callback.messageSent(contactId, message);
             return true;
         }
         return false;

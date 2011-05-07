@@ -67,15 +67,22 @@ public abstract class MessageDispatcher
     
     private final TransportCallback callback = new TransportCallback() {
         @Override
-        public void messageReceived(Endpoint endpoint, Message message) throws IOException {
-            MessageDispatcher.this.handleMessage(endpoint, message);
+        public void messageSent(KUID contactId, Message message) {
+            MessageDispatcher.this.messageSent(contactId, message);
         }
         
         @Override
-        public void messageSent(Endpoint endpoint, Message message) {
-            MessageDispatcher.this.messageSent(endpoint, message);
+        public ResponseMessage handleRequest(RequestMessage request)
+                throws IOException {
+            return MessageDispatcher.this.handleRequest(request);
         }
-        
+
+        @Override
+        public boolean handleResponse(ResponseMessage response)
+                throws IOException {
+            return MessageDispatcher.this.handleResponse(response);
+        }
+
         @Override
         public void handleException(Endpoint endpoint, Message message, Throwable t) {
             MessageDispatcher.this.handleException(endpoint, message, t);
@@ -178,39 +185,6 @@ public abstract class MessageDispatcher
     }
     
     /**
-     * Sends the given {@link Message}.
-     */
-    protected void send(Endpoint endpoint, Message message, 
-            long timeout, TimeUnit unit) throws IOException {
-        
-        if (endpoint == null) {
-            throw new IOException("endpoint=null");
-        }
-        
-        endpoint.send(message, timeout, unit);
-    }
-    
-    /**
-     * Sends a {@link ResponseMessage} to the given {@link Contact}.
-     */
-    public void send(Endpoint endpoint, Contact dst, 
-            ResponseMessage message) throws IOException {
-        send(endpoint, message, -1L, TimeUnit.MILLISECONDS);
-        fireMessageSent(dst, message);
-    }
-    
-    /**
-     * Sends a {@link RequestMessage} to the given {@link Contact}.
-     */
-    public void send(MessageCallback callback, 
-            Contact dst, RequestMessage message, 
-            long timeout, TimeUnit unit) throws IOException {
-        
-        KUID contactId = dst.getId();
-        send(callback, contactId, message, timeout, unit);
-    }
-    
-    /**
      * Sends a {@link RequestMessage} to the a {@link Contact} with the 
      * given {@link KUID}.
      * 
@@ -233,7 +207,11 @@ public abstract class MessageDispatcher
             transport = this.transport;
         }
         
-        send(transport, request, timeout, unit);
+        if (transport == null) {
+            throw new IOException();
+        }
+        
+        transport.send(contactId, request, timeout, unit);
         fireMessageSent(contactId, request);
     }
     
@@ -256,44 +234,45 @@ public abstract class MessageDispatcher
     /**
      * Callback method for all outgoing {@link Message}s that have been sent.
      */
-    public void messageSent(Endpoint endpoint, Message message) {
-    }
-    
-    /**
-     * Callback method for incoming {@link Message}s.
-     */
-    public void handleMessage(Endpoint endpoint, Message message) throws IOException {
-        if (message instanceof RequestMessage) {
-            handleRequest(endpoint, (RequestMessage)message);
-        } else {
-            handleResponse((ResponseMessage)message);
-        }
-        
-        fireMessageReceived(message);
+    public void messageSent(KUID contactId, Message message) {
     }
     
     /**
      * Callback method for incoming {@link ResponseMessage}s.
      */
-    private void handleResponse(ResponseMessage response) throws IOException {
-        
-        if (!checker.check(response)) {
-            return;
+    public boolean handleResponse(ResponseMessage response) throws IOException {
+        fireMessageReceived(response);
+        return handleResponse0(response);
+    }
+    
+    private boolean handleResponse0(ResponseMessage response) throws IOException {
+        boolean success = false;
+        if (checker.check(response)) {
+            MessageEntity entity = entityManager.get(response);
+            if (entity != null) {
+                success = entity.handleResponse(response);
+            } else {
+                lateResponse(response);
+            }
         }
-        
-        MessageEntity entity = entityManager.get(response);
-        if (entity != null) {
-            entity.handleResponse(response);
-        } else {
-            lateResponse(response);
-        }
+        return success;
     }
     
     /**
      * Callback method for incoming {@link RequestMessage}s.
      */
-    protected abstract void handleRequest(Endpoint endpoint, 
-            RequestMessage request) throws IOException;
+    public final ResponseMessage handleRequest(RequestMessage request) throws IOException {
+        fireMessageReceived(request);
+        ResponseMessage response = handleRequest0(request);
+        
+        if (response != null) {
+            KUID contactId = request.getContact().getId();
+            fireMessageSent(contactId, response);
+        }
+        return response;
+    }
+    
+    protected abstract ResponseMessage handleRequest0(RequestMessage request) throws IOException;
     
     /**
      * Callback method for late incoming {@link ResponseMessage}s.
@@ -303,10 +282,10 @@ public abstract class MessageDispatcher
     /**
      * Callback method for late incoming {@link ResponseMessage}s.
      */
-    protected void handleResponse(MessageCallback callback, 
+    protected boolean handleResponse(MessageCallback callback, 
             RequestEntity entity, ResponseMessage response, 
             long time, TimeUnit unit) throws IOException {
-        callback.handleResponse(entity, response, time, unit);
+        return callback.handleResponse(entity, response, time, unit);
     }
     
     /**
@@ -357,13 +336,6 @@ public abstract class MessageDispatcher
      */
     public MessageListener[] getMessageListeners() {
         return listeners.toArray(new MessageListener[0]);
-    }
-    
-    /**
-     * Fires a message sent event.
-     */
-    protected void fireMessageSent(Contact dst, Message message) {
-        fireMessageSent(dst.getId(), message);
     }
     
     /**
@@ -525,18 +497,20 @@ public abstract class MessageDispatcher
         /**
          * Called if a {@link ResponseMessage} was received.
          */
-        public void handleResponse(ResponseMessage response) throws IOException {
+        public boolean handleResponse(ResponseMessage response) throws IOException {
+            boolean success = false;
             if (cancel()) {
                 long time = creationTime.getAgeInMillis();
                 
                 if (entity.check(response)) {
-                    MessageDispatcher.this.handleResponse(callback, entity, 
+                    success = MessageDispatcher.this.handleResponse(callback, entity, 
                             response, time, TimeUnit.MILLISECONDS);
                 } else {
                     MessageDispatcher.this.handleIllegalResponse(callback, 
                             entity, response, time, TimeUnit.MILLISECONDS);
                 }
             }
+            return success;
         }
 
         /**

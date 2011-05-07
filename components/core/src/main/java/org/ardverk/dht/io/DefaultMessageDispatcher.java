@@ -19,7 +19,6 @@ package org.ardverk.dht.io;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.dht.io.transport.Endpoint;
 import org.ardverk.dht.message.Message;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.message.NodeRequest;
@@ -106,31 +105,31 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
     }
 
     @Override
-    protected void handleRequest(Endpoint endpoint, 
-            RequestMessage request) throws IOException {
+    protected ResponseMessage handleRequest0(RequestMessage request) throws IOException {
         
         defaultHandler.handleRequest(request);
         
         if (request instanceof PingRequest) {
-            ping.handleRequest(endpoint, request);
+            return ping.handleRequest(request);
         } else if (request instanceof NodeRequest) {
-            node.handleRequest(endpoint, request);
+            return node.handleRequest(request);
         } else if (request instanceof ValueRequest) {
-            value.handleRequest(endpoint, request);
+            return value.handleRequest(request);
         } else if (request instanceof StoreRequest) {
-            store.handleRequest(endpoint, request);
-        } else {
-            unhandledRequest(endpoint, request);
+            return store.handleRequest(request);
         }
+        
+        return unhandledRequest(request);
     }
     
     @Override
-    protected void handleResponse(MessageCallback callback,
+    protected boolean handleResponse(MessageCallback callback,
             RequestEntity entity, ResponseMessage response, long time,
             TimeUnit unit) throws IOException {
         
-        super.handleResponse(callback, entity, response, time, unit);
+        boolean success = super.handleResponse(callback, entity, response, time, unit);
         defaultHandler.handleResponse(entity, response, time, unit);
+        return success;
     }
 
     @Override
@@ -147,10 +146,10 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
         defaultHandler.handleLateResponse(response);
     }
 
-    protected void unhandledRequest(Endpoint endpoint, 
-            RequestMessage message) throws IOException {
+    protected ResponseMessage unhandledRequest(RequestMessage message) throws IOException {
         if (LOG.isErrorEnabled()) {
             LOG.error("Unhandled Request: " + message);
         }
+        return null;
     }
 }

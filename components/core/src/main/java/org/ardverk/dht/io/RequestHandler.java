@@ -18,8 +18,8 @@ package org.ardverk.dht.io;
 
 import java.io.IOException;
 
-import org.ardverk.dht.io.transport.Endpoint;
 import org.ardverk.dht.message.RequestMessage;
+import org.ardverk.dht.message.ResponseMessage;
 
 
 /**
@@ -30,5 +30,5 @@ public interface RequestHandler {
     /**
      * Called for every {@link RequestMessage} we're receiving.
      */
-    public void handleRequest(Endpoint endpoint, RequestMessage request) throws IOException;
+    public ResponseMessage handleRequest(RequestMessage request) throws IOException;
 }

@@ -204,20 +204,21 @@ abstract class AbstractResponseHandler<V extends Entity>
     }
     
     @Override
-    public void handleResponse(RequestEntity entity,
+    public boolean handleResponse(RequestEntity entity,
             ResponseMessage response, long time, TimeUnit unit)
             throws IOException {
         
+        boolean success = false;
         synchronized (future) {
-            if (!isOpen()) {
-                return;
-            }
-            
-            synchronized (this) {
-                lastResponseTime = TimeStamp.now();
-                processResponse(entity, response, time, unit);
+            if (isOpen()) {
+                synchronized (this) {
+                    lastResponseTime = TimeStamp.now();
+                    processResponse(entity, response, time, unit);
+                    success = true;
+                }
             }
         }
+        return success;
     }
     
     /**

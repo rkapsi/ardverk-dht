@@ -19,15 +19,13 @@ package org.ardverk.dht.io;
 import java.io.IOException;
 
 import org.ardverk.dht.KUID;
-import org.ardverk.dht.io.transport.Endpoint;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.message.NodeRequest;
-import org.ardverk.dht.message.NodeResponse;
 import org.ardverk.dht.message.RequestMessage;
+import org.ardverk.dht.message.ResponseMessage;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
-import org.ardverk.lang.Arguments;
 
 
 /**
@@ -43,10 +41,13 @@ public class NodeRequestHandler extends AbstractRequestHandler {
             RouteTable routeTable) {
         super(messageDispatcher);
         
-        this.routeTable = Arguments.notNull(routeTable, "routeTable");
+        this.routeTable = routeTable;
     }
-
-    public NodeResponse createResponse(NodeRequest request) {
+    
+    @Override
+    public ResponseMessage handleRequest(RequestMessage message) throws IOException {
+        NodeRequest request = (NodeRequest)message;
+        
         KUID lookupId = request.getId();
         
         // This is an idea where I'm not sure if it's improving anything 
@@ -81,12 +82,5 @@ public class NodeRequestHandler extends AbstractRequestHandler {
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
         return factory.createNodeResponse(request, contacts);
-    }
-    
-    @Override
-    public void handleRequest(Endpoint endpoint, 
-            RequestMessage request) throws IOException {
-        NodeResponse response = createResponse((NodeRequest)request);
-        send(endpoint, request, response);
     }
 }

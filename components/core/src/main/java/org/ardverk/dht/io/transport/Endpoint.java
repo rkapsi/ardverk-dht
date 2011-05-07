@@ -19,6 +19,7 @@ package org.ardverk.dht.io.transport;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.dht.KUID;
 import org.ardverk.dht.message.Message;
 
 public interface Endpoint {
@@ -26,5 +27,6 @@ public interface Endpoint {
     /**
      * Sends the given {@link Message}.
      */
-    public void send(Message message, long timeout, TimeUnit unit) throws IOException;
+    public void send(KUID contactId, Message message, 
+            long timeout, TimeUnit unit) throws IOException;
 }

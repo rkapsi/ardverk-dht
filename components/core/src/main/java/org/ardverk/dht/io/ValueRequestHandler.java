@@ -18,7 +18,6 @@ package org.ardverk.dht.io;
 
 import java.io.IOException;
 
-import org.ardverk.dht.io.transport.Endpoint;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.message.RequestMessage;
@@ -50,8 +49,11 @@ public class ValueRequestHandler extends AbstractRequestHandler {
         this.routeTable = routeTable;
         this.database = database;
     }
-
-    public ResponseMessage createResponse(ValueRequest request) {
+    
+    @Override
+    public ResponseMessage handleRequest(RequestMessage message) throws IOException {
+        ValueRequest request = (ValueRequest)message;
+        
         Key key = request.getKey();
         Value value = database.get(key);
         
@@ -66,11 +68,5 @@ public class ValueRequestHandler extends AbstractRequestHandler {
         }
         
         return response;
-    }
-    
-    @Override
-    public void handleRequest(Endpoint endpoint, RequestMessage request) throws IOException {
-        ResponseMessage response = createResponse((ValueRequest)request);
-        send(endpoint, request, response);
     }
 }

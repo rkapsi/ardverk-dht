@@ -31,7 +31,7 @@ public interface MessageCallback {
     /**
      * Called for a {@link ResponseMessage}.
      */
-    public void handleResponse(RequestEntity entity, ResponseMessage response, 
+    public boolean handleResponse(RequestEntity entity, ResponseMessage response, 
             long time, TimeUnit unit) throws IOException;
     
     /**
