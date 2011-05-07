@@ -267,7 +267,7 @@ public class SocketTransport extends AbstractTransport implements Closeable {
                     messageReceived(message);
                     success = true;
                     
-                } catch (IOException err) {err.printStackTrace();
+                } catch (IOException err) {
                     uncaughtException(client, err);
                     handleException(message, err);
                     
