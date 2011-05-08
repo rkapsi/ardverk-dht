@@ -179,12 +179,14 @@ public class SocketTransport extends AbstractTransport implements Closeable {
                     RequestMessage request = (RequestMessage)decoder.read();
                     ResponseMessage response = handleRequest(request);
                     
-                    encoder = codec.createEncoder(
-                            new BufferedOutputStream(
-                                client.getOutputStream()));
-                
-                    encoder.write(response);
-                    encoder.flush();
+                    if (response != null) {
+                        encoder = codec.createEncoder(
+                                new BufferedOutputStream(
+                                    client.getOutputStream()));
+                    
+                        encoder.write(response);
+                        encoder.flush();
+                    }
                     
                 } catch (IOException err) {
                     uncaughtException(client, err);
