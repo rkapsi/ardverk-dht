@@ -242,7 +242,7 @@ store(int offset, int count, boolean randomize) {
 		
 		put(dhts.get(putIndex), key, value1);
 		
-		InMemoryValue value2 = get(dhts.get(getIndex), key);
+		Value value2 = get(dhts.get(getIndex), key);
 		if (!value1.equals(value2.toString())) {
 			//throw new IllegalStateException(value1 + ", " + value2);
 		}

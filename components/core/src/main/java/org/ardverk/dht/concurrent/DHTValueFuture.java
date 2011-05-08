@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.AsyncValueFuture;
-import org.ardverk.dht.event.EventUtils;
+import org.ardverk.concurrent.EventUtils;
 
 /**
  * Like {@link AsyncValueFuture} but implements the {@link DHTFuture} interface.

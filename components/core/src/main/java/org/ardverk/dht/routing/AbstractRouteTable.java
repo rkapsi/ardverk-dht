@@ -20,12 +20,12 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.ardverk.concurrent.EventUtils;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.concurrent.DHTValueFuture;
 import org.ardverk.dht.config.PingConfig;
 import org.ardverk.dht.entity.PingEntity;
-import org.ardverk.dht.event.EventUtils;
 import org.ardverk.lang.Arguments;
 
 

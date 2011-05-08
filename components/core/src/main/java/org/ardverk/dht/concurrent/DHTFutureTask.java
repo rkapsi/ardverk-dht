@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.AsyncProcess;
 import org.ardverk.concurrent.AsyncProcessFutureTask;
-import org.ardverk.dht.event.EventUtils;
+import org.ardverk.concurrent.EventUtils;
 
 /**
  * An implementation of {@link DHTFuture} that implements the 

@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.ardverk.dht.concurrent.DHTFuture;
-import org.ardverk.dht.concurrent.NopFuture;
 import org.ardverk.dht.message.Message;
 
 /**
@@ -30,17 +28,6 @@ import org.ardverk.dht.message.Message;
  * @see Message#getValue()
  */
 public interface Value {
-    
-    /**
-     * A default {@link DHTFuture} that may be returned by {@link #getContentFuture()}
-     */
-    public static final NopFuture<Void> DEFAULT_FUTURE 
-        = NopFuture.withValue(null);
-    
-    /**
-     * Returns the {@link Value}'s {@link DHTFuture}.
-     */
-    public DHTFuture<Void> getContentFuture();
     
     /**
      * Returns the length of the {@link Value}.

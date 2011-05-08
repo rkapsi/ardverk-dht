@@ -31,9 +31,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.ardverk.collection.FixedSizeHashSet;
+import org.ardverk.concurrent.EventUtils;
 import org.ardverk.concurrent.ExecutorUtils;
 import org.ardverk.dht.KUID;
-import org.ardverk.dht.event.EventUtils;
 import org.ardverk.dht.io.transport.Endpoint;
 import org.ardverk.dht.io.transport.Transport;
 import org.ardverk.dht.io.transport.TransportCallback;

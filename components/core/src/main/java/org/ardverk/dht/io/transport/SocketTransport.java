@@ -30,20 +30,19 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.concurrent.AsyncFuture;
-import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.ExecutorUtils;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.codec.MessageCodec;
 import org.ardverk.dht.codec.MessageCodec.Decoder;
 import org.ardverk.dht.codec.MessageCodec.Encoder;
 import org.ardverk.dht.codec.bencode.BencodeMessageCodec;
-import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.message.Message;
 import org.ardverk.dht.message.RequestMessage;
 import org.ardverk.dht.message.ResponseMessage;
 import org.ardverk.dht.rsrc.Value;
 import org.ardverk.io.IoUtils;
+import org.ardverk.io.IdleInputStream;
+import org.ardverk.io.IdleInputStream.IdleAdapter;
 import org.ardverk.net.NetworkUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -244,13 +243,15 @@ public class SocketTransport extends AbstractTransport implements Closeable {
                     encoder.flush();
                     
                     SocketAddress src = client.getRemoteSocketAddress();
-                    decoder = codec.createDecoder(src, 
-                            new BufferedInputStream(
-                                client.getInputStream()));
+                    
+                    IdleInputStream in = new IdleInputStream(
+                        new BufferedInputStream(
+                            client.getInputStream()));
+                    decoder = codec.createDecoder(src, in);
                     
                     ResponseMessage response = (ResponseMessage)decoder.read();
                     hasContent = handleContent(response, 
-                            client, encoder, decoder);
+                            in, client, encoder, decoder);
                     
                     success = handleResponse(response);
                     
@@ -290,17 +291,16 @@ public class SocketTransport extends AbstractTransport implements Closeable {
     }
     
     private static boolean handleContent(Message message, 
-            final Socket client, final Closeable... closeable) {
+            IdleInputStream in, final Socket client, 
+            final Closeable... closeables) {
         
         Value value = message.getValue();
         if (value.getContentLength() != 0L) {
-            DHTFuture<Void> future = value.getContentFuture();
-            future.addAsyncFutureListener(new AsyncFutureListener<Void>() {
-                @Override
-                public void operationComplete(AsyncFuture<Void> future) {
-                    close(client, closeable);
+            in.addIdleListener(new IdleAdapter() {
+                public void handleClosed(IdleInputStream in) {
+                    close(client, closeables);
                 }
-            });
+            }, 30L, TimeUnit.SECONDS);
             return true;
         }
         return false;

@@ -20,16 +20,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.io.IoUtils;
 import org.ardverk.io.StreamUtils;
 
 public abstract class AbstractValue implements Value {
-    
-    @Override
-    public DHTFuture<Void> getContentFuture() {
-        return DEFAULT_FUTURE;
-    }
     
     @Override
     public long getContentLength() {
