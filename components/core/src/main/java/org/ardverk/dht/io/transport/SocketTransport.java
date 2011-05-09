@@ -40,9 +40,9 @@ import org.ardverk.dht.message.Message;
 import org.ardverk.dht.message.RequestMessage;
 import org.ardverk.dht.message.ResponseMessage;
 import org.ardverk.dht.rsrc.Value;
-import org.ardverk.io.IoUtils;
 import org.ardverk.io.IdleInputStream;
 import org.ardverk.io.IdleInputStream.IdleAdapter;
+import org.ardverk.io.IoUtils;
 import org.ardverk.net.NetworkUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -271,7 +271,7 @@ public class SocketTransport extends AbstractTransport implements Closeable {
     }
     
     private static void configure(Socket client) throws SocketException {
-        //client.setSoLinger(true, 0);
+        client.setSoLinger(true, 0);
     }
     
     private static void uncaughtException(ServerSocket socket, Throwable t) {
@@ -284,7 +284,7 @@ public class SocketTransport extends AbstractTransport implements Closeable {
     
     private static void uncaughtException(boolean closed, Throwable t) {
         if (closed) {
-            LOG.debug("Exception", t);
+            LOG.info("Exception", t);
         } else {
             LOG.error("Exception", t);
         }
@@ -297,6 +297,7 @@ public class SocketTransport extends AbstractTransport implements Closeable {
         Value value = message.getValue();
         if (value.getContentLength() != 0L) {
             in.addIdleListener(new IdleAdapter() {
+                @Override
                 public void handleClosed(IdleInputStream in) {
                     close(client, closeables);
                 }

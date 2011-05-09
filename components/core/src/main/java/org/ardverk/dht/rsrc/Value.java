@@ -53,7 +53,7 @@ public interface Value {
     public boolean isStreaming();
     
     /**
-     * 
+     * Writes the contents of this {@link Value} to the given {@link OutputStream}.
      */
     public void writeTo(OutputStream out) throws IOException;
 }
