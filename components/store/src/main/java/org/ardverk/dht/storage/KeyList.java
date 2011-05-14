@@ -16,22 +16,20 @@
 
 package org.ardverk.dht.storage;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Collection;
 
 import org.ardverk.collection.CollectionUtils;
 import org.ardverk.dht.codec.bencode.MessageInputStream;
 import org.ardverk.dht.codec.bencode.MessageOutputStream;
 import org.ardverk.dht.rsrc.Key;
+import org.ardverk.io.InputOutputStream;
 
 public class KeyList extends SimpleValue {
 
     private final Key[] keys;
-    
-    private byte[] payload = null;
     
     public KeyList(Collection<? extends Key> c) {
         this(CollectionUtils.toArray(c, Key.class));
@@ -59,13 +57,21 @@ public class KeyList extends SimpleValue {
     }
     
     @Override
-    public long getContentLength() {
-        return payload().length;
-    }
-
-    @Override
     public InputStream getContent() throws IOException {
-        return new ByteArrayInputStream(payload());
+        return new InputOutputStream() {
+            @Override
+            protected void produce(OutputStream out) throws IOException {
+                MessageOutputStream mos = new MessageOutputStream(out);
+                
+                writeHeader(mos);
+                
+                mos.writeShort(keys.length);
+                for (Key key: keys) {
+                    mos.writeKey(key);
+                }
+                mos.close();
+            }
+        };
     }
     
     @Override
@@ -76,28 +82,6 @@ public class KeyList extends SimpleValue {
     @Override
     public boolean isStreaming() {
         return false;
-    }
-    
-    private synchronized byte[] payload() {
-        if (payload == null) {
-            try {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                MessageOutputStream out = new MessageOutputStream(baos);
-                
-                writeHeader(out);
-                
-                out.writeShort(keys.length);
-                for (Key key: keys) {
-                    out.writeKey(key);
-                }
-                out.close();
-                
-                payload = baos.toByteArray();
-            } catch (IOException err) {
-                throw new IllegalStateException("IOException", err);
-            }
-        }
-        return payload;
     }
     
     public static KeyList valueOf(MessageInputStream in) throws IOException {

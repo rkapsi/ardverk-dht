@@ -18,21 +18,16 @@ package org.ardverk.dht.rsrc;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 import org.ardverk.dht.message.Message;
+import org.ardverk.io.Writable;
 
 /**
  * The {@link Message}'s value.
  * 
  * @see Message#getValue()
  */
-public interface Value {
-    
-    /**
-     * Returns the length of the {@link Value}.
-     */
-    public long getContentLength();
+public interface Value extends Writable {
     
     /**
      * Returns the {@link Value}'s data as an {@link InputStream}.
@@ -51,9 +46,4 @@ public interface Value {
      * Returns {@code true} if the {@link Value} is streaming.
      */
     public boolean isStreaming();
-    
-    /**
-     * Writes the contents of this {@link Value} to the given {@link OutputStream}.
-     */
-    public void writeTo(OutputStream out) throws IOException;
 }

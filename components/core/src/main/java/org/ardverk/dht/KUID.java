@@ -445,9 +445,8 @@ public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>,
     }
     
     @Override
-    public int write(OutputStream out) throws IOException {
+    public void writeTo(OutputStream out) throws IOException {
         out.write(key);
-        return length();
     }
 
     /**

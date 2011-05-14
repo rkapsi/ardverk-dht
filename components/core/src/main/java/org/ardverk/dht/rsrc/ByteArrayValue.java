@@ -40,12 +40,7 @@ public class ByteArrayValue extends AbstractValue {
         this.offset = offset;
         this.length = length;
     }
-
-    @Override
-    public long getContentLength() {
-        return length;
-    }
-
+    
     @Override
     public InputStream getContent() {
         return new ByteArrayInputStream(content, offset, length);

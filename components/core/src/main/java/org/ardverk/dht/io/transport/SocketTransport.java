@@ -39,6 +39,7 @@ import org.ardverk.dht.codec.bencode.BencodeMessageCodec;
 import org.ardverk.dht.message.Message;
 import org.ardverk.dht.message.RequestMessage;
 import org.ardverk.dht.message.ResponseMessage;
+import org.ardverk.dht.rsrc.NoValue;
 import org.ardverk.dht.rsrc.Value;
 import org.ardverk.io.IdleInputStream;
 import org.ardverk.io.IdleInputStream.IdleAdapter;
@@ -295,7 +296,7 @@ public class SocketTransport extends AbstractTransport implements Closeable {
             final Closeable... closeables) {
         
         Value value = message.getValue();
-        if (value.getContentLength() != 0L) {
+        if (!(value instanceof NoValue)) {
             in.addIdleListener(new IdleAdapter() {
                 @Override
                 public void handleClosed(IdleInputStream in) {

@@ -26,11 +26,6 @@ import org.ardverk.io.StreamUtils;
 public abstract class AbstractValue implements Value {
     
     @Override
-    public long getContentLength() {
-        return -1L;
-    }
-    
-    @Override
     public boolean isRepeatable() {
         return false;
     }

@@ -4,22 +4,14 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class StreamingValue extends AbstractValue implements Closeable {
+public class InputStreamValue extends AbstractValue implements Closeable {
     
     private final InputStream in;
     
-    private final long contentLength;
-    
-    public StreamingValue(InputStream in, long contentLength) {
+    public InputStreamValue(InputStream in) {
         this.in = in;
-        this.contentLength = contentLength;
     }
     
-    @Override
-    public long getContentLength() {
-        return contentLength;
-    }
-
     @Override
     public InputStream getContent() {
         return in;

@@ -15,12 +15,7 @@ public class NoValue extends AbstractValue {
     };
     
     private NoValue() {}
-
-    @Override
-    public long getContentLength() {
-        return 0L;
-    }
-
+    
     @Override
     public InputStream getContent() {
         return in;

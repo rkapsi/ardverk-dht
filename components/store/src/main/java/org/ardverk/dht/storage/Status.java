@@ -16,10 +16,9 @@
 
 package org.ardverk.dht.storage;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import org.ardverk.dht.codec.bencode.MessageInputStream;
 import org.ardverk.dht.codec.bencode.MessageOutputStream;
@@ -27,7 +26,8 @@ import org.ardverk.dht.lang.IntegerValue;
 import org.ardverk.dht.lang.StringValue;
 import org.ardverk.dht.message.StoreResponse;
 import org.ardverk.dht.rsrc.Value;
-import org.ardverk.io.SequenceInputStream;
+import org.ardverk.io.InputOutputStream;
+import org.ardverk.io.StreamUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,8 +92,6 @@ public class Status extends SimpleValue implements IntegerValue, StringValue {
     
     private final Value value;
     
-    private byte[] payload = null;
-    
     private Status(Code code, Value value) {
         this(code.value, code.name(), value);
     }
@@ -138,23 +136,31 @@ public class Status extends SimpleValue implements IntegerValue, StringValue {
     }
     
     @Override
-    public long getContentLength() {
-        long contentLength = payload().length;
-        if (value != null) {
-            contentLength += value.getContentLength();
-        }
-        return contentLength;
-    }
-
-    @Override
     public InputStream getContent() throws IOException {
-        InputStream in = new ByteArrayInputStream(payload());
-        
-        if (value != null) {
-            in = new SequenceInputStream(in, value.getContent());
-        }
-        
-        return in;
+        return new InputOutputStream() {
+
+            @Override
+            protected void produce(OutputStream out) throws IOException {
+                MessageOutputStream mos = new MessageOutputStream(out);
+                
+                writeHeader(mos);
+                
+                mos.writeInt(code);
+                mos.writeString(message);
+                mos.writeBoolean(value != null);
+                
+                if (value != null) {
+                    InputStream in = value.getContent();
+                    try {
+                        StreamUtils.copy(in, mos);
+                    } finally {
+                        in.close();
+                    }
+                }
+                
+                mos.close();
+            }
+        };
     }
     
     @Override
@@ -171,29 +177,6 @@ public class Status extends SimpleValue implements IntegerValue, StringValue {
             return value.isStreaming();
         }
         return false;
-    }
-
-    private synchronized byte[] payload() {
-        if (payload == null) {
-            try {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                MessageOutputStream out = new MessageOutputStream(baos);
-                
-                writeHeader(out);
-                
-                out.writeInt(code);
-                out.writeString(message);
-                out.writeBoolean(value != null);
-                
-                out.close();
-                
-                payload = baos.toByteArray();
-            } catch (IOException err) {
-                throw new IllegalStateException("IOException", err);
-            }
-        }
-        
-        return payload;
     }
     
     public static Status valueOf(MessageInputStream in) throws IOException {

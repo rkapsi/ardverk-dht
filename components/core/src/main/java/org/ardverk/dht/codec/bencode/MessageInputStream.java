@@ -16,6 +16,7 @@
 
 package org.ardverk.dht.codec.bencode;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -50,12 +51,10 @@ import org.ardverk.dht.message.ValueRequest;
 import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.DefaultContact;
+import org.ardverk.dht.rsrc.InputStreamValue;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.KeyFactory;
-import org.ardverk.dht.rsrc.NoValue;
-import org.ardverk.dht.rsrc.StreamingValue;
 import org.ardverk.dht.rsrc.Value;
-import org.ardverk.io.ContentInputStream;
 import org.ardverk.net.NetworkUtils;
 import org.ardverk.version.Vector;
 import org.ardverk.version.VectorClock;
@@ -182,15 +181,13 @@ public class MessageInputStream extends BencodingInputStream {
     }
     
     public Value readValue() throws IOException {
-        long contentLength = readLong();
-        if (contentLength == 0L) {
-            return NoValue.EMPTY;
-        }
+        FilterInputStream in = new MessageInputStream(this) {
+            @Override
+            public void close() throws IOException {
+            }
+        };
         
-        ContentInputStream in 
-            = new ContentInputStream(this, contentLength);
-        
-        return new StreamingValue(in, contentLength);
+        return new InputStreamValue(in);
     }
     
     public Message readMessage(SocketAddress src) throws IOException {

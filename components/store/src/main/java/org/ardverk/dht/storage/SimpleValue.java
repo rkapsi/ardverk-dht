@@ -1,12 +1,13 @@
 package org.ardverk.dht.storage;
 
 import java.io.IOException;
+import java.io.OutputStream;
 
 import org.ardverk.dht.codec.bencode.MessageInputStream;
-import org.ardverk.dht.codec.bencode.MessageOutputStream;
 import org.ardverk.dht.lang.IntegerValue;
 import org.ardverk.dht.rsrc.AbstractValue;
 import org.ardverk.dht.rsrc.Value;
+import org.ardverk.io.DataUtils;
 import org.ardverk.io.IoUtils;
 
 public abstract class SimpleValue extends AbstractValue {
@@ -49,9 +50,9 @@ public abstract class SimpleValue extends AbstractValue {
         return valueType;
     }
     
-    protected void writeHeader(MessageOutputStream out) throws IOException {
-        out.writeByte(VERSION);
-        out.writeInt(getValueType().intValue());
+    protected void writeHeader(OutputStream out) throws IOException {
+        out.write(VERSION);
+        DataUtils.int2beb(getValueType().intValue(), out);
     }
     
     public static SimpleValue valueOf(Value value) throws IOException {

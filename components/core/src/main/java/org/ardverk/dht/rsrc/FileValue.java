@@ -38,11 +38,6 @@ public class FileValue extends AbstractValue {
     }
     
     @Override
-    public long getContentLength() {
-        return file.length();
-    }
-
-    @Override
     public InputStream getContent() throws IOException {
         return new FileInputStream(file);
     }

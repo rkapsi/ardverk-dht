@@ -102,9 +102,8 @@ public final class MessageId implements Writable, Serializable,
     }
 
     @Override
-    public int write(OutputStream out) throws IOException {
+    public void writeTo(OutputStream out) throws IOException {
         out.write(messageId);
-        return messageId.length;
     }
 
     /**

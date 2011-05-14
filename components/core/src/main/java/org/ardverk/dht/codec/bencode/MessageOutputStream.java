@@ -148,7 +148,6 @@ public class MessageOutputStream extends BencodingOutputStream {
     }
     
     public void writeValue(Value value) throws IOException {
-        writeLong(value.getContentLength());
         value.writeTo(this);
     }
     
