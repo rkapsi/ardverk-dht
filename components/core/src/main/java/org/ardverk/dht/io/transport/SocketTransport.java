@@ -42,7 +42,7 @@ import org.ardverk.dht.message.ResponseMessage;
 import org.ardverk.dht.rsrc.NoValue;
 import org.ardverk.dht.rsrc.Value;
 import org.ardverk.io.IdleInputStream;
-import org.ardverk.io.IdleInputStream.IdleAdapter;
+import org.ardverk.io.IdleInputStream.IdleInputStreamAdapter;
 import org.ardverk.io.IoUtils;
 import org.ardverk.net.NetworkUtils;
 import org.slf4j.Logger;
@@ -297,7 +297,7 @@ public class SocketTransport extends AbstractTransport implements Closeable {
         
         Value value = message.getValue();
         if (!(value instanceof NoValue)) {
-            in.addIdleListener(new IdleAdapter() {
+            in.addIdleInputStreamListener(new IdleInputStreamAdapter() {
                 @Override
                 public void handleClosed(IdleInputStream in) {
                     close(client, closeables);
