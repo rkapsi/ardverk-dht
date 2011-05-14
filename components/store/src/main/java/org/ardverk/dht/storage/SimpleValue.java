@@ -60,13 +60,15 @@ public abstract class SimpleValue extends AbstractValue {
         try {
             in = new MessageInputStream(value.getContent());
             
-            int version = in.readUnsignedByte();
+            int version = in.read();
             if (version != VERSION) {
                 throw new IOException();
             }
             
-            ValueType type = ValueType.valueOf(in.readInt());
-            switch (type) {
+            int type = DataUtils.beb2int(in);
+            ValueType valueType = ValueType.valueOf(type);
+            
+            switch (valueType) {
                 case STATUS:
                     return Status.valueOf(in);
                 case KEY_LIST:
