@@ -18,6 +18,7 @@ package org.ardverk.dht.config;
 
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.dht.routing.RouteTableConfig;
 import org.ardverk.utils.TimeUtils;
 
 public class DefaultStoreConfig extends DefaultConfig 
@@ -27,6 +28,8 @@ public class DefaultStoreConfig extends DefaultConfig
         = TimeUtils.convert(60L, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
     
     private volatile int s = 5;
+    
+    private volatile int w = RouteTableConfig.DEFAULT_K;
     
     public DefaultStoreConfig() {
         super(DEFAULT_STORE_TIMEOUT, TimeUnit.MILLISECONDS);
@@ -59,5 +62,15 @@ public class DefaultStoreConfig extends DefaultConfig
     @Override
     public void setS(int s) {
         this.s = s;
+    }
+
+    @Override
+    public int getW() {
+        return w;
+    }
+
+    @Override
+    public void setW(int w) {
+        this.w = w;
     }
 }

@@ -36,12 +36,17 @@ import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.Value;
 import org.ardverk.lang.TimeStamp;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * The {@link StoreResponseHandler} manages the {@link MessageType#STORE} process.
  */
 public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
+    
+    private static final Logger LOG 
+        = LoggerFactory.getLogger(StoreResponseHandler.class);
     
     private final ProcessCounter counter;
     
@@ -54,13 +59,13 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     
     private final Iterator<Contact> it;
     
-    private final int k;
-    
     private final Key key;
     
     private final Value value;
     
     private final StoreConfig config;
+    
+    private final int w;
     
     public StoreResponseHandler(
             MessageDispatcher messageDispatcher, 
@@ -71,13 +76,21 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
         
         this.contacts = contacts;
         this.it = Iterators.iterator(contacts);
-        this.k = k;
         
         this.key = key;
         this.value = value;
         this.config = config;
         
         counter = new ProcessCounter(config.getS());
+        
+        int w = config.getW();
+        
+        int replicate = Math.min(w, k);
+        if (replicate != w && LOG.isWarnEnabled()) {
+            LOG.warn("replicate=" + replicate + ", w=" + w);
+        }
+        
+        this.w = replicate;
     }
 
     @Override
@@ -89,7 +102,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
         try {
             preProcess(pop);
             
-            while (counter.hasNext() && counter.getCount() < k) {
+            while (counter.hasNext() && counter.getCount() < w) {
                 if (!it.hasNext()) {
                     break;
                 }

@@ -19,6 +19,7 @@ package org.ardverk.dht.config;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.dht.message.MessageType;
+import org.ardverk.dht.routing.RouteTableConfig;
 
 
 /**
@@ -52,5 +53,16 @@ public interface StoreConfig extends Config {
      * The S parameter is controlling how many {@link MessageType#STORE}
      * operations should run in parallel.
      */
-    public void setS(int value);
+    public void setS(int s);
+    
+    /**
+     * Returns the write (replication) count. The default value is 
+     * {@link RouteTableConfig#DEFAULT_K}.
+     */
+    public int getW();
+    
+    /**
+     * Sets the write (replication) count.
+     */
+    public void setW(int w);
 }

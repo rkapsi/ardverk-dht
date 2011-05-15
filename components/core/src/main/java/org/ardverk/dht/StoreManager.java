@@ -37,7 +37,6 @@ import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.Value;
 
-
 /**
  * The {@link StoreManager} manages STORE operations.
  */
@@ -58,6 +57,16 @@ public class StoreManager {
     
     public DHTFuture<PutEntity> put(final Key key, 
             final Value value, final PutConfig config) {
+        
+        int w = config.getStoreConfig().getW();
+        if (w < 1) {
+            throw new IllegalArgumentException("w=" + w);
+        }
+        
+        if (w >= 2 && !value.isRepeatable()) {
+            throw new IllegalArgumentException(
+                    "The value is not repeatable: w=" + w);
+        }
         
         final Object lock = new Object();
         synchronized (lock) {
@@ -105,8 +114,7 @@ public class StoreManager {
                     Contact[] contacts = nodeEntity.getContacts();
                     DHTFuture<StoreEntity> storeFuture 
                         = storeFutureRef.make(store(contacts, 
-                                key, value, 
-                                config.getStoreConfig()));
+                                key, value, config.getStoreConfig()));
                     
                     storeFuture.addAsyncFutureListener(new AsyncFutureListener<StoreEntity>() {
                         @Override
@@ -165,7 +173,6 @@ public class StoreManager {
             Value value, StoreConfig config) {
         
         int k = routeTable.getK();
-        
         DHTProcess<StoreEntity> process 
             = new StoreResponseHandler(messageDispatcher, 
                 dst, k, key, value, config);
