@@ -18,7 +18,7 @@ package org.ardverk.dht.entity;
 
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.lang.Arguments;
+import org.ardverk.lang.Precoditions;
 
 /**
  * An abstract implementation of {@link Entity}.
@@ -30,8 +30,10 @@ public abstract class AbstractEntity implements Entity {
     protected final TimeUnit unit;
     
     public AbstractEntity(long time, TimeUnit unit) {
-        this.time = Arguments.notNegative(time, "time");
-        this.unit = Arguments.notNull(unit, "unit");
+        Precoditions.argument(time >= 0L, "time");
+        
+        this.time = time;
+        this.unit = Precoditions.notNull(unit, "unit");
     }
     
     @Override

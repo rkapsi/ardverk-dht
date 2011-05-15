@@ -25,7 +25,7 @@ import java.util.Random;
 import org.ardverk.coding.CodingUtils;
 import org.ardverk.dht.security.SecurityUtils;
 import org.ardverk.io.Writable;
-import org.ardverk.lang.Arguments;
+import org.ardverk.lang.Precoditions;
 import org.ardverk.utils.ByteArrayComparator;
 
 /**
@@ -84,7 +84,7 @@ public final class MessageId implements Writable, Serializable,
     private final int hashCode;
     
     private MessageId(byte[] messageId) {
-        this.messageId = Arguments.notNull(messageId, "messageId");
+        this.messageId = Precoditions.notNull(messageId, "messageId");
         this.hashCode = Arrays.hashCode(messageId);
     }
     

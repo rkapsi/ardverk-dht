@@ -45,7 +45,7 @@ import org.ardverk.dht.message.ResponseMessage;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.io.Bindable;
 import org.ardverk.io.IoUtils;
-import org.ardverk.lang.Arguments;
+import org.ardverk.lang.Precoditions;
 import org.ardverk.lang.TimeStamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -321,7 +321,7 @@ public abstract class MessageDispatcher
      * Adds the given {@link MessageListener}.
      */
     public void addMessageListener(MessageListener l) {
-        listeners.add(Arguments.notNull(l, "l"));
+        listeners.add(Precoditions.notNull(l, "l"));
     }
     
     /**
@@ -481,9 +481,9 @@ public abstract class MessageDispatcher
                 MessageCallback callback, 
                 RequestEntity entity) {
             
-            this.future = Arguments.notNull(future, "future");
-            this.callback = Arguments.notNull(callback, "callback");
-            this.entity = Arguments.notNull(entity, "entity");
+            this.future = Precoditions.notNull(future, "future");
+            this.callback = Precoditions.notNull(callback, "callback");
+            this.entity = Precoditions.notNull(entity, "entity");
         }
 
         /**
@@ -550,7 +550,7 @@ public abstract class MessageDispatcher
         private final Set<MessageId> history;
         
         public ResponseChecker(MessageFactory factory, int historySize) {
-            this.factory = Arguments.notNull(factory, "factory");
+            this.factory = Precoditions.notNull(factory, "factory");
             this.history = Collections.synchronizedSet(
                     new FixedSizeHashSet<MessageId>(historySize));
         }

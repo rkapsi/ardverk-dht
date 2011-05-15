@@ -17,7 +17,7 @@
 package org.ardverk.dht.io;
 
 import org.ardverk.dht.message.MessageFactory;
-import org.ardverk.lang.Arguments;
+import org.ardverk.lang.Precoditions;
 
 
 /**
@@ -28,7 +28,7 @@ abstract class AbstractMessageHandler {
     protected final MessageDispatcher messageDispatcher;
     
     public AbstractMessageHandler(MessageDispatcher messageDispatcher) {
-        this.messageDispatcher = Arguments.notNull(messageDispatcher, "messageDispatcher");
+        this.messageDispatcher = Precoditions.notNull(messageDispatcher, "messageDispatcher");
     }
     
     public MessageDispatcher getMessageDispatcher() {

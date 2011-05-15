@@ -23,7 +23,7 @@ import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.Localhost;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.Value;
-import org.ardverk.lang.Arguments;
+import org.ardverk.lang.Precoditions;
 
 
 public class DefaultMessageFactory extends AbstractMessageFactory {
@@ -36,7 +36,7 @@ public class DefaultMessageFactory extends AbstractMessageFactory {
     
     public DefaultMessageFactory(int length, Localhost localhost) {
         super(length);
-        this.localhost = Arguments.notNull(localhost, "localhost");
+        this.localhost = Precoditions.notNull(localhost, "localhost");
     }
     
     @Override

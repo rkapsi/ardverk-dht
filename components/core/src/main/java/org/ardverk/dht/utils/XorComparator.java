@@ -20,7 +20,7 @@ import java.util.Comparator;
 
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.lang.Identifier;
-import org.ardverk.lang.Arguments;
+import org.ardverk.lang.Precoditions;
 
 
 /**
@@ -31,7 +31,7 @@ public class XorComparator implements Comparator<Identifier> {
     private final Identifier identifier;
     
     public XorComparator(Identifier identifier) {
-        this.identifier = Arguments.notNull(identifier, "identifier");
+        this.identifier = Precoditions.notNull(identifier, "identifier");
     }
     
     /**

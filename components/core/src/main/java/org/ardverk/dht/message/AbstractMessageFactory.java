@@ -18,7 +18,7 @@ package org.ardverk.dht.message;
 
 import java.net.SocketAddress;
 
-import org.ardverk.lang.Arguments;
+import org.ardverk.lang.Precoditions;
 
 /**
  * An abstract implementation of {@link MessageFactory}.
@@ -28,7 +28,8 @@ public abstract class AbstractMessageFactory implements MessageFactory {
     private final int length;
     
     public AbstractMessageFactory(int length) {
-        this.length = Arguments.notNegative(length, "length");
+        Precoditions.argument(length >= 0, "length");
+        this.length = length;
     }
     
     @Override

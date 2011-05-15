@@ -40,7 +40,7 @@ import org.ardverk.dht.entity.PingEntity;
 import org.ardverk.dht.lang.Identifier;
 import org.ardverk.dht.routing.ContactEntry.Update;
 import org.ardverk.dht.utils.ContactKey;
-import org.ardverk.lang.Arguments;
+import org.ardverk.lang.Precoditions;
 import org.ardverk.net.NetworkCounter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,8 +71,8 @@ public class DefaultRouteTable extends AbstractRouteTable {
     }
     
     public DefaultRouteTable(RouteTableConfig config, Localhost localhost) {
-        this.config = Arguments.notNull(config, "config");
-        this.localhost = Arguments.notNull(localhost, "localhost");
+        this.config = Precoditions.notNull(config, "config");
+        this.localhost = Precoditions.notNull(localhost, "localhost");
         
         this.buckets = new PatriciaTrie<KUID, DefaultBucket>();
         

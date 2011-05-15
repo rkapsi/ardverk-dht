@@ -29,7 +29,7 @@ import org.ardverk.dht.entity.Entity;
 import org.ardverk.dht.message.RequestMessage;
 import org.ardverk.dht.message.ResponseMessage;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.lang.Arguments;
+import org.ardverk.lang.Precoditions;
 import org.ardverk.lang.TimeStamp;
 
 
@@ -172,7 +172,7 @@ abstract class AbstractResponseHandler<V extends Entity>
     
     @Override
     public final void start(AsyncProcessFuture<V> future) throws Exception {
-        this.future = Arguments.notNull(future, "future");
+        this.future = Precoditions.notNull(future, "future");
         
         future.addAsyncFutureListener(new AsyncFutureListener<V>() {
             @Override

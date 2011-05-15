@@ -39,7 +39,7 @@ import org.ardverk.dht.message.ResponseMessage;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.utils.XorComparator;
-import org.ardverk.lang.Arguments;
+import org.ardverk.lang.Precoditions;
 import org.ardverk.lang.TimeStamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +73,7 @@ abstract class LookupResponseHandler<T extends LookupEntity>
             LookupConfig config) {
         super(messageDispatcher);
         
-        this.config = Arguments.notNull(config, "config");
+        this.config = Precoditions.notNull(config, "config");
         lookupManager = new LookupManager(contacts, routeTable, lookupId);
         lookupCounter = new ProcessCounter(config.getAlpha());
     }
@@ -336,8 +336,8 @@ abstract class LookupResponseHandler<T extends LookupEntity>
         private int timeouts = 0;
         
         public LookupManager(Contact[] contacts, RouteTable routeTable, KUID lookupId) {
-            this.routeTable = Arguments.notNull(routeTable, "routeTable");
-            this.lookupId = Arguments.notNull(lookupId, "lookupId");
+            this.routeTable = Precoditions.notNull(routeTable, "routeTable");
+            this.lookupId = Precoditions.notNull(lookupId, "lookupId");
             
             Contact localhost = routeTable.getLocalhost();
             KUID contactId = localhost.getId();

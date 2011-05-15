@@ -26,7 +26,7 @@ import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.concurrent.DHTValueFuture;
 import org.ardverk.dht.config.PingConfig;
 import org.ardverk.dht.entity.PingEntity;
-import org.ardverk.lang.Arguments;
+import org.ardverk.lang.Precoditions;
 
 
 public abstract class AbstractRouteTable implements RouteTable {
@@ -80,12 +80,12 @@ public abstract class AbstractRouteTable implements RouteTable {
     
     @Override
     public void addRouteTableListener(RouteTableListener l) {
-        listeners.add(Arguments.notNull(l, "l"));
+        listeners.add(Precoditions.notNull(l, "l"));
     }
 
     @Override
     public void removeRouteTableListener(RouteTableListener l) {
-        listeners.remove(Arguments.notNull(l, "l"));
+        listeners.remove(Precoditions.notNull(l, "l"));
     }
     
     @Override

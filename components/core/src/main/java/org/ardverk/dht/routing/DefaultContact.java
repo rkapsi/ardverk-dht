@@ -21,7 +21,7 @@ import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.dht.KUID;
-import org.ardverk.lang.Arguments;
+import org.ardverk.lang.Precoditions;
 import org.ardverk.lang.TimeStamp;
 import org.ardverk.net.NetworkUtils;
 
@@ -91,14 +91,14 @@ public class DefaultContact extends AbstractContact {
             contactAddress = socketAddress;
         }
         
-        this.type = Arguments.notNull(type, "type");
+        this.type = Precoditions.notNull(type, "type");
         this.creationTime = TimeStamp.now();
         this.timeStamp = creationTime;
         
         this.instanceId = instanceId;
         this.invisible = invisible;
-        this.socketAddress = Arguments.notNull(socketAddress, "socketAddress");
-        this.contactAddress = Arguments.notNull(contactAddress, "contactAddress");
+        this.socketAddress = Precoditions.notNull(socketAddress, "socketAddress");
+        this.contactAddress = Precoditions.notNull(contactAddress, "contactAddress");
         this.remoteAddress = combine(socketAddress, contactAddress);
     }
     
