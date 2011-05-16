@@ -75,23 +75,23 @@ public class InMemoryDatabase extends AbstractDatabase {
             LOG.error("IOException", err);
         }
         
-        if (!(simpleValue instanceof BlobValue)) {
+        if (!(simpleValue instanceof ObjectValue)) {
             return Status.FAILURE;
         }
         
-        return store(key, (BlobValue)simpleValue);
+        return store(key, (ObjectValue)simpleValue);
     }
     
-    private synchronized Value store(Key key, BlobValue value) {
-        BlobValue existing = getValue(key);
+    private synchronized Value store(Key key, ObjectValue value) {
+        ObjectValue existing = getValue(key);
         
         Occured occured = compare(existing, value);
         if (occured == Occured.AFTER) {
-            if (value.isEmpty()) {
+            /*if (value.isEmpty()) {
                 remove(key);
-            } else {
+            } else {*/
                 put(key, value);
-            }
+            //}
             return Status.SUCCESS;
         }
         
@@ -117,12 +117,12 @@ public class InMemoryDatabase extends AbstractDatabase {
         return getValue(key);
     }
     
-    private synchronized BlobValue getValue(Key key) {
+    private synchronized ObjectValue getValue(Key key) {
         Bucket bucket = database.get(key.getId());
         return bucket != null ? bucket.get(key) : null;
     }
     
-    private synchronized BlobValue put(Key key, BlobValue value) {
+    private synchronized ObjectValue put(Key key, ObjectValue value) {
         KUID bucketId = key.getId();
         
         Bucket bucket = database.get(bucketId);
@@ -134,12 +134,12 @@ public class InMemoryDatabase extends AbstractDatabase {
         return bucket.put(key, value);
     }
     
-    private synchronized BlobValue remove(Key key) {
+    private synchronized ObjectValue remove(Key key) {
         KUID bucketId = key.getId();
         
         Bucket bucket = database.get(bucketId);
         if (bucket != null) {
-            BlobValue removed = bucket.remove(key);
+            ObjectValue removed = bucket.remove(key);
             if (bucket.isEmpty()) {
                 database.remove(bucketId);
             }
@@ -209,7 +209,7 @@ public class InMemoryDatabase extends AbstractDatabase {
         return sb.toString();
     }
     
-    private static Occured compare(BlobValue existing, BlobValue value) {
+    private static Occured compare(ObjectValue existing, ObjectValue value) {
         if (existing == null) {
             return Occured.AFTER;
         }
@@ -230,7 +230,7 @@ public class InMemoryDatabase extends AbstractDatabase {
         return clock.compareTo(existing);
     }
     
-    private static class Bucket extends HashMap<Key, BlobValue> 
+    private static class Bucket extends HashMap<Key, ObjectValue> 
             implements Identifier {
         
         private static final long serialVersionUID = -8794611016380746313L;

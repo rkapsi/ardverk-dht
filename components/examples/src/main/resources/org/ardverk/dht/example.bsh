@@ -170,7 +170,7 @@ toValue(String value) {
   //byte[] raw = StringUtils.getBytes(value);
   //byte[] data = new byte[1024 * 1024];
   //System.arraycopy(raw, 0, data, 0, raw.length);
-	return new BlobValue(dhts.get(current).getLocalhost(), null, StringUtils.getBytes(value));
+	return new ObjectValue(dhts.get(current).getLocalhost(), null, StringUtils.getBytes(value));
 }
 
 // Closes all DHTs

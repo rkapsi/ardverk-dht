@@ -17,7 +17,8 @@ public abstract class SimpleValue extends AbstractValue {
     public static enum ValueType implements IntegerValue {
         STATUS(0x01),
         KEY_LIST(0x02),
-        BLOB(0x03);
+        BLOB(0x03),
+        OBJECT(0x04);
         
         private final int type;
         
@@ -75,6 +76,8 @@ public abstract class SimpleValue extends AbstractValue {
                     return KeyList.valueOf(in);
                 case BLOB:
                     return BlobValue.valueOf(in);
+                case OBJECT:
+                    return ObjectValue.valueOf(in);
                 default:
                     throw new IOException();
             }

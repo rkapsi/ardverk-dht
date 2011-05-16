@@ -16,13 +16,9 @@
 
 package org.ardverk.dht.rsrc;
 
-import java.io.IOException;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 
-import org.ardverk.io.DataUtils;
-import org.ardverk.io.InputOutputStream;
-import org.ardverk.io.StreamUtils;
 import org.ardverk.utils.StringUtils;
 
 public class ByteArrayValue extends AbstractValue {
@@ -45,13 +41,7 @@ public class ByteArrayValue extends AbstractValue {
     
     @Override
     public InputStream getContent() {
-        return new InputOutputStream() {
-            @Override
-            protected void produce(OutputStream out) throws IOException {
-                DataUtils.int2beb(length);
-                out.write(content, offset, length);
-            }
-        };
+        return new ByteArrayInputStream(content, offset, length);
     }
     
     public byte[] getContentAsBytes() {
@@ -77,13 +67,5 @@ public class ByteArrayValue extends AbstractValue {
     @Override
     public String toString() {
         return StringUtils.toString(getContentAsBytes());
-    }
-    
-    public static ByteArrayValue valueOf(InputStream in) throws IOException {
-        int length = DataUtils.beb2int(in);
-        byte[] data = new byte[length];
-        StreamUtils.readFully(in, data);
-        
-        return new ByteArrayValue(data);
     }
 }
