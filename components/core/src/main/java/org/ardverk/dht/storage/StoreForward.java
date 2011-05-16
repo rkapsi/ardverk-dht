@@ -50,12 +50,12 @@ public class StoreForward {
     }
     
     private void handleContact(Contact contact) {
-        DatabaseConfig config = database.getDatabaseConfig();
-        if (!config.isStoreForward()) {
+        if (contact.isInvisible()) {
             return;
         }
         
-        if (contact.isInvisible()) {
+        DatabaseConfig config = database.getDatabaseConfig();
+        if (!config.isStoreForward()) {
             return;
         }
         
