@@ -27,17 +27,10 @@ public class ValueOutputStream extends MessageOutputStream {
         writeArray(property.values());
     }
     
-    public static void main(String[] args) throws IOException {
-        Property[] props = new Property[] {
-            new Property("key1", "value1"),
-            new Property("key2", "value2"),
-        };
+    @Override
+    public void close() throws IOException {
+        super.flush();
         
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ValueOutputStream oos = new ValueOutputStream(baos);
-        oos.writeArray(props);
-        oos.close();
-        
-        System.out.println(new String(baos.toByteArray()));
+        Thread.dumpStack();
     }
 }

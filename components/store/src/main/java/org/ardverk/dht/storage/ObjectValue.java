@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -26,6 +25,8 @@ import org.ardverk.dht.routing.DefaultContact;
 import org.ardverk.dht.rsrc.ByteArrayValue;
 import org.ardverk.dht.rsrc.InputStreamValue;
 import org.ardverk.dht.rsrc.Value;
+import org.ardverk.dht.storage.io.ValueInputStream;
+import org.ardverk.dht.storage.io.ValueOutputStream;
 import org.ardverk.io.InputOutputStream;
 import org.ardverk.net.NetworkUtils;
 import org.ardverk.utils.StringUtils;
@@ -146,7 +147,7 @@ public class ObjectValue extends SimpleValue {
         return new InputOutputStream() {
             @Override
             protected void produce(OutputStream out) throws IOException {
-                DataOutputStream dos = new DataOutputStream(out);
+                /*DataOutputStream dos = new DataOutputStream(out);
                 
                 writeHeader(dos);
                 
@@ -161,13 +162,24 @@ public class ObjectValue extends SimpleValue {
                 }
                 
                 value.writeTo(dos);
-                dos.close();
+                dos.close();*/
+                
+                try {
+                ValueOutputStream vos = new ValueOutputStream(out);
+                writeHeader(vos);
+                vos.writeCollection(properties.values());
+                value.writeTo(vos);
+                vos.close();
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    throw new IOException(t);
+                }
             }
         };
     }
     
     public static ObjectValue valueOf(InputStream in) throws IOException {
-        DataInputStream dis = new DataInputStream(in);
+        /*DataInputStream dis = new DataInputStream(in);
         
         Property[] properties = new Property[dis.readInt()];
         for (int i = 0; i < properties.length; i++) {
@@ -181,7 +193,11 @@ public class ObjectValue extends SimpleValue {
             properties[i] = new Property(name, Arrays.asList(values));
         }
         
-        return new ObjectValue(properties, new InputStreamValue(dis));
+        return new ObjectValue(properties, new InputStreamValue(dis));*/
+        
+        ValueInputStream vis = new ValueInputStream(in);
+        Property[] properties = vis.readProperties();
+        return new ObjectValue(properties, new InputStreamValue(vis));
     }
 
     @Override
