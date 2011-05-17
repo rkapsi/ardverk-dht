@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.ardverk.coding.BencodingInputStream;
 import org.ardverk.dht.codec.bencode.MessageInputStream;
+import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.storage.ObjectValue.Property;
 
 public class ValueInputStream extends MessageInputStream {
@@ -21,15 +22,23 @@ public class ValueInputStream extends MessageInputStream {
         }
     };
     
+    private static ObjectFactory<Key> KEY_FACTORY
+            = new ObjectFactory<Key>() {
+        @Override
+        public Key read(BencodingInputStream in) throws IOException {
+            return ((ValueInputStream)in).readKey();
+        }
+    };
+    
     public ValueInputStream(InputStream in) {
         super(in);
-    }
-
-    public Property readProperty() throws IOException {
-        return readObject(PROPERTY_FACTORY);
     }
     
     public Property[] readProperties() throws IOException {
         return readList(PROPERTY_FACTORY).toArray(new Property[0]);
+    }
+    
+    public Key[] readKeys() throws IOException {
+        return readList(KEY_FACTORY).toArray(new Key[0]);
     }
 }

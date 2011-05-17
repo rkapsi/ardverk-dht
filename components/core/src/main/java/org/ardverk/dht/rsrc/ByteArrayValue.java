@@ -39,9 +39,12 @@ public class ByteArrayValue extends AbstractValue {
         this.length = length;
     }
     
-    @Override
-    public InputStream getContent() {
-        return new ByteArrayInputStream(content, offset, length);
+    public boolean isEmpty() {
+        return size() == 0;
+    }
+    
+    public int size() {
+        return length;
     }
     
     public byte[] getContentAsBytes() {
@@ -52,6 +55,11 @@ public class ByteArrayValue extends AbstractValue {
         byte[] copy = new byte[length];
         System.arraycopy(content, offset, copy, 0, length);
         return copy;
+    }
+    
+    @Override
+    public InputStream getContent() {
+        return new ByteArrayInputStream(content, offset, length);
     }
 
     @Override

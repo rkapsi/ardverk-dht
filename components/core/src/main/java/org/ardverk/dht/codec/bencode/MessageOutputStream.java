@@ -68,6 +68,8 @@ public class MessageOutputStream extends BencodingOutputStream {
             writeContact((Contact)obj);
         } else if (obj instanceof Message) {
             writeMessage((Message)obj);
+        } else if (obj instanceof Key) {
+            writeKey((Key)obj);
         } else {
             super.writeCustom(obj);
         }

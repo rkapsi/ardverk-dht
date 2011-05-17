@@ -22,9 +22,9 @@ import java.io.OutputStream;
 import java.util.Collection;
 
 import org.ardverk.collection.CollectionUtils;
-import org.ardverk.dht.codec.bencode.MessageInputStream;
 import org.ardverk.dht.codec.bencode.MessageOutputStream;
 import org.ardverk.dht.rsrc.Key;
+import org.ardverk.dht.storage.io.ValueInputStream;
 import org.ardverk.io.InputOutputStream;
 
 public class KeyList extends SimpleValue {
@@ -64,11 +64,8 @@ public class KeyList extends SimpleValue {
                 MessageOutputStream mos = new MessageOutputStream(out);
                 
                 writeHeader(mos);
+                mos.writeArray(keys);
                 
-                mos.writeShort(keys.length);
-                for (Key key: keys) {
-                    mos.writeKey(key);
-                }
                 mos.close();
             }
         };
@@ -84,13 +81,9 @@ public class KeyList extends SimpleValue {
         return false;
     }
     
-    public static KeyList valueOf(MessageInputStream in) throws IOException {
-        int count = in.readUnsignedShort();
-        Key[] keys = new Key[count];
-        for (int i = 0; i < keys.length; i++) {
-            keys[i] = in.readKey();
-        }
-        
+    public static KeyList valueOf(InputStream in) throws IOException {
+        ValueInputStream vis = new ValueInputStream(in);
+        Key[] keys = vis.readKeys();
         return new KeyList(keys);
     }
 }
