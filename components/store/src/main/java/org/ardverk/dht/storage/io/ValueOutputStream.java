@@ -1,6 +1,5 @@
 package org.ardverk.dht.storage.io;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -25,12 +24,5 @@ public class ValueOutputStream extends MessageOutputStream {
     public void writeProperty(Property property) throws IOException {
         writeString(property.getName());
         writeArray(property.values());
-    }
-    
-    @Override
-    public void close() throws IOException {
-        super.flush();
-        
-        Thread.dumpStack();
     }
 }

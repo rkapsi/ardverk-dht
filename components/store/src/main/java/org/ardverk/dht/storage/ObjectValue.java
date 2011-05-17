@@ -22,9 +22,6 @@ import org.ardverk.collection.CollectionUtils;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.DefaultContact;
-import org.ardverk.dht.rsrc.ByteArrayValue;
-import org.ardverk.dht.rsrc.InputStreamValue;
-import org.ardverk.dht.rsrc.Value;
 import org.ardverk.dht.storage.io.ValueInputStream;
 import org.ardverk.dht.storage.io.ValueOutputStream;
 import org.ardverk.io.InputOutputStream;
@@ -54,22 +51,18 @@ public class ObjectValue extends SimpleValue {
     private final Map<String, Property> properties 
         = new TreeMap<String, Property>(COMPARATOR);
     
-    private final Value value;
+    private final byte[] value;
     
-    public ObjectValue(Map<String, String> properties, Value value) {
+    public ObjectValue(Map<String, String> properties, byte[] value) {
         this(null, null, properties, value);
     }
     
     public ObjectValue(Contact creator, VectorClock<KUID> clock, byte[] value) {
-        this(creator, clock, new ByteArrayValue(value));
-    }
-    
-    public ObjectValue(Contact creator, VectorClock<KUID> clock, Value value) {
         this(creator, clock, null, value);
     }
     
     public ObjectValue(Contact creator, VectorClock<KUID> clock,
-            Map<String, String> properties, Value value) {
+            Map<String, String> properties, byte[] value) {
         super(ValueType.OBJECT);
         
         if (properties != null) {
@@ -89,7 +82,7 @@ public class ObjectValue extends SimpleValue {
         this.value = value;
     }
     
-    private ObjectValue(Property[] properties, Value value) {
+    private ObjectValue(Property[] properties, byte[] value) {
         super(ValueType.OBJECT);
         
         for (Property property : properties) {
@@ -147,67 +140,32 @@ public class ObjectValue extends SimpleValue {
         return new InputOutputStream() {
             @Override
             protected void produce(OutputStream out) throws IOException {
-                /*DataOutputStream dos = new DataOutputStream(out);
-                
-                writeHeader(dos);
-                
-                dos.writeInt(properties.size());
-                for (Property property : properties.values()) {
-                    dos.writeUTF(property.getName());
-                    
-                    dos.writeInt(property.size());
-                    for (String value : property) {
-                        dos.writeUTF(value);
-                    }
-                }
-                
-                value.writeTo(dos);
-                dos.close();*/
-                
-                try {
                 ValueOutputStream vos = new ValueOutputStream(out);
                 writeHeader(vos);
                 vos.writeCollection(properties.values());
-                value.writeTo(vos);
+                vos.writeBytes(value);
+                
                 vos.close();
-                } catch (Throwable t) {
-                    t.printStackTrace();
-                    throw new IOException(t);
-                }
             }
         };
     }
     
     public static ObjectValue valueOf(InputStream in) throws IOException {
-        /*DataInputStream dis = new DataInputStream(in);
-        
-        Property[] properties = new Property[dis.readInt()];
-        for (int i = 0; i < properties.length; i++) {
-            String name = dis.readUTF();
-            
-            String[] values = new String[dis.readInt()];
-            for (int j = 0; j < values.length; j++) {
-                values[j] = dis.readUTF();
-            }
-            
-            properties[i] = new Property(name, Arrays.asList(values));
-        }
-        
-        return new ObjectValue(properties, new InputStreamValue(dis));*/
-        
         ValueInputStream vis = new ValueInputStream(in);
         Property[] properties = vis.readProperties();
-        return new ObjectValue(properties, new InputStreamValue(vis));
+        byte[] value = vis.readBytes();
+        
+        return new ObjectValue(properties, value);
     }
 
     @Override
     public boolean isRepeatable() {
-        return value.isRepeatable();
+        return true;
     }
 
     @Override
     public boolean isStreaming() {
-        return value.isStreaming();
+        return false;
     }
     
     @Override
@@ -216,8 +174,8 @@ public class ObjectValue extends SimpleValue {
     }
     
     private static Contact decodeContact(String value) {
-        Base64 foo = new Base64(true);
-        byte[] data = foo.decode(StringUtils.getBytes(value));
+        Base64 decoder = new Base64(true);
+        byte[] data = decoder.decode(StringUtils.getBytes(value));
         
         ByteArrayInputStream bais = new ByteArrayInputStream(data);
         DataInputStream dis = new DataInputStream(bais);
