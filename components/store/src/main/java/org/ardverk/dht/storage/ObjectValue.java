@@ -1,10 +1,13 @@
 package org.ardverk.dht.storage;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -15,13 +18,18 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.apache.commons.codec.binary.Base64;
 import org.ardverk.collection.CollectionUtils;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.DefaultContact;
 import org.ardverk.dht.rsrc.ByteArrayValue;
 import org.ardverk.dht.rsrc.InputStreamValue;
 import org.ardverk.dht.rsrc.Value;
 import org.ardverk.io.InputOutputStream;
+import org.ardverk.net.NetworkUtils;
+import org.ardverk.utils.StringUtils;
+import org.ardverk.version.Vector;
 import org.ardverk.version.VectorClock;
 
 public class ObjectValue extends SimpleValue {
@@ -122,6 +130,9 @@ public class ObjectValue extends SimpleValue {
     
     public Contact getCreator() {
         String value = getProperty(CREATOR_KEY);
+        if (value != null) {
+            return decodeContact(value);
+        }
         return null;
     }
     
@@ -188,8 +199,88 @@ public class ObjectValue extends SimpleValue {
         return properties.values().toString();
     }
     
-    private static String encode(Object value) {
-        return value.toString();
+    private static Contact decodeContact(String value) {
+        Base64 foo = new Base64(true);
+        byte[] data = foo.decode(StringUtils.getBytes(value));
+        
+        ByteArrayInputStream bais = new ByteArrayInputStream(data);
+        DataInputStream dis = new DataInputStream(bais);
+        
+        try {
+            byte[] x = new byte[dis.read()];
+            dis.readFully(x);
+            
+            KUID contactId = KUID.create(x);
+            
+            String host = dis.readUTF();
+            int port = dis.readUnsignedShort();
+            
+            return new DefaultContact(contactId, 
+                    NetworkUtils.createUnresolved(host, port));
+            
+        } catch (IOException err) {
+            throw new IllegalStateException(err);
+        }
+    }
+    
+    private static String encode(Contact contact) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(baos);
+        
+        try {
+            
+            KUID contactId = contact.getId();
+            dos.writeByte(contactId.length());
+            contactId.writeTo(dos);
+            
+            InetSocketAddress addr 
+                = (InetSocketAddress)contact.getRemoteAddress();
+            
+            dos.writeUTF(addr.getHostName());
+            dos.writeShort(addr.getPort());
+            
+            dos.close();
+        } catch (IOException err) {
+            throw new IllegalStateException(err);
+        }
+        
+        return encode(baos.toByteArray());
+    }
+    
+    private static String encode(VectorClock<KUID> clock) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(baos);
+        
+        try {
+            int size = clock.size();
+            dos.writeInt(size);
+            
+            if (0 < size) {
+                dos.writeLong(clock.getCreationTime());
+                for (Map.Entry<? extends KUID, ? extends Vector> entry 
+                        : clock.entrySet()) {
+                    KUID contactId = entry.getKey();
+                    Vector vector = entry.getValue();
+                    
+                    dos.writeByte(contactId.length());
+                    contactId.writeTo(dos);
+                    
+                    dos.writeLong(vector.getTimeStamp());
+                    dos.writeInt(vector.getValue());
+                }
+            }
+            
+            dos.close();
+        } catch (IOException err) {
+            throw new IllegalStateException(err);
+        }
+        
+        return encode(baos.toByteArray());
+    }
+    
+    private static String encode(byte[] value) {
+        byte[] base64 = Base64.encodeBase64(value, false, true);
+        return StringUtils.toString(base64);
     }
     
     public static class Property implements Iterable<String> {

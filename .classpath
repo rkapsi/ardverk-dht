@@ -19,5 +19,6 @@
 	<classpathentry kind="lib" path="lib/ardverk/ardverk-concurrent/jars/ardverk-concurrent-0.2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ardverk-commons"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/bee-encode"/>
+	<classpathentry kind="lib" path="lib/apache/commons-codec/jars/commons-codec-1.5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
