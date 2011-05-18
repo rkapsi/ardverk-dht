@@ -50,45 +50,45 @@ public class ListBucketResult extends AbstractValue {
                     throws IOException, XMLStreamException {
                 
                 XMLOutputFactory factory = XMLOutputFactory.newFactory();
-                XMLStreamWriter writer = factory.createXMLStreamWriter(out);
+                XMLStreamWriter xml = factory.createXMLStreamWriter(out);
                 
-                writer.writeStartDocument(StringUtils.UTF_8, "1.0");
-                writer.writeStartElement("ListBucketResult");
+                xml.writeStartDocument(StringUtils.UTF_8, "1.0");
+                xml.writeStartElement("ListBucketResult");
                 
-                writer.writeStartElement("Name");
-                writer.writeCharacters(name);
-                writer.writeEndElement();
+                xml.writeStartElement("Name");
+                xml.writeCharacters(name);
+                xml.writeEndElement();
                 
                 if (prefix != null) {
-                    writer.writeStartElement("Prefix");
-                    writer.writeCharacters(prefix);
-                    writer.writeEndElement();
+                    xml.writeStartElement("Prefix");
+                    xml.writeCharacters(prefix);
+                    xml.writeEndElement();
                 }
                 
                 if (marker != null) {
-                    writer.writeStartElement("Marker");
-                    writer.writeCharacters(marker);
-                    writer.writeEndElement();
+                    xml.writeStartElement("Marker");
+                    xml.writeCharacters(marker);
+                    xml.writeEndElement();
                 }
                 
                 if (0 < maxKeys) {
-                    writer.writeStartElement("MaxKeys");
-                    writer.writeCharacters(Integer.toString(maxKeys));
-                    writer.writeEndElement();
+                    xml.writeStartElement("MaxKeys");
+                    xml.writeCharacters(Integer.toString(maxKeys));
+                    xml.writeEndElement();
                 }
                 
                 for (Key key : keys) {
-                    writer.writeStartElement("Contents");
-                    writer.writeStartElement("Key");
-                    writer.writeCharacters(key.toString());
-                    writer.writeEndElement();
+                    xml.writeStartElement("Contents");
+                    xml.writeStartElement("Key");
+                    xml.writeCharacters(key.toString());
+                    xml.writeEndElement();
                     
                     // More...
                     
-                    writer.writeEndElement();
+                    xml.writeEndElement();
                 }
-                writer.writeEndElement();
-                writer.writeEndDocument();
+                xml.writeEndElement();
+                xml.writeEndDocument();
             }
         };
     }
