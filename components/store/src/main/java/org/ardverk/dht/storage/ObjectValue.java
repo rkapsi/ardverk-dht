@@ -17,6 +17,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.http.protocol.HTTP;
 import org.ardverk.collection.CollectionUtils;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.routing.Contact;
@@ -42,12 +43,6 @@ public class ObjectValue extends SimpleValue {
             return o1.compareToIgnoreCase(o2);
         }
     };
-    
-    public static final String CONTENT_LENGTH = "Content-Length";
-    
-    public static final String CONTENT_TYPE = "Content-Type";
-    
-    public static final String BINARY = "binary/octet-stream";
     
     public static final String CREATOR_KEY = "X-Ardverk-Creator";
     
@@ -94,11 +89,11 @@ public class ObjectValue extends SimpleValue {
             setProperty(VECTOR_CLOCK_KEY, encodeVectorClock(clock));
         }
         
-        if (!hasProperty(CONTENT_TYPE)) {
-            setProperty(CONTENT_TYPE, BINARY);
+        if (!hasProperty(HTTP.CONTENT_TYPE)) {
+            setProperty(HTTP.CONTENT_TYPE, HTTP.DEFAULT_CONTENT_TYPE);
         }
         
-        if (!hasProperty(CONTENT_LENGTH)) {
+        if (!hasProperty(HTTP.CONTENT_LEN)) {
             throw new IllegalArgumentException();
         }
         
@@ -165,7 +160,7 @@ public class ObjectValue extends SimpleValue {
     }
     
     public long getContentLength() {
-        String value = getProperty(CONTENT_LENGTH);
+        String value = getProperty(HTTP.CONTENT_LEN);
         return Long.parseLong(value);
     }
 
@@ -292,11 +287,11 @@ public class ObjectValue extends SimpleValue {
 
     private static Map<String, String> contentLength(Map<String, String> dst, long length) {
         if (dst == null) {
-            return Collections.singletonMap(CONTENT_LENGTH, Long.toString(length));
+            return Collections.singletonMap(HTTP.CONTENT_LEN, Long.toString(length));
         }
         
-        if (!dst.containsKey(CONTENT_LENGTH)) {
-            dst.put(CONTENT_LENGTH, Long.toString(length));
+        if (!dst.containsKey(HTTP.CONTENT_LEN)) {
+            dst.put(HTTP.CONTENT_LEN, Long.toString(length));
         }
         return dst;
     }
@@ -377,7 +372,7 @@ public class ObjectValue extends SimpleValue {
         }
         
         public static long getContentLength(Property... properties) {
-            Property property = getProperty(CONTENT_LENGTH, properties);
+            Property property = getProperty(HTTP.CONTENT_LEN, properties);
             return Long.parseLong(property.value());
         }
     }
