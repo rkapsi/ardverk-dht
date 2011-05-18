@@ -45,51 +45,51 @@ public class ListBucketResult extends AbstractValue {
                     throw new IOException("XMLStreamException", e);
                 }
             }
-            
-            private void writeXml(OutputStream out) 
-                    throws IOException, XMLStreamException {
-                
-                XMLOutputFactory factory = XMLOutputFactory.newFactory();
-                XMLStreamWriter xml = factory.createXMLStreamWriter(out);
-                
-                xml.writeStartDocument(StringUtils.UTF_8, "1.0");
-                xml.writeStartElement("ListBucketResult");
-                
-                xml.writeStartElement("Name");
-                xml.writeCharacters(name);
-                xml.writeEndElement();
-                
-                if (prefix != null) {
-                    xml.writeStartElement("Prefix");
-                    xml.writeCharacters(prefix);
-                    xml.writeEndElement();
-                }
-                
-                if (marker != null) {
-                    xml.writeStartElement("Marker");
-                    xml.writeCharacters(marker);
-                    xml.writeEndElement();
-                }
-                
-                if (0 < maxKeys) {
-                    xml.writeStartElement("MaxKeys");
-                    xml.writeCharacters(Integer.toString(maxKeys));
-                    xml.writeEndElement();
-                }
-                
-                for (Key key : keys) {
-                    xml.writeStartElement("Contents");
-                    xml.writeStartElement("Key");
-                    xml.writeCharacters(key.toString());
-                    xml.writeEndElement();
-                    
-                    // More...
-                    
-                    xml.writeEndElement();
-                }
-                xml.writeEndElement();
-                xml.writeEndDocument();
-            }
         };
+    }
+    
+    private void writeXml(OutputStream out) 
+            throws IOException, XMLStreamException {
+        
+        XMLOutputFactory factory = XMLOutputFactory.newFactory();
+        XMLStreamWriter xml = factory.createXMLStreamWriter(out);
+        
+        xml.writeStartDocument(StringUtils.UTF_8, "1.0");
+        xml.writeStartElement("ListBucketResult");
+        
+        xml.writeStartElement("Name");
+        xml.writeCharacters(name);
+        xml.writeEndElement();
+        
+        if (prefix != null) {
+            xml.writeStartElement("Prefix");
+            xml.writeCharacters(prefix);
+            xml.writeEndElement();
+        }
+        
+        if (marker != null) {
+            xml.writeStartElement("Marker");
+            xml.writeCharacters(marker);
+            xml.writeEndElement();
+        }
+        
+        if (0 < maxKeys) {
+            xml.writeStartElement("MaxKeys");
+            xml.writeCharacters(Integer.toString(maxKeys));
+            xml.writeEndElement();
+        }
+        
+        for (Key key : keys) {
+            xml.writeStartElement("Contents");
+            xml.writeStartElement("Key");
+            xml.writeCharacters(key.toString());
+            xml.writeEndElement();
+            
+            // More...
+            
+            xml.writeEndElement();
+        }
+        xml.writeEndElement();
+        xml.writeEndDocument();
     }
 }

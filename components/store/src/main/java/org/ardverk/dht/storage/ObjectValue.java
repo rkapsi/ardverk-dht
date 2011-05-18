@@ -7,8 +7,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collections;
 import java.util.Map;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
+import java.util.zip.DeflaterOutputStream;
+import java.util.zip.InflaterInputStream;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.Header;
@@ -153,11 +153,8 @@ public class ObjectValue extends SimpleValue {
     private static Contact decodeContact(String value) {
         byte[] data = decodeBase64(value);
         
-        ByteArrayInputStream bais = new ByteArrayInputStream(data);
-        
-        ValueInputStream vis = null;
+        ValueInputStream vis = newValueInputStream(data);
         try {
-            vis = new ValueInputStream(new GZIPInputStream(bais));
             return vis.readContact();
         } catch (IOException err) {
             throw new IllegalStateException(err);
@@ -168,9 +165,8 @@ public class ObjectValue extends SimpleValue {
     
     private static String encodeContact(Contact contact) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ValueOutputStream vos = null;
+        ValueOutputStream vos = newValueOutputStream(baos);
         try {
-            vos = new ValueOutputStream(new GZIPOutputStream(baos));
             vos.writeContact(contact);
         } catch (IOException err) {
             throw new IllegalStateException(err);
@@ -184,11 +180,8 @@ public class ObjectValue extends SimpleValue {
     private static VectorClock<KUID> decodeVectorClock(String value) {
         byte[] data = decodeBase64(value);
         
-        ByteArrayInputStream bais = new ByteArrayInputStream(data);
-        
-        ValueInputStream vis = null;
+        ValueInputStream vis = newValueInputStream(data);
         try {
-            vis = new ValueInputStream(new GZIPInputStream(bais));
             return vis.readVectorClock();
         } catch (IOException err) {
             throw new IllegalStateException(err);
@@ -199,10 +192,8 @@ public class ObjectValue extends SimpleValue {
     
     private static String encodeVectorClock(VectorClock<KUID> clock) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        
-        ValueOutputStream vos = null;
+        ValueOutputStream vos = newValueOutputStream(baos);
         try {
-            vos = new ValueOutputStream(new GZIPOutputStream(baos));
             vos.writeVectorClock(clock);
         } catch (IOException err) {
             throw new IllegalStateException(err);
@@ -236,6 +227,14 @@ public class ObjectValue extends SimpleValue {
             dst.put(HTTP.CONTENT_LEN, Long.toString(length));
         }
         return dst;
+    }
+    
+    private static ValueInputStream newValueInputStream(byte[] data) {
+        return new ValueInputStream(new InflaterInputStream(new ByteArrayInputStream(data)));
+    }
+    
+    private static ValueOutputStream newValueOutputStream(OutputStream out) {
+        return new ValueOutputStream(new DeflaterOutputStream(out));
     }
     
     private static HeaderGroup properties(Contact creator, 
