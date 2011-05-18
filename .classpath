@@ -20,5 +20,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/ardverk-commons"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/bee-encode"/>
 	<classpathentry kind="lib" path="lib/apache/commons-codec/jars/commons-codec-1.5.jar"/>
+	<classpathentry kind="lib" path="lib/apache/httpcore/jars/httpcore-4.1.jar"/>
+	<classpathentry kind="lib" path="lib/apache/httpmime/jars/httpmime-4.1.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

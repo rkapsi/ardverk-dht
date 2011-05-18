@@ -9,5 +9,8 @@
 	</publications> 
 	<dependencies>
 	  <dependency org="ardverk" name="ardverk-dht-core" rev="latest.integration"/>
+	  
+	  <dependency org="apache" name="httpcore" rev="4.1"/>
+	  <dependency org="apache" name="httpmime" rev="4.1.1"/>
 	</dependencies>
 </ivy-module>
