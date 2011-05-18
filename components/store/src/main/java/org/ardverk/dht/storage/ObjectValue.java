@@ -5,20 +5,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.message.HeaderGroup;
 import org.apache.http.protocol.HTTP;
-import org.ardverk.collection.CollectionUtils;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.rsrc.ByteArrayValue;
@@ -32,24 +28,11 @@ import org.ardverk.version.VectorClock;
 
 public class ObjectValue extends SimpleValue {
 
-    private static final Comparator<String> COMPARATOR 
-            = new Comparator<String>() {
-        @Override
-        public int compare(String o1, String o2) {
-            if (o1 == null || o2 == null) {
-                throw new NullPointerException();
-            }
-            
-            return o1.compareToIgnoreCase(o2);
-        }
-    };
-    
     public static final String CREATOR_KEY = "X-Ardverk-Creator";
     
     public static final String VECTOR_CLOCK_KEY = "X-Ardverk-VectorClock";
     
-    private final Map<String, Property> properties 
-        = new TreeMap<String, Property>(COMPARATOR);
+    private final HeaderGroup properties;
     
     private final Value value;
     
@@ -69,78 +52,35 @@ public class ObjectValue extends SimpleValue {
     
     public ObjectValue(Contact creator, VectorClock<KUID> clock,
             Map<String, String> props, Value value) {
+        this(properties(creator, clock, props), value);
+    }
+    
+    private ObjectValue(HeaderGroup properties, Value value) {
         super(ValueType.OBJECT);
         
-        if (props != null) {
-            for (Map.Entry<String, String> entry : props.entrySet()) {
-                addProperty(entry.getKey(), entry.getValue());
-            }
-        }
-        
-        if (creator != null) {
-            setProperty(CREATOR_KEY, encodeContact(creator));
-            
-            if (clock == null) {
-                clock = VectorClock.create(creator.getId());
-            }
-        }
-        
-        if (clock != null) {
-            setProperty(VECTOR_CLOCK_KEY, encodeVectorClock(clock));
-        }
-        
-        if (!hasProperty(HTTP.CONTENT_TYPE)) {
-            setProperty(HTTP.CONTENT_TYPE, HTTP.DEFAULT_CONTENT_TYPE);
-        }
-        
-        if (!hasProperty(HTTP.CONTENT_LEN)) {
+        if (!properties.containsHeader(HTTP.CONTENT_LEN)) {
             throw new IllegalArgumentException();
         }
         
-        this.value = value;
-    }
-    
-    private ObjectValue(Property[] properties, Value value) {
-        super(ValueType.OBJECT);
-        
-        for (Property property : properties) {
-            this.properties.put(property.getName(), property);
-        }
-        
+        this.properties = properties;
         this.value = value;
     }
     
     public boolean hasProperty(String name) {
-        return properties.containsKey(name);
+        return properties.containsHeader(name);
     }
     
     public void setProperty(String name, String value) {
-        properties.put(name, new Property(name, value));
+        properties.updateHeader(new BasicHeader(name, value));
     }
     
     public void addProperty(String name, String value) {
-        Property property = properties.get(name);
-        if (property == null) {
-            property = new Property(name);
-            properties.put(name, property);
-        }
-        property.add(value);
+        properties.addHeader(new BasicHeader(name, value));
     }
     
     public String getProperty(String name) {
-        Property property = properties.get(name);
-        if (property != null) {
-            return property.value();
-        }
-        return null;
-    }
-    
-    public String[] getProperies(String name) {
-        Property property = properties.get(name);
-        if (property != null) {
-            return property.values();
-        }
-        return null;
+        Header header = properties.getFirstHeader(name);
+        return header != null ? header.getValue() : null;
     }
     
     public Contact getCreator() {
@@ -172,7 +112,7 @@ public class ObjectValue extends SimpleValue {
                 ValueOutputStream vos = new ValueOutputStream(out);
                 writeHeader(vos);
                 
-                vos.writeCollection(properties.values());
+                vos.writeHeaderGroup(properties);
                 value.writeTo(vos);
                 
                 vos.close();
@@ -182,13 +122,15 @@ public class ObjectValue extends SimpleValue {
     
     public static ObjectValue valueOf(InputStream in) throws IOException {
         ValueInputStream vis = new ValueInputStream(in);
-        Property[] properties = vis.readProperties();
-        long length = Property.getContentLength(properties);
+        HeaderGroup headers = vis.readHeaderGroup();
+        
+        Header header = headers.getFirstHeader(HTTP.CONTENT_LEN);
+        long length = Long.parseLong(header.getValue());
         
         byte[] value = new byte[(int)length];
         vis.readFully(value);
         
-        return new ObjectValue(properties, new ByteArrayValue(value));
+        return new ObjectValue(headers, new ByteArrayValue(value));
     }
 
     @Override
@@ -204,12 +146,12 @@ public class ObjectValue extends SimpleValue {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(value).append(" @ ").append(properties.values());
+        sb.append(value).append(" @ ").append(properties);
         return sb.toString();
     }
     
     private static Contact decodeContact(String value) {
-        byte[] data = decode(value);
+        byte[] data = decodeBase64(value);
         
         ByteArrayInputStream bais = new ByteArrayInputStream(data);
         
@@ -236,11 +178,11 @@ public class ObjectValue extends SimpleValue {
             IoUtils.close(vos);
         }
         
-        return encode(baos.toByteArray());
+        return encodeBase64(baos.toByteArray());
     }
     
     private static VectorClock<KUID> decodeVectorClock(String value) {
-        byte[] data = decode(value);
+        byte[] data = decodeBase64(value);
         
         ByteArrayInputStream bais = new ByteArrayInputStream(data);
         
@@ -268,15 +210,15 @@ public class ObjectValue extends SimpleValue {
             IoUtils.close(vos);
         }
         
-        return encode(baos.toByteArray());
+        return encodeBase64(baos.toByteArray());
     }
     
-    private static byte[] decode(String value) {
+    private static byte[] decodeBase64(String value) {
         Base64 decoder = new Base64(true);
         return decoder.decode(StringUtils.getBytes(value));
     }
     
-    private static String encode(byte[] value) {
+    private static String encodeBase64(byte[] value) {
         byte[] base64 = Base64.encodeBase64(value, false, true);
         return StringUtils.toString(base64);
     }
@@ -296,84 +238,33 @@ public class ObjectValue extends SimpleValue {
         return dst;
     }
     
-    public static class Property implements Iterable<String> {
+    private static HeaderGroup properties(Contact creator, 
+            VectorClock<KUID> clock, Map<String, String> props) {
         
-        private static final Comparator<String> COMPARATOR 
-                = new Comparator<String>() {
-            @Override
-            public int compare(String o1, String o2) {
-                if (o1 == null || o2 == null) {
-                    throw new NullPointerException();
-                }
-                
-                return o1.compareTo(o2);
+        HeaderGroup group = new HeaderGroup();
+        
+        if (props != null) {
+            for (Map.Entry<String, String> entry : props.entrySet()) {
+                group.addHeader(new BasicHeader(entry.getKey(), entry.getValue()));
             }
-        };
-        
-        private final String name;
-        
-        private final Set<String> values = new TreeSet<String>(COMPARATOR);
-        
-        public Property(String name) {
-            this.name = name;
         }
         
-        public Property(String name, String value) {
-            this(name);
-            add(value);
-        }
-        
-        public Property(String name, Collection<String> values) {
-            this(name);
-            addAll(values);
-        }
-        
-        public String getName() {
-            return name;
-        }
-        
-        public int size() {
-            return values.size();
-        }
-        
-        @Override
-        public Iterator<String> iterator() {
-            return values.iterator();
-        }
-
-        public void addAll(Collection<String> c) {
-            values.addAll(c);
-        }
-        
-        public void add(String value) {
-            values.add(value);
-        }
-        
-        public String value() {
-            return CollectionUtils.first(values);
-        }
-        
-        public String[] values() {
-            return values.toArray(new String[0]);
-        }
-        
-        @Override
-        public String toString() {
-            return name + "=" + values.toString();
-        }
-        
-        public static Property getProperty(String key, Property... properties) {
-            for (Property property : properties) {
-                if (property.getName().equalsIgnoreCase(key)) {
-                    return property;
-                }
+        if (creator != null) {
+            group.updateHeader(new BasicHeader(CREATOR_KEY, encodeContact(creator)));
+            
+            if (clock == null) {
+                clock = VectorClock.create(creator.getId());
             }
-            return null;
         }
         
-        public static long getContentLength(Property... properties) {
-            Property property = getProperty(HTTP.CONTENT_LEN, properties);
-            return Long.parseLong(property.value());
+        if (clock != null) {
+            group.updateHeader(new BasicHeader(VECTOR_CLOCK_KEY, encodeVectorClock(clock)));
         }
+        
+        if (!group.containsHeader(HTTP.CONTENT_TYPE)) {
+            group.addHeader(new BasicHeader(HTTP.CONTENT_TYPE, HTTP.DEFAULT_CONTENT_TYPE));
+        }
+        
+        return group;
     }
 }

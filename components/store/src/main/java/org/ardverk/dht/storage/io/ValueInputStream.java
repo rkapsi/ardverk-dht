@@ -2,23 +2,26 @@ package org.ardverk.dht.storage.io;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.message.HeaderGroup;
 import org.ardverk.coding.BencodingInputStream;
 import org.ardverk.dht.codec.bencode.MessageInputStream;
 import org.ardverk.dht.rsrc.Key;
-import org.ardverk.dht.storage.ObjectValue.Property;
 
 public class ValueInputStream extends MessageInputStream {
 
-    private static ObjectFactory<Property> PROPERTY_FACTORY 
-            = new ObjectFactory<Property>() {
+    private static final Header[] EMPTY_HEADERS_ARRAY = new Header[0];
+    
+    private static ObjectFactory<Header> HEADER_FACTORY 
+            = new ObjectFactory<Header>() {
         
         @Override
-        public Property read(BencodingInputStream in) throws IOException {
+        public Header read(BencodingInputStream in) throws IOException {
             String name = in.readString();
-            List<String> values = in.readList(StringObjectFactory.STRING);
-            return new Property(name, values);
+            String value = in.readString();
+            return new BasicHeader(name, value);
         }
     };
     
@@ -34,8 +37,14 @@ public class ValueInputStream extends MessageInputStream {
         super(in);
     }
     
-    public Property[] readProperties() throws IOException {
-        return readList(PROPERTY_FACTORY).toArray(new Property[0]);
+    public Header[] readHeaders() throws IOException {
+        return readList(HEADER_FACTORY).toArray(EMPTY_HEADERS_ARRAY);
+    }
+    
+    public HeaderGroup readHeaderGroup() throws IOException {
+        HeaderGroup headers = new HeaderGroup();
+        headers.setHeaders(readHeaders());
+        return headers;
     }
     
     public Key[] readKeys() throws IOException {
