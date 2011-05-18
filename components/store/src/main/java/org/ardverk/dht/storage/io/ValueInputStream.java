@@ -38,7 +38,7 @@ public class ValueInputStream extends MessageInputStream {
     }
     
     public Header[] readHeaders() throws IOException {
-        return readList(HEADER_FACTORY).toArray(EMPTY_HEADERS_ARRAY);
+        return readArray(HEADER_FACTORY, EMPTY_HEADERS_ARRAY);
     }
     
     public HeaderGroup readHeaderGroup() throws IOException {
