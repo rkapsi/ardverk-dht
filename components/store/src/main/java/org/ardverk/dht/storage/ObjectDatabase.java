@@ -40,20 +40,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class InMemoryDatabase extends AbstractDatabase {
+public class ObjectDatabase extends AbstractDatabase {
     
-    private static final Logger LOG = LoggerFactory.getLogger(InMemoryDatabase.class);
+    private static final Logger LOG 
+        = LoggerFactory.getLogger(ObjectDatabase.class);
     
     private final Trie<KUID, Bucket> database 
         = new PatriciaTrie<KUID, Bucket>();
     
     private final DatabaseConfig config;
     
-    public InMemoryDatabase() {
+    public ObjectDatabase() {
         this(new DefaultDatabaseConfig());
     }
     
-    public InMemoryDatabase(DatabaseConfig config) {
+    public ObjectDatabase(DatabaseConfig config) {
         this.config = config;
     }
     
@@ -83,19 +84,8 @@ public class InMemoryDatabase extends AbstractDatabase {
     }
     
     private synchronized Value store(Key key, ObjectValue value) {
-        ObjectValue existing = getValue(key);
-        
-        Occured occured = compare(existing, value);
-        if (occured == Occured.AFTER) {
-            /*if (value.isEmpty()) {
-                remove(key);
-            } else {*/
-                put(key, value);
-            //}
-            return Status.SUCCESS;
-        }
-        
-        return Status.conflict(existing);
+        put(key, value);
+        return Status.SUCCESS;
     }
     
     public synchronized Set<KUID> getBuckets() {
@@ -119,10 +109,19 @@ public class InMemoryDatabase extends AbstractDatabase {
     
     private synchronized ObjectValue getValue(Key key) {
         Bucket bucket = database.get(key.getId());
-        return bucket != null ? bucket.get(key) : null;
+        if (bucket == null) {
+            return null;
+        }
+        
+        VectorClockMap<?, ObjectValue> map = bucket.get(key);
+        if (map == null) {
+            return null;
+        }
+        
+        return map.value();
     }
     
-    private synchronized ObjectValue put(Key key, ObjectValue value) {
+    private synchronized void put(Key key, ObjectValue value) {
         KUID bucketId = key.getId();
         
         Bucket bucket = database.get(bucketId);
@@ -131,26 +130,13 @@ public class InMemoryDatabase extends AbstractDatabase {
             database.put(bucketId, bucket);
         }
         
-        return bucket.put(key, value);
-    }
-    
-    private synchronized ObjectValue remove(Key key) {
-        KUID bucketId = key.getId();
-        
-        Bucket bucket = database.get(bucketId);
-        if (bucket != null) {
-            ObjectValue removed = bucket.remove(key);
-            if (bucket.isEmpty()) {
-                database.remove(bucketId);
-            }
-            return removed;
+        VectorClockMap<KUID, ObjectValue> map = bucket.get(key);
+        if (map == null) {
+            map = new VectorClockMap<KUID, ObjectValue>();
+            bucket.put(key, map);
         }
         
-        return null;
-    }
-    
-    public synchronized Bucket remove(KUID bucketId) {
-        return database.remove(bucketId);
+        map.upsert(value.getVectorClock(), value);
     }
     
     @Override
@@ -217,20 +203,10 @@ public class InMemoryDatabase extends AbstractDatabase {
         VectorClock<KUID> clock1 = existing.getVectorClock();
         VectorClock<KUID> clock2 = value.getVectorClock();
         
-        return compare(clock1, clock2);
+        return VectorClockUtils.compare(clock1, clock2);
     }
     
-    private static Occured compare(VectorClock<KUID> existing, 
-            VectorClock<KUID> clock) {
-        if (existing == null || existing.isEmpty()
-                || clock == null || clock.isEmpty()) {
-            return Occured.AFTER;
-        }
-        
-        return clock.compareTo(existing);
-    }
-    
-    private static class Bucket extends HashMap<Key, ObjectValue> 
+    private static class Bucket extends HashMap<Key, VectorClockMap<KUID, ObjectValue>> 
             implements Identifier {
         
         private static final long serialVersionUID = -8794611016380746313L;

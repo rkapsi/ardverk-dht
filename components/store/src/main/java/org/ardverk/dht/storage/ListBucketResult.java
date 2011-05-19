@@ -10,7 +10,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.ardverk.dht.rsrc.AbstractValue;
-import org.ardverk.dht.rsrc.Key;
 import org.ardverk.io.InputOutputStream;
 import org.ardverk.utils.StringUtils;
 
@@ -26,16 +25,16 @@ public class ListBucketResult extends AbstractValue {
     
     private final int maxKeys;
     
-    private final Iterable<? extends Key> keys;
+    private final Iterable<? extends Context> objects;
     
     public ListBucketResult(String name, String prefix, String marker, 
-            String delimiter, int maxKeys, Iterable<? extends Key> keys) {
+            String delimiter, int maxKeys, Iterable<? extends Context> objects) {
         this.name = name;
         this.prefix = prefix;
         this.marker = marker;
         this.delimiter = delimiter;
         this.maxKeys = maxKeys;
-        this.keys = keys;
+        this.objects = objects;
     }
     
     @Override
@@ -93,10 +92,23 @@ public class ListBucketResult extends AbstractValue {
                 xml.writeEndElement();
             }
             
-            for (Key key : keys) {
+            for (Context context : objects) {
                 xml.writeStartElement("Contents");
+                
                 xml.writeStartElement("Key");
-                xml.writeCharacters(key.toString());
+                xml.writeCharacters(context.getKey().toString());
+                xml.writeEndElement();
+                
+                xml.writeStartElement("LastModified");
+                xml.writeCharacters(Long.toString(context.getLastModified()));
+                xml.writeEndElement();
+                
+                xml.writeStartElement("Size");
+                xml.writeCharacters(Long.toString(context.getSize()));
+                xml.writeEndElement();
+                
+                xml.writeStartElement("ETag");
+                xml.writeCharacters(context.getETag());
                 xml.writeEndElement();
                 
                 // More...
