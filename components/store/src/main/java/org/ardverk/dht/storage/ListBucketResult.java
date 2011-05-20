@@ -38,16 +38,10 @@ public class ListBucketResult extends BasicObjectValue {
         this.delimiter = delimiter;
         this.maxKeys = maxKeys;
         this.objects = objects;
-    }
-    
-    @Override
-    protected void writeHeaders(ValueOutputStream out) throws IOException {
         
         if (!containsHeader(HTTP.CONTENT_TYPE)) {
             setHeader(HTTP.CONTENT_TYPE, XML_TEXT_TYPE);
         }
-        
-        super.writeHeaders(out);
     }
     
     @Override

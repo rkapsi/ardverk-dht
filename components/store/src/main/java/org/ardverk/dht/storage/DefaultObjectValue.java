@@ -33,8 +33,8 @@ public class DefaultObjectValue extends BasicObjectValue {
     
     private final Value value;
     
-    public DefaultObjectValue(Map<String, String> properties, byte[] value) {
-        this(null, null, contentLength(properties, value.length), 
+    public DefaultObjectValue(byte[] value) {
+        this(null, null, contentLength(value.length), 
                 new ByteArrayValue(value));
     }
     
@@ -52,13 +52,8 @@ public class DefaultObjectValue extends BasicObjectValue {
         this(properties(creator, clock, props), value);
     }
     
-    private DefaultObjectValue(HeaderGroup properties, Value value) {
-        super(properties);
-        
-        if (!containsHeader(HTTP.CONTENT_LEN)) {
-            throw new IllegalArgumentException();
-        }
-        
+    private DefaultObjectValue(HeaderGroup headers, Value value) {
+        super(headers);
         this.value = value;
     }
     
@@ -106,7 +101,11 @@ public class DefaultObjectValue extends BasicObjectValue {
         HeaderGroup headers = vis.readHeaderGroup();
         
         Header header = headers.getFirstHeader(HTTP.CONTENT_LEN);
-        long length = Long.parseLong(header.getValue());
+        
+        long length = 0L;
+        if (header != null) {
+            length = Long.parseLong(header.getValue());
+        }
         
         byte[] value = new byte[(int)length];
         vis.readFully(value);

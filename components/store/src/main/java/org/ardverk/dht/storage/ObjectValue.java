@@ -1,5 +1,7 @@
 package org.ardverk.dht.storage;
 
+import java.util.Iterator;
+
 import org.apache.http.Header;
 import org.ardverk.dht.rsrc.Value;
 
@@ -11,7 +13,7 @@ public interface ObjectValue extends Value {
     
     public void addHeader(Header header);
     
-    public Header[] getAllHeaders();
+    public Header[] getHeaders();
     
     public Header getFirstHeader(String name);
     
@@ -28,4 +30,8 @@ public interface ObjectValue extends Value {
     public void removeHeaders(String name);
     
     public void removeHeader(Header header);
+    
+    public Iterator<Header> headerIterator();
+    
+    public Iterator<Header> headerIterator(String name);
 }
