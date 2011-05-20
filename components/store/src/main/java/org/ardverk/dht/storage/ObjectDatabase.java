@@ -34,8 +34,6 @@ import org.ardverk.dht.KUID;
 import org.ardverk.dht.lang.Identifier;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.Value;
-import org.ardverk.version.Occured;
-import org.ardverk.version.VectorClock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -193,17 +191,6 @@ public class ObjectDatabase extends AbstractDatabase {
             sb.append(bucket).append("\n");
         }
         return sb.toString();
-    }
-    
-    private static Occured compare(ObjectValue existing, ObjectValue value) {
-        if (existing == null) {
-            return Occured.AFTER;
-        }
-        
-        VectorClock<KUID> clock1 = existing.getVectorClock();
-        VectorClock<KUID> clock2 = value.getVectorClock();
-        
-        return VectorClockUtils.compare(clock1, clock2);
     }
     
     private static class Bucket extends HashMap<Key, VectorClockMap<KUID, ObjectValue>> 
