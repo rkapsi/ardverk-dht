@@ -17,7 +17,6 @@
 package org.ardverk.dht.storage;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,6 +33,7 @@ import org.ardverk.dht.KUID;
 import org.ardverk.dht.lang.Identifier;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.Value;
+import org.ardverk.version.VectorClock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,18 +67,18 @@ public class ObjectDatabase extends AbstractDatabase {
             return Status.FAILURE;
         }
         
-        SimpleValue simpleValue = null;
+        ObjectValue ov = null;
         try {
-            simpleValue = SimpleValue.valueOf(value);
+            ov = DefaultObjectValue.valueOf(value);
         } catch (IOException err) {
             LOG.error("IOException", err);
         }
         
-        if (!(simpleValue instanceof ObjectValue)) {
+        if (!(ov instanceof ObjectValue)) {
             return Status.FAILURE;
         }
         
-        return store(key, (ObjectValue)simpleValue);
+        return store(key, (ObjectValue)ov);
     }
     
     private synchronized Value store(Key key, ObjectValue value) {
@@ -92,7 +92,7 @@ public class ObjectDatabase extends AbstractDatabase {
 
     @Override
     public synchronized Value get(Key key) {
-        URI uri = key.getURI();
+        /*URI uri = key.getURI();
         String query = uri.getQuery();
         if (query != null) {
             Bucket bucket = database.get(key.getId());
@@ -100,7 +100,7 @@ public class ObjectDatabase extends AbstractDatabase {
                 return new KeyList(bucket.keySet());
             }
             return null;
-        }
+        }*/
         
         return getValue(key);
     }
@@ -134,7 +134,8 @@ public class ObjectDatabase extends AbstractDatabase {
             bucket.put(key, map);
         }
         
-        map.upsert(value.getVectorClock(), value);
+        VectorClock<KUID> clock = DefaultObjectValue.getVectorClock(value);
+        map.upsert(clock, value);
     }
     
     @Override

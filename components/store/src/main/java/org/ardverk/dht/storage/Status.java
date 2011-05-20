@@ -1,216 +1,42 @@
-/*
- * Copyright 2009-2011 Roger Kapsi
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.ardverk.dht.storage;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
-import org.ardverk.dht.codec.bencode.MessageInputStream;
-import org.ardverk.dht.codec.bencode.MessageOutputStream;
-import org.ardverk.dht.lang.IntegerValue;
-import org.ardverk.dht.lang.StringValue;
-import org.ardverk.dht.message.StoreResponse;
+import org.apache.http.message.HeaderGroup;
 import org.ardverk.dht.rsrc.Value;
-import org.ardverk.io.InputOutputStream;
-import org.ardverk.io.StreamUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.ardverk.dht.storage.io.ValueInputStream;
+import org.ardverk.io.IoUtils;
 
-public class Status extends SimpleValue implements IntegerValue, StringValue {
+public class Status extends BasicObjectValue {
     
-    private static final Logger LOG = LoggerFactory.getLogger(Status.class);
+    public static final String X_ARDVERK_MESSAGE = "X-Ardverk-Message";
     
-    private static enum Code {
-        SUCCESS(100),
-        FAILURE(200),
-        CONFLICT(201);
-        
-        private final int value;
-        
-        private Code(int value) {
-            this.value = value;
+    public static final Status SUCCESS = new Status("SUCCESS");
+    
+    public static final Status FAILURE = new Status("FAILURE");
+    
+    private Status(String message) {
+        setHeader(X_ARDVERK_MESSAGE, message);
+    }
+    
+    private Status(HeaderGroup headers) {
+        super(headers);
+    }
+    
+    public static Status valueOf(Value value) throws IOException {
+        InputStream in = value.getContent();
+        try {
+            return valueOf(in);
+        } finally {
+            IoUtils.close(in);
         }
     }
     
-    /**
-     * A generic {@link Status} if the STORE operation completed successfully.
-     */
-    public static final Status SUCCESS = new Status(Code.SUCCESS, null);
-    
-    /**
-     * A generic {@link Status} if the STORE operation failed.
-     */
-    public static final Status FAILURE = new Status(Code.FAILURE, null);
-    
-    /**
-     * Factory method to create {@link Status}.
-     */
-    public static Status valueOf(int code, String message, Value content) {
-        if (content == null) {
-            switch (code) {
-                case 100:
-                    if (SUCCESS.stringValue().equalsIgnoreCase(message)) {
-                        return SUCCESS;
-                    }
-                    break;
-                case 200:
-                    if (FAILURE.stringValue().equalsIgnoreCase(message)) {
-                        return FAILURE;
-                    }
-                    break;
-            }
-        }
+    public static Status valueOf(InputStream in) throws IOException {
+        ValueInputStream vis = new ValueInputStream(in);
+        HeaderGroup headers = vis.readHeaderGroup();
         
-        return new Status(code, message, content);
-    }
-    
-    /**
-     * Creates a {@link Status} for the case there was a conflict.
-     */
-    public static Status conflict(Value content) {
-        return new Status(Code.CONFLICT, content);
-    }
-    
-    private final int code;
-    
-    private final String message;
-    
-    private final Value value;
-    
-    private Status(Code code, Value value) {
-        this(code.value, code.name(), value);
-    }
-    
-    private Status(int code, String message, Value value) {
-        super(ValueType.STATUS);
-        this.code = code;
-        this.message = message;
-        this.value = value;
-    }
-    
-    @Override
-    public int intValue() {
-        return code;
-    }
-    
-    @Override
-    public String stringValue() {
-        return message;
-    }
-    
-    @Override
-    public int hashCode() {
-        return code;
-    }
-    
-    @Override
-    public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        } else if (!(o instanceof Status)) {
-            return false;
-        }
-        
-        Status other = (Status)o;
-        return code == other.intValue();
-    }
-    
-    @Override
-    public String toString() {
-        return code + ", " + message;
-    }
-    
-    @Override
-    public InputStream getContent() throws IOException {
-        return new InputOutputStream() {
-
-            @Override
-            protected void produce(OutputStream out) throws IOException {
-                MessageOutputStream mos = new MessageOutputStream(out);
-                
-                writeHeader(mos);
-                
-                mos.writeInt(code);
-                mos.writeString(message);
-                mos.writeBoolean(value != null);
-                
-                if (value != null) {
-                    InputStream in = value.getContent();
-                    try {
-                        StreamUtils.copy(in, mos);
-                    } finally {
-                        in.close();
-                    }
-                }
-                
-                mos.close();
-            }
-        };
-    }
-    
-    @Override
-    public boolean isRepeatable() {
-        if (value != null) {
-            return value.isRepeatable();
-        }
-        return true;
-    }
-
-    @Override
-    public boolean isStreaming() {
-        if (value != null) {
-            return value.isStreaming();
-        }
-        return false;
-    }
-    
-    public static Status valueOf(MessageInputStream in) throws IOException {
-        int code = in.readInt();
-        String message = in.readString();
-        
-        Value body = null;
-        if (in.readBoolean()) {
-            body = in.readValue();
-        }
-        
-        return valueOf(code, message, body);
-    }
-    
-    public static boolean isSuccess(StoreResponse... responses) {
-        for (StoreResponse response : responses) {
-            
-            SimpleValue value = null;
-            try {
-                value = SimpleValue.valueOf(response.getValue());
-            } catch (IOException err) {
-                LOG.error("IOException", err);
-            }
-            
-            if (!(value instanceof Status)) {
-                return false;
-            }
-            
-            Status status = (Status)value;
-            if (!status.equals(Status.SUCCESS)) {
-                return false;
-            }
-        }
-        
-        return true;
+        return new Status(headers);
     }
 }

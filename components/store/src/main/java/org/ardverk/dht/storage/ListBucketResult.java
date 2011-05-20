@@ -1,7 +1,6 @@
 package org.ardverk.dht.storage;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
@@ -9,12 +8,16 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.ardverk.dht.rsrc.AbstractValue;
-import org.ardverk.io.InputOutputStream;
+import org.apache.http.protocol.HTTP;
+import org.ardverk.dht.storage.io.ValueOutputStream;
 import org.ardverk.utils.StringUtils;
 
-public class ListBucketResult extends AbstractValue {
+public class ListBucketResult extends BasicObjectValue {
 
+    private static final String XML_VERSION = "1.0";
+    
+    public static final String XML_TEXT_TYPE = "text/xml";
+    
     private final String name;
     
     private final String prefix;
@@ -38,21 +41,26 @@ public class ListBucketResult extends AbstractValue {
     }
     
     @Override
-    public InputStream getContent() throws IOException {
-        return new InputOutputStream() {
-            @Override
-            protected void produce(OutputStream out) throws IOException {
-                try {
-                    writeXml(out);
-                } catch (XMLStreamException e) {
-                    throw new IOException("XMLStreamException", e);
-                }
-            }
-        };
+    protected void writeHeaders(ValueOutputStream out) throws IOException {
+        
+        if (!containsHeader(HTTP.CONTENT_TYPE)) {
+            setHeader(HTTP.CONTENT_TYPE, XML_TEXT_TYPE);
+        }
+        
+        super.writeHeaders(out);
     }
     
-    private static final String XML_VERSION = "1.0";
-    
+    @Override
+    protected void writeContent(ValueOutputStream out) throws IOException {
+        super.writeContent(out);
+        
+        try {
+            writeXml(out);
+        } catch (XMLStreamException e) {
+            throw new IOException("XMLStreamException", e);
+        }
+    }
+
     private void writeXml(OutputStream out) 
             throws IOException, XMLStreamException {
         
