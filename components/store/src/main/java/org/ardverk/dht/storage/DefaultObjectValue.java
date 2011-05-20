@@ -5,8 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Collections;
-import java.util.Map;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
@@ -34,8 +32,7 @@ public class DefaultObjectValue extends BasicObjectValue {
     private final Value value;
     
     public DefaultObjectValue(byte[] value) {
-        this(null, null, contentLength(value.length), 
-                new ByteArrayValue(value));
+        this(create(null, null, value.length), new ByteArrayValue(value));
     }
     
     public DefaultObjectValue(Contact creator, VectorClock<KUID> clock, byte[] value) {
@@ -44,12 +41,7 @@ public class DefaultObjectValue extends BasicObjectValue {
     
     public DefaultObjectValue(Contact creator, VectorClock<KUID> clock, 
             Value value, long length) {
-        this(creator, clock, contentLength(length), value);
-    }
-    
-    public DefaultObjectValue(Contact creator, VectorClock<KUID> clock,
-            Map<String, String> props, Value value) {
-        this(properties(creator, clock, props), value);
+        this(create(creator, clock, length), value);
     }
     
     private DefaultObjectValue(HeaderGroup headers, Value value) {
@@ -194,21 +186,6 @@ public class DefaultObjectValue extends BasicObjectValue {
         return StringUtils.toString(base64);
     }
     
-    private static Map<String, String> contentLength(long length) {
-        return contentLength(null, length);
-    }
-
-    private static Map<String, String> contentLength(Map<String, String> dst, long length) {
-        if (dst == null) {
-            return Collections.singletonMap(HTTP.CONTENT_LEN, Long.toString(length));
-        }
-        
-        if (!dst.containsKey(HTTP.CONTENT_LEN)) {
-            dst.put(HTTP.CONTENT_LEN, Long.toString(length));
-        }
-        return dst;
-    }
-    
     private static ValueInputStream newValueInputStream(byte[] data) {
         return new ValueInputStream(new InflaterInputStream(new ByteArrayInputStream(data)));
     }
@@ -217,19 +194,13 @@ public class DefaultObjectValue extends BasicObjectValue {
         return new ValueOutputStream(new DeflaterOutputStream(out));
     }
     
-    private static HeaderGroup properties(Contact creator, 
-            VectorClock<KUID> clock, Map<String, String> props) {
+    private static HeaderGroup create(Contact creator, 
+            VectorClock<KUID> clock, long length) {
         
-        HeaderGroup group = new HeaderGroup();
-        
-        if (props != null) {
-            for (Map.Entry<String, String> entry : props.entrySet()) {
-                group.addHeader(new BasicHeader(entry.getKey(), entry.getValue()));
-            }
-        }
+        HeaderGroup headers = new HeaderGroup();
         
         if (creator != null) {
-            group.updateHeader(new BasicHeader(CREATOR_KEY, encodeContact(creator)));
+            headers.updateHeader(new BasicHeader(CREATOR_KEY, encodeContact(creator)));
             
             if (clock == null) {
                 clock = VectorClock.create(creator.getId());
@@ -237,13 +208,15 @@ public class DefaultObjectValue extends BasicObjectValue {
         }
         
         if (clock != null) {
-            group.updateHeader(new BasicHeader(VECTOR_CLOCK_KEY, encodeVectorClock(clock)));
+            headers.updateHeader(new BasicHeader(VECTOR_CLOCK_KEY, encodeVectorClock(clock)));
         }
         
-        if (!group.containsHeader(HTTP.CONTENT_TYPE)) {
-            group.addHeader(new BasicHeader(HTTP.CONTENT_TYPE, HTTP.DEFAULT_CONTENT_TYPE));
+        headers.addHeader(new BasicHeader(HTTP.CONTENT_TYPE, HTTP.DEFAULT_CONTENT_TYPE));
+        
+        if (length >= 0L) {
+            headers.addHeader(new BasicHeader(HTTP.CONTENT_LEN, Long.toString(length)));
         }
         
-        return group;
+        return headers;
     }
 }
