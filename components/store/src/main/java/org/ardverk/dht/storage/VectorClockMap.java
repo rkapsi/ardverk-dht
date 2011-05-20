@@ -25,6 +25,12 @@ public class VectorClockMap<K, V extends Value> {
                 case AFTER:
                     it.remove();
                     break;
+                case BEFORE:
+                case IDENTICAL:
+                    if (map.size() == 1) {
+                        return;
+                    }
+                    break;
             }
         }
         
