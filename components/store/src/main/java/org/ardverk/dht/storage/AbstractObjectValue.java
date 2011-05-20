@@ -92,4 +92,9 @@ public abstract class AbstractObjectValue extends AbstractValue implements Objec
     public Iterator<Header> headerIterator(String name) {
         return headers.iterator(name);
     }
+    
+    @Override
+    public String toString() {
+        return headers.toString();
+    }
 }
