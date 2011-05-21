@@ -17,7 +17,9 @@
 package org.ardverk.dht.rsrc;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import org.ardverk.utils.StringUtils;
 
@@ -60,6 +62,11 @@ public class ByteArrayValue extends AbstractValue {
     @Override
     public InputStream getContent() {
         return new ByteArrayInputStream(content, offset, length);
+    }
+    
+    @Override
+    public void writeTo(OutputStream out) throws IOException {
+        out.write(content, offset, length);
     }
 
     @Override

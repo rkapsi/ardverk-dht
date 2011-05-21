@@ -32,6 +32,7 @@ public class ListBucketResult extends BasicObjectValue {
     
     public ListBucketResult(String name, String prefix, String marker, 
             String delimiter, int maxKeys, Iterable<? extends Context> objects) {
+        
         this.name = name;
         this.prefix = prefix;
         this.marker = marker;
@@ -45,8 +46,8 @@ public class ListBucketResult extends BasicObjectValue {
     }
     
     @Override
-    protected void writeContent(ValueOutputStream out) throws IOException {
-        super.writeContent(out);
+    protected void writeTo(ValueOutputStream out) throws IOException {
+        super.writeTo(out);
         
         try {
             writeXml(out);

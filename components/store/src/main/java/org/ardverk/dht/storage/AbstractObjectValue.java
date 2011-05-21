@@ -1,5 +1,7 @@
 package org.ardverk.dht.storage;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Iterator;
 
 import org.apache.http.Header;
@@ -92,6 +94,9 @@ public abstract class AbstractObjectValue extends AbstractValue implements Objec
     public Iterator<Header> headerIterator(String name) {
         return headers.iterator(name);
     }
+    
+    @Override
+    public abstract void writeTo(OutputStream out) throws IOException;
     
     @Override
     public String toString() {

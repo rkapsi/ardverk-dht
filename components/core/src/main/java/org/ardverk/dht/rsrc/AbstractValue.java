@@ -36,6 +36,11 @@ public abstract class AbstractValue implements Value {
     }
 
     @Override
+    public InputStream getContent() throws IOException {
+        throw new IOException();
+    }
+
+    @Override
     public void writeTo(OutputStream out) throws IOException {
         InputStream in = getContent();
         try {

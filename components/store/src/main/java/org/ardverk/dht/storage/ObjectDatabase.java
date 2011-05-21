@@ -64,7 +64,7 @@ public class ObjectDatabase extends AbstractDatabase {
     @Override
     public synchronized Value store(Key key, Value value) {
         if (!isInBucket(key)) {
-            return Status.FAILURE;
+            return Status.INTERNAL_SERVER_ERROR;
         }
         
         ObjectValue ov = null;
@@ -75,7 +75,7 @@ public class ObjectDatabase extends AbstractDatabase {
         }
         
         if (!(ov instanceof ObjectValue)) {
-            return Status.FAILURE;
+            return Status.INTERNAL_SERVER_ERROR;
         }
         
         return store(key, (ObjectValue)ov);
@@ -83,7 +83,7 @@ public class ObjectDatabase extends AbstractDatabase {
     
     private synchronized Value store(Key key, ObjectValue value) {
         put(key, value);
-        return Status.SUCCESS;
+        return Status.OK;
     }
     
     public synchronized Set<KUID> getBuckets() {

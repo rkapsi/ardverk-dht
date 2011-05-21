@@ -75,7 +75,8 @@ public class DefaultObjectValue extends BasicObjectValue {
     }
     
     @Override
-    protected void writeContent(ValueOutputStream out) throws IOException {
+    protected void writeTo(ValueOutputStream out) throws IOException {
+        super.writeTo(out);
         value.writeTo(out);
     }
 
