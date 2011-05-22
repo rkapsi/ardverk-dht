@@ -107,7 +107,7 @@ public class ListBucketResult extends BasicObjectValue {
                 xml.writeEndElement();
                 
                 xml.writeStartElement("Size");
-                xml.writeCharacters(Long.toString(context.getSize()));
+                xml.writeCharacters(Long.toString(context.getContentLength()));
                 xml.writeEndElement();
                 
                 xml.writeStartElement("ETag");
