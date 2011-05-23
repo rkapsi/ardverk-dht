@@ -30,19 +30,23 @@ public class Status extends ContextValue {
     private Status(int code, String message) {
         this.code = code;
         this.message = message;
+        
+        getContext().setHeader(HTTP.CONTENT_LEN, "0");
     }
     
     private Status(Context context, int code, String message) {
         super(context);
         this.code = code;
         this.message = message;
+        
+        getContext().setHeader(HTTP.CONTENT_LEN, "0");
     }
     
     @Override
     public void writeTo(OutputStream out) throws IOException {
         super.writeTo(out);
         
-        DataUtils.short2beb(code);
+        DataUtils.short2beb(code, out);
         StringUtils.writeString(message, out);
     }
 
@@ -54,7 +58,7 @@ public class Status extends ContextValue {
     public static Status valueOf(Value value) throws IOException {
         InputStream in = value.getContent();
         try {
-            return valueOf(in);
+            return Status.valueOf(in);
         } finally {
             IoUtils.close(in);
         }

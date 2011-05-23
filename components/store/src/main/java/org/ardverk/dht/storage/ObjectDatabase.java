@@ -69,7 +69,7 @@ public class ObjectDatabase extends AbstractDatabase {
         
         ContextValue ov = null;
         try {
-            ov = ContextValue.valueOf(value);
+            ov = ByteArrayContextValue.valueOf(value);
         } catch (IOException err) {
             LOG.error("IOException", err);
         }
@@ -134,7 +134,7 @@ public class ObjectDatabase extends AbstractDatabase {
             bucket.put(key, map);
         }
         
-        VectorClock<KUID> clock = VectorClockUtils.getVectorClock(value);
+        VectorClock<KUID> clock = DefaultObjectValue.getVectorClock(value);
         map.upsert(clock, value);
     }
     
