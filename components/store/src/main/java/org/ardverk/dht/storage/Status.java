@@ -2,15 +2,17 @@ package org.ardverk.dht.storage;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import org.apache.http.HttpStatus;
-import org.apache.http.message.HeaderGroup;
+import org.apache.http.protocol.HTTP;
 import org.ardverk.dht.rsrc.Value;
-import org.ardverk.dht.storage.io.ValueInputStream;
-import org.ardverk.dht.storage.io.ValueOutputStream;
+import org.ardverk.io.DataUtils;
 import org.ardverk.io.IoUtils;
+import org.ardverk.io.StreamUtils;
+import org.ardverk.utils.StringUtils;
 
-public class Status extends BasicObjectValue {
+public class Status extends ContextValue {
     
     public static final Status OK = new Status(
             HttpStatus.SC_OK, "OK");
@@ -30,18 +32,18 @@ public class Status extends BasicObjectValue {
         this.message = message;
     }
     
-    private Status(HeaderGroup headers, int code, String message) {
-        super(headers);
+    private Status(Context context, int code, String message) {
+        super(context);
         this.code = code;
         this.message = message;
     }
     
     @Override
-    protected void writeTo(ValueOutputStream out) throws IOException {
+    public void writeTo(OutputStream out) throws IOException {
         super.writeTo(out);
         
-        out.writeInt(code);
-        out.writeString(message);
+        DataUtils.short2beb(code);
+        StringUtils.writeString(message, out);
     }
 
     @Override
@@ -59,13 +61,19 @@ public class Status extends BasicObjectValue {
     }
     
     public static Status valueOf(InputStream in) throws IOException {
-        ValueInputStream vis = new ValueInputStream(in);
+        Context context = Context.valueOf(in);
         
-        HeaderGroup headers = vis.readHeaderGroup();
+        long length = 0L;
+        if (context.containsHeader(HTTP.CONTENT_LEN)) {
+            length = context.getContentLength();
+        }
         
-        int code = vis.readInt();
-        String message = vis.readString();
+        byte[] data = new byte[(int)length];
+        StreamUtils.readFully(in, data);
         
-        return new Status(headers, code, message);
+        int code = DataUtils.beb2ushort(in);
+        String message = StringUtils.readString(in);
+        
+        return new Status(context, code, message);
     }
 }

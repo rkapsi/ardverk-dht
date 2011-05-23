@@ -10,7 +10,6 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.message.HeaderGroup;
 import org.apache.http.protocol.HTTP;
 import org.ardverk.io.DataUtils;
-import org.ardverk.io.StreamUtils;
 import org.ardverk.io.Writable;
 import org.ardverk.utils.StringUtils;
 
@@ -75,27 +74,13 @@ public class Context extends Properties implements Writable {
     
     private static void writeHeader(Header header, 
             OutputStream out) throws IOException {
-        writeString(header.getName(), out);
-        writeString(header.getValue(), out);
+        StringUtils.writeString(header.getName(), out);
+        StringUtils.writeString(header.getValue(), out);
     }
     
     private static Header readHeader(InputStream in) throws IOException {
-        String name = readString(in);
-        String value = readString(in);
+        String name = StringUtils.readString(in);
+        String value = StringUtils.readString(in);
         return new BasicHeader(name, value);
-    }
-    
-    private static void writeString(String value, 
-            OutputStream out) throws IOException {
-        byte[] data = StringUtils.getBytes(value);
-        DataUtils.short2beb(data.length, out);
-        out.write(data);
-    }
-    
-    private static String readString(InputStream in) throws IOException {
-        int length = DataUtils.beb2ushort(in);
-        byte[] data = new byte[length];
-        StreamUtils.readFully(in, data);
-        return StringUtils.toString(data);
     }
 }

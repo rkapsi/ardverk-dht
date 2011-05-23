@@ -67,21 +67,21 @@ public class ObjectDatabase extends AbstractDatabase {
             return Status.INTERNAL_SERVER_ERROR;
         }
         
-        ObjectValue ov = null;
+        ContextValue ov = null;
         try {
-            ov = DefaultObjectValue.valueOf(value);
+            ov = ContextValue.valueOf(value);
         } catch (IOException err) {
             LOG.error("IOException", err);
         }
         
-        if (!(ov instanceof ObjectValue)) {
+        if (!(ov instanceof ContextValue)) {
             return Status.INTERNAL_SERVER_ERROR;
         }
         
-        return store(key, (ObjectValue)ov);
+        return store(key, ov);
     }
     
-    private synchronized Value store(Key key, ObjectValue value) {
+    private synchronized Value store(Key key, ContextValue value) {
         put(key, value);
         return Status.OK;
     }
@@ -105,13 +105,13 @@ public class ObjectDatabase extends AbstractDatabase {
         return getValue(key);
     }
     
-    private synchronized ObjectValue getValue(Key key) {
+    private synchronized ContextValue getValue(Key key) {
         Bucket bucket = database.get(key.getId());
         if (bucket == null) {
             return null;
         }
         
-        VectorClockMap<?, ObjectValue> map = bucket.get(key);
+        VectorClockMap<?, ContextValue> map = bucket.get(key);
         if (map == null) {
             return null;
         }
@@ -119,7 +119,7 @@ public class ObjectDatabase extends AbstractDatabase {
         return map.value();
     }
     
-    private synchronized void put(Key key, ObjectValue value) {
+    private synchronized void put(Key key, ContextValue value) {
         KUID bucketId = key.getId();
         
         Bucket bucket = database.get(bucketId);
@@ -128,13 +128,13 @@ public class ObjectDatabase extends AbstractDatabase {
             database.put(bucketId, bucket);
         }
         
-        VectorClockMap<KUID, ObjectValue> map = bucket.get(key);
+        VectorClockMap<KUID, ContextValue> map = bucket.get(key);
         if (map == null) {
-            map = new VectorClockMap<KUID, ObjectValue>();
+            map = new VectorClockMap<KUID, ContextValue>();
             bucket.put(key, map);
         }
         
-        VectorClock<KUID> clock = DefaultObjectValue.getVectorClock(value);
+        VectorClock<KUID> clock = VectorClockUtils.getVectorClock(value);
         map.upsert(clock, value);
     }
     
@@ -194,7 +194,7 @@ public class ObjectDatabase extends AbstractDatabase {
         return sb.toString();
     }
     
-    private static class Bucket extends HashMap<Key, VectorClockMap<KUID, ObjectValue>> 
+    private static class Bucket extends HashMap<Key, VectorClockMap<KUID, ContextValue>> 
             implements Identifier {
         
         private static final long serialVersionUID = -8794611016380746313L;

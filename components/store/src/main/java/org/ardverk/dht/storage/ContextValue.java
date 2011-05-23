@@ -21,21 +21,21 @@ public class ContextValue extends AbstractValue {
     
     private final Value value;
     
+    public ContextValue() {
+        this(new Context(), null);
+    }
+    
     public ContextValue(Value value) {
         this(new Context(), value);
-        
-        init();
+    }
+    
+    public ContextValue(Context context) {
+        this(context, null);
     }
     
     public ContextValue(Context context, Value value) {
         this.context = context;
         this.value = value;
-        
-        init();
-    }
-    
-    private void init() {
-        
     }
     
     public Context getContext() {
@@ -48,18 +48,21 @@ public class ContextValue extends AbstractValue {
 
     @Override
     public boolean isRepeatable() {
-        return value.isRepeatable();
+        return value != null ? value.isRepeatable() : true;
     }
 
     @Override
     public boolean isStreaming() {
-        return value.isStreaming();
+        return value != null ? value.isStreaming() : false;
     }
     
     @Override
     public void writeTo(OutputStream out) throws IOException {
         context.writeTo(out);
-        value.writeTo(out);
+        
+        if (value != null) {
+            value.writeTo(out);
+        }
     }
     
     public static ContextValue valueOf(Value value) throws IOException {

@@ -11,10 +11,9 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.http.protocol.HTTP;
 import org.ardverk.dht.rsrc.Key;
-import org.ardverk.dht.storage.io.ValueOutputStream;
 import org.ardverk.utils.StringUtils;
 
-public class ListBucketResult extends BasicObjectValue {
+public class ListBucketResult extends ContextValue {
 
     private static final String XML_VERSION = "1.0";
     
@@ -42,13 +41,14 @@ public class ListBucketResult extends BasicObjectValue {
         this.maxKeys = maxKeys;
         this.objects = objects;
         
-        if (!containsHeader(HTTP.CONTENT_TYPE)) {
-            setHeader(HTTP.CONTENT_TYPE, XML_TEXT_TYPE);
+        Context context = getContext();
+        if (!context.containsHeader(HTTP.CONTENT_TYPE)) {
+            context.setHeader(HTTP.CONTENT_TYPE, XML_TEXT_TYPE);
         }
     }
     
     @Override
-    protected void writeTo(ValueOutputStream out) throws IOException {
+    public void writeTo(OutputStream out) throws IOException {
         super.writeTo(out);
         
         try {
@@ -57,7 +57,7 @@ public class ListBucketResult extends BasicObjectValue {
             throw new IOException("XMLStreamException", e);
         }
     }
-
+    
     private void writeXml(OutputStream out) 
             throws IOException, XMLStreamException {
         
