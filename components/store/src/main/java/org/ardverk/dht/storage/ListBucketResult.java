@@ -3,12 +3,14 @@ package org.ardverk.dht.storage;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.Map;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.http.protocol.HTTP;
+import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.storage.io.ValueOutputStream;
 import org.ardverk.utils.StringUtils;
 
@@ -28,10 +30,10 @@ public class ListBucketResult extends BasicObjectValue {
     
     private final int maxKeys;
     
-    private final Iterable<? extends Context> objects;
+    private final Map<? extends Key, ? extends Context> objects;
     
     public ListBucketResult(String name, String prefix, String marker, 
-            String delimiter, int maxKeys, Iterable<? extends Context> objects) {
+            String delimiter, int maxKeys, Map<? extends Key, ? extends Context> objects) {
         
         this.name = name;
         this.prefix = prefix;
@@ -95,23 +97,26 @@ public class ListBucketResult extends BasicObjectValue {
                 xml.writeEndElement();
             }
             
-            for (Context context : objects) {
+            for (Map.Entry<? extends Key, ? extends Context> entry : objects.entrySet()) {
+                Key key = entry.getKey();
+                Context value = entry.getValue();
+                
                 xml.writeStartElement("Contents");
                 
                 xml.writeStartElement("Key");
-                xml.writeCharacters(context.getKey().toString());
+                xml.writeCharacters(key.toString());
                 xml.writeEndElement();
                 
                 xml.writeStartElement("LastModified");
-                xml.writeCharacters(Long.toString(context.getLastModified()));
+                xml.writeCharacters(Long.toString(value.getLastModified()));
                 xml.writeEndElement();
                 
                 xml.writeStartElement("Size");
-                xml.writeCharacters(Long.toString(context.getContentLength()));
+                xml.writeCharacters(Long.toString(value.getContentLength()));
                 xml.writeEndElement();
                 
                 xml.writeStartElement("ETag");
-                xml.writeCharacters(context.getETag());
+                xml.writeCharacters(value.getETag());
                 xml.writeEndElement();
                 
                 // More...

@@ -9,7 +9,6 @@ import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.HeaderGroup;
 import org.apache.http.protocol.HTTP;
-import org.ardverk.dht.rsrc.Key;
 import org.ardverk.io.DataUtils;
 import org.ardverk.io.StreamUtils;
 import org.ardverk.io.Writable;
@@ -21,22 +20,12 @@ public class Context extends Properties implements Writable {
     
     public static final String ETAG = "ETag";
     
-    private final Key key;
-    
-    public Context(Key key) {
+    public Context() {
         super();
-        
-        this.key = key;
     }
 
-    public Context(Key key, HeaderGroup headers) {
-        super(headers);
-        
-        this.key = key;
-    }
-
-    public Key getKey() {
-        return key;
+    public Context(HeaderGroup group) {
+        super(group);
     }
     
     public String getStringValue(String name) {
@@ -63,8 +52,8 @@ public class Context extends Properties implements Writable {
         return getStringValue(ETAG);
     }
     
-    public static Context valueOf(Key key, InputStream in) throws IOException {
-        Context context = new Context(key);
+    public static Context valueOf(InputStream in) throws IOException {
+        Context context = new Context();
         
         int count = DataUtils.beb2ushort(in);
         for (int i = 0; i < count; i++) {
