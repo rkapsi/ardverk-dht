@@ -44,7 +44,10 @@ public class Context extends Properties implements Writable {
     }
 
     public long getContentLength() {
-        return getLongValue(HTTP.CONTENT_LEN);
+        if (containsHeader(HTTP.CONTENT_LEN)) {
+            return getLongValue(HTTP.CONTENT_LEN);
+        }
+        return -1L;
     }
 
     public String getETag() {

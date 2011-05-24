@@ -1,15 +1,10 @@
 package org.ardverk.dht.storage;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.apache.http.protocol.HTTP;
 import org.ardverk.dht.rsrc.AbstractValue;
-import org.ardverk.dht.rsrc.ByteArrayValue;
 import org.ardverk.dht.rsrc.Value;
-import org.ardverk.io.IoUtils;
-import org.ardverk.io.StreamUtils;
 
 public class ContextValue extends AbstractValue {
     

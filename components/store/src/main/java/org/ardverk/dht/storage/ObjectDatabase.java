@@ -17,6 +17,7 @@
 package org.ardverk.dht.storage;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,8 +32,11 @@ import org.ardverk.collection.PatriciaTrie;
 import org.ardverk.collection.Trie;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.lang.Identifier;
+import org.ardverk.dht.rsrc.ByteArrayValue;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.Value;
+import org.ardverk.io.IoUtils;
+import org.ardverk.io.StreamUtils;
 import org.ardverk.version.VectorClock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,27 +66,34 @@ public class ObjectDatabase extends AbstractDatabase {
     }
     
     @Override
-    public synchronized Value store(Key key, Value value) {
+    public Value store(Key key, Value value) {
         if (!isInBucket(key)) {
             return Status.INTERNAL_SERVER_ERROR;
         }
         
-        ContextValue ov = null;
+        InputStream in = null;
         try {
-            ov = ByteArrayContextValue.valueOf(value);
+            in = value.getContent();
+            Context context = Context.valueOf(in);
+            return store(key, context, in);
         } catch (IOException err) {
             LOG.error("IOException", err);
-        }
-        
-        if (!(ov instanceof ContextValue)) {
             return Status.INTERNAL_SERVER_ERROR;
+        } finally {
+            IoUtils.close(in);
         }
-        
-        return store(key, ov);
     }
     
-    private synchronized Value store(Key key, ContextValue value) {
-        put(key, value);
+    private Value store(Key key, Context context, 
+            InputStream in) throws IOException {
+        
+        long length = context.getContentLength();
+        byte[] data = new byte[(int)Math.max(0L, length)];
+        StreamUtils.readFully(in, data);
+        
+        put(key, new ContextValue(context, new ContextValue(
+                context, new ByteArrayValue(data))));
+        
         return Status.OK;
     }
     
