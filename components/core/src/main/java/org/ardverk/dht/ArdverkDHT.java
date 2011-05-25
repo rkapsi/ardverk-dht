@@ -27,13 +27,11 @@ import org.ardverk.dht.config.LookupConfig;
 import org.ardverk.dht.config.PingConfig;
 import org.ardverk.dht.config.PutConfig;
 import org.ardverk.dht.config.QuickenConfig;
-import org.ardverk.dht.config.SyncConfig;
 import org.ardverk.dht.entity.BootstrapEntity;
 import org.ardverk.dht.entity.NodeEntity;
 import org.ardverk.dht.entity.PingEntity;
 import org.ardverk.dht.entity.PutEntity;
 import org.ardverk.dht.entity.QuickenEntity;
-import org.ardverk.dht.entity.SyncEntity;
 import org.ardverk.dht.entity.ValueEntity;
 import org.ardverk.dht.io.DefaultMessageDispatcher;
 import org.ardverk.dht.io.MessageDispatcher;
@@ -62,8 +60,6 @@ public class ArdverkDHT extends AbstractDHT {
     private final QuickenManager quickenManager;
     
     private final StoreManager storeManager;
-    
-    private final SyncManager syncManager;
     
     private final LookupManager lookupManager;
     
@@ -107,8 +103,7 @@ public class ArdverkDHT extends AbstractDHT {
         quickenManager = new QuickenManager(this, routeTable);
         storeManager = new StoreManager(this, routeTable, 
                 messageDispatcher);
-        syncManager = new SyncManager(pingManager, 
-                storeManager, routeTable, database);
+        
         lookupManager = new LookupManager(this, 
                 messageDispatcher, routeTable);
         
@@ -168,13 +163,6 @@ public class ArdverkDHT extends AbstractDHT {
      */
     public StoreManager getStoreManager() {
         return storeManager;
-    }
-    
-    /**
-     * Returns the {@link SyncManager}.
-     */
-    public SyncManager getSyncManager() {
-        return syncManager;
     }
     
     /**
@@ -266,10 +254,5 @@ public class ArdverkDHT extends AbstractDHT {
     @Override
     public DHTFuture<QuickenEntity> quicken(QuickenConfig config) {
         return quickenManager.quicken(config);
-    }
-    
-    @Override
-    public DHTFuture<SyncEntity> sync(SyncConfig config) {
-        return syncManager.sync(config);
     }
 }

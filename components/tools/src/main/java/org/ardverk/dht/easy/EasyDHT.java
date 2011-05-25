@@ -28,7 +28,6 @@ import org.ardverk.dht.entity.NodeEntity;
 import org.ardverk.dht.entity.PingEntity;
 import org.ardverk.dht.entity.PutEntity;
 import org.ardverk.dht.entity.QuickenEntity;
-import org.ardverk.dht.entity.SyncEntity;
 import org.ardverk.dht.entity.ValueEntity;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.rsrc.Key;
@@ -64,6 +63,4 @@ public interface EasyDHT extends DHT, Closeable {
     public DHTFuture<BootstrapEntity> bootstrap(Contact contact);
 
     public DHTFuture<QuickenEntity> quicken();
-    
-    public DHTFuture<SyncEntity> sync();
 }

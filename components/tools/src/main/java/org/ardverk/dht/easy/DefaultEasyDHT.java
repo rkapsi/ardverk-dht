@@ -27,7 +27,6 @@ import org.ardverk.dht.entity.NodeEntity;
 import org.ardverk.dht.entity.PingEntity;
 import org.ardverk.dht.entity.PutEntity;
 import org.ardverk.dht.entity.QuickenEntity;
-import org.ardverk.dht.entity.SyncEntity;
 import org.ardverk.dht.entity.ValueEntity;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.routing.Contact;
@@ -106,10 +105,5 @@ public class DefaultEasyDHT extends ArdverkDHT implements EasyDHT {
     @Override
     public DHTFuture<QuickenEntity> quicken() {
         return quicken(config.getQuickenConfig());
-    }
-    
-    @Override
-    public DHTFuture<SyncEntity> sync() {
-        return sync(config.getSyncConfig());
     }
 }

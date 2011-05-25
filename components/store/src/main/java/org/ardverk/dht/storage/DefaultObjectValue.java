@@ -23,10 +23,6 @@ import org.ardverk.version.VectorClock;
 
 public class DefaultObjectValue extends ContextValue {
 
-    public static final String CREATOR_KEY = "X-Ardverk-Creator";
-    
-    public static final String VECTOR_CLOCK_KEY = "X-Ardverk-VectorClock";
-    
     public DefaultObjectValue(Contact creator, 
             VectorClock<KUID> clock, byte[] value) {
         super(new ByteArrayValue(value));
@@ -34,7 +30,7 @@ public class DefaultObjectValue extends ContextValue {
         Context context = getContext();
 
         if (creator != null) {
-            context.addHeader(CREATOR_KEY, encodeContact(creator));
+            context.addHeader(Constants.CREATOR_KEY, encodeContact(creator));
             
             if (clock == null) {
                 clock = VectorClock.create(creator.getId());
@@ -42,7 +38,7 @@ public class DefaultObjectValue extends ContextValue {
         }
         
         if (clock != null) {
-            context.addHeader(VECTOR_CLOCK_KEY, encodeVectorClock(clock));
+            context.addHeader(Constants.VECTOR_CLOCK_KEY, encodeVectorClock(clock));
         }
         
         context.addHeader(HTTP.CONTENT_LEN, Long.toString(value.length));
@@ -53,7 +49,7 @@ public class DefaultObjectValue extends ContextValue {
     }
 
     public Contact getCreator() {
-        return decodeContact(getContext().getStringValue(CREATOR_KEY));
+        return decodeContact(getContext().getStringValue(Constants.CREATOR_KEY));
     }
     
     public static DefaultObjectValue valueOf(Value value) throws IOException {
@@ -156,7 +152,7 @@ public class DefaultObjectValue extends ContextValue {
     }
     
     public static VectorClock<KUID> getVectorClock(Context context) {
-        String value = context.getStringValue(VECTOR_CLOCK_KEY);
+        String value = context.getStringValue(Constants.VECTOR_CLOCK_KEY);
         return decodeVectorClock(value);
     }
 }

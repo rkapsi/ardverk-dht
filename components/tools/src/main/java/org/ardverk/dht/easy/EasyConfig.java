@@ -23,13 +23,11 @@ import org.ardverk.dht.config.DefaultLookupConfig;
 import org.ardverk.dht.config.DefaultPingConfig;
 import org.ardverk.dht.config.DefaultPutConfig;
 import org.ardverk.dht.config.DefaultQuickenConfig;
-import org.ardverk.dht.config.DefaultSyncConfig;
 import org.ardverk.dht.config.GetConfig;
 import org.ardverk.dht.config.LookupConfig;
 import org.ardverk.dht.config.PingConfig;
 import org.ardverk.dht.config.PutConfig;
 import org.ardverk.dht.config.QuickenConfig;
-import org.ardverk.dht.config.SyncConfig;
 
 public class EasyConfig {
     
@@ -48,8 +46,6 @@ public class EasyConfig {
     private volatile BootstrapConfig bootstrapConfig = new DefaultBootstrapConfig();
     
     private volatile QuickenConfig quickenConfig = new DefaultQuickenConfig();
-    
-    private volatile SyncConfig syncConfig = new DefaultSyncConfig();
     
     public EasyConfig() {
         this(DEFAULT_KEY_SIZE);
@@ -109,13 +105,5 @@ public class EasyConfig {
 
     public void setQuickenConfig(QuickenConfig quickenConfig) {
         this.quickenConfig = quickenConfig;
-    }
-
-    public SyncConfig getSyncConfig() {
-        return syncConfig;
-    }
-
-    public void setSyncConfig(SyncConfig syncConfig) {
-        this.syncConfig = syncConfig;
     }
 }

@@ -25,8 +25,7 @@ import org.ardverk.dht.storage.Database;
  * The default interface for a DHT.
  */
 public interface DHT extends DHTService, BootstrapService, 
-        QuickenService, SyncService, FutureService, 
-        TransportService {
+        QuickenService, FutureService, TransportService {
     
     /**
      * Returns the localhost {@link Contact}.
