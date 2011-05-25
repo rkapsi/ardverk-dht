@@ -58,10 +58,12 @@ public class Properties implements Iterable<Header> {
         group.setHeaders(h);
     }
 
-    public void removeHeaders(String name) {
-        for (Header header : getHeaders(name)) {
+    public Header[] removeHeaders(String name) {
+        Header[] headers = getHeaders(name);
+        for (Header header : headers) {
             removeHeader(header);
         }
+        return headers;
     }
 
     public void removeHeader(Header header) {

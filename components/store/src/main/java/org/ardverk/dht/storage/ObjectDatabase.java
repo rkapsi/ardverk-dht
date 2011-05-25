@@ -18,7 +18,9 @@ package org.ardverk.dht.storage;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,6 +29,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.http.Header;
+import org.ardverk.coding.CodingUtils;
 import org.ardverk.collection.Cursor;
 import org.ardverk.collection.PatriciaTrie;
 import org.ardverk.collection.Trie;
@@ -37,10 +42,10 @@ import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.Value;
 import org.ardverk.io.IoUtils;
 import org.ardverk.io.StreamUtils;
+import org.ardverk.security.MessageDigestUtils;
 import org.ardverk.version.VectorClock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 public class ObjectDatabase extends AbstractDatabase {
     
@@ -90,6 +95,24 @@ public class ObjectDatabase extends AbstractDatabase {
         long length = context.getContentLength();
         byte[] data = new byte[(int)Math.max(0L, length)];
         StreamUtils.readFully(in, data);
+        
+        MessageDigest md = MessageDigestUtils.createMD5();
+        byte[] digest = md.digest(data);
+        
+        Header contentMD5 = context.getFirstHeader(Constants.CONTENT_MD5);
+        
+        if (contentMD5 != null) {
+            byte[] decoded = Base64.decodeBase64(contentMD5.getValue());
+            if (!Arrays.equals(decoded, digest)) {
+                return Status.INTERNAL_SERVER_ERROR;
+            }
+            
+            // Replacing Content-MD5 with ETag!
+            context.removeHeader(contentMD5);   
+        }
+        
+        String etag = "\"" + CodingUtils.encodeBase16(digest) + "\"";
+        context.setHeader(Constants.ETAG_KEY, etag);
         
         put(key, new ContextValue(context, new ContextValue(
                 context, new ByteArrayValue(data))));

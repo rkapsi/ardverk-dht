@@ -17,8 +17,6 @@ public class ListBucketResult extends ContextValue {
 
     private static final String XML_VERSION = "1.0";
     
-    public static final String XML_TEXT_TYPE = "text/xml";
-    
     private final String name;
     
     private final String prefix;
@@ -41,10 +39,7 @@ public class ListBucketResult extends ContextValue {
         this.maxKeys = maxKeys;
         this.objects = objects;
         
-        Context context = getContext();
-        if (!context.containsHeader(HTTP.CONTENT_TYPE)) {
-            context.setHeader(HTTP.CONTENT_TYPE, XML_TEXT_TYPE);
-        }
+        context.setHeader(HTTP.CONTENT_TYPE, Constants.XML_TEXT_TYPE);
     }
     
     @Override

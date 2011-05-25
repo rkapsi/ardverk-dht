@@ -8,9 +8,9 @@ import org.ardverk.dht.rsrc.Value;
 
 public class ContextValue extends AbstractValue {
     
-    private final Context context;
+    protected final Context context;
     
-    private final Value value;
+    protected final Value value;
     
     public ContextValue() {
         this(new Context(), null);
