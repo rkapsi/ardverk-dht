@@ -6,7 +6,7 @@ class Constants {
     
     public static final String CREATOR_KEY = "X-Ardverk-Creator";
     
-    public static final String VECTOR_CLOCK_KEY = "X-Ardverk-VectorClock";
+    public static final String VECTOR_CLOCK_KEY = "X-Ardverk-Vclock";
 
     public static final String CONTENT_MD5 = "Content-MD5";
     

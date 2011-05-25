@@ -120,6 +120,25 @@ public class ObjectDatabase extends AbstractDatabase {
         return Status.OK;
     }
     
+    private synchronized void put(Key key, ContextValue value) {
+        KUID bucketId = key.getId();
+        
+        Bucket bucket = database.get(bucketId);
+        if (bucket == null) {
+            bucket = new Bucket(bucketId);
+            database.put(bucketId, bucket);
+        }
+        
+        VectorClockMap<KUID, ContextValue> map = bucket.get(key);
+        if (map == null) {
+            map = new VectorClockMap<KUID, ContextValue>();
+            bucket.put(key, map);
+        }
+        
+        VectorClock<KUID> clock = DefaultObjectValue.getVectorClock(value);
+        map.upsert(clock, value);
+    }
+    
     public synchronized Set<KUID> getBuckets() {
         return new HashSet<KUID>(database.keySet());
     }
@@ -151,25 +170,6 @@ public class ObjectDatabase extends AbstractDatabase {
         }
         
         return map.value();
-    }
-    
-    private synchronized void put(Key key, ContextValue value) {
-        KUID bucketId = key.getId();
-        
-        Bucket bucket = database.get(bucketId);
-        if (bucket == null) {
-            bucket = new Bucket(bucketId);
-            database.put(bucketId, bucket);
-        }
-        
-        VectorClockMap<KUID, ContextValue> map = bucket.get(key);
-        if (map == null) {
-            map = new VectorClockMap<KUID, ContextValue>();
-            bucket.put(key, map);
-        }
-        
-        VectorClock<KUID> clock = DefaultObjectValue.getVectorClock(value);
-        map.upsert(clock, value);
     }
     
     @Override
@@ -232,6 +232,8 @@ public class ObjectDatabase extends AbstractDatabase {
             implements Identifier {
         
         private static final long serialVersionUID = -8794611016380746313L;
+        
+        private final Properties properties = new Properties();
         
         private final KUID bucketId;
         

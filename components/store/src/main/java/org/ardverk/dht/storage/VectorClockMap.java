@@ -16,6 +16,7 @@ public class VectorClockMap<K, V extends Value> {
     
     public void upsert(VectorClock<K> key, V value) {
         
+        int before = 0;
         Iterator<VectorClock<K>> it = map.keySet().iterator();
         while (it.hasNext()) {
             VectorClock<K> existing = it.next();
