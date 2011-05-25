@@ -99,16 +99,16 @@ public class ObjectDatabase extends AbstractDatabase {
         MessageDigest md = MessageDigestUtils.createMD5();
         byte[] digest = md.digest(data);
         
-        Header contentMD5 = context.getFirstHeader(Constants.CONTENT_MD5);
+        Header[] contentMD5s = context.getHeaders(Constants.CONTENT_MD5);
         
-        if (contentMD5 != null) {
-            byte[] decoded = Base64.decodeBase64(contentMD5.getValue());
+        if (contentMD5s != null && contentMD5s.length != 0) {
+            byte[] decoded = Base64.decodeBase64(contentMD5s[0].getValue());
             if (!Arrays.equals(decoded, digest)) {
                 return Status.INTERNAL_SERVER_ERROR;
             }
             
-            // Replacing Content-MD5 with ETag!
-            context.removeHeader(contentMD5);   
+            // Remove the Content-MD5s and replace it/them with an ETag!
+            context.removeHeaders(contentMD5s);   
         }
         
         String etag = "\"" + CodingUtils.encodeBase16(digest) + "\"";

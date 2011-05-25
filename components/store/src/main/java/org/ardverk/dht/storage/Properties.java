@@ -60,14 +60,18 @@ public class Properties implements Iterable<Header> {
 
     public Header[] removeHeaders(String name) {
         Header[] headers = getHeaders(name);
-        for (Header header : headers) {
-            removeHeader(header);
-        }
+        removeHeaders(headers);
         return headers;
     }
 
     public void removeHeader(Header header) {
         group.removeHeader(header);
+    }
+    
+    public void removeHeaders(Header... headers) {
+        for (Header header : headers) {
+            group.removeHeader(header);
+        }
     }
     
     @SuppressWarnings("unchecked")
