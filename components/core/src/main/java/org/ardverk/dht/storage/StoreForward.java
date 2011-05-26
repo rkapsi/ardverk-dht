@@ -18,25 +18,41 @@ package org.ardverk.dht.storage;
 
 import org.ardverk.collection.CollectionUtils;
 import org.ardverk.dht.KUID;
+import org.ardverk.dht.routing.Bucket;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
+import org.ardverk.dht.routing.RouteTableAdapter;
 
 
 /**
  * This class implements the logic that is used to determinate weather or
  * not a value should be store-forwarded.
  */
-public class StoreForward {
+public class StoreForward extends RouteTableAdapter {
     
-    private final RouteTable routeTable;
+    protected final RouteTable routeTable;
     
-    private final Database database;
-    
-    public StoreForward(RouteTable routeTable, Database database) {
+    public StoreForward(RouteTable routeTable) {
         this.routeTable = routeTable;
-        this.database = database;
     }
     
+    @Override
+    public void handleContactAdded(Bucket bucket, Contact contact) {
+        handleContact(contact);
+    }
+
+    @Override
+    public void handleContactReplaced(Bucket bucket, Contact existing,
+            Contact contact) {
+        handleContact(contact);
+    }
+
+    @Override
+    public void handleContactChanged(Bucket bucket, Contact existing,
+            Contact contact) {
+        handleContact(contact);
+    }
+
     public void handleRequest(Contact contact) {
         handleContact(contact);
     }
@@ -50,15 +66,6 @@ public class StoreForward {
     }
     
     private void handleContact(Contact contact) {
-        if (contact.isInvisible()) {
-            return;
-        }
-        
-        DatabaseConfig config = database.getDatabaseConfig();
-        if (!config.isStoreForward()) {
-            return;
-        }
-        
         KUID contactId = contact.getId();
 
         Contact localhost = routeTable.getLocalhost();
@@ -68,7 +75,10 @@ public class StoreForward {
         }
         
         Contact last = CollectionUtils.last(contacts);    
-        database.forward(contact, last.getId());
+        forward(contact, last.getId());
+    }
+    
+    protected void forward(Contact contact, KUID lastId) {
     }
     
     /**

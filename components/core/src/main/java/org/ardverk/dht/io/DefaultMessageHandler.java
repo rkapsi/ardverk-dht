@@ -28,7 +28,6 @@ import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.Localhost;
 import org.ardverk.dht.routing.RoundTripTime;
 import org.ardverk.dht.routing.RouteTable;
-import org.ardverk.dht.storage.StoreForward;
 
 
 /**
@@ -38,19 +37,14 @@ import org.ardverk.dht.storage.StoreForward;
  */
 public class DefaultMessageHandler implements MessageCallback {
 
-    private final StoreForward storeForward;
-    
     private final RouteTable routeTable;
     
-    public DefaultMessageHandler(StoreForward storeForward, 
-            RouteTable routeTable) {
-        this.storeForward = storeForward;
+    public DefaultMessageHandler(RouteTable routeTable) {
         this.routeTable = routeTable;
     }
     
     public void handleRequest(RequestMessage request) throws IOException {
         Contact src = request.getContact();
-        storeForward.handleRequest(src);
         routeTable.add(src);
     }
     
@@ -67,7 +61,6 @@ public class DefaultMessageHandler implements MessageCallback {
         SocketAddress address = response.getAddress();
         updateContactAddress(address);
         
-        storeForward.handleResponse(src);
         routeTable.add(src);
         
         return true;
@@ -75,7 +68,6 @@ public class DefaultMessageHandler implements MessageCallback {
     
     public void handleLateResponse(ResponseMessage response) throws IOException {
         Contact src = response.getContact();
-        storeForward.handleLateResponse(src);
         routeTable.add(src);
     }
     

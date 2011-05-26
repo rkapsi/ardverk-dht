@@ -46,7 +46,6 @@ import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.Value;
 import org.ardverk.dht.storage.Database;
-import org.ardverk.dht.storage.StoreForward;
 import org.ardverk.io.IoUtils;
 
 
@@ -71,8 +70,6 @@ public class ArdverkDHT extends AbstractDHT {
     
     private final MessageDispatcher messageDispatcher;
     
-    private final StoreForward storeForward;
-    
     public ArdverkDHT(int keySize, Database database) {
         this(new Localhost(keySize), database);
     }
@@ -92,11 +89,8 @@ public class ArdverkDHT extends AbstractDHT {
         this.routeTable = routeTable;
         this.database = database;
         
-        storeForward = new StoreForward(routeTable, database);
-        
         messageDispatcher = new DefaultMessageDispatcher(
-                messageFactory, storeForward, 
-                routeTable, database);
+                messageFactory, routeTable, database);
         
         pingManager = new PingManager(this, messageDispatcher);
         bootstrapManager = new BootstrapManager(this);
