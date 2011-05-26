@@ -23,6 +23,7 @@ import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.message.RequestMessage;
 import org.ardverk.dht.message.ResponseMessage;
 import org.ardverk.dht.message.StoreRequest;
+import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.Value;
 import org.ardverk.dht.storage.Database;
@@ -45,9 +46,10 @@ public class StoreRequestHandler extends AbstractRequestHandler {
     }
 
     private Value store(StoreRequest request) {
+        Contact src = request.getContact();
         Key key = request.getKey();
         Value value = request.getValue();
-        return database.store(key, value);
+        return database.store(src, key, value);
     }
     
     @Override

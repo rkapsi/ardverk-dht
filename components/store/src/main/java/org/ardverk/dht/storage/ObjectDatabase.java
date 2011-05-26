@@ -37,6 +37,7 @@ import org.ardverk.collection.PatriciaTrie;
 import org.ardverk.collection.Trie;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.lang.Identifier;
+import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.rsrc.ByteArrayValue;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.Value;
@@ -71,7 +72,7 @@ public class ObjectDatabase extends AbstractDatabase {
     }
     
     @Override
-    public Value store(Key key, Value value) {
+    public Value store(Contact src, Key key, Value value) {
         if (!isInBucket(key)) {
             return Status.INTERNAL_SERVER_ERROR;
         }

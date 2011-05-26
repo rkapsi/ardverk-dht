@@ -35,9 +35,9 @@ public interface Database extends Bindable<DHT> {
     public DatabaseConfig getDatabaseConfig();
     
     /**
-     * Stores the given {@link Value} and returns a {@link Status}.
+     * Stores the given {@link Value} and returns a {@link Value}.
      */
-    public Value store(Key key, Value value);
+    public Value store(Contact src, Key key, Value value);
     
     /**
      * Returns a {@link Value} for the given {@link Key}.
