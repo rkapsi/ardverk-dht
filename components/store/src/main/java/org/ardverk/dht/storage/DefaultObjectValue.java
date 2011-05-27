@@ -27,21 +27,12 @@ public class DefaultObjectValue extends ContextValue {
             VectorClock<KUID> clock, byte[] value) {
         super(new ByteArrayValue(value));
         
-        Context context = getContext();
-
         if (creator != null) {
-            context.addHeader(Constants.CREATOR_KEY, encodeContact(creator));
-            
-            if (clock == null) {
-                clock = VectorClock.create(creator.getId());
-            }
+            addHeader(Constants.CREATOR_KEY, encodeContact(creator));
+            addHeader(Constants.CLIENT_ID, creator.getId().toHexString());
         }
         
-        if (clock != null) {
-            context.addHeader(Constants.VECTOR_CLOCK_KEY, encodeVectorClock(clock));
-        }
-        
-        context.addHeader(HTTP.CONTENT_LEN, Long.toString(value.length));
+        addHeader(HTTP.CONTENT_LEN, Long.toString(value.length));
     }
     
     private DefaultObjectValue(Context context, Value value) {
@@ -152,7 +143,7 @@ public class DefaultObjectValue extends ContextValue {
     }
     
     public static VectorClock<KUID> getVectorClock(Context context) {
-        String value = context.getStringValue(Constants.VECTOR_CLOCK_KEY);
+        String value = context.getStringValue(Constants.VCLOCK);
         return decodeVectorClock(value);
     }
 }

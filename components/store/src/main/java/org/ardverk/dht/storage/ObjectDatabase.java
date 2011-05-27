@@ -44,6 +44,7 @@ import org.ardverk.dht.rsrc.Value;
 import org.ardverk.io.IoUtils;
 import org.ardverk.io.StreamUtils;
 import org.ardverk.security.MessageDigestUtils;
+import org.ardverk.utils.ArrayUtils;
 import org.ardverk.version.VectorClock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,6 +94,21 @@ public class ObjectDatabase extends AbstractDatabase {
     private Value store(Key key, Context context, 
             InputStream in) throws IOException {
         
+        Header[] clientIds = context.removeHeaders(Constants.CLIENT_ID);
+        if (ArrayUtils.isEmpty(clientIds)) {
+            return Status.INTERNAL_SERVER_ERROR;
+        }
+        
+        Header[] vclocks = context.removeHeaders(Constants.VCLOCK);
+        if (ArrayUtils.isEmpty(vclocks)) {
+            vclocks = VclockUtils.INIT;
+        }
+        
+        VectorClock<KUID> vclock = VclockUtils.valueOf(vclocks[0].getValue());
+        KUID clientId = KUID.create(clientIds[0].getValue(), 16);
+        
+        vclock = vclock.update(clientId);
+        
         long length = context.getContentLength();
         byte[] data = new byte[(int)Math.max(0L, length)];
         StreamUtils.readFully(in, data);
@@ -102,7 +118,7 @@ public class ObjectDatabase extends AbstractDatabase {
         
         Header[] contentMD5s = context.getHeaders(Constants.CONTENT_MD5);
         
-        if (contentMD5s != null && contentMD5s.length != 0) {
+        if (!ArrayUtils.isEmpty(contentMD5s)) {
             byte[] decoded = Base64.decodeBase64(contentMD5s[0].getValue());
             if (!Arrays.equals(decoded, digest)) {
                 return Status.INTERNAL_SERVER_ERROR;
@@ -113,15 +129,15 @@ public class ObjectDatabase extends AbstractDatabase {
         }
         
         String etag = "\"" + CodingUtils.encodeBase16(digest) + "\"";
-        context.setHeader(Constants.ETAG_KEY, etag);
+        context.setHeader(Constants.ETAG, etag);
         
-        put(key, new ContextValue(context, new ContextValue(
+        put(key, vclock, new ContextValue(context, new ContextValue(
                 context, new ByteArrayValue(data))));
         
         return Status.OK;
     }
     
-    private synchronized void put(Key key, ContextValue value) {
+    private synchronized void put(Key key, VectorClock<KUID> vclock, ContextValue value) {
         KUID bucketId = key.getId();
         
         Bucket bucket = database.get(bucketId);
@@ -136,8 +152,10 @@ public class ObjectDatabase extends AbstractDatabase {
             bucket.put(key, map);
         }
         
-        VectorClock<KUID> clock = DefaultObjectValue.getVectorClock(value);
-        map.upsert(clock, value);
+        value.setHeader(Constants.VCLOCK, 
+                VclockUtils.toString(vclock));
+        
+        map.upsert(vclock, value);
     }
     
     public synchronized Set<KUID> getBuckets() {
@@ -234,7 +252,7 @@ public class ObjectDatabase extends AbstractDatabase {
         
         private static final long serialVersionUID = -8794611016380746313L;
         
-        private final Properties properties = new Properties();
+        private final Properties properties = new DefaultProperties();
         
         private final KUID bucketId;
         

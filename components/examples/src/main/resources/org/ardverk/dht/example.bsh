@@ -199,7 +199,7 @@ init() {
 init(boolean withUI) {
 	//INSTANCE_COUNT = 256;
 	INSTANCE_COUNT = 30;
-	INITIAL_PORT = 12000;
+	INITIAL_PORT = 13000;
 
 	print("Creating DHTs...");
 	createDHTs(INSTANCE_COUNT, INITIAL_PORT);

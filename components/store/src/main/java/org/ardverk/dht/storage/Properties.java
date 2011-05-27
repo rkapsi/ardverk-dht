@@ -3,90 +3,34 @@ package org.ardverk.dht.storage;
 import java.util.Iterator;
 
 import org.apache.http.Header;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.message.HeaderGroup;
 
-public class Properties implements Iterable<Header> {
+public interface Properties extends Iterable<Header> {
 
-    protected final HeaderGroup group;
-    
-    public Properties() {
-        this(new HeaderGroup());
-    }
-    
-    public Properties(HeaderGroup group) {
-        this.group = group;
-    }
-    
-    public boolean containsHeader(String name) {
-        return group.containsHeader(name);
-    }
+    public abstract boolean containsHeader(String name);
 
-    public void addHeader(String name, String value) {
-        addHeader(new BasicHeader(name, value));
-    }
+    public abstract void addHeader(String name, String value);
 
-    public void addHeader(Header header) {
-        group.addHeader(header);
-    }
+    public abstract void addHeader(Header header);
 
-    public Header[] getHeaders() {
-        return group.getAllHeaders();
-    }
+    public abstract Header[] getHeaders();
 
-    public Header getFirstHeader(String name) {
-        return group.getFirstHeader(name);
-    }
+    public abstract Header getFirstHeader(String name);
 
-    public Header[] getHeaders(String name) {
-        return group.getHeaders(name);
-    }
+    public abstract Header[] getHeaders(String name);
 
-    public Header getLastHeader(String name) {
-        return group.getLastHeader(name);
-    }
+    public abstract Header getLastHeader(String name);
 
-    public void setHeader(String name, String value) {
-        setHeader(new BasicHeader(name, value));
-    }
+    public abstract void setHeader(String name, String value);
 
-    public void setHeader(Header header) {
-        group.updateHeader(header);
-    }
+    public abstract void setHeader(Header header);
 
-    public void setHeaders(Header... h) {
-        group.setHeaders(h);
-    }
+    public abstract void setHeaders(Header... h);
 
-    public Header[] removeHeaders(String name) {
-        Header[] headers = getHeaders(name);
-        removeHeaders(headers);
-        return headers;
-    }
+    public abstract Header[] removeHeaders(String name);
 
-    public void removeHeader(Header header) {
-        group.removeHeader(header);
-    }
-    
-    public void removeHeaders(Header... headers) {
-        for (Header header : headers) {
-            group.removeHeader(header);
-        }
-    }
-    
-    @SuppressWarnings("unchecked")
-    @Override
-    public Iterator<Header> iterator() {
-        return group.iterator();
-    }
+    public abstract void removeHeader(Header header);
 
-    @SuppressWarnings("unchecked")
-    public Iterator<Header> iterator(String name) {
-        return group.iterator(name);
-    }
-    
-    @Override
-    public String toString() {
-        return group.toString();
-    }
+    public abstract void removeHeaders(Header... headers);
+
+    public abstract Iterator<Header> iterator(String name);
 }

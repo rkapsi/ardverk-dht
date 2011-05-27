@@ -13,12 +13,8 @@ import org.ardverk.io.DataUtils;
 import org.ardverk.io.Writable;
 import org.ardverk.utils.StringUtils;
 
-public class Context extends Properties implements Writable {
+public class Context extends DefaultProperties implements Writable {
 
-    public static final String LAST_MODIFIED = "Last-Modified";
-    
-    public static final String ETAG = "ETag";
-    
     public Context() {
         super();
     }
@@ -40,7 +36,7 @@ public class Context extends Properties implements Writable {
     }
     
     public long getLastModified() {
-        return getLongValue(LAST_MODIFIED);
+        return getLongValue(Constants.LAST_MODIFIED);
     }
 
     public long getContentLength() {
@@ -51,7 +47,7 @@ public class Context extends Properties implements Writable {
     }
 
     public String getETag() {
-        return getStringValue(ETAG);
+        return getStringValue(Constants.ETAG);
     }
     
     public static Context valueOf(InputStream in) throws IOException {
