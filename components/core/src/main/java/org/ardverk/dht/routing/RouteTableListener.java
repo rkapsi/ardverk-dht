@@ -18,6 +18,8 @@ package org.ardverk.dht.routing;
 
 public interface RouteTableListener {
 
+    public void handleContact(Bucket bucket, Contact existing, Contact contact);
+    
     public void handleBucketSplit(Bucket bucket, Bucket left, Bucket right);
     
     public void handleContactAdded(Bucket bucket, Contact contact);

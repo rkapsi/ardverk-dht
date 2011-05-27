@@ -162,32 +162,40 @@ public class DefaultRouteTable extends AbstractRouteTable {
             consecutiveErrors = 0;
         }
         
-        add0(contact);
+        StateEntity entity = add0(contact);
+        fireContact(entity.bucket, entity.existing, contact);
     }
     
-    private synchronized void add0(Contact contact) {
+    private synchronized StateEntity  add0(Contact contact) {
         KUID contactId = contact.getId();
         DefaultBucket bucket = buckets.selectValue(contactId);
         ContactEntry entry = bucket.get(contactId);
         
-        if (contact.isAuthoritative()) {
-            authoritative(bucket, entry, contact);
-            return;
+        Contact existing = null;
+        if (entry != null) {
+            existing = entry.getContact();
         }
         
-        if (entry != null) {
-            updateContact(bucket, entry, contact);
-        } else if (!bucket.isActiveFull()) {
-            if (isOkayToAdd(bucket, contact)) {
-                addActive(bucket, contact);
-            } else if (!canSplit(bucket)) {
-                addCache(bucket, contact);
-            }
-        } else if (split(bucket)) {
-            add0(contact);
+        if (contact.isAuthoritative()) {
+            authoritative(bucket, entry, contact);
         } else {
-            replaceCache(bucket, contact);
+        
+            if (entry != null) {
+                updateContact(bucket, entry, contact);
+            } else if (!bucket.isActiveFull()) {
+                if (isOkayToAdd(bucket, contact)) {
+                    addActive(bucket, contact);
+                } else if (!canSplit(bucket)) {
+                    addCache(bucket, contact);
+                }
+            } else if (split(bucket)) {
+                return add0(contact);
+            } else {
+                replaceCache(bucket, contact);
+            }
         }
+        
+        return new StateEntity(bucket, existing);
     }
     
     private synchronized void authoritative(DefaultBucket bucket, 
@@ -984,6 +992,18 @@ public class DefaultRouteTable extends AbstractRouteTable {
             }
             
             return new DefaultBucket[] { left, right };
+        }
+    }
+    
+    private static class StateEntity {
+        
+        private final Bucket bucket;
+        
+        private final Contact existing;
+
+        public StateEntity(Bucket bucket, Contact existing) {
+            this.bucket = bucket;
+            this.existing = existing;
         }
     }
 }

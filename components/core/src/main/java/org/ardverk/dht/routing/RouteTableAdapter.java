@@ -17,6 +17,10 @@
 package org.ardverk.dht.routing;
 
 public class RouteTableAdapter implements RouteTableListener {
+    
+    @Override
+    public void handleContact(Bucket bucket, Contact existing, Contact contact) {
+    }
 
     @Override
     public void handleBucketSplit(Bucket bucket, Bucket left, Bucket right) {

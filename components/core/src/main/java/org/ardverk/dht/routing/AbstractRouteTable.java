@@ -93,6 +93,23 @@ public abstract class AbstractRouteTable implements RouteTable {
         return listeners.toArray(new RouteTableListener[0]);
     }
 
+    protected void fireContact(final Bucket bucket, 
+            final Contact existing, final Contact contact) {
+        
+        if (!listeners.isEmpty()) {
+            Runnable event = new Runnable() {
+                @Override
+                public void run() {
+                    for (RouteTableListener l : listeners) {
+                        l.handleContact(bucket, existing, contact);
+                    }
+                }
+            };
+            
+            EventUtils.fireEvent(event);
+        }
+    }
+    
     protected void fireBucketSplit(final Bucket bucket, 
             final Bucket left, final Bucket right) {
         
