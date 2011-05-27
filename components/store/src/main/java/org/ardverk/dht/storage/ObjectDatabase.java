@@ -134,7 +134,7 @@ public class ObjectDatabase extends AbstractDatabase {
         put(key, vclock, new ContextValue(context, new ContextValue(
                 context, new ByteArrayValue(data))));
         
-        return Status.OK;
+        return Status.createOk(vclock);
     }
     
     private synchronized void put(Key key, VectorClock<KUID> vclock, ContextValue value) {

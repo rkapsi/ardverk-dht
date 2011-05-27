@@ -6,11 +6,13 @@ import java.io.OutputStream;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.protocol.HTTP;
+import org.ardverk.dht.KUID;
 import org.ardverk.dht.rsrc.Value;
 import org.ardverk.io.DataUtils;
 import org.ardverk.io.IoUtils;
 import org.ardverk.io.StreamUtils;
 import org.ardverk.utils.StringUtils;
+import org.ardverk.version.VectorClock;
 
 public class Status extends ContextValue {
     
@@ -22,6 +24,12 @@ public class Status extends ContextValue {
     
     public static final Status LENGTH_REQUIRED = new Status(
             HttpStatus.SC_LENGTH_REQUIRED, "Length Required");
+    
+    public static Status createOk(VectorClock<KUID> vclock) {
+        Status status = new Status(HttpStatus.SC_OK, "OK");
+        status.setHeader(Constants.VCLOCK, VclockUtils.toString(vclock));
+        return status;
+    }
     
     private final int code;
     
