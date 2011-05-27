@@ -83,31 +83,17 @@ public class ObjectDatabase extends AbstractDatabase {
             in = value.getContent();
             Context context = Context.valueOf(in);
             return store(key, context, in);
-        } catch (IOException err) {
-            LOG.error("IOException", err);
+        } catch (Exception err) {
+            LOG.error("Exception", err);
             return Status.INTERNAL_SERVER_ERROR;
         } finally {
             IoUtils.close(in);
         }
     }
     
-    private Value store(Key key, Context context, 
-            InputStream in) throws IOException {
+    private Value store(Key key, Context context, InputStream in) throws IOException {
         
-        Header[] clientIds = context.removeHeaders(Constants.CLIENT_ID);
-        if (ArrayUtils.isEmpty(clientIds)) {
-            return Status.INTERNAL_SERVER_ERROR;
-        }
-        
-        Header[] vclocks = context.removeHeaders(Constants.VCLOCK);
-        if (ArrayUtils.isEmpty(vclocks)) {
-            vclocks = VclockUtils.INIT;
-        }
-        
-        VectorClock<KUID> vclock = VclockUtils.valueOf(vclocks[0].getValue());
-        KUID clientId = KUID.create(clientIds[0].getValue(), 16);
-        
-        vclock = vclock.update(clientId);
+        VectorClock<KUID> vclock = VclockUtils.valueOf(context);
         
         long length = context.getContentLength();
         byte[] data = new byte[(int)Math.max(0L, length)];

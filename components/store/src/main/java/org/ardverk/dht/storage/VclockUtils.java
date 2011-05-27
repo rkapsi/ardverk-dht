@@ -6,6 +6,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.TreeMap;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
@@ -14,6 +15,7 @@ import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.ardverk.dht.KUID;
 import org.ardverk.io.IoUtils;
+import org.ardverk.utils.ArrayUtils;
 import org.ardverk.version.Occured;
 import org.ardverk.version.Vector;
 import org.ardverk.version.VectorClock;
@@ -25,7 +27,7 @@ public class VclockUtils {
     private static final String VCLOCK = VclockUtils.toString(
             VectorClock.<KUID>create());
     
-    public static final Header[] INIT = new Header[] {
+    private static final Header[] INIT = new Header[] {
         new BasicHeader(Constants.VCLOCK, VCLOCK)
     };
     
@@ -107,5 +109,28 @@ public class VclockUtils {
         }
         
         return VectorClock.create();
+    }
+    
+    public static VectorClock<KUID> valueOf(Properties properties) {
+        Header[] clientIds = properties.removeHeaders(Constants.CLIENT_ID);
+        if (ArrayUtils.isEmpty(clientIds)) {
+            throw new NoSuchElementException(Constants.CLIENT_ID);
+        }
+        
+        Header[] vclocks = properties.removeHeaders(Constants.VCLOCK);
+        return valueOf(vclocks, clientIds);
+    }
+    
+    public static VectorClock<KUID> valueOf(Header[] vclocks, Header[] clientIds) {
+        VectorClock<KUID> vclock = null;
+        
+        if (!ArrayUtils.isEmpty(vclocks)) {
+            vclock = valueOf(vclocks[0].getValue());
+        } else {
+            vclock = VectorClock.create();
+        }
+        
+        KUID clientId = KUID.create(clientIds[0].getValue(), 16);
+        return vclock.update(clientId);
     }
 }
