@@ -3,9 +3,9 @@ package org.ardverk.dht.storage;
 import org.ardverk.version.Occured;
 import org.ardverk.version.VectorClock;
 
-public class VectorClockUtils {
+public class VclockUtils {
     
-    private VectorClockUtils() {}
+    private VclockUtils() {}
     
     public static <K> Occured compare(VectorClock<K> existing, 
             VectorClock<K> clock) {

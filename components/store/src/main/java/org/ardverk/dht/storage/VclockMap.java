@@ -9,19 +9,18 @@ import org.ardverk.dht.rsrc.Value;
 import org.ardverk.version.Occured;
 import org.ardverk.version.VectorClock;
 
-public class VectorClockMap<K, V extends Value> {
+public class VclockMap<K, V extends Value> {
     
     private final Map<VectorClock<K>, V> map 
         = new LinkedHashMap<VectorClock<K>, V>();
     
-    public void upsert(VectorClock<K> key, V value) {
+    public void upsert(VectorClock<K> clock, V value) {
         
-        int before = 0;
         Iterator<VectorClock<K>> it = map.keySet().iterator();
         while (it.hasNext()) {
             VectorClock<K> existing = it.next();
             
-            Occured occured = VectorClockUtils.compare(existing, key);
+            Occured occured = VclockUtils.compare(existing, clock);
             switch (occured) {
                 case AFTER:
                     it.remove();
@@ -35,11 +34,11 @@ public class VectorClockMap<K, V extends Value> {
             }
         }
         
-        map.put(key, value);
+        map.put(clock, value);
     }
     
-    public boolean remove(VectorClock<K> key) {
-        return map.remove(key) != null;
+    public boolean remove(VectorClock<K> clock) {
+        return map.remove(clock) != null;
     }
     
     public V value() {

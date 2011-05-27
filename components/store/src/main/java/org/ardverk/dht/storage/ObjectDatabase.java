@@ -130,9 +130,9 @@ public class ObjectDatabase extends AbstractDatabase {
             database.put(bucketId, bucket);
         }
         
-        VectorClockMap<KUID, ContextValue> map = bucket.get(key);
+        VclockMap<KUID, ContextValue> map = bucket.get(key);
         if (map == null) {
-            map = new VectorClockMap<KUID, ContextValue>();
+            map = new VclockMap<KUID, ContextValue>();
             bucket.put(key, map);
         }
         
@@ -165,7 +165,7 @@ public class ObjectDatabase extends AbstractDatabase {
             return null;
         }
         
-        VectorClockMap<?, ContextValue> map = bucket.get(key);
+        VclockMap<?, ContextValue> map = bucket.get(key);
         if (map == null) {
             return null;
         }
@@ -229,7 +229,7 @@ public class ObjectDatabase extends AbstractDatabase {
         return sb.toString();
     }
     
-    private static class Bucket extends HashMap<Key, VectorClockMap<KUID, ContextValue>> 
+    private static class Bucket extends HashMap<Key, VclockMap<KUID, ContextValue>> 
             implements Identifier {
         
         private static final long serialVersionUID = -8794611016380746313L;
