@@ -18,6 +18,7 @@ package org.ardverk.dht.storage;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -97,10 +98,12 @@ public class ObjectDatabase extends AbstractDatabase {
         
         long length = context.getContentLength();
         byte[] data = new byte[(int)Math.max(0L, length)];
-        StreamUtils.readFully(in, data);
         
         MessageDigest md = MessageDigestUtils.createMD5();
-        byte[] digest = md.digest(data);
+        DigestInputStream dis = new DigestInputStream(in, md);
+        StreamUtils.readFully(dis, data);
+        
+        byte[] digest = md.digest();
         
         Header[] contentMD5s = context.getHeaders(Constants.CONTENT_MD5);
         
