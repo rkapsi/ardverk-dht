@@ -152,7 +152,7 @@ public class SocketTransport extends AbstractTransport implements Closeable {
                 client = socket.accept();
                 
                 configure(client);
-                processing = process(client);
+                processing = receive(client);
                 
             } catch (IOException err) {
                 uncaughtException(socket, err);
@@ -164,7 +164,7 @@ public class SocketTransport extends AbstractTransport implements Closeable {
         }
     }
     
-    private boolean process(final Socket client) {
+    private boolean receive(final Socket client) {
         Runnable task = new Runnable() {
             @Override
             public void run() {
