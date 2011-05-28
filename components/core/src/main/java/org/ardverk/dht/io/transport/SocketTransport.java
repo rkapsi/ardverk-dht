@@ -20,6 +20,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -42,7 +43,8 @@ import org.ardverk.dht.message.ResponseMessage;
 import org.ardverk.dht.rsrc.NoValue;
 import org.ardverk.dht.rsrc.Value;
 import org.ardverk.io.IdleInputStream;
-import org.ardverk.io.IdleInputStream.IdleInputStreamAdapter;
+import org.ardverk.io.IdleInputStream.IdleAdapter;
+import org.ardverk.io.IdleInputStream.IdleCallback;
 import org.ardverk.io.IoUtils;
 import org.ardverk.net.NetworkUtils;
 import org.slf4j.Logger;
@@ -245,14 +247,12 @@ public class SocketTransport extends AbstractTransport implements Closeable {
                     
                     SocketAddress src = client.getRemoteSocketAddress();
                     
-                    IdleInputStream in = new IdleInputStream(
-                        new BufferedInputStream(
-                            client.getInputStream()));
+                    InputStream in = getInputStream(client);
                     decoder = codec.createDecoder(src, in);
                     
                     ResponseMessage response = (ResponseMessage)decoder.read();
-                    hasContent = handleContent(response, 
-                            in, client, encoder, decoder);
+                    
+                    hasContent = handleContent(response);
                     
                     success = handleResponse(response);
                     
@@ -291,18 +291,9 @@ public class SocketTransport extends AbstractTransport implements Closeable {
         }
     }
     
-    private static boolean handleContent(Message message, 
-            IdleInputStream in, final Socket client, 
-            final Closeable... closeables) {
-        
+    private static boolean handleContent(Message message) {
         Value value = message.getValue();
         if (!(value instanceof NoValue)) {
-            in.addIdleInputStreamListener(new IdleInputStreamAdapter() {
-                @Override
-                public void handleClosed(IdleInputStream in) {
-                    close(client, closeables);
-                }
-            }, 30L, TimeUnit.SECONDS);
             return true;
         }
         return false;
@@ -311,5 +302,31 @@ public class SocketTransport extends AbstractTransport implements Closeable {
     private static void close(Socket client, Closeable... closeable) {
         IoUtils.closeAll(closeable);
         IoUtils.close(client);
+    }
+    
+    private static InputStream getInputStream(final Socket client) throws IOException {
+        final Object lock = new Object();
+        synchronized (lock) {
+            IdleCallback callback = new IdleAdapter() {
+                @Override
+                public void idle(InputStream in, long time, TimeUnit unit) {
+                    SocketTransport.close(client, in);
+                }
+
+                @Override
+                public void eof(InputStream in) {
+                    SocketTransport.close(client, in);
+                }
+
+                @Override
+                public void closed(InputStream in) {
+                    SocketTransport.close(client, in);
+                }
+            };
+            
+            return new IdleInputStream(new BufferedInputStream(
+                    client.getInputStream()), 
+                    callback, 5L, 5L, TimeUnit.SECONDS);
+        }
     }
 }

@@ -3,16 +3,22 @@ package org.ardverk.dht.storage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
 
+import org.apache.http.Header;
 import org.apache.http.HttpStatus;
 import org.apache.http.protocol.HTTP;
+import org.ardverk.coding.CodingUtils;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.rsrc.Value;
 import org.ardverk.io.DataUtils;
 import org.ardverk.io.IoUtils;
 import org.ardverk.io.StreamUtils;
+import org.ardverk.security.MessageDigestUtils;
 import org.ardverk.utils.StringUtils;
 import org.ardverk.version.VectorClock;
+
 
 public class Status extends ContextValue {
     
@@ -39,23 +45,23 @@ public class Status extends ContextValue {
         this.code = code;
         this.message = message;
         
-        getContext().setHeader(HTTP.CONTENT_LEN, "0");
+        setHeader(Constants.NO_CONTENT);
     }
     
-    private Status(Context context, int code, String message) {
+    private Status(int code, String message, Context context) {
         super(context);
         this.code = code;
         this.message = message;
         
-        getContext().setHeader(HTTP.CONTENT_LEN, "0");
+        setHeader(Constants.NO_CONTENT);
     }
     
     @Override
-    public void writeTo(OutputStream out) throws IOException {
-        super.writeTo(out);
-        
+    protected void writeContext(OutputStream out) throws IOException {
         DataUtils.short2beb(code, out);
         StringUtils.writeString(message, out);
+        
+        super.writeContext(out);
     }
 
     @Override
@@ -73,6 +79,10 @@ public class Status extends ContextValue {
     }
     
     public static Status valueOf(InputStream in) throws IOException {
+        
+        int code = DataUtils.beb2ushort(in);
+        String message = StringUtils.readString(in);
+        
         Context context = Context.valueOf(in);
         
         long length = 0L;
@@ -81,11 +91,21 @@ public class Status extends ContextValue {
         }
         
         byte[] data = new byte[(int)length];
-        StreamUtils.readFully(in, data);
         
-        int code = DataUtils.beb2ushort(in);
-        String message = StringUtils.readString(in);
+        MessageDigest md = MessageDigestUtils.createMD5();
+        DigestInputStream dis = new DigestInputStream(in, md);
+        StreamUtils.readFully(dis, data);
         
-        return new Status(context, code, message);
+        /*Header etag = context.getFirstHeader(Constants.ETAG);
+        if (etag != null) {
+            String actual = "\"" + CodingUtils.encodeBase16(md.digest()) + "\"";
+            String expected = etag.getValue();
+            
+            if (!actual.equalsIgnoreCase(expected)) {
+                throw new IOException("Mismatching ETags: " + actual + " vs. " + expected);
+            }
+        }*/
+        
+        return new Status(code, message, context);
     }
 }

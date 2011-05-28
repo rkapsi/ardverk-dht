@@ -126,8 +126,15 @@ public class ContextValue extends AbstractValue implements Properties {
     
     @Override
     public void writeTo(OutputStream out) throws IOException {
+        writeContext(out);
+        writeValue(out);
+    }
+    
+    protected void writeContext(OutputStream out) throws IOException {
         context.writeTo(out);
-        
+    }
+    
+    protected void writeValue(OutputStream out) throws IOException {
         if (value != null) {
             value.writeTo(out);
         }
