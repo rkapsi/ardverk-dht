@@ -2,15 +2,10 @@ package org.ardverk.dht.storage;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Iterator;
 
-import org.apache.http.Header;
-import org.ardverk.dht.rsrc.AbstractValue;
 import org.ardverk.dht.rsrc.Value;
 
-public class ContextValue extends AbstractValue implements Properties {
-    
-    protected final Context context;
+public class ContextValue extends AbstractContextValue {
     
     protected final Value value;
     
@@ -27,95 +22,16 @@ public class ContextValue extends AbstractValue implements Properties {
     }
     
     public ContextValue(Context context, Value value) {
-        assert (!(value instanceof ContextValue));
+        super(context);
         
-        this.context = context;
+        assert (!(value instanceof ContextValue));
         this.value = value;
     }
-    
-    public Context getContext() {
-        return context;
-    }
-    
+
     public Value getValue() {
         return value;
     }
     
-    @Override
-    public Iterator<Header> iterator() {
-        return context.iterator();
-    }
-
-    @Override
-    public boolean containsHeader(String name) {
-        return context.containsHeader(name);
-    }
-
-    @Override
-    public void addHeader(String name, String value) {
-        context.addHeader(name, value);
-    }
-
-    @Override
-    public void addHeader(Header header) {
-        context.addHeader(header);
-    }
-
-    @Override
-    public Header[] getHeaders() {
-        return context.getHeaders();
-    }
-
-    @Override
-    public Header getFirstHeader(String name) {
-        return context.getFirstHeader(name);
-    }
-
-    @Override
-    public Header[] getHeaders(String name) {
-        return context.getHeaders(name);
-    }
-
-    @Override
-    public Header getLastHeader(String name) {
-        return context.getLastHeader(name);
-    }
-
-    @Override
-    public void setHeader(String name, String value) {
-        context.setHeader(name, value);
-    }
-
-    @Override
-    public void setHeader(Header header) {
-        context.setHeader(header);
-    }
-
-    @Override
-    public void setHeaders(Header... h) {
-        context.setHeaders(h);
-    }
-
-    @Override
-    public Header[] removeHeaders(String name) {
-        return context.removeHeaders(name);
-    }
-
-    @Override
-    public void removeHeader(Header header) {
-        context.removeHeader(header);
-    }
-
-    @Override
-    public void removeHeaders(Header... headers) {
-        context.removeHeaders(headers);
-    }
-
-    @Override
-    public Iterator<Header> iterator(String name) {
-        return context.iterator(name);
-    }
-
     @Override
     public boolean isRepeatable() {
         return value != null ? value.isRepeatable() : true;
@@ -127,15 +43,6 @@ public class ContextValue extends AbstractValue implements Properties {
     }
     
     @Override
-    public void writeTo(OutputStream out) throws IOException {
-        writeContext(out);
-        writeValue(out);
-    }
-    
-    protected void writeContext(OutputStream out) throws IOException {
-        context.writeTo(out);
-    }
-    
     protected void writeValue(OutputStream out) throws IOException {
         if (value != null) {
             value.writeTo(out);
@@ -148,7 +55,7 @@ public class ContextValue extends AbstractValue implements Properties {
         if (value != null) {
             sb.append(value).append(" ");
         }
-        sb.append(context);
-        return sb.toString();
+        
+        return sb.append(super.toString()).toString();
     }
 }
