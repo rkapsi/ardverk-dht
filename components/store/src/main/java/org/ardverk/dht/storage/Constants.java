@@ -12,6 +12,8 @@ class Constants {
     
     public static final String VCLOCK = "X-Ardverk-Vclock";
 
+    public static final String VTAG = "X-Ardverk-Vtag";
+    
     public static final String CONTENT_MD5 = "Content-MD5";
     
     public static final String XML_TEXT_TYPE = "text/xml";

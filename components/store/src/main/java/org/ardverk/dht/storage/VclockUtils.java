@@ -131,6 +131,7 @@ public class VclockUtils {
         }
         
         KUID clientId = KUID.create(clientIds[0].getValue(), 16);
+        //KUID clientId = KUID.createRandom(20);
         return vclock.update(clientId);
     }
 }

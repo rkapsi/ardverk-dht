@@ -45,8 +45,12 @@ public class VclockMap<K, V extends Value> {
         return CollectionUtils.last(map.values());
     }
     
-    public Value[] values() {
-        return map.values().toArray(new Value[0]);
+    /*public Value[] values() {
+        return values(Value.class);
+    }*/
+    
+    public V[] values(Class<V> clazz) {
+        return CollectionUtils.toArray(map.values(), clazz);
     }
     
     public int size() {

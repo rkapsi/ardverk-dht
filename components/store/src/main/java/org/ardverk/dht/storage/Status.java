@@ -6,10 +6,8 @@ import java.io.OutputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 
-import org.apache.http.Header;
 import org.apache.http.HttpStatus;
 import org.apache.http.protocol.HTTP;
-import org.ardverk.coding.CodingUtils;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.rsrc.Value;
 import org.ardverk.io.DataUtils;
@@ -24,6 +22,12 @@ public class Status extends ContextValue {
     
     public static final Status OK = new Status(
             HttpStatus.SC_OK, "OK");
+    
+    public static final Status MULTIPLE_CHOICES = new Status(
+            HttpStatus.SC_MULTIPLE_CHOICES, "Multiple Choices");
+    
+    public static final Status NOT_FOUND = new Status(
+            HttpStatus.SC_NOT_FOUND, "Not Found");
     
     public static final Status INTERNAL_SERVER_ERROR = new Status(
             HttpStatus.SC_INTERNAL_SERVER_ERROR, "Internal Server Error");

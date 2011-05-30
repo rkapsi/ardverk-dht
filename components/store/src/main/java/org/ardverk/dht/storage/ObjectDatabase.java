@@ -33,6 +33,7 @@ import java.util.Set;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.Header;
 import org.ardverk.coding.CodingUtils;
+import org.ardverk.collection.CollectionUtils;
 import org.ardverk.collection.Cursor;
 import org.ardverk.collection.PatriciaTrie;
 import org.ardverk.collection.Trie;
@@ -151,7 +152,7 @@ public class ObjectDatabase extends AbstractDatabase {
     }
 
     @Override
-    public synchronized Value get(Key key) {
+    public Value get(Key key) {
         /*URI uri = key.getURI();
         String query = uri.getQuery();
         if (query != null) {
@@ -162,10 +163,19 @@ public class ObjectDatabase extends AbstractDatabase {
             return null;
         }*/
         
-        return getValue(key);
+        ContextValue[] values = getValues(key);
+        if (ArrayUtils.isEmpty(values)) {
+            return Status.NOT_FOUND;
+        }
+        
+        if (values.length == 1) {
+            return CollectionUtils.first(values);
+        }
+        
+        return Status.MULTIPLE_CHOICES;
     }
     
-    private synchronized ContextValue getValue(Key key) {
+    private synchronized ContextValue[] getValues(Key key) {
         Bucket bucket = database.get(key.getId());
         if (bucket == null) {
             return null;
@@ -176,7 +186,7 @@ public class ObjectDatabase extends AbstractDatabase {
             return null;
         }
         
-        return map.value();
+        return map.values(ContextValue.class);
     }
     
     @Override
