@@ -120,8 +120,7 @@ public class ObjectDatabase extends AbstractDatabase {
         String etag = "\"" + CodingUtils.encodeBase16(digest) + "\"";
         context.setHeader(Constants.ETAG, etag);
         
-        put(key, vclock, new ContextValue(context, new ContextValue(
-                context, new ByteArrayValue(data))));
+        put(key, vclock, new ContextValue(context, new ByteArrayValue(data)));
         
         return Status.createOk(vclock);
     }

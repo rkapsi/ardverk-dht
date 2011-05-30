@@ -193,7 +193,7 @@ quit() {
 print("\nHello, please type init(); and press Enter. For further instructions and examples see 'example.bsh' and www.beanshell.org.\n");
 
 init() {
-	init(true);
+	init(false);
 }
 
 init(boolean withUI) {

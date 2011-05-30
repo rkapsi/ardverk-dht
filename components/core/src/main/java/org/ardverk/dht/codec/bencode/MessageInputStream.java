@@ -16,7 +16,6 @@
 
 package org.ardverk.dht.codec.bencode;
 
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -181,13 +180,7 @@ public class MessageInputStream extends BencodingInputStream {
     }
     
     public Value readValue() throws IOException {
-        FilterInputStream in = new MessageInputStream(this) {
-            @Override
-            public void close() throws IOException {
-            }
-        };
-        
-        return new InputStreamValue(in);
+        return new InputStreamValue(this);
     }
     
     public Message readMessage(SocketAddress src) throws IOException {

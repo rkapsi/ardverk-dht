@@ -25,18 +25,18 @@ import org.ardverk.utils.StringUtils;
 
 public class ByteArrayValue extends AbstractValue {
     
-    private final byte[] content;
+    private final byte[] data;
     
     private final int offset;
     
     private final int length;
     
-    public ByteArrayValue(byte[] content) {
-        this(content, 0, content.length);
+    public ByteArrayValue(byte[] data) {
+        this(data, 0, data.length);
     }
     
-    public ByteArrayValue(byte[] content, int offset, int length) {
-        this.content = content;
+    public ByteArrayValue(byte[] data, int offset, int length) {
+        this.data = data;
         this.offset = offset;
         this.length = length;
     }
@@ -50,23 +50,23 @@ public class ByteArrayValue extends AbstractValue {
     }
     
     public byte[] getContentAsBytes() {
-        if (offset == 0 && length == content.length) {
-            return content;
+        if (offset == 0 && length == data.length) {
+            return data;
         }
         
         byte[] copy = new byte[length];
-        System.arraycopy(content, offset, copy, 0, length);
+        System.arraycopy(data, offset, copy, 0, length);
         return copy;
     }
     
     @Override
     public InputStream getContent() {
-        return new ByteArrayInputStream(content, offset, length);
+        return new ByteArrayInputStream(data, offset, length);
     }
     
     @Override
     public void writeTo(OutputStream out) throws IOException {
-        out.write(content, offset, length);
+        out.write(data, offset, length);
     }
 
     @Override

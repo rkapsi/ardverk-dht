@@ -27,6 +27,8 @@ public class ContextValue extends AbstractValue implements Properties {
     }
     
     public ContextValue(Context context, Value value) {
+        assert (!(value instanceof ContextValue));
+        
         this.context = context;
         this.value = value;
     }

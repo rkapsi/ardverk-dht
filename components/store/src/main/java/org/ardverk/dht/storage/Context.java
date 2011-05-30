@@ -65,6 +65,10 @@ public class Context extends DefaultProperties implements Writable {
     @Override
     public void writeTo(OutputStream out) throws IOException {
         Header[] headers = getHeaders();
+        if (0xFFFF < headers.length) {
+            throw new IOException();
+        }
+        
         DataUtils.short2beb(headers.length, out);
         for (Header header : headers) {
             writeHeader(header, out);

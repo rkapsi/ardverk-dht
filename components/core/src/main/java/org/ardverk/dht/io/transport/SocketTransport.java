@@ -19,14 +19,15 @@ package org.ardverk.dht.io.transport;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.Closeable;
+import java.io.FilterInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketException;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -42,9 +43,6 @@ import org.ardverk.dht.message.RequestMessage;
 import org.ardverk.dht.message.ResponseMessage;
 import org.ardverk.dht.rsrc.NoValue;
 import org.ardverk.dht.rsrc.Value;
-import org.ardverk.io.IdleInputStream;
-import org.ardverk.io.IdleInputStream.IdleAdapter;
-import org.ardverk.io.IdleInputStream.IdleCallback;
 import org.ardverk.io.IoUtils;
 import org.ardverk.net.NetworkUtils;
 import org.slf4j.Logger;
@@ -168,23 +166,17 @@ public class SocketTransport extends AbstractTransport implements Closeable {
         Runnable task = new Runnable() {
             @Override
             public void run() {
-                SocketAddress src = client.getRemoteSocketAddress();
-                
                 Decoder decoder = null;
                 Encoder encoder = null;
                 
                 try {
-                    decoder = codec.createDecoder(src, 
-                            new BufferedInputStream(
-                                client.getInputStream()));
+                    decoder = createDecoder(client);
                     
                     RequestMessage request = (RequestMessage)decoder.read();
                     ResponseMessage response = handleRequest(request);
                     
                     if (response != null) {
-                        encoder = codec.createEncoder(
-                                new BufferedOutputStream(
-                                    client.getOutputStream()));
+                        encoder = createEncoder(client);
                     
                         encoder.write(response);
                         encoder.flush();
@@ -193,10 +185,7 @@ public class SocketTransport extends AbstractTransport implements Closeable {
                 } catch (IOException err) {
                     uncaughtException(client, err);
                 } finally {
-                    IoUtils.close(decoder);
-                    IoUtils.close(encoder);
-                    
-                    IoUtils.close(client);
+                    close(client, encoder, decoder);
                 }
             }
         };
@@ -206,7 +195,7 @@ public class SocketTransport extends AbstractTransport implements Closeable {
     }
     
     @Override
-    public void send(final KUID contactId, final Message request, 
+    public void send(KUID contactId, final Message request, 
             final long timeout, final TimeUnit unit) throws IOException {
         
         ServerSocket socket = this.socket;
@@ -221,8 +210,6 @@ public class SocketTransport extends AbstractTransport implements Closeable {
                 Encoder encoder = null;
                 Decoder decoder = null;
                 
-                boolean hasContent = false;
-                boolean success = false;
                 try {
                     client = new Socket();
                     configure(client);
@@ -238,32 +225,28 @@ public class SocketTransport extends AbstractTransport implements Closeable {
                     
                     client.connect(endpoint, timeoutInMillis);
                     
-                    encoder = codec.createEncoder(
-                                new BufferedOutputStream(
-                                    client.getOutputStream()));
-                    
+                    encoder = createEncoder(client);
                     encoder.write(request);
                     encoder.flush();
                     
-                    SocketAddress src = client.getRemoteSocketAddress();
-                    
-                    InputStream in = getInputStream(client);
-                    decoder = codec.createDecoder(src, in);
+                    CountDownLatch latch = new CountDownLatch(1);
+                    decoder = createDecoder(client, latch);
                     
                     ResponseMessage response = (ResponseMessage)decoder.read();
+                    boolean hasContent = handleContent(response);
                     
-                    hasContent = handleContent(response);
+                    boolean success = handleResponse(response);
                     
-                    success = handleResponse(response);
+                    if (success && hasContent) {
+                        latch.await();
+                    }
                     
-                } catch (IOException err) {
+                } catch (Exception err) {
                     uncaughtException(client, err);
                     handleException(request, err);
                     
                 } finally {
-                    if (!hasContent || !success) {
-                        close(client, encoder, decoder);
-                    }
+                    close(client, encoder, decoder);
                 }
             }
         };
@@ -271,6 +254,33 @@ public class SocketTransport extends AbstractTransport implements Closeable {
         EXECUTOR.execute(task);
     }
     
+    private Encoder createEncoder(Socket client) throws IOException {
+        return codec.createEncoder(new BufferedOutputStream(
+                    client.getOutputStream()));
+    }
+    
+    private Decoder createDecoder(Socket client) throws IOException {
+        return createDecoder(client, null);
+    }
+    
+    private Decoder createDecoder(Socket client, final CountDownLatch latch) throws IOException {
+        SocketAddress addr = client.getRemoteSocketAddress();
+        
+        SocketInputStream sis = new SocketInputStream(client) {
+            @Override
+            public void close() throws IOException {
+                try {
+                    super.close();
+                } finally {
+                    if (latch != null) { latch.countDown(); };
+                }
+            }
+        };
+        
+        return codec.createDecoder(addr, 
+                new BufferedInputStream(sis));
+    }
+
     private static void configure(Socket client) throws SocketException {
         client.setSoLinger(true, 0);
     }
@@ -304,7 +314,7 @@ public class SocketTransport extends AbstractTransport implements Closeable {
         IoUtils.close(client);
     }
     
-    private static InputStream getInputStream(final Socket client) throws IOException {
+    /*private static InputStream getInputStream(final Socket client) throws IOException {
         final Object lock = new Object();
         synchronized (lock) {
             IdleCallback callback = new IdleAdapter() {
@@ -327,6 +337,36 @@ public class SocketTransport extends AbstractTransport implements Closeable {
             return new IdleInputStream(new BufferedInputStream(
                     client.getInputStream()), 
                     callback, 5L, 5L, TimeUnit.SECONDS);
+        }
+    }*/
+    
+    private static class SocketInputStream extends FilterInputStream {
+        
+        private boolean open = true;
+        
+        public SocketInputStream(Socket socket) throws IOException {
+            super(socket.getInputStream());
+        }
+
+        @Override
+        public int read() throws IOException {
+            if (!open) {
+                throw new IOException();
+            }
+            return super.read();
+        }
+
+        @Override
+        public int read(byte[] b, int off, int len) throws IOException {
+            if (!open) {
+                throw new IOException();
+            }
+            return super.read(b, off, len);
+        }
+
+        @Override
+        public void close() throws IOException {
+            open = false;
         }
     }
 }
