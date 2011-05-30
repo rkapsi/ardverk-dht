@@ -53,11 +53,21 @@ public class Status extends ContextValue {
     }
     
     private Status(int code, String message, Context context) {
-        super(context);
+        this(code, message, context, null);
+    }
+    
+    private Status(int code, String message, ContextValue value) {
+        this(code, message, value.getContext(), value.getValue());
+    }
+    
+    private Status(int code, String message, Context context, Value value) {
+        super(context, value);
         this.code = code;
         this.message = message;
         
-        setHeader(Constants.NO_CONTENT);
+        if (value == null) {
+            setHeader(Constants.NO_CONTENT);
+        }
     }
     
     @Override

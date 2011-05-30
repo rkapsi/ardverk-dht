@@ -250,7 +250,7 @@ public class ObjectDatabase extends AbstractDatabase {
         
         private static final long serialVersionUID = -8794611016380746313L;
         
-        private final Properties properties = new DefaultProperties();
+        private final Properties properties = new ObjectProperties();
         
         private final KUID bucketId;
         

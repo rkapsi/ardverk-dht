@@ -6,16 +6,22 @@ import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.HeaderGroup;
 
-public class DefaultProperties implements Properties {
+public class ObjectProperties implements Properties {
 
     protected final HeaderGroup group;
     
-    public DefaultProperties() {
+    public ObjectProperties() {
         this(new HeaderGroup());
     }
     
-    public DefaultProperties(HeaderGroup group) {
+    public ObjectProperties(HeaderGroup group) {
         this.group = group;
+    }
+    
+    public ObjectProperties(Properties properties) {
+        this();
+        
+        setHeaders(properties.getHeaders());
     }
     
     @Override

@@ -13,7 +13,8 @@ import org.ardverk.io.DataUtils;
 import org.ardverk.io.Writable;
 import org.ardverk.utils.StringUtils;
 
-public class Context extends DefaultProperties implements Writable {
+public final class Context extends ObjectProperties 
+        implements Cloneable, Writable {
 
     public Context() {
         super();
@@ -21,6 +22,10 @@ public class Context extends DefaultProperties implements Writable {
 
     public Context(HeaderGroup group) {
         super(group);
+    }
+    
+    public Context(Context context) {
+        super(context);
     }
     
     public String getStringValue(String name) {
@@ -48,6 +53,11 @@ public class Context extends DefaultProperties implements Writable {
 
     public String getETag() {
         return getStringValue(Constants.ETAG);
+    }
+    
+    @Override 
+    public Context clone() {
+        return new Context(this);
     }
     
     public static Context valueOf(InputStream in) throws IOException {
