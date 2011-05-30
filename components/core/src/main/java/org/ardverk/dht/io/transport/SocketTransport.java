@@ -21,13 +21,13 @@ import java.io.BufferedOutputStream;
 import java.io.Closeable;
 import java.io.FilterInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketException;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -43,7 +43,9 @@ import org.ardverk.dht.message.RequestMessage;
 import org.ardverk.dht.message.ResponseMessage;
 import org.ardverk.dht.rsrc.NoValue;
 import org.ardverk.dht.rsrc.Value;
+import org.ardverk.dht.utils.Idle;
 import org.ardverk.io.IoUtils;
+import org.ardverk.io.ProgressInputStream;
 import org.ardverk.net.NetworkUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -229,8 +231,8 @@ public class SocketTransport extends AbstractTransport implements Closeable {
                     encoder.write(request);
                     encoder.flush();
                     
-                    CountDownLatch latch = new CountDownLatch(1);
-                    decoder = createDecoder(client, latch);
+                    Idle idle = new Idle();
+                    decoder = createDecoder(client, idle);
                     
                     ResponseMessage response = (ResponseMessage)decoder.read();
                     boolean hasContent = handleContent(response);
@@ -238,7 +240,7 @@ public class SocketTransport extends AbstractTransport implements Closeable {
                     boolean success = handleResponse(response);
                     
                     if (success && hasContent) {
-                        latch.await();
+                        idle.await(10L, TimeUnit.SECONDS);
                     }
                     
                 } catch (Exception err) {
@@ -263,22 +265,17 @@ public class SocketTransport extends AbstractTransport implements Closeable {
         return createDecoder(client, null);
     }
     
-    private Decoder createDecoder(Socket client, final CountDownLatch latch) throws IOException {
+    private Decoder createDecoder(Socket client, final Idle idle) throws IOException {
         SocketAddress addr = client.getRemoteSocketAddress();
         
-        SocketInputStream sis = new SocketInputStream(client) {
-            @Override
-            public void close() throws IOException {
-                try {
-                    super.close();
-                } finally {
-                    if (latch != null) { latch.countDown(); };
-                }
-            }
-        };
+        InputStream in = new BufferedInputStream(
+                new SocketInputStream(client));
         
-        return codec.createDecoder(addr, 
-                new BufferedInputStream(sis));
+        if (idle != null) {
+            in = new ProgressInputStream(in, idle);
+        }
+        
+        return codec.createDecoder(addr, in);
     }
 
     private static void configure(Socket client) throws SocketException {
