@@ -77,7 +77,7 @@ public class ObjectDatabase extends AbstractDatabase {
     @Override
     public Value store(Contact src, Key key, Value value) {
         if (!isInBucket(key)) {
-            return Status.INTERNAL_SERVER_ERROR;
+            return ResponseValue.INTERNAL_SERVER_ERROR;
         }
         
         InputStream in = null;
@@ -87,7 +87,7 @@ public class ObjectDatabase extends AbstractDatabase {
             return store(key, context, in);
         } catch (Exception err) {
             LOG.error("Exception", err);
-            return Status.INTERNAL_SERVER_ERROR;
+            return ResponseValue.INTERNAL_SERVER_ERROR;
         } finally {
             IoUtils.close(in);
         }
@@ -111,7 +111,7 @@ public class ObjectDatabase extends AbstractDatabase {
         if (!ArrayUtils.isEmpty(contentMD5s)) {
             byte[] decoded = Base64.decodeBase64(contentMD5s[0].getValue());
             if (!Arrays.equals(decoded, digest)) {
-                return Status.INTERNAL_SERVER_ERROR;
+                return ResponseValue.INTERNAL_SERVER_ERROR;
             }
             
             // Remove the Content-MD5s and replace it/them with an ETag!
@@ -123,7 +123,7 @@ public class ObjectDatabase extends AbstractDatabase {
         
         put(key, vclock, new ContextValue(context, new ByteArrayValue(data)));
         
-        return Status.createOk(vclock);
+        return ResponseValue.createOk(vclock);
     }
     
     private synchronized void put(Key key, VectorClock<KUID> vclock, ContextValue value) {
@@ -165,14 +165,14 @@ public class ObjectDatabase extends AbstractDatabase {
         
         ContextValue[] values = getValues(key);
         if (ArrayUtils.isEmpty(values)) {
-            return Status.NOT_FOUND;
+            return ResponseValue.NOT_FOUND;
         }
         
         if (values.length == 1) {
             return CollectionUtils.first(values);
         }
         
-        return Status.MULTIPLE_CHOICES;
+        return ResponseValue.MULTIPLE_CHOICES;
     }
     
     private synchronized ContextValue[] getValues(Key key) {

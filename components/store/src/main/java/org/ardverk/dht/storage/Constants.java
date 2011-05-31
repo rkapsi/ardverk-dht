@@ -5,7 +5,7 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 
 class Constants {
-
+    
     public static final String CLIENT_ID = "X-Ardverk-ClientId";
     
     public static final String CREATOR_KEY = "X-Ardverk-Creator";
@@ -24,5 +24,16 @@ class Constants {
     
     public static final Header NO_CONTENT = new BasicHeader(HTTP.CONTENT_LEN, "0");
 
+    public static final Header SERVER = new BasicHeader(HTTP.SERVER_HEADER, "Ardverk-DHT/0.1");
+    
     private Constants() {}
+    
+    public static Header date() {
+        return new BasicHeader(HTTP.DATE_HEADER, DateUtils.now());
+    }
+    
+    public static void init(Properties properties) {
+        properties.setHeader(date());
+        properties.setHeader(SERVER);
+    }
 }
