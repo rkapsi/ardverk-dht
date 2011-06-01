@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.apache.http.protocol.HTTP;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.rsrc.Value;
-import org.ardverk.io.DataUtils;
 import org.ardverk.io.IoUtils;
 import org.ardverk.version.VectorClock;
 
@@ -34,40 +34,43 @@ public class ResponseValue extends AbstractContextValue {
     
     public static ResponseValue createMultipleChoice(ContextValue... values) {
         ResponseValue response = new ResponseValue(StatusLine.MULTIPLE_CHOICES);
-        
+        response.setHeader(Constants.XML);
         return response;
     }
     
     private final StatusLine status;
     
-    private final Value value;
+    private volatile ValueEntity entity = null;
     
     public ResponseValue(StatusLine status) {
         this(status, new Context());
     }
 
     public ResponseValue(StatusLine status, Context context) {
-        this(status, context, null);
-    }
-    
-    public ResponseValue(StatusLine status, 
-            Context context, Value value) {
         super(context);
         
         this.status = status;
-        this.value = value;
         
         Constants.init(context);
-        
-        if (value == null) {
-            setHeader(Constants.NO_CONTENT);
+        setHeader(Constants.NO_CONTENT);
+    }
+    
+    public ValueEntity getEntity() {
+        return entity;
+    }
+
+    public void setEntity(ValueEntity entity) {
+        if (entity == null) {
+            removeHeaders(HTTP.CONTENT_LEN);
+            removeHeaders(HTTP.CONTENT_TYPE);
+        } else {
+            setHeader(HTTP.CONTENT_LEN, Long.toString(entity.getContentLength()));
+            setHeader(HTTP.CONTENT_TYPE, entity.getContentType());
         }
+        
+        this.entity = entity;
     }
-    
-    public Value getValue() {
-        return value;
-    }
-    
+
     @Override
     protected void writeContext(OutputStream out) throws IOException {
         status.writeTo(out);
@@ -76,10 +79,9 @@ public class ResponseValue extends AbstractContextValue {
     
     @Override
     protected void writeValue(OutputStream out) throws IOException {
-        DataUtils.bool(value != null, out);
-        
-        if (value != null) {
-            value.writeTo(out);
+        ValueEntity entity = this.entity;
+        if (entity != null) {
+            entity.writeTo(out);
         }
     }
 
@@ -100,12 +102,6 @@ public class ResponseValue extends AbstractContextValue {
     public static ResponseValue valueOf(InputStream in) throws IOException {
         StatusLine status = StatusLine.valueOf(in);
         Context context = Context.valueOf(in);
-        
-        Value value = null;
-        
-        if (DataUtils.bool(in)) {
-            
-        }
         
         return new ResponseValue(status, context);
     }

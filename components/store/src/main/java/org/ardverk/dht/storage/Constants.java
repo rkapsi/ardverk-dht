@@ -26,6 +26,8 @@ class Constants {
 
     public static final Header SERVER = new BasicHeader(HTTP.SERVER_HEADER, "Ardverk-DHT/0.1");
     
+    public static final Header XML = new BasicHeader(HTTP.CONTENT_TYPE, XML_TEXT_TYPE);
+    
     private Constants() {}
     
     public static Header date() {
