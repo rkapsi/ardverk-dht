@@ -16,6 +16,16 @@ public class ContextValue extends ContextValueBase {
     public ContextValue(Context context) {
         super(context);
     }
+    
+    public ContextValue(ValueEntity entity) {
+        this(new Context(), entity);
+    }
+    
+    public ContextValue(Context context, ValueEntity entity) {
+        super(context);
+        
+        this.entity = entity;
+    }
 
     public ValueEntity getEntity() {
         return entity;

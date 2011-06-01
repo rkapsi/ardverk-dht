@@ -12,7 +12,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.http.protocol.HTTP;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.rsrc.ByteArrayValue;
 import org.ardverk.dht.rsrc.Value;
 import org.ardverk.dht.storage.io.ValueInputStream;
 import org.ardverk.dht.storage.io.ValueOutputStream;
@@ -25,7 +24,7 @@ public class DefaultObjectValue extends ContextValue {
 
     public DefaultObjectValue(Contact creator, 
             VectorClock<KUID> clock, byte[] value) {
-        super(new ByteArrayValue(value));
+        super(new ByteArrayValueEntity(value));
         
         if (creator != null) {
             addHeader(Constants.CREATOR_KEY, encodeContact(creator));
@@ -35,7 +34,7 @@ public class DefaultObjectValue extends ContextValue {
         addHeader(HTTP.CONTENT_LEN, Long.toString(value.length));
     }
     
-    private DefaultObjectValue(Context context, Value value) {
+    private DefaultObjectValue(Context context, ValueEntity value) {
         super(context, value);
     }
 
@@ -63,7 +62,7 @@ public class DefaultObjectValue extends ContextValue {
         byte[] data = new byte[(int)length];
         StreamUtils.readFully(in, data);
         
-        return new DefaultObjectValue(context, new ByteArrayValue(data));
+        return new DefaultObjectValue(context, new ByteArrayValueEntity(data));
     }
     
     private static Contact decodeContact(String value) {

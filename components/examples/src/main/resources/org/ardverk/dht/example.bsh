@@ -143,7 +143,7 @@ get(String key) {
 get(DHT dht, String key) {
 	DHTFuture future = dht.get(toKey(key));
 	
-	ValueEntity entity = future.get();
+	org.ardverk.dht.entity.ValueEntity entity = future.get();
 	DefaultObjectValue value = DefaultObjectValue.valueOf(entity.getValue());
 	
 	KUID senderId = entity.getSender().getId();

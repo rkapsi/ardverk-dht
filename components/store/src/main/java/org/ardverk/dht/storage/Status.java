@@ -57,11 +57,11 @@ public class Status extends ContextValue {
     }
     
     private Status(int code, String message, ContextValue value) {
-        this(code, message, value.getContext(), value.getValue());
+        this(code, message, value.getContext(), value.getEntity());
     }
     
-    private Status(int code, String message, Context context, Value value) {
-        super(context, value);
+    private Status(int code, String message, Context context, ValueEntity entity) {
+        super(context, entity);
         this.code = code;
         this.message = message;
         

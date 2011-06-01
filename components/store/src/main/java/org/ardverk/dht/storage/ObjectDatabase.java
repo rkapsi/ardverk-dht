@@ -40,7 +40,6 @@ import org.ardverk.collection.Trie;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.lang.Identifier;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.rsrc.ByteArrayValue;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.Value;
 import org.ardverk.io.IoUtils;
@@ -121,7 +120,8 @@ public class ObjectDatabase extends AbstractDatabase {
         String etag = "\"" + CodingUtils.encodeBase16(digest) + "\"";
         context.setHeader(Constants.ETAG, etag);
         
-        put(key, vclock, new ContextValue(context, new ByteArrayValue(data)));
+        put(key, vclock, new ContextValue(context, 
+                new ByteArrayValueEntity(data)));
         
         return ResponseValue.createOk(vclock);
     }
