@@ -4,7 +4,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class InputStreamValue extends AbstractValue implements Closeable {
+public class InputStreamValue extends DefaultValue implements Closeable {
     
     private final InputStream in;
     

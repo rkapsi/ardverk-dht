@@ -23,7 +23,7 @@ import java.io.OutputStream;
 import org.ardverk.io.IoUtils;
 import org.ardverk.io.StreamUtils;
 
-public abstract class AbstractValue implements Value {
+public class DefaultValue implements Value {
     
     @Override
     public boolean isRepeatable() {

@@ -23,7 +23,7 @@ import java.io.OutputStream;
 
 import org.ardverk.utils.StringUtils;
 
-public class ByteArrayValue extends AbstractValue {
+public class ByteArrayValue extends DefaultValue {
     
     private final byte[] data;
     

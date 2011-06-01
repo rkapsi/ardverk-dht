@@ -5,20 +5,20 @@ import java.io.OutputStream;
 import java.util.Iterator;
 
 import org.apache.http.Header;
-import org.ardverk.dht.rsrc.AbstractValue;
+import org.ardverk.dht.rsrc.DefaultValue;
 
-abstract class AbstractContextValue extends AbstractValue implements Properties {
+class ContextValueBase extends DefaultValue implements Properties {
 
     protected final Context context;
     
-    public AbstractContextValue() {
+    public ContextValueBase() {
         this(new Context());
     }
     
-    public AbstractContextValue(Context context) {
+    public ContextValueBase(Context context) {
         this.context = context;
     }
-    
+
     public Context getContext() {
         return context;
     }
@@ -101,14 +101,11 @@ abstract class AbstractContextValue extends AbstractValue implements Properties 
     @Override
     public void writeTo(OutputStream out) throws IOException {
         writeContext(out);
-        writeValue(out);
     }
     
     protected void writeContext(OutputStream out) throws IOException {
         context.writeTo(out);
     }
-    
-    protected abstract void writeValue(OutputStream out) throws IOException;
     
     @Override
     public String toString() {

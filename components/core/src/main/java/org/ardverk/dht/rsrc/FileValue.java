@@ -25,7 +25,7 @@ import java.io.InputStream;
 /**
  * {@link FileValue} reads its data from a {@link File}.
  */
-public class FileValue extends AbstractValue {
+public class FileValue extends DefaultValue {
     
     private final File file;
     
