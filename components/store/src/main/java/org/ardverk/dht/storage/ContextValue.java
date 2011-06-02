@@ -5,12 +5,12 @@ import java.io.OutputStream;
 
 import org.apache.http.protocol.HTTP;
 
-public class ContextValue extends ContextValueBase {
+public class ContextValue extends PropertiesValue<Context> {
     
     protected volatile ValueEntity entity = null;
     
     public ContextValue() {
-        super();
+        this(new Context());
     }
 
     public ContextValue(Context context) {

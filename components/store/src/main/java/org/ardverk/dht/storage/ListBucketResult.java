@@ -39,7 +39,7 @@ public class ListBucketResult extends ContextValue {
         this.maxKeys = maxKeys;
         this.objects = objects;
         
-        context.setHeader(HTTP.CONTENT_TYPE, Constants.XML_TEXT_TYPE);
+        properties.setHeader(HTTP.CONTENT_TYPE, Constants.XML_TEXT_TYPE);
     }
     
     @Override

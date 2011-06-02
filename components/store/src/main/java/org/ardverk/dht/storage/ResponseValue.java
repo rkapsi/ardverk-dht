@@ -9,7 +9,7 @@ import org.ardverk.dht.rsrc.Value;
 import org.ardverk.io.IoUtils;
 import org.ardverk.version.VectorClock;
 
-public class ResponseValue extends ContextValueBase {
+public class ResponseValue extends PropertiesValue {
 
     public static final ResponseValue OK = new ResponseValue(StatusLine.OK);
     

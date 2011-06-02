@@ -21,7 +21,7 @@ import org.ardverk.utils.StringUtils;
 import org.ardverk.version.VectorClock;
 
 public class DefaultObjectValue extends ContextValue {
-
+    
     public DefaultObjectValue(Contact creator, 
             VectorClock<KUID> clock, byte[] value) {
         super(new ByteArrayValueEntity(value));
@@ -39,7 +39,7 @@ public class DefaultObjectValue extends ContextValue {
     }
 
     public Contact getCreator() {
-        return decodeContact(getContext().getStringValue(Constants.CREATOR_KEY));
+        return decodeContact(getProperties().getStringValue(Constants.CREATOR_KEY));
     }
     
     public static DefaultObjectValue valueOf(Value value) throws IOException {
@@ -138,7 +138,7 @@ public class DefaultObjectValue extends ContextValue {
     }
     
     public static VectorClock<KUID> getVectorClock(ContextValue value) {
-        return getVectorClock(value.getContext());
+        return getVectorClock(value.getProperties());
     }
     
     public static VectorClock<KUID> getVectorClock(Context context) {

@@ -6,96 +6,94 @@ import java.util.Iterator;
 
 import org.apache.http.Header;
 import org.ardverk.dht.rsrc.DefaultValue;
+import org.ardverk.io.Writable;
 
-class ContextValueBase extends DefaultValue implements Properties {
+class PropertiesValue<T extends Properties & Writable> 
+        extends DefaultValue implements Properties {
 
-    protected final Context context;
+    protected final T properties;
     
-    public ContextValueBase() {
-        this(new Context());
-    }
-    
-    public ContextValueBase(Context context) {
-        this.context = context;
+    public PropertiesValue(T properties) {
+        this.properties = properties;
     }
 
-    public Context getContext() {
-        return context;
+    public T getProperties() {
+        return properties;
     }
     
     @Override
     public Iterator<Header> iterator() {
-        return context.iterator();
+        return properties.iterator();
     }
 
     @Override
     public boolean containsHeader(String name) {
-        return context.containsHeader(name);
+        return properties.containsHeader(name);
     }
 
     @Override
     public void addHeader(String name, String value) {
-        context.addHeader(name, value);
+        properties.addHeader(name, value);
     }
 
     @Override
     public void addHeader(Header header) {
-        context.addHeader(header);
+        properties.addHeader(header);
     }
 
     @Override
     public Header[] getHeaders() {
-        return context.getHeaders();
+        return properties.getHeaders();
     }
 
     @Override
     public Header getFirstHeader(String name) {
-        return context.getFirstHeader(name);
+        return properties.getFirstHeader(name);
     }
 
     @Override
     public Header[] getHeaders(String name) {
-        return context.getHeaders(name);
+        return properties.getHeaders(name);
     }
 
     @Override
     public Header getLastHeader(String name) {
-        return context.getLastHeader(name);
+        return properties.getLastHeader(name);
     }
 
     @Override
     public void setHeader(String name, String value) {
-        context.setHeader(name, value);
+        properties.setHeader(name, value);
     }
 
     @Override
     public void setHeader(Header header) {
-        context.setHeader(header);
+        properties.setHeader(header);
     }
 
     @Override
     public void setHeaders(Header... h) {
-        context.setHeaders(h);
+        properties.setHeaders(h);
     }
 
     @Override
     public Header[] removeHeaders(String name) {
-        return context.removeHeaders(name);
+        return properties.removeHeaders(name);
     }
 
     @Override
     public void removeHeader(Header header) {
-        context.removeHeader(header);
+        properties.removeHeader(header);
     }
 
     @Override
     public void removeHeaders(Header... headers) {
-        context.removeHeaders(headers);
+        properties.removeHeaders(headers);
     }
 
     @Override
     public Iterator<Header> iterator(String name) {
-        return context.iterator(name);
+        return properties.iterator(name);
     }
     
     @Override
@@ -104,11 +102,11 @@ class ContextValueBase extends DefaultValue implements Properties {
     }
     
     protected void writeContext(OutputStream out) throws IOException {
-        context.writeTo(out);
+        properties.writeTo(out);
     }
     
     @Override
     public String toString() {
-        return context.toString();
+        return properties.toString();
     }
 }

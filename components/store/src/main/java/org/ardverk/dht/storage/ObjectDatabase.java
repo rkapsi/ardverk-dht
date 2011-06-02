@@ -82,7 +82,10 @@ public class ObjectDatabase extends AbstractDatabase {
         InputStream in = null;
         try {
             in = value.getContent();
+            
+            //Method method = Method.valueOf(in);
             Context context = Context.valueOf(in);
+            
             return store(key, context, in);
         } catch (Exception err) {
             LOG.error("Exception", err);
