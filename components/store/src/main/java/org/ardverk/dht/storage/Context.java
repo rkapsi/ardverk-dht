@@ -3,61 +3,122 @@ package org.ardverk.dht.storage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.NoSuchElementException;
+import java.util.Iterator;
 
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.HeaderGroup;
-import org.apache.http.protocol.HTTP;
 import org.ardverk.io.DataUtils;
 import org.ardverk.io.Writable;
 import org.ardverk.utils.StringUtils;
 
-public final class Context extends ObjectProperties 
-        implements Cloneable, Writable {
-
+public final class Context implements Properties, Writable, Cloneable {
+    
+    protected final HeaderGroup group;
+    
     public Context() {
-        super();
+        this(new HeaderGroup());
     }
-
+    
     public Context(HeaderGroup group) {
-        super(group);
+        this.group = group;
     }
     
     public Context(Context context) {
-        super(context);
+        this();
+        
+        setHeaders(context.getHeaders());
     }
     
-    public String getStringValue(String name) {
-        Header header = getFirstHeader(name);
-        if (header != null) {
-            return header.getValue();
-        }
-        throw new NoSuchElementException(name);
-    }
-    
-    public long getLongValue(String name) {
-        return Long.parseLong(getStringValue(name));
-    }
-    
-    public long getLastModified() {
-        return getLongValue(Constants.LAST_MODIFIED);
+    @Override
+    public boolean containsHeader(String name) {
+        return group.containsHeader(name);
     }
 
-    public long getContentLength() {
-        if (containsHeader(HTTP.CONTENT_LEN)) {
-            return getLongValue(HTTP.CONTENT_LEN);
-        }
-        return -1L;
+    @Override
+    public void addHeader(String name, String value) {
+        addHeader(new BasicHeader(name, value));
     }
 
-    public String getETag() {
-        return getStringValue(Constants.ETAG);
+    @Override
+    public void addHeader(Header header) {
+        group.addHeader(header);
+    }
+
+    @Override
+    public Header[] getHeaders() {
+        return group.getAllHeaders();
+    }
+
+    @Override
+    public Header getFirstHeader(String name) {
+        return group.getFirstHeader(name);
+    }
+
+    @Override
+    public Header[] getHeaders(String name) {
+        return group.getHeaders(name);
+    }
+
+    @Override
+    public Header getLastHeader(String name) {
+        return group.getLastHeader(name);
+    }
+
+    @Override
+    public void setHeader(String name, String value) {
+        setHeader(new BasicHeader(name, value));
     }
     
-    @Override 
+    @Override
+    public void setHeader(Header header) {
+        group.updateHeader(header);
+    }
+
+    @Override
+    public void setHeaders(Header... h) {
+        group.setHeaders(h);
+    }
+
+    @Override
+    public Header[] removeHeaders(String name) {
+        Header[] headers = getHeaders(name);
+        removeHeaders(headers);
+        return headers;
+    }
+
+    @Override
+    public void removeHeader(Header header) {
+        group.removeHeader(header);
+    }
+    
+    @Override
+    public void removeHeaders(Header... headers) {
+        for (Header header : headers) {
+            group.removeHeader(header);
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Override
+    public Iterator<Header> iterator() {
+        return group.iterator();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Iterator<Header> iterator(String name) {
+        return group.iterator(name);
+    }
+    
+    @Override
     public Context clone() {
         return new Context(this);
+    }
+    
+    @Override
+    public String toString() {
+        return group.toString();
     }
     
     public static Context valueOf(InputStream in) throws IOException {

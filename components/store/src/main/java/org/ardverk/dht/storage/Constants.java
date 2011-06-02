@@ -4,7 +4,7 @@ import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 
-class Constants {
+public class Constants {
     
     public static final String CLIENT_ID = "X-Ardverk-ClientId";
     

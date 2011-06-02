@@ -17,11 +17,20 @@ public class ByteArrayValueEntity extends AbstractValueEntity {
     private final int length;
     
     public ByteArrayValueEntity(byte[] data) {
-        this(data, 0, data.length);
+        this(HTTP.OCTET_STREAM_TYPE, data);
+    }
+    
+    public ByteArrayValueEntity(String contentType, byte[] data) {
+        this(contentType, data, 0, data.length);
     }
     
     public ByteArrayValueEntity(byte[] data, int offset, int length) {
-        super(HTTP.OCTET_STREAM_TYPE, length);
+        this(HTTP.OCTET_STREAM_TYPE, data, offset, length);
+    }
+    
+    public ByteArrayValueEntity(String contentType, 
+            byte[] data, int offset, int length) {
+        super(contentType, length);
         
         this.data = data;
         this.offset = offset;

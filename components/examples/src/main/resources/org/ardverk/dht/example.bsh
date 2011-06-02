@@ -129,7 +129,7 @@ put(DHT dht, String key, String value) {
 		
 	PutEntity entity = future.get();
 	for (StoreResponse response : entity.getStoreResponses()) {
-	  ResponseValue status = ResponseValue.valueOf(response.getValue());
+	  org.ardverk.dht.storage.Response status = org.ardverk.dht.storage.Response.valueOf(response.getValue());
 		print("PUT: " + response.getContact().getId() + " -> " + status);
 	}
 }
@@ -144,14 +144,10 @@ get(DHT dht, String key) {
 	DHTFuture future = dht.get(toKey(key));
 	
 	org.ardverk.dht.entity.ValueEntity entity = future.get();
-	DefaultObjectValue value = DefaultObjectValue.valueOf(entity.getValue());
+	org.ardverk.dht.storage.Response value = org.ardverk.dht.storage.Response.valueOf(entity.getValue());
 	
 	KUID senderId = entity.getSender().getId();
 	KUID creatorId = null;
-	
-	if (value instanceof DefaultObjectValue) {
-	  creatorId = value.getCreator().getId();
-	}
 	
 	print("GET: " + entity.getId() + " (" + key + ")" + " -> " 
 		+ value
@@ -170,7 +166,7 @@ toValue(String value) {
   //byte[] raw = StringUtils.getBytes(value);
   //byte[] data = new byte[1024 * 1024];
   //System.arraycopy(raw, 0, data, 0, raw.length);
-	return new DefaultObjectValue(dhts.get(current).getLocalhost(), null, StringUtils.getBytes(value));
+	return new org.ardverk.dht.storage.DefaultRequest(dhts.get(current).getLocalhost(), new ByteArrayValueEntity(StringUtils.getBytes(value)));
 }
 
 // Closes all DHTs

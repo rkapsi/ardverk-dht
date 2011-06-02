@@ -5,20 +5,20 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.ardverk.collection.CollectionUtils;
-import org.ardverk.dht.rsrc.Value;
+import org.ardverk.dht.KUID;
 import org.ardverk.version.Occured;
 import org.ardverk.version.VectorClock;
 
-public class VclockMap<K, V extends Value> {
+public class VclockMap {
     
-    private final Map<VectorClock<K>, V> map 
-        = new LinkedHashMap<VectorClock<K>, V>();
+    private final Map<VectorClock<KUID>, Entry> map 
+        = new LinkedHashMap<VectorClock<KUID>, Entry>();
     
-    public void upsert(VectorClock<K> clock, V value) {
+    public void upsert(VectorClock<KUID> clock, Context context, ValueEntity value) {
         
-        Iterator<VectorClock<K>> it = map.keySet().iterator();
+        Iterator<VectorClock<KUID>> it = map.keySet().iterator();
         while (it.hasNext()) {
-            VectorClock<K> existing = it.next();
+            VectorClock<KUID> existing = it.next();
             
             Occured occured = VclockUtils.compare(existing, clock);
             switch (occured) {
@@ -34,23 +34,19 @@ public class VclockMap<K, V extends Value> {
             }
         }
         
-        map.put(clock, value);
+        map.put(clock, new Entry(context, value));
     }
     
-    public boolean remove(VectorClock<K> clock) {
+    public boolean remove(VectorClock<?> clock) {
         return map.remove(clock) != null;
     }
     
-    public V value() {
+    public Entry value() {
         return CollectionUtils.last(map.values());
     }
     
-    /*public Value[] values() {
-        return values(Value.class);
-    }*/
-    
-    public V[] values(Class<V> clazz) {
-        return CollectionUtils.toArray(map.values(), clazz);
+    public Entry[] values() {
+        return CollectionUtils.toArray(map.values(), Entry.class);
     }
     
     public int size() {
@@ -59,5 +55,25 @@ public class VclockMap<K, V extends Value> {
     
     public boolean isEmpty() {
         return map.isEmpty();
+    }
+    
+    public static class Entry {
+        
+        private final Context context;
+        
+        private final ValueEntity entity;
+
+        public Entry(Context context, ValueEntity entity) {
+            this.context = context;
+            this.entity = entity;
+        }
+
+        public Context getContext() {
+            return context;
+        }
+
+        public ValueEntity getValueEntity() {
+            return entity;
+        }
     }
 }

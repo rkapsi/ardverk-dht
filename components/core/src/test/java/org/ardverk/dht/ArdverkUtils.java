@@ -47,7 +47,6 @@ import org.ardverk.dht.rsrc.DefaultKey;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.Value;
 import org.ardverk.dht.storage.Database;
-import org.ardverk.dht.storage.DefaultObjectValue;
 import org.ardverk.io.IoUtils;
 import org.ardverk.utils.StringUtils;
 import org.ardverk.version.VectorClock;
@@ -202,7 +201,8 @@ public class ArdverkUtils {
             int rnd = (int)(dhts.size() * Math.random());
             Contact contact = dhts.get(rnd).getLocalhost();
             
-            Value value = new DefaultObjectValue(contact, clock, data);
+            //Value value = new DefaultObjectValue(contact, clock, data);
+            Value value = null;
             
             future = dhts.get(rnd).put(key, value, putConfig);
             

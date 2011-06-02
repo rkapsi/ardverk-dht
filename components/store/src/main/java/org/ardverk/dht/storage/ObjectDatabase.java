@@ -32,6 +32,7 @@ import java.util.Set;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.Header;
+import org.apache.http.protocol.HTTP;
 import org.ardverk.coding.CodingUtils;
 import org.ardverk.collection.CollectionUtils;
 import org.ardverk.collection.Cursor;
@@ -74,32 +75,39 @@ public class ObjectDatabase extends AbstractDatabase {
     }
     
     @Override
-    public Value store(Contact src, Key key, Value value) {
+    public Response store(Contact src, Key key, Value value) {
         if (!isInBucket(key)) {
-            return ResponseValue.INTERNAL_SERVER_ERROR;
+            return Response.INTERNAL_SERVER_ERROR;
         }
         
         InputStream in = null;
         try {
             in = value.getContent();
             
-            //Method method = Method.valueOf(in);
+            Method method = Method.valueOf(in);
+            switch (method) {
+                case PUT:
+                    break;
+                default:
+                    throw new IOException(method.toString());
+            }
+            
             Context context = Context.valueOf(in);
             
             return store(key, context, in);
         } catch (Exception err) {
             LOG.error("Exception", err);
-            return ResponseValue.INTERNAL_SERVER_ERROR;
+            return Response.INTERNAL_SERVER_ERROR;
         } finally {
             IoUtils.close(in);
         }
     }
     
-    private Value store(Key key, Context context, InputStream in) throws IOException {
+    private Response store(Key key, Context context, InputStream in) throws IOException {
         
         VectorClock<KUID> vclock = VclockUtils.valueOf(context);
         
-        long length = context.getContentLength();
+        long length = ContextUtils.getContentLength(context);
         byte[] data = new byte[(int)Math.max(0L, length)];
         
         MessageDigest md = MessageDigestUtils.createMD5();
@@ -113,7 +121,7 @@ public class ObjectDatabase extends AbstractDatabase {
         if (!ArrayUtils.isEmpty(contentMD5s)) {
             byte[] decoded = Base64.decodeBase64(contentMD5s[0].getValue());
             if (!Arrays.equals(decoded, digest)) {
-                return ResponseValue.INTERNAL_SERVER_ERROR;
+                return Response.INTERNAL_SERVER_ERROR;
             }
             
             // Remove the Content-MD5s and replace it/them with an ETag!
@@ -123,13 +131,19 @@ public class ObjectDatabase extends AbstractDatabase {
         String etag = "\"" + CodingUtils.encodeBase16(digest) + "\"";
         context.setHeader(Constants.ETAG, etag);
         
-        put(key, vclock, new ContextValue(context, 
-                new ByteArrayValueEntity(data)));
+        String contentType = HTTP.OCTET_STREAM_TYPE;
+        if (context.containsHeader(HTTP.CONTENT_TYPE)) {
+            contentType = ContextUtils.getStringValue(context, HTTP.CONTENT_TYPE);
+        }
         
-        return ResponseValue.createOk(vclock);
+        ValueEntity entity = new ByteArrayValueEntity(contentType, data);
+        
+        put(key, vclock, context, entity);
+        
+        return Response.createOk(vclock);
     }
     
-    private synchronized void put(Key key, VectorClock<KUID> vclock, ContextValue value) {
+    private synchronized void put(Key key, VectorClock<KUID> vclock, Context context, ValueEntity entity) {
         KUID bucketId = key.getId();
         
         Bucket bucket = database.get(bucketId);
@@ -138,16 +152,16 @@ public class ObjectDatabase extends AbstractDatabase {
             database.put(bucketId, bucket);
         }
         
-        VclockMap<KUID, ContextValue> map = bucket.get(key);
+        VclockMap map = bucket.get(key);
         if (map == null) {
-            map = new VclockMap<KUID, ContextValue>();
+            map = new VclockMap();
             bucket.put(key, map);
         }
         
-        value.setHeader(Constants.VCLOCK, 
+        context.setHeader(Constants.VCLOCK, 
                 VclockUtils.toString(vclock));
         
-        map.upsert(vclock, value);
+        map.upsert(vclock, context, entity);
     }
     
     public synchronized Set<KUID> getBuckets() {
@@ -155,7 +169,7 @@ public class ObjectDatabase extends AbstractDatabase {
     }
 
     @Override
-    public Value get(Key key) {
+    public Response get(Key key) {
         /*URI uri = key.getURI();
         String query = uri.getQuery();
         if (query != null) {
@@ -166,30 +180,31 @@ public class ObjectDatabase extends AbstractDatabase {
             return null;
         }*/
         
-        ContextValue[] values = getValues(key);
+        VclockMap.Entry[] values = getValues(key);
         if (ArrayUtils.isEmpty(values)) {
-            return ResponseValue.NOT_FOUND;
+            return Response.NOT_FOUND;
         }
         
         if (values.length == 1) {
-            return CollectionUtils.first(values);
+            VclockMap.Entry entry = CollectionUtils.first(values);
+            return Response.createOk(entry.getContext(), entry.getValueEntity());
         }
         
-        return ResponseValue.MULTIPLE_CHOICES;
+        return Response.MULTIPLE_CHOICES;
     }
     
-    private synchronized ContextValue[] getValues(Key key) {
+    private synchronized VclockMap.Entry[] getValues(Key key) {
         Bucket bucket = database.get(key.getId());
         if (bucket == null) {
             return null;
         }
         
-        VclockMap<?, ContextValue> map = bucket.get(key);
+        VclockMap map = bucket.get(key);
         if (map == null) {
             return null;
         }
         
-        return map.values(ContextValue.class);
+        return map.values();
     }
     
     @Override
@@ -248,12 +263,12 @@ public class ObjectDatabase extends AbstractDatabase {
         return sb.toString();
     }
     
-    private static class Bucket extends HashMap<Key, VclockMap<KUID, ContextValue>> 
+    private static class Bucket extends HashMap<Key, VclockMap> 
             implements Identifier {
         
         private static final long serialVersionUID = -8794611016380746313L;
         
-        private final Properties properties = new ObjectProperties();
+        private final Context context = new Context();
         
         private final KUID bucketId;
         
