@@ -1,5 +1,8 @@
 package org.ardverk.dht.storage;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,6 +16,7 @@ import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.ardverk.io.DataUtils;
+import org.ardverk.io.IoUtils;
 import org.ardverk.io.Writable;
 import org.ardverk.utils.StringUtils;
 
@@ -133,6 +137,16 @@ public final class Context implements Properties, Writable, Cloneable {
     @Override
     public String toString() {
         return group.toString();
+    }
+    
+    public static Context valueOf(File file) throws IOException {
+        InputStream in = new BufferedInputStream(
+                new FileInputStream(file));
+        try {
+            return valueOf(in);
+        } finally {
+            IoUtils.close(in);
+        }
     }
     
     public static Context valueOf(InputStream in) throws IOException {

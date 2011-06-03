@@ -16,13 +16,15 @@
 
 package org.ardverk.dht.easy;
 
+import java.io.IOException;
+
 import org.ardverk.dht.message.DefaultMessageFactory;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.routing.DefaultRouteTable;
 import org.ardverk.dht.routing.Localhost;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Database;
-import org.ardverk.dht.storage.ObjectDatabase;
+import org.ardverk.dht.storage.ObjectDatabase2;
 
 public class EasyFactory {
     
@@ -37,7 +39,7 @@ public class EasyFactory {
         MessageFactory messageFactory 
             = new DefaultMessageFactory(keySize, localhost);
         
-        Database database = new ObjectDatabase();
+        Database database = createDatabase();
         //Database database = new SimpleDatabase(new File("database", localhost.getId().toHexString()));
         RouteTable routeTable = new DefaultRouteTable(localhost);
         
@@ -46,4 +48,13 @@ public class EasyFactory {
     }
     
     private EasyFactory() {}
+    
+    
+    private static Database createDatabase() {
+        try {
+            return new ObjectDatabase2();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 }

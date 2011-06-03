@@ -115,8 +115,15 @@ abstract class ContextValue extends DefaultValue implements Properties {
         
         ValueEntity value = this.value;
         if (value != null) {
-            context.addHeader(HTTP.CONTENT_LEN, Long.toString(value.getContentLength()));
-            context.addHeader(HTTP.CONTENT_TYPE, value.getContentType());
+            if (!context.containsHeader(HTTP.CONTENT_LEN)) {
+                context.addHeader(HTTP.CONTENT_LEN, 
+                        Long.toString(value.getContentLength()));
+            }
+            
+            if (!context.containsHeader(HTTP.CONTENT_TYPE)) {
+                context.addHeader(HTTP.CONTENT_TYPE, value.getContentType());
+            }
+            
         } else {
             context.addHeader(Constants.NO_CONTENT);
         }

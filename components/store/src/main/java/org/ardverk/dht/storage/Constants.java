@@ -16,6 +16,8 @@ public class Constants {
     
     public static final String CONTENT_MD5 = "Content-MD5";
     
+    public static final String CONTENT_SHA1 = "Content-SHA1";
+    
     public static final String XML_TEXT_TYPE = "text/xml";
 
     public static final String LAST_MODIFIED = "Last-Modified";
