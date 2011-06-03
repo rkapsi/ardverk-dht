@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.HTTP;
 import org.ardverk.io.DataUtils;
 import org.ardverk.io.Writable;
 import org.ardverk.utils.StringUtils;
@@ -54,6 +55,14 @@ public final class Context implements Properties, Writable, Cloneable {
             return Long.parseLong(value);
         }
         return defaultValue;
+    }
+    
+    public long getContentLength() {
+        return getLongValue(HTTP.CONTENT_LEN, -1L);
+    }
+
+    public String getETag(Context context) {
+        return getStringValue(Constants.ETAG);
     }
     
     @Override

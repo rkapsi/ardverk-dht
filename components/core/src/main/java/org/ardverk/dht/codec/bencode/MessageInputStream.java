@@ -23,8 +23,8 @@ import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.SocketAddress;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.ardverk.coding.BencodingInputStream;
 import org.ardverk.dht.KUID;
@@ -134,7 +134,7 @@ public class MessageInputStream extends BencodingInputStream {
         }
         
         long creationTime = readLong();
-        Map<KUID, Vector> dst = new HashMap<KUID, Vector>(count);
+        SortedMap<KUID, Vector> dst = new TreeMap<KUID, Vector>();
         
         while (0 < count--) {
             KUID contactId = readKUID();

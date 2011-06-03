@@ -47,7 +47,6 @@ import org.ardverk.io.IoUtils;
 import org.ardverk.io.StreamUtils;
 import org.ardverk.security.MessageDigestUtils;
 import org.ardverk.utils.ArrayUtils;
-import org.ardverk.version.VectorClock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,9 +105,8 @@ public class ObjectDatabase extends AbstractDatabase {
         }
         
         Context context = request.getContext();
-        VectorClock<KUID> vclock = VclockUtils.valueOf(context);
         
-        long length = ContextUtils.getContentLength(context);
+        long length = context.getContentLength();
         byte[] data = new byte[(int)Math.max(0L, length)];
         
         MessageDigest md = MessageDigestUtils.createMD5();
@@ -137,13 +135,13 @@ public class ObjectDatabase extends AbstractDatabase {
         
         ValueEntity entity = new ByteArrayValueEntity(contentType, data);
         
-        Header[] response = put(key, vclock, context, entity);
+        Header[] response = put(key, context, entity);
         
         return Response.createOk(response);
     }
     
-    private synchronized Header[] put(Key key, VectorClock<KUID> vclock, 
-            Context context, ValueEntity entity) {
+    private synchronized Header[] put(Key key, 
+            Context context, ValueEntity entity) throws IOException {
         
         KUID bucketId = key.getId();
         
@@ -159,12 +157,17 @@ public class ObjectDatabase extends AbstractDatabase {
             bucket.put(key, map);
         }
         
+        Vclock vclock = VclockUtils.valueOf(context);
+        
         Header header = context.setHeader(Constants.VCLOCK, 
-                VclockUtils.toString(vclock));
+                vclock.toString());
+        
+        Header vtag = context.setHeader(Constants.VTAG, 
+                vclock.getVTag());
         
         map.upsert(vclock, context, entity);
         
-        return new Header[] { header };
+        return new Header[] { header, vtag };
     }
     
     public synchronized Set<KUID> getBuckets() {

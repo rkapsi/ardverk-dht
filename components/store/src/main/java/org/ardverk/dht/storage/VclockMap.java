@@ -5,22 +5,21 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.ardverk.collection.CollectionUtils;
-import org.ardverk.dht.KUID;
 import org.ardverk.version.Occured;
-import org.ardverk.version.VectorClock;
 
 class VclockMap {
     
-    private final Map<VectorClock<KUID>, Entry> map 
-        = new LinkedHashMap<VectorClock<KUID>, Entry>();
+    private final Map<String, Entry> map 
+        = new LinkedHashMap<String, Entry>();
     
-    public void upsert(VectorClock<KUID> clock, Context context, ValueEntity value) {
+    public void upsert(Vclock vclock, Context context, ValueEntity value) {
         
-        Iterator<VectorClock<KUID>> it = map.keySet().iterator();
+        Iterator<Entry> it = map.values().iterator();
         while (it.hasNext()) {
-            VectorClock<KUID> existing = it.next();
             
-            Occured occured = VclockUtils.compare(existing, clock);
+            Vclock existing = it.next().vclock;
+            
+            Occured occured = VclockUtils.compare(existing, vclock);
             switch (occured) {
                 case AFTER:
                     it.remove();
@@ -34,11 +33,16 @@ class VclockMap {
             }
         }
         
-        map.put(clock, new Entry(context, value));
+        String vtag = vclock.getVTag();
+        map.put(vtag, new Entry(vclock, context, value));
     }
     
-    public boolean remove(VectorClock<?> clock) {
-        return map.remove(clock) != null;
+    public boolean remove(Vclock vclock) {
+        return map.remove(vclock.getVTag()) != null;
+    }
+    
+    public Entry value(String vtag) {
+        return map.get(vtag);
     }
     
     public Entry value() {
@@ -59,15 +63,22 @@ class VclockMap {
     
     public static class Entry {
         
+        private final Vclock vclock;
+        
         private final Context context;
         
         private final ValueEntity entity;
 
-        public Entry(Context context, ValueEntity entity) {
+        public Entry(Vclock vclock, Context context, ValueEntity entity) {
+            this.vclock = vclock;
             this.context = context;
             this.entity = entity;
         }
 
+        public Vclock getVclock() {
+            return vclock;
+        }
+        
         public Context getContext() {
             return context;
         }

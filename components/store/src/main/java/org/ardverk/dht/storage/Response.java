@@ -77,7 +77,7 @@ public class Response extends ContextValue {
         StatusLine status = StatusLine.valueOf(in);
         Context context = Context.valueOf(in);
         
-        long length = ContextUtils.getContentLength(context);
+        long length = context.getContentLength();
         byte[] data = new byte[(int)Math.max(0L, length)];
         StreamUtils.readFully(in, data);
         
