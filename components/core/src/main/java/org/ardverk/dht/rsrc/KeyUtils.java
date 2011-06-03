@@ -16,7 +16,14 @@
 
 package org.ardverk.dht.rsrc;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLDecoder;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.ardverk.utils.StringUtils;
 
 
 public class KeyUtils {
@@ -52,5 +59,41 @@ public class KeyUtils {
         }
         
         return path;
+    }
+    
+    public static Map<String, String> getQueryString(Key key) {
+        URI uri = key.getURI();
+        String query = uri.getQuery();
+        
+        if (query == null) {
+            return Collections.emptyMap();
+        }
+        
+        String[] arguments = query.split("&");
+        Map<String, String> map = new HashMap<String, String>(arguments.length);
+        
+        for (String argument : arguments) {
+            String[] tokens = argument.split("=");
+            switch (tokens.length) {
+                case 1:
+                    map.put(decode(tokens[0]), "true");
+                    break;
+                case 2:
+                    map.put(decode(tokens[0]), decode(tokens[1]));
+                    break;
+                default:
+                    throw new IllegalArgumentException(argument);
+            }
+        }
+        
+        return map;
+    }
+    
+    private static String decode(String value) {
+        try {
+            return URLDecoder.decode(value, StringUtils.UTF_8);
+        } catch (UnsupportedEncodingException err) {
+            throw new IllegalArgumentException("UnsupportedEncodingException", err);
+        }
     }
 }

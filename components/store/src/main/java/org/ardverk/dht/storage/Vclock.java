@@ -77,7 +77,7 @@ public class Vclock implements Version<Vclock>, Writable, Serializable {
 
     @Override
     public int hashCode() {
-        return vclock.hashCode();
+        return vtag.hashCode();
     }
     
     @Override
@@ -89,7 +89,7 @@ public class Vclock implements Version<Vclock>, Writable, Serializable {
         }
         
         Vclock other = (Vclock)o;
-        return vclock.equals(other.vclock);
+        return vtag.equals(other.vtag);
     }
 
     @Override

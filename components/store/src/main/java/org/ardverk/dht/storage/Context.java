@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -202,7 +203,7 @@ public final class Context implements Properties, Writable, Cloneable {
      */
     private static class HeaderGroup implements Iterable<Header> {
         
-        private final List<Header> list = new ArrayList<Header>();
+        private final List<Header> list = Collections.synchronizedList(new ArrayList<Header>());
         
         @Override
         public Iterator<Header> iterator() {

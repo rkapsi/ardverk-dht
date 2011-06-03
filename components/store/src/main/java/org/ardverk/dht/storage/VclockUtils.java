@@ -22,23 +22,23 @@ public class VclockUtils {
         return clock.compareTo(existing);
     }
     
-    public static Vclock valueOf(Properties properties) throws IOException {
-        Header[] clientIds = properties.removeHeaders(Constants.CLIENT_ID);
+    public static Vclock valueOf(Context context) throws IOException {
+        Header[] clientIds = context.removeHeaders(Constants.CLIENT_ID);
         if (ArrayUtils.isEmpty(clientIds)) {
             throw new NoSuchElementException(Constants.CLIENT_ID);
         }
         
-        Header[] vclocks = properties.removeHeaders(Constants.VCLOCK);
+        Header[] vclocks = context.removeHeaders(Constants.VCLOCK);
         return valueOf(vclocks, clientIds);
     }
     
-    public static Vclock valueOf(Header[] vclocks, Header[] clientIds) throws IOException {
-        Vclock vclock = null;
+    private static Vclock valueOf(Header[] vclocks, Header[] clientIds) throws IOException {
         
+        Vclock vclock = null;
         if (!ArrayUtils.isEmpty(vclocks)) {
             vclock = Vclock.valueOf(vclocks[0].getValue());
         } else {
-            vclock = Vclock.create();
+            vclock = Vclock.create(); // Create a new Vclock
         }
         
         String clientId = clientIds[0].getValue();

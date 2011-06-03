@@ -42,6 +42,7 @@ import org.ardverk.dht.KUID;
 import org.ardverk.dht.lang.Identifier;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.rsrc.Key;
+import org.ardverk.dht.rsrc.KeyUtils;
 import org.ardverk.dht.rsrc.Value;
 import org.ardverk.io.IoUtils;
 import org.ardverk.io.StreamUtils;
@@ -178,17 +179,17 @@ public class ObjectDatabase extends AbstractDatabase {
 
     @Override
     public Response get(Key key) {
-        /*URI uri = key.getURI();
-        String query = uri.getQuery();
-        if (query != null) {
-            Bucket bucket = database.get(key.getId());
-            if (bucket != null) {
-                return new KeyList(bucket.keySet());
+        String vtag = null;
+        Map<String, String> query = KeyUtils.getQueryString(key);
+        if (!query.isEmpty()) {
+            if (query.containsKey("list")) {
+                throw new IllegalArgumentException("Not implemented!");
+            } else if (query.containsKey("vtag")) {
+                vtag = query.get("vtag");
             }
-            return null;
-        }*/
+        }
         
-        VclockMap.Entry[] values = getValues(key);
+        VclockMap.Entry[] values = getValues(key, vtag);
         if (ArrayUtils.isEmpty(values)) {
             return Response.NOT_FOUND;
         }
@@ -201,7 +202,7 @@ public class ObjectDatabase extends AbstractDatabase {
         return MultipleChoicesFactory.create(key, values);
     }
     
-    private synchronized VclockMap.Entry[] getValues(Key key) {
+    private synchronized VclockMap.Entry[] getValues(Key key, String vtag) {
         Bucket bucket = database.get(key.getId());
         if (bucket == null) {
             return null;
@@ -209,6 +210,14 @@ public class ObjectDatabase extends AbstractDatabase {
         
         VclockMap map = bucket.get(key);
         if (map == null) {
+            return null;
+        }
+        
+        if (vtag != null) {
+            VclockMap.Entry entry = map.value(vtag);
+            if (entry != null) {
+                return new VclockMap.Entry[] { entry };
+            }
             return null;
         }
         

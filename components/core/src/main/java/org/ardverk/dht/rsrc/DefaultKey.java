@@ -73,6 +73,27 @@ public class DefaultKey extends AbstractKey {
         return uri;
     }
 
+    public String getPath() {
+        return uri.getPath();
+    }
+    
+    @Override
+    public int hashCode() {
+        return bucketId.hashCode();
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        } else if (!(o instanceof DefaultKey)) {
+            return false;
+        }
+        
+        DefaultKey other = (DefaultKey)o;
+        return getPath().equals(other.getPath());
+    }
+    
     private static byte[] digest(String bucket) {
         MessageDigest md = MessageDigestUtils.createSHA1();
         return md.digest(StringUtils.getBytes(bucket));
