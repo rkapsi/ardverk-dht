@@ -84,8 +84,8 @@ abstract class ContextValue extends DefaultValue implements Properties {
     }
 
     @Override
-    public void setHeader(String name, String value) {
-        context.setHeader(name, value);
+    public Header setHeader(String name, String value) {
+        return context.setHeader(name, value);
     }
 
     @Override
@@ -132,11 +132,11 @@ abstract class ContextValue extends DefaultValue implements Properties {
 
     @Override
     public void writeTo(OutputStream out) throws IOException {
-        writeContext(out);
+        writeHeader(out);
         writeValue(out);
     }
     
-    protected void writeContext(OutputStream out) throws IOException {
+    protected void writeHeader(OutputStream out) throws IOException {
         
         ValueEntity value = this.value;
         if (value != null) {

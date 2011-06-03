@@ -84,17 +84,9 @@ public class ObjectDatabase extends AbstractDatabase {
         try {
             in = value.getContent();
             
-            Method method = Method.valueOf(in);
-            switch (method) {
-                case PUT:
-                    break;
-                default:
-                    throw new IOException(method.toString());
-            }
+            Request request = Request.valueOf(in);
             
-            Context context = Context.valueOf(in);
-            
-            return store(key, context, in);
+            return store(key, request, in);
         } catch (Exception err) {
             LOG.error("Exception", err);
             return Response.INTERNAL_SERVER_ERROR;
@@ -103,8 +95,17 @@ public class ObjectDatabase extends AbstractDatabase {
         }
     }
     
-    private Response store(Key key, Context context, InputStream in) throws IOException {
+    private Response store(Key key, Request request, InputStream in) throws IOException {
         
+        Method method = request.getMethod();
+        switch (method) {
+            case PUT:
+                break;
+            default:
+                throw new IOException(method.toString());
+        }
+        
+        Context context = request.getContext();
         VectorClock<KUID> vclock = VclockUtils.valueOf(context);
         
         long length = ContextUtils.getContentLength(context);
@@ -131,19 +132,19 @@ public class ObjectDatabase extends AbstractDatabase {
         String etag = "\"" + CodingUtils.encodeBase16(digest) + "\"";
         context.setHeader(Constants.ETAG, etag);
         
-        String contentType = HTTP.OCTET_STREAM_TYPE;
-        if (context.containsHeader(HTTP.CONTENT_TYPE)) {
-            contentType = ContextUtils.getStringValue(context, HTTP.CONTENT_TYPE);
-        }
+        String contentType = context.getStringValue(
+                HTTP.CONTENT_TYPE, HTTP.OCTET_STREAM_TYPE);
         
         ValueEntity entity = new ByteArrayValueEntity(contentType, data);
         
-        put(key, vclock, context, entity);
+        Header[] response = put(key, vclock, context, entity);
         
-        return Response.createOk(vclock);
+        return Response.createOk(response);
     }
     
-    private synchronized void put(Key key, VectorClock<KUID> vclock, Context context, ValueEntity entity) {
+    private synchronized Header[] put(Key key, VectorClock<KUID> vclock, 
+            Context context, ValueEntity entity) {
+        
         KUID bucketId = key.getId();
         
         Bucket bucket = database.get(bucketId);
@@ -158,10 +159,12 @@ public class ObjectDatabase extends AbstractDatabase {
             bucket.put(key, map);
         }
         
-        context.setHeader(Constants.VCLOCK, 
+        Header header = context.setHeader(Constants.VCLOCK, 
                 VclockUtils.toString(vclock));
         
         map.upsert(vclock, context, entity);
+        
+        return new Header[] { header };
     }
     
     public synchronized Set<KUID> getBuckets() {

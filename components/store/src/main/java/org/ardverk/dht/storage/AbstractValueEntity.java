@@ -10,8 +10,8 @@ abstract class AbstractValueEntity extends DefaultValue implements ValueEntity {
     private final long contentLength;
     
     public AbstractValueEntity(Context context) {
-        this(ContextUtils.getStringValue(context, HTTP.CONTENT_TYPE),
-                ContextUtils.getContentLength(context));
+        this(context.getStringValue(HTTP.CONTENT_TYPE),
+                context.getLongValue(HTTP.CONTENT_LEN));
     }
     
     public AbstractValueEntity(String contentType, long contentLength) {

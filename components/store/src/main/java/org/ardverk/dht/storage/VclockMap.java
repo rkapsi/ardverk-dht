@@ -9,7 +9,7 @@ import org.ardverk.dht.KUID;
 import org.ardverk.version.Occured;
 import org.ardverk.version.VectorClock;
 
-public class VclockMap {
+class VclockMap {
     
     private final Map<VectorClock<KUID>, Entry> map 
         = new LinkedHashMap<VectorClock<KUID>, Entry>();

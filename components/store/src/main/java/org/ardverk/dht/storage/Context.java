@@ -32,6 +32,30 @@ public final class Context implements Properties, Writable, Cloneable {
         setHeaders(context.getHeaders());
     }
     
+    public String getStringValue(String name) {
+        return getStringValue(name, null);
+    }
+    
+    public String getStringValue(String name, String defaultValue) {
+        Header header = getFirstHeader(name);
+        if (header != null) {
+            return header.getValue();
+        }
+        return defaultValue;
+    }
+    
+    public long getLongValue(String name) {
+        return getLongValue(name, 0L);
+    }
+    
+    public long getLongValue(String name, long defaultValue) {
+        String value = getStringValue(name);
+        if (value != null) {
+            return Long.parseLong(value);
+        }
+        return defaultValue;
+    }
+    
     @Override
     public boolean containsHeader(String name) {
         return group.contains(name);
@@ -68,8 +92,10 @@ public final class Context implements Properties, Writable, Cloneable {
     }
 
     @Override
-    public void setHeader(String name, String value) {
-        setHeader(new BasicHeader(name, value));
+    public Header setHeader(String name, String value) {
+        Header header = new BasicHeader(name, value);
+        setHeader(header);
+        return header;
     }
     
     @Override

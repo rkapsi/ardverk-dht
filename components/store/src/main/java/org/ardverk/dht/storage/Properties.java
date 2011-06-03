@@ -20,7 +20,7 @@ public interface Properties extends Iterable<Header> {
 
     public abstract Header getLastHeader(String name);
 
-    public abstract void setHeader(String name, String value);
+    public abstract Header setHeader(String name, String value);
 
     public abstract void setHeader(Header header);
 

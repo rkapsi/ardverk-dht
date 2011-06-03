@@ -5,12 +5,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.http.Header;
 import org.apache.http.protocol.HTTP;
-import org.ardverk.dht.KUID;
 import org.ardverk.dht.rsrc.Value;
 import org.ardverk.io.IoUtils;
 import org.ardverk.io.StreamUtils;
-import org.ardverk.version.VectorClock;
 
 public class Response extends ContextValue {
 
@@ -28,9 +27,9 @@ public class Response extends ContextValue {
     public static final Response LENGTH_REQUIRED = new Response(
             StatusLine.LENGTH_REQUIRED);
     
-    public static Response createOk(VectorClock<KUID> vclock) {
+    public static Response createOk(Header... headers) {
         Response response = new Response(StatusLine.OK);
-        response.setHeader(Constants.VCLOCK, VclockUtils.toString(vclock));
+        response.setHeaders(headers);
         return response;
     }
     
@@ -55,9 +54,9 @@ public class Response extends ContextValue {
     }
 
     @Override
-    protected void writeContext(OutputStream out) throws IOException {
+    protected void writeHeader(OutputStream out) throws IOException {
         status.writeTo(out);
-        super.writeContext(out);
+        super.writeHeader(out);
     }
     
     @Override
@@ -85,10 +84,8 @@ public class Response extends ContextValue {
         ValueEntity entity = null;
         if (!ArrayUtils.isEmpty(data)) {
             
-            String contentType = HTTP.OCTET_STREAM_TYPE;
-            if (context.containsHeader(HTTP.CONTENT_TYPE)) {
-                contentType = ContextUtils.getStringValue(context, HTTP.CONTENT_TYPE);
-            }
+            String contentType = context.getStringValue(
+                    HTTP.CONTENT_TYPE, HTTP.OCTET_STREAM_TYPE);
             
             entity = new ByteArrayValueEntity(contentType, data);
         }
