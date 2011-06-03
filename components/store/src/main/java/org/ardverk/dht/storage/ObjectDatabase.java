@@ -98,6 +98,8 @@ public class ObjectDatabase extends AbstractDatabase {
         
         Method method = request.getMethod();
         switch (method) {
+            case GET:
+                return get(key);
             case PUT:
                 break;
             default:
@@ -196,7 +198,7 @@ public class ObjectDatabase extends AbstractDatabase {
             return Response.createOk(entry.getContext(), entry.getValueEntity());
         }
         
-        return Response.MULTIPLE_CHOICES;
+        return MultipleChoicesFactory.create(key, values);
     }
     
     private synchronized VclockMap.Entry[] getValues(Key key) {

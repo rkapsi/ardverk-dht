@@ -43,12 +43,18 @@ public class Response extends ContextValue {
         this.status = status;
     }
     
-    private Response(StatusLine status, Context context) {
+    public Response(StatusLine status, Context context) {
         super(context);
         this.status = status;
     }
     
-    private Response(StatusLine status, Context context, ValueEntity entity) {
+    public Response(StatusLine status, ValueEntity entity) {
+        super(entity);
+        
+        this.status = status;
+    }
+    
+    public Response(StatusLine status, Context context, ValueEntity entity) {
         super(context, entity);
         this.status = status;
     }

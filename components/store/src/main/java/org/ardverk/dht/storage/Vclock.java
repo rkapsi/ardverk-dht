@@ -54,6 +54,14 @@ public class Vclock implements Version<Vclock>, Writable, Serializable {
         return vtag;
     }
     
+    public long getCreationTime() {
+        return vclock.getCreationTime();
+    }
+    
+    public long getLastModified() {
+        return vclock.getLastModified();
+    }
+    
     public int size() {
         return vclock.size();
     }

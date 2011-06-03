@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.ardverk.dht.lang.StringValue;
 import org.ardverk.io.Writable;
@@ -14,6 +15,7 @@ import org.ardverk.utils.StringUtils;
 
 public enum Method implements Writable, StringValue {
     
+    GET(HttpGet.METHOD_NAME),
     PUT(HttpPut.METHOD_NAME),
     DELETE(HttpDelete.METHOD_NAME);
     

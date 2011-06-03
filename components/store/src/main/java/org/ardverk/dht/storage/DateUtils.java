@@ -16,6 +16,13 @@ public class DateUtils {
      * Returns the current date and time in RFC 1123 format.
      */
     public static String now() {
-        return RFC1123.format(System.currentTimeMillis());
+        return format(System.currentTimeMillis());
+    }
+    
+    /**
+     * Returns the given date and time in RFC 1123 format.
+     */
+    public static String format(long time) {
+        return RFC1123.format(time);
     }
 }
