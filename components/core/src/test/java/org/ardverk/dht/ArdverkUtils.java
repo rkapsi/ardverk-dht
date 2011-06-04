@@ -181,11 +181,11 @@ public class ArdverkUtils {
         frame.setVisible(true);
         frame.start();*/
         
-        for (EasyDHT dht : dhts) {
+        /*for (EasyDHT dht : dhts) {
             Database database = dht.getDatabase();
             database.getDatabaseConfig().setStoreForward(false);
             database.getDatabaseConfig().setCheckBucket(false);
-        }
+        }*/
         
         final DefaultPutConfig putConfig = new DefaultPutConfig();
         putConfig.setExecutorKey(ExecutorKey.BACKEND);
@@ -226,7 +226,7 @@ public class ArdverkUtils {
         int max = Integer.MIN_VALUE;
         int total = 0;
         
-        for (EasyDHT dht : dhts) {
+        /*for (EasyDHT dht : dhts) {
             Database database = dht.getDatabase();
             int size = database.size();
             total += size;
@@ -238,7 +238,7 @@ public class ArdverkUtils {
             if (max < size) {
                 max = size;
             }
-        }
+        }*/
         
         System.out.println("MIN: " + min);
         System.out.println("MAX: " + max);

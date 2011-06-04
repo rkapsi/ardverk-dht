@@ -22,12 +22,10 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.codec.binary.Base64;
@@ -35,7 +33,6 @@ import org.apache.http.Header;
 import org.apache.http.protocol.HTTP;
 import org.ardverk.coding.CodingUtils;
 import org.ardverk.collection.CollectionUtils;
-import org.ardverk.collection.Cursor;
 import org.ardverk.collection.PatriciaTrie;
 import org.ardverk.collection.Trie;
 import org.ardverk.dht.KUID;
@@ -70,16 +67,7 @@ public class ObjectDatabase extends AbstractDatabase {
     }
     
     @Override
-    public DatabaseConfig getDatabaseConfig() {
-        return config;
-    }
-    
-    @Override
     public Response store(Contact src, Key key, Value value) {
-        if (!isInBucket(key)) {
-            return Response.INTERNAL_SERVER_ERROR;
-        }
-        
         
         InputStream in = null;
         try {
@@ -87,7 +75,7 @@ public class ObjectDatabase extends AbstractDatabase {
             
             Request request = Request.valueOf(in);
             
-            Response response = store(key, request, in);
+            Response response = store(src, key, request, in);
             if (response == null) {
                 response = Response.NOT_FOUND;
             }
@@ -101,12 +89,13 @@ public class ObjectDatabase extends AbstractDatabase {
         }
     }
     
-    private Response store(Key key, Request request, InputStream in) throws IOException {
+    private Response store(Contact src, Key key, 
+            Request request, InputStream in) throws IOException {
         
         Method method = request.getMethod();
         switch (method) {
             case GET:
-                return get(key);
+                return get(src, key);
             case PUT:
                 break;
             default:
@@ -185,7 +174,7 @@ public class ObjectDatabase extends AbstractDatabase {
     }
 
     @Override
-    public Response get(Key key) {
+    public Response get(Contact src, Key key) {
         String vtag = null;
         Map<String, String> query = KeyUtils.getQueryString(key);
         if (!query.isEmpty()) {
@@ -247,53 +236,6 @@ public class ObjectDatabase extends AbstractDatabase {
         }
         
         return ListBucketResponse.create(prefix, keys);
-    }
-    
-    @Override
-    public synchronized int size() {
-        int size = 0;
-        for (Bucket bucket : database.values()) {
-            size += bucket.size();
-        }
-        return size;
-    }
-    
-    @Override
-    public synchronized Iterable<Key> keys() {
-        List<Key> values = new ArrayList<Key>();
-        for (Bucket bucket : database.values()) {
-            values.addAll(bucket.keySet());
-        }
-        return values;
-    }
-    
-    public synchronized Iterable<Key> keys(KUID bucketId) {
-        Bucket bucket = database.get(bucketId);
-        if (bucket != null) {
-            return new ArrayList<Key>(bucket.keySet());
-        }
-        return Collections.emptyList();
-    }
-
-    @Override
-    public synchronized Iterable<Key> keys(
-            final KUID lookupId, final KUID lastId) {
-        
-        final List<Key> values = new ArrayList<Key>();
-        database.select(lookupId, new Cursor<KUID, Bucket>() {
-            @Override
-            public Decision select(Entry<? extends KUID, 
-                    ? extends Bucket> entry) {
-                KUID bucketId = entry.getKey();
-                if (lookupId.isCloserTo(bucketId, lastId)) {
-                    values.addAll(entry.getValue().keySet());
-                    return Decision.CONTINUE;
-                }
-                return Decision.EXIT;
-            }
-        });
-        
-        return values;
     }
     
     @Override

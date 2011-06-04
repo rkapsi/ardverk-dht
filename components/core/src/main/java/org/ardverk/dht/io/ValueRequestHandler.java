@@ -54,8 +54,9 @@ public class ValueRequestHandler extends AbstractRequestHandler {
     public ResponseMessage handleRequest(RequestMessage message) throws IOException {
         ValueRequest request = (ValueRequest)message;
         
+        Contact src = request.getContact();
         Key key = request.getKey();
-        Value value = database.get(key);
+        Value value = database.get(src, key);
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
         ResponseMessage response = null;
