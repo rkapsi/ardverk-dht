@@ -62,9 +62,11 @@ public class KeyUtils {
     }
     
     public static Map<String, String> getQueryString(Key key) {
-        URI uri = key.getURI();
+        return getQueryString(key.getURI());
+    }
+    
+    public static Map<String, String> getQueryString(URI uri) {
         String query = uri.getQuery();
-        
         if (query == null) {
             return Collections.emptyMap();
         }

@@ -15,7 +15,7 @@ import org.ardverk.dht.storage.VclockMap.Entry;
 import org.ardverk.lang.Longs;
 import org.ardverk.utils.StringUtils;
 
-class MultipleChoicesFactory extends Response {
+class MultipleChoicesResponse extends Response {
 
     private static final Comparator<VclockMap.Entry> COMPARATOR 
             = new Comparator<VclockMap.Entry>() {
@@ -76,7 +76,7 @@ class MultipleChoicesFactory extends Response {
                 xml.close();
             }
             
-            return new MultipleChoicesFactory(StatusLine.MULTIPLE_CHOICES, 
+            return new MultipleChoicesResponse(StatusLine.MULTIPLE_CHOICES, 
                     new ByteArrayValueEntity(
                             Constants.XML_TEXT_TYPE, 
                             baos.toByteArray()));
@@ -88,7 +88,7 @@ class MultipleChoicesFactory extends Response {
         }
     }
     
-    private MultipleChoicesFactory(StatusLine status, ValueEntity entity) {
+    private MultipleChoicesResponse(StatusLine status, ValueEntity entity) {
         super(status, entity);
     }
 }

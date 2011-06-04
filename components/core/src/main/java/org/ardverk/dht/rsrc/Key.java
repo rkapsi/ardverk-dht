@@ -17,6 +17,7 @@
 package org.ardverk.dht.rsrc;
 
 import java.net.URI;
+import java.util.Map;
 
 import org.ardverk.dht.lang.Identifier;
 
@@ -27,7 +28,24 @@ import org.ardverk.dht.lang.Identifier;
 public interface Key extends Comparable<Key>, Identifier {
     
     /**
+     * 
+     */
+    public Key normalize();
+    
+    /**
      * Returns the resource's {@link URI}.
      */
     public URI getURI();
+    
+    /**
+     * Returns the {@link URI}'s path
+     * 
+     * @see URI#getPath()
+     */
+    public String getPath();
+    
+    /**
+     * Returns the {@link URI}'s query string
+     */
+    public Map<String, String> getQueryString();
 }

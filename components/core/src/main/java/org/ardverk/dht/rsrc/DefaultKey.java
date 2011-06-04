@@ -64,6 +64,20 @@ public class DefaultKey extends AbstractKey {
     }
     
     @Override
+    public Key normalize() {
+        String query = uri.getQuery();
+        if (query == null) {
+            return this;
+        }
+        
+        String scheme = uri.getScheme();
+        String path = KeyUtils.getKeyPath(uri);
+        
+        URI normalized = URI.create(scheme + "://" + path);
+        return new DefaultKey(bucketId, normalized);
+    }
+
+    @Override
     public KUID getId() {
         return bucketId;
     }
@@ -71,27 +85,6 @@ public class DefaultKey extends AbstractKey {
     @Override
     public URI getURI() {
         return uri;
-    }
-
-    public String getPath() {
-        return uri.getPath();
-    }
-    
-    @Override
-    public int hashCode() {
-        return bucketId.hashCode();
-    }
-    
-    @Override
-    public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        } else if (!(o instanceof DefaultKey)) {
-            return false;
-        }
-        
-        DefaultKey other = (DefaultKey)o;
-        return getPath().equals(other.getPath());
     }
     
     private static byte[] digest(String bucket) {

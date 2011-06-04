@@ -16,19 +16,31 @@
 
 package org.ardverk.dht.rsrc;
 
+import java.util.Map;
+
 /**
  * An abstract implementation of {@link Key}.
  */
 public abstract class AbstractKey implements Key {
 
     @Override
+    public String getPath() {
+        return getURI().getPath();
+    }
+    
+    @Override
+    public Map<String, String> getQueryString() {
+        return KeyUtils.getQueryString(getURI());
+    }
+    
+    @Override
     public int compareTo(Key o) {
-        return getURI().compareTo(o.getURI());
+        return getPath().compareTo(o.getPath());
     }
 
     @Override
     public int hashCode() {
-        return getURI().hashCode();
+        return getPath().hashCode();
     }
     
     @Override
@@ -39,8 +51,7 @@ public abstract class AbstractKey implements Key {
             return false;
         }
         
-        Key other = (Key)o;
-        return getURI().equals(other.getURI());
+        return compareTo((Key)o) == 0;
     }
     
     @Override

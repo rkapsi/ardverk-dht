@@ -80,13 +80,19 @@ public class ObjectDatabase extends AbstractDatabase {
             return Response.INTERNAL_SERVER_ERROR;
         }
         
+        
         InputStream in = null;
         try {
             in = value.getContent();
             
             Request request = Request.valueOf(in);
             
-            return store(key, request, in);
+            Response response = store(key, request, in);
+            if (response == null) {
+                response = Response.NOT_FOUND;
+            }
+            return response;
+            
         } catch (Exception err) {
             LOG.error("Exception", err);
             return Response.INTERNAL_SERVER_ERROR;
@@ -154,10 +160,11 @@ public class ObjectDatabase extends AbstractDatabase {
             database.put(bucketId, bucket);
         }
         
-        VclockMap map = bucket.get(key);
+        Key normalized = key.normalize();
+        VclockMap map = bucket.get(normalized);
         if (map == null) {
             map = new VclockMap();
-            bucket.put(key, map);
+            bucket.put(normalized, map);
         }
         
         Vclock vclock = VclockUtils.valueOf(context);
@@ -183,7 +190,7 @@ public class ObjectDatabase extends AbstractDatabase {
         Map<String, String> query = KeyUtils.getQueryString(key);
         if (!query.isEmpty()) {
             if (query.containsKey("list")) {
-                throw new IllegalArgumentException("Not implemented!");
+                return list(key);
             } else if (query.containsKey("vtag")) {
                 vtag = query.get("vtag");
             }
@@ -199,7 +206,7 @@ public class ObjectDatabase extends AbstractDatabase {
             return Response.createOk(entry.getContext(), entry.getValueEntity());
         }
         
-        return MultipleChoicesFactory.create(key, values);
+        return MultipleChoicesResponse.create(key, values);
     }
     
     private synchronized VclockMap.Entry[] getValues(Key key, String vtag) {
@@ -222,6 +229,24 @@ public class ObjectDatabase extends AbstractDatabase {
         }
         
         return map.values();
+    }
+    
+    private synchronized Response list(Key prefix) {
+        Bucket bucket = database.get(prefix.getId());
+        if (bucket == null) {
+            return null;
+        }
+        
+        String path = prefix.getPath();
+        
+        List<Key> keys = new ArrayList<Key>();
+        for (Key existing : bucket.keySet()) {
+            if (existing.getPath().startsWith(path)) {
+                keys.add(existing);
+            }
+        }
+        
+        return ListBucketResponse.create(prefix, keys);
     }
     
     @Override
