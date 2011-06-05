@@ -17,22 +17,35 @@ abstract class AbstractObjectDatabase extends AbstractDatabase {
     
     @Override
     public Response store(Contact src, Key key, Value value) {
+        
         InputStream in = null;
         try {
             in = value.getContent();
             
             Request request = Request.valueOf(in);
             Method method = request.getMethod();
+            
+            Response response = null;
             switch (method) {
                 case PUT:
-                    return handlePut(src, key, request, in);
+                    response = handlePut(src, key, request, in);
+                    break;
                 case GET:
-                    return handleGet(src, key, request, in);
+                    response = handleGet(src, key, request, in);
+                    break;
                 case DELETE:
-                    return handleDelete(src, key, request, in);
+                    response = handleDelete(src, key, request, in);
+                    break;
                 default:
                     throw new IllegalArgumentException("method=" + method);
             }
+            
+            if (response == null) {
+                throw new IllegalStateException();
+            }
+            
+            return response;
+            
         } catch (Exception err) {
             LOG.error("Exception", err);
             return ExceptionResponse.create(err);
