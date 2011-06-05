@@ -15,11 +15,6 @@ public class Response extends ContextValue {
 
     public static final Response OK = new Response(StatusLine.OK);
     
-    public static final Response MULTIPLE_CHOICES = new Response(
-            StatusLine.MULTIPLE_CHOICES);
-    
-    public static final Response NOT_FOUND = new Response(
-            StatusLine.NOT_FOUND);
     
     public static final Response INTERNAL_SERVER_ERROR = new Response(
             StatusLine.INTERNAL_SERVER_ERROR);
@@ -40,25 +35,36 @@ public class Response extends ContextValue {
     private final StatusLine status;
     
     public Response(StatusLine status) {
+        init();
+        
         this.status = status;
     }
     
     public Response(StatusLine status, Context context) {
         super(context);
+        init();
+        
         this.status = status;
     }
     
     public Response(StatusLine status, ValueEntity entity) {
         super(entity);
+        init();
         
         this.status = status;
     }
     
     public Response(StatusLine status, Context context, ValueEntity entity) {
         super(context, entity);
+        init();
+        
         this.status = status;
     }
 
+    private void init() {
+        //setHeader(ContextUtils.now());
+    }
+    
     @Override
     protected void writeHeader(OutputStream out) throws IOException {
         status.writeTo(out);

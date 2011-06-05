@@ -77,7 +77,7 @@ public class ObjectDatabase extends AbstractDatabase {
             
             Response response = store(src, key, request, in);
             if (response == null) {
-                response = Response.NOT_FOUND;
+                response = ResponseFactory.createNotFound();
             }
             return response;
             
@@ -187,7 +187,7 @@ public class ObjectDatabase extends AbstractDatabase {
         
         VclockMap.Entry[] values = getValues(key, vtag);
         if (ArrayUtils.isEmpty(values)) {
-            return Response.NOT_FOUND;
+            return ResponseFactory.createNotFound();
         }
         
         if (values.length == 1) {

@@ -61,7 +61,7 @@ abstract class AbstractObjectDatabase extends AbstractDatabase {
             Request request, InputStream in) throws IOException {
         Response response = get(src, key);
         if (response == null) {
-            response = Response.NOT_FOUND;
+            response = ResponseFactory.createNotFound();
         }
         return response;
     }
