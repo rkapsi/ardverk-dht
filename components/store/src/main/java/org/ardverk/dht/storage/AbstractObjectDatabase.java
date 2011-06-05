@@ -46,7 +46,11 @@ abstract class AbstractObjectDatabase extends AbstractDatabase {
     
     protected Response handleGet(Contact src, Key key, 
             Request request, InputStream in) throws IOException {
-        return get(src, key);
+        Response response = get(src, key);
+        if (response == null) {
+            response = Response.NOT_FOUND;
+        }
+        return response;
     }
     
     protected abstract Response handleDelete(Contact src, Key key, 
