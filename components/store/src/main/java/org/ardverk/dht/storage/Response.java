@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.http.Header;
 import org.apache.http.protocol.HTTP;
 import org.ardverk.dht.rsrc.Value;
 import org.ardverk.io.IoUtils;
@@ -21,16 +20,6 @@ public class Response extends ContextValue {
     
     public static final Response LENGTH_REQUIRED = new Response(
             StatusLine.LENGTH_REQUIRED);
-    
-    public static Response createOk(Header... headers) {
-        Response response = new Response(StatusLine.OK);
-        response.setHeaders(headers);
-        return response;
-    }
-    
-    public static Response createOk(Context context, ValueEntity value) {
-        return new Response(StatusLine.OK, context, value);
-    }
     
     private final StatusLine status;
     

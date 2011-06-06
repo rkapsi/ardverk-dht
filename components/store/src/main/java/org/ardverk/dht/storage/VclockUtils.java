@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 
 import org.apache.http.Header;
-import org.ardverk.utils.ArrayUtils;
 import org.ardverk.version.Occured;
 
 public class VclockUtils {
@@ -23,25 +22,21 @@ public class VclockUtils {
     }
     
     public static Vclock valueOf(Context context) throws IOException {
-        Header[] clientIds = context.removeHeaders(Constants.CLIENT_ID);
-        if (ArrayUtils.isEmpty(clientIds)) {
+        Header clientId = context.removeHeader(Constants.CLIENT_ID);
+        if (clientId == null) {
             throw new NoSuchElementException(Constants.CLIENT_ID);
         }
         
-        Header[] vclocks = context.removeHeaders(Constants.VCLOCK);
-        return valueOf(vclocks, clientIds);
+        return getOrCreate(context).update(clientId.getValue());
     }
     
-    private static Vclock valueOf(Header[] vclocks, Header[] clientIds) throws IOException {
+    private static Vclock getOrCreate(Context context) throws IOException {
+        Header vclock = context.removeHeader(Constants.VCLOCK);
         
-        Vclock vclock = null;
-        if (!ArrayUtils.isEmpty(vclocks)) {
-            vclock = Vclock.valueOf(vclocks[0].getValue());
-        } else {
-            vclock = Vclock.create(); // Create a new Vclock
+        if (vclock != null) {
+            return Vclock.valueOf(vclock.getValue());
         }
         
-        String clientId = clientIds[0].getValue();
-        return vclock.update(clientId);
+        return Vclock.create(); // Create a new Vclock
     }
 }

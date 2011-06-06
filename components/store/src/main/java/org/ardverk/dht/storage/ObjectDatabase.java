@@ -113,20 +113,16 @@ public class ObjectDatabase extends AbstractDatabase {
         
         byte[] digest = md.digest();
         
-        Header[] contentMD5s = context.getHeaders(Constants.CONTENT_MD5);
-        
-        if (!ArrayUtils.isEmpty(contentMD5s)) {
-            byte[] decoded = Base64.decodeBase64(contentMD5s[0].getValue());
+        String contentMD5 = context.getContentMD5();
+        if (contentMD5 != null) {
+            byte[] decoded = Base64.decodeBase64(contentMD5);
             if (!Arrays.equals(decoded, digest)) {
                 return Response.INTERNAL_SERVER_ERROR;
-            }
-            
-            // Remove the Content-MD5s and replace it/them with an ETag!
-            context.removeHeaders(contentMD5s);   
+            }  
         }
         
         String etag = "\"" + CodingUtils.encodeBase16(digest) + "\"";
-        context.setHeader(Constants.ETAG, etag);
+        context.addHeader(Constants.ETAG, etag);
         
         String contentType = context.getStringValue(
                 HTTP.CONTENT_TYPE, HTTP.OCTET_STREAM_TYPE);
@@ -135,7 +131,7 @@ public class ObjectDatabase extends AbstractDatabase {
         
         Header[] response = put(key, context, entity);
         
-        return Response.createOk(response);
+        return ResponseFactory.createOk(response);
     }
     
     private synchronized Header[] put(Key key, 
@@ -158,10 +154,10 @@ public class ObjectDatabase extends AbstractDatabase {
         
         Vclock vclock = VclockUtils.valueOf(context);
         
-        Header header = context.setHeader(Constants.VCLOCK, 
+        Header header = context.addHeader(Constants.VCLOCK, 
                 vclock.toString());
         
-        Header vtag = context.setHeader(Constants.VTAG, 
+        Header vtag = context.addHeader(Constants.VTAG, 
                 vclock.getVTag());
         
         map.upsert(vclock, context, entity);
@@ -192,7 +188,7 @@ public class ObjectDatabase extends AbstractDatabase {
         
         if (values.length == 1) {
             VclockMap.Entry entry = CollectionUtils.first(values);
-            return Response.createOk(entry.getContext(), entry.getValueEntity());
+            return ResponseFactory.createOk(entry.getContext(), entry.getValueEntity());
         }
         
         return MultipleChoicesResponse.create(key, values);

@@ -35,7 +35,7 @@ public class Constants {
     }
     
     public static void init(Properties properties) {
-        properties.setHeader(date());
-        properties.setHeader(SERVER);
+        properties.addHeader(date());
+        properties.addHeader(SERVER);
     }
 }

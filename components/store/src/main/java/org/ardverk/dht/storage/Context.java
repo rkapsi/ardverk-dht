@@ -3,11 +3,11 @@ package org.ardverk.dht.storage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
 
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
@@ -31,7 +31,7 @@ public final class Context implements Properties, Writable, Cloneable {
     public Context(Context context) {
         this();
         
-        setHeaders(context.getHeaders());
+        addHeaders(context.getHeaders());
     }
     
     public String getStringValue(String name) {
@@ -39,7 +39,7 @@ public final class Context implements Properties, Writable, Cloneable {
     }
     
     public String getStringValue(String name, String defaultValue) {
-        Header header = getFirstHeader(name);
+        Header header = getHeader(name);
         if (header != null) {
             return header.getValue();
         }
@@ -62,73 +62,55 @@ public final class Context implements Properties, Writable, Cloneable {
         return getLongValue(HTTP.CONTENT_LEN, -1L);
     }
 
-    public String getETag(Context context) {
+    public String getETag() {
         return getStringValue(Constants.ETAG);
+    }
+    
+    public String getContentMD5() {
+        return getStringValue(Constants.CONTENT_MD5);
     }
     
     @Override
     public boolean containsHeader(String name) {
         return group.contains(name);
     }
-
-    @Override
-    public void addHeader(String name, String value) {
-        addHeader(new BasicHeader(name, value));
-    }
-
-    @Override
-    public void addHeader(Header header) {
-        group.add(header);
-    }
-
+    
     @Override
     public Header[] getHeaders() {
         return group.headers();
     }
 
     @Override
-    public Header getFirstHeader(String name) {
-        return group.first(name);
+    public Header getHeader(String name) {
+        return group.get(name);
     }
 
     @Override
-    public Header[] getHeaders(String name) {
-        return group.headers(name);
-    }
-
-    @Override
-    public Header getLastHeader(String name) {
-        return group.last(name);
-    }
-
-    @Override
-    public Header setHeader(String name, String value) {
+    public Header addHeader(String name, String value) {
         Header header = new BasicHeader(name, value);
-        setHeader(header);
+        addHeader(header);
         return header;
     }
     
     @Override
-    public void setHeader(Header header) {
-        group.replace(header);
+    public void addHeader(Header header) {
+        group.add(header);
     }
 
     @Override
-    public void setHeaders(Header... h) {
+    public void addHeaders(Header... h) {
         group.clear();
         group.addAll(h);
     }
 
     @Override
-    public Header[] removeHeaders(String name) {
-        Header[] headers = getHeaders(name);
-        removeHeaders(headers);
-        return headers;
+    public Header removeHeader(String name) {
+        return group.remove(name);
     }
 
     @Override
-    public void removeHeader(Header header) {
-        group.remove(header);
+    public boolean removeHeader(Header header) {
+        return group.remove(header);
     }
     
     @Override
@@ -143,11 +125,6 @@ public final class Context implements Properties, Writable, Cloneable {
         return group.iterator();
     }
 
-    @Override
-    public Iterator<Header> iterator(String name) {
-        return group.iterator(name);
-    }
-    
     @Override
     public Context clone() {
         return new Context(this);
@@ -203,31 +180,36 @@ public final class Context implements Properties, Writable, Cloneable {
      */
     private static class HeaderGroup implements Iterable<Header> {
         
-        private final List<Header> list = Collections.synchronizedList(new ArrayList<Header>());
+        private final Map<String, Header> map = Collections.synchronizedMap(
+                new LinkedHashMap<String, Header>());
+        
+        private static String key(Header h) {
+            return key(h.getName());
+        }
+        
+        private static String key(String name) {
+            return name.toLowerCase(Locale.US);
+        }
         
         @Override
         public Iterator<Header> iterator() {
-            return list.iterator();
-        }
-        
-        public Iterator<Header> iterator(String name) {
-            return Arrays.asList(headers(name)).iterator();
+            return map.values().iterator();
         }
         
         public boolean contains(String name) {
-            return first(name) != null;
+            return map.containsKey(key(name));
         }
         
         public void add(Header header) {
-            if (header != null) {
-                list.add(header);
-            }
+            map.put(key(header), header);
         }
         
-        public void remove(Header header) {
-            if (header != null) {
-                list.remove(header);
-            }
+        public Header remove(String name) {
+            return map.remove(key(name));
+        }
+        
+        public boolean remove(Header header) {
+            return map.values().remove(header);
         }
         
         public void addAll(Header... headers) {
@@ -238,76 +220,21 @@ public final class Context implements Properties, Writable, Cloneable {
             }
         }
         
-        public Header first(String name) {
-            name = name.toLowerCase();
-            
-            for (Header header : list) {
-                if (equalsIgnoreCase(name, header)) {
-                    return header;
-                }
-            }
-            return null;
-        }
-        
-        public Header last(String name) {
-            name = name.toLowerCase();
-            
-            for (int i = list.size()-1; i >= 0; --i) {
-                Header header = list.get(i);
-                if (equalsIgnoreCase(name, header)) {
-                    return header;
-                }
-            }
-            return null;
+        public Header get(String name) {
+            return map.get(key(name));
         }
         
         public Header[] headers() {
-            return list.toArray(new Header[0]);
-        }
-        
-        public Header[] headers(String name) {
-            List<Header> dst = new ArrayList<Header>();
-            
-            name = name.toLowerCase();
-            for (Header header : list) {
-                if (equalsIgnoreCase(name, header)) {
-                    dst.add(header);
-                }
-            }
-            
-            return dst.toArray(new Header[0]);
-        }
-        
-        public void replace(Header header) {
-            String name = header.getName().toLowerCase();
-            
-            int size = list.size();
-            for (int i = 0; i < size; i++) {
-                Header other = list.get(i);
-                if (equalsIgnoreCase(name, other)) {
-                    list.set(i, header);
-                    return;
-                }
-            }
-            
-            add(header);
+            return map.values().toArray(new Header[0]);
         }
         
         public void clear() {
-            list.clear();
+            map.clear();
         }
         
         @Override
         public String toString() {
-            return list.toString();
-        }
-        
-        /**
-         * NOTE: It's being assumed that the {@link String} argument
-         * is in lower case (see {@link String#toLowerCase()}).
-         */
-        private static boolean equalsIgnoreCase(String name, Header header) {
-            return name.equals(header.getName().toLowerCase());
+            return map.values().toString();
         }
     }
 }

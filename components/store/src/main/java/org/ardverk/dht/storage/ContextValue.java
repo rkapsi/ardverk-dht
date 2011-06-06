@@ -54,8 +54,18 @@ abstract class ContextValue extends DefaultValue implements Properties {
     }
 
     @Override
-    public void addHeader(String name, String value) {
-        context.addHeader(name, value);
+    public Header[] getHeaders() {
+        return context.getHeaders();
+    }
+
+    @Override
+    public Header getHeader(String name) {
+        return context.getHeader(name);
+    }
+    
+    @Override
+    public Header addHeader(String name, String value) {
+        return context.addHeader(name, value);
     }
 
     @Override
@@ -64,48 +74,18 @@ abstract class ContextValue extends DefaultValue implements Properties {
     }
 
     @Override
-    public Header[] getHeaders() {
-        return context.getHeaders();
+    public void addHeaders(Header... h) {
+        context.addHeaders(h);
     }
 
     @Override
-    public Header getFirstHeader(String name) {
-        return context.getFirstHeader(name);
+    public Header removeHeader(String name) {
+        return context.removeHeader(name);
     }
 
     @Override
-    public Header[] getHeaders(String name) {
-        return context.getHeaders(name);
-    }
-
-    @Override
-    public Header getLastHeader(String name) {
-        return context.getLastHeader(name);
-    }
-
-    @Override
-    public Header setHeader(String name, String value) {
-        return context.setHeader(name, value);
-    }
-
-    @Override
-    public void setHeader(Header header) {
-        context.setHeader(header);
-    }
-
-    @Override
-    public void setHeaders(Header... h) {
-        context.setHeaders(h);
-    }
-
-    @Override
-    public Header[] removeHeaders(String name) {
-        return context.removeHeaders(name);
-    }
-
-    @Override
-    public void removeHeader(Header header) {
-        context.removeHeader(header);
+    public boolean removeHeader(Header header) {
+        return context.removeHeader(header);
     }
 
     @Override
@@ -113,11 +93,6 @@ abstract class ContextValue extends DefaultValue implements Properties {
         context.removeHeaders(headers);
     }
 
-    @Override
-    public Iterator<Header> iterator(String name) {
-        return context.iterator(name);
-    }
-    
     @Override
     public boolean isRepeatable() {
         ValueEntity value = this.value;
@@ -140,10 +115,10 @@ abstract class ContextValue extends DefaultValue implements Properties {
         
         ValueEntity value = this.value;
         if (value != null) {
-            context.setHeader(HTTP.CONTENT_LEN, Long.toString(value.getContentLength()));
-            context.setHeader(HTTP.CONTENT_TYPE, value.getContentType());
+            context.addHeader(HTTP.CONTENT_LEN, Long.toString(value.getContentLength()));
+            context.addHeader(HTTP.CONTENT_TYPE, value.getContentType());
         } else {
-            context.setHeader(Constants.NO_CONTENT);
+            context.addHeader(Constants.NO_CONTENT);
         }
         
         context.writeTo(out);

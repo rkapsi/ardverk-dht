@@ -1,36 +1,24 @@
 package org.ardverk.dht.storage;
 
-import java.util.Iterator;
-
 import org.apache.http.Header;
 
 public interface Properties extends Iterable<Header> {
 
-    public abstract boolean containsHeader(String name);
+    public boolean containsHeader(String name);
 
-    public abstract void addHeader(String name, String value);
+    public Header[] getHeaders();
 
-    public abstract void addHeader(Header header);
+    public Header getHeader(String name);
 
-    public abstract Header[] getHeaders();
+    public Header addHeader(String name, String value);
 
-    public abstract Header getFirstHeader(String name);
+    public void addHeader(Header header);
 
-    public abstract Header[] getHeaders(String name);
+    public void addHeaders(Header... h);
 
-    public abstract Header getLastHeader(String name);
+    public Header removeHeader(String name);
 
-    public abstract Header setHeader(String name, String value);
+    public boolean removeHeader(Header header);
 
-    public abstract void setHeader(Header header);
-
-    public abstract void setHeaders(Header... h);
-
-    public abstract Header[] removeHeaders(String name);
-
-    public abstract void removeHeader(Header header);
-
-    public abstract void removeHeaders(Header... headers);
-
-    public abstract Iterator<Header> iterator(String name);
+    public void removeHeaders(Header... headers);
 }
