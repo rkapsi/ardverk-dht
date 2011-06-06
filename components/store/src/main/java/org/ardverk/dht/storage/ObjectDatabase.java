@@ -119,6 +119,9 @@ public class ObjectDatabase extends AbstractDatabase {
             if (!Arrays.equals(decoded, digest)) {
                 return Response.INTERNAL_SERVER_ERROR;
             }  
+        } else {
+            context.addHeader(Constants.CONTENT_MD5, 
+                    Base64.encodeBase64String(digest));
         }
         
         String etag = "\"" + CodingUtils.encodeBase16(digest) + "\"";
