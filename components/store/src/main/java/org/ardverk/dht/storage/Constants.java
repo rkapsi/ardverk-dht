@@ -22,6 +22,8 @@ public class Constants {
 
     public static final String ETAG = "ETag";
     
+    public static final String TOMBSTONE = "Tombstone";
+    
     public static final Header NO_CONTENT = new BasicHeader(HTTP.CONTENT_LEN, "0");
 
     public static final Header SERVER = new BasicHeader(HTTP.SERVER_HEADER, "Ardverk-DHT/0.1");
@@ -32,6 +34,10 @@ public class Constants {
     
     public static Header date() {
         return new BasicHeader(HTTP.DATE_HEADER, DateUtils.now());
+    }
+    
+    public static Header tombstone() {
+        return new BasicHeader(TOMBSTONE, DateUtils.now());
     }
     
     public static void init(Properties properties) {

@@ -36,6 +36,9 @@ abstract class AbstractObjectDatabase extends AbstractDatabase {
                 case DELETE:
                     response = handleDelete(src, key, request, in);
                     break;
+                case HEAD:
+                    response = handleHead(src, key, request, in);
+                    break;
                 default:
                     throw new IllegalArgumentException("method=" + method);
             }
@@ -59,16 +62,31 @@ abstract class AbstractObjectDatabase extends AbstractDatabase {
     
     protected Response handleGet(Contact src, Key key, 
             Request request, InputStream in) throws IOException {
-        Response response = get(src, key);
+        
+        Response response = handleGet(src, key, true);
         if (response == null) {
             response = ResponseFactory.createNotFound();
         }
+        
         return response;
     }
     
     protected abstract Response handleDelete(Contact src, Key key, 
             Request request, InputStream in) throws IOException;
     
+    protected abstract Response handleHead(Contact src, Key key, 
+            Request request, InputStream in) throws IOException;
+    
     @Override
-    public abstract Response get(Contact src, Key key);
+    public Response get(Contact src, Key key) {
+        try {
+            return handleGet(src, key, false);
+        } catch (Exception err) {
+            LOG.error("Exception", err);
+            return ExceptionResponse.create(err);
+        }
+    }
+    
+    protected abstract Response handleGet(Contact src, 
+            Key key, boolean store) throws IOException;
 }
