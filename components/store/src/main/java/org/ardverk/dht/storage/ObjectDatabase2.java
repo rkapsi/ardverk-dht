@@ -58,12 +58,20 @@ public class ObjectDatabase2 extends AbstractObjectDatabase {
         
         File file = mkfile(key, true);
         
-        FileOutputStream fos = new FileOutputStream(file);
+        boolean success = false;
         try {
-            context.writeTo(fos);
-            StreamUtils.copy(dis, fos);
+            FileOutputStream fos = new FileOutputStream(file);
+            try {
+                context.writeTo(fos);
+                StreamUtils.copy(dis, fos);
+                success = true;
+            } finally {
+                IoUtils.close(fos);
+            }
         } finally {
-            IoUtils.close(fos);
+            if (!success) {
+                file.delete();
+            }
         }
         
         return null;

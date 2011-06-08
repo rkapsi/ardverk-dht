@@ -30,7 +30,7 @@ public interface Key extends Comparable<Key>, Identifier {
     /**
      * 
      */
-    public Key normalize();
+    public Key strip();
     
     /**
      * Returns the resource's {@link URI}.

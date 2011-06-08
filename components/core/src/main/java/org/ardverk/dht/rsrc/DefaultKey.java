@@ -16,8 +16,11 @@
 
 package org.ardverk.dht.rsrc;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLDecoder;
 import java.security.MessageDigest;
+import java.util.regex.Pattern;
 
 import org.ardverk.dht.KUID;
 import org.ardverk.security.MessageDigestUtils;
@@ -25,6 +28,8 @@ import org.ardverk.utils.StringUtils;
 
 public class DefaultKey extends AbstractKey {
 
+    private static final Pattern PATTERN = Pattern.compile("/");
+    
     public static String SCHEME = "ardverk";
     
     public static DefaultKey valueOf(String uri) {
@@ -37,21 +42,52 @@ public class DefaultKey extends AbstractKey {
             throw new IllegalArgumentException(uri.toString());
         }
         
-        String path = KeyUtils.getKeyPath(uri);
+        String host = uri.getHost();
+        int port = uri.getPort();
+        String path = uri.getPath();
         
-        int p = path.indexOf('/');
-        if (p != 0) {
+        String keyPath = KeyUtils.getKeyPath(host, port, path);
+        
+        // Remove all leading and trailing slashes and then split
+        String[] tokens = PATTERN.split(
+                StringUtils.trim(keyPath, '/'));
+        
+        if (tokens.length == 0) {
             throw new IllegalArgumentException(uri.toString());
         }
         
-        int q = path.indexOf('/', p + 1);
+        // The first token is the Bucket!
+        String bucket = normalize(tokens[0]);
         
-        String bucket = path;
-        if (q != -1) {
-            bucket = path.substring(p, q);
+        StringBuilder sb = new StringBuilder(
+                scheme.length() + keyPath.length() + 3);
+        
+        sb.append(scheme).append("://");
+        
+        if (StringUtils.isEmpty(host)) {
+            sb.append('/');
         }
         
-        return new DefaultKey(create(bucket), uri);
+        sb.append(bucket);
+        
+        for (int i = 1; i < tokens.length; i++) {
+            sb.append('/').append(normalize(tokens[i]));
+        }
+        
+        return new DefaultKey(create(bucket), URI.create(sb.toString()));
+    }
+    
+    private static String normalize(String value) {
+        return StringUtils.trim(decode(value), '.');
+    }
+    
+    private static String decode(String value) {
+        try {
+            return URLDecoder.decode(value, StringUtils.UTF_8);
+        } catch (UnsupportedEncodingException err) {
+            throw new IllegalArgumentException(
+                    "UnsupportedEncodingException", err);
+        }
     }
     
     private final KUID bucketId;
@@ -64,7 +100,7 @@ public class DefaultKey extends AbstractKey {
     }
     
     @Override
-    public Key normalize() {
+    public Key strip() {
         String query = uri.getQuery();
         if (query == null) {
             return this;

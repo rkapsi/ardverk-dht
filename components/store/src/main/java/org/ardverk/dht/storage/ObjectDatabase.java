@@ -148,7 +148,7 @@ public class ObjectDatabase extends AbstractDatabase {
             database.put(bucketId, bucket);
         }
         
-        Key normalized = key.normalize();
+        Key normalized = key.strip();
         VclockMap map = bucket.get(normalized);
         if (map == null) {
             map = new VclockMap();
