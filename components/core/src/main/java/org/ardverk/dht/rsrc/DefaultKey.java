@@ -16,10 +16,14 @@
 
 package org.ardverk.dht.rsrc;
 
-import java.io.UnsupportedEncodingException;
+import static org.ardverk.utils.StringUtils.decode;
+import static org.ardverk.utils.StringUtils.isEmpty;
+import static org.ardverk.utils.StringUtils.trim;
+
 import java.net.URI;
-import java.net.URLDecoder;
 import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.ardverk.dht.KUID;
@@ -46,48 +50,53 @@ public class DefaultKey extends AbstractKey {
         int port = uri.getPort();
         String path = uri.getPath();
         
-        String keyPath = KeyUtils.getKeyPath(host, port, path);
-        
-        // Remove all leading and trailing slashes and then split
-        String[] tokens = PATTERN.split(
-                StringUtils.trim(keyPath, '/'));
-        
-        if (tokens.length == 0) {
+        List<String> normalized = normalize(path);
+        if (normalized.isEmpty()) {
             throw new IllegalArgumentException(uri.toString());
         }
         
-        // The first token is the Bucket!
-        String bucket = normalize(tokens[0]);
-        
-        StringBuilder sb = new StringBuilder(
-                scheme.length() + keyPath.length() + 3);
-        
+        StringBuilder sb = new StringBuilder();
         sb.append(scheme).append("://");
         
-        if (StringUtils.isEmpty(host)) {
-            sb.append('/');
+        String bucket = null;
+        if (!isEmpty(host)) {
+            int p = sb.length();
+            sb.append(host);
+            if (port != -1) {
+                sb.append(':').append(port);
+            }
+            // host:port
+            bucket = sb.substring(p);
+        } else {
+            // Fist segment of the path
+            bucket = normalized.get(0);
         }
         
-        sb.append(bucket);
+        for (String element : normalized) {
+            sb.append('/').append(element);
+        }
         
-        for (int i = 1; i < tokens.length; i++) {
-            sb.append('/').append(normalize(tokens[i]));
+        String query = uri.getQuery();
+        if (!isEmpty(query)) {
+            sb.append('?').append(query);
         }
         
         return new DefaultKey(create(bucket), URI.create(sb.toString()));
     }
     
-    private static String normalize(String value) {
-        return StringUtils.trim(decode(value), '.');
-    }
-    
-    private static String decode(String value) {
-        try {
-            return URLDecoder.decode(value, StringUtils.UTF_8);
-        } catch (UnsupportedEncodingException err) {
-            throw new IllegalArgumentException(
-                    "UnsupportedEncodingException", err);
+    private static List<String> normalize(String value) {
+        String[] tokens = PATTERN.split(value, '/');
+        List<String> dst = new ArrayList<String>(tokens.length);
+        
+        for (String token : tokens) {
+            String normalized = trim(decode(token), '.');
+            
+            if (!isEmpty(normalized)) {
+                dst.add(normalized);
+            }
         }
+        
+        return dst;
     }
     
     private final KUID bucketId;
@@ -107,10 +116,24 @@ public class DefaultKey extends AbstractKey {
         }
         
         String scheme = uri.getScheme();
-        String path = KeyUtils.getKeyPath(uri);
+        String host = uri.getHost();
+        int port = uri.getPort();
+        String path = uri.getPath();
         
-        URI normalized = URI.create(scheme + "://" + path);
-        return new DefaultKey(bucketId, normalized);
+        StringBuilder sb = new StringBuilder();
+        sb.append(scheme).append("://");
+        
+        if (!isEmpty(host)) {
+            sb.append(host);
+            if (port != -1) {
+                sb.append(':').append(port);
+            }
+        }
+        
+        sb.append(path);
+        
+        return new DefaultKey(bucketId, 
+                URI.create(sb.toString()));
     }
 
     @Override
