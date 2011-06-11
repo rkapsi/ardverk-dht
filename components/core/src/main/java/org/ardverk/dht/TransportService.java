@@ -21,7 +21,7 @@ import java.net.InetAddress;
 import java.net.SocketAddress;
 
 import org.ardverk.dht.io.transport.Transport;
-import org.ardverk.io.Bindable;
+import org.ardverk.lang.Bindable;
 
 /**
  * The {@link TransportService} binds the {@link DHT} 

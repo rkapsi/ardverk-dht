@@ -43,8 +43,9 @@ import org.ardverk.dht.message.MessageId;
 import org.ardverk.dht.message.RequestMessage;
 import org.ardverk.dht.message.ResponseMessage;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.io.Bindable;
 import org.ardverk.io.IoUtils;
+import org.ardverk.lang.Bindable;
+import org.ardverk.lang.BindableUtils;
 import org.ardverk.lang.Precoditions;
 import org.ardverk.lang.TimeStamp;
 import org.slf4j.Logger;
@@ -161,7 +162,7 @@ public abstract class MessageDispatcher
      */
     private synchronized void unbind(boolean close) {
         if (transport != null) {
-            IoUtils.unbind(transport);
+            BindableUtils.unbind(transport);
             
             if (close) {
                 IoUtils.close(transport);

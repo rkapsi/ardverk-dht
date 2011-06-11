@@ -46,7 +46,7 @@ import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.Value;
 import org.ardverk.dht.storage.Database;
-import org.ardverk.io.IoUtils;
+import org.ardverk.lang.BindableUtils;
 
 
 /**
@@ -101,7 +101,7 @@ public class ArdverkDHT extends AbstractDHT {
         lookupManager = new LookupManager(this, 
                 messageDispatcher, routeTable);
         
-        IoUtils.bind(routeTable, new RouteTable.ContactPinger() {
+        BindableUtils.bind(routeTable, new RouteTable.ContactPinger() {
             @Override
             public DHTFuture<PingEntity> ping(Contact contact,
                     PingConfig config) {
@@ -109,7 +109,7 @@ public class ArdverkDHT extends AbstractDHT {
             }
         });
         
-        IoUtils.bind(database, this);
+        BindableUtils.bind(database, this);
     }
     
     @Override
@@ -117,8 +117,8 @@ public class ArdverkDHT extends AbstractDHT {
         super.close();
         messageDispatcher.close();
         
-        IoUtils.unbind(database);
-        IoUtils.unbind(routeTable);
+        BindableUtils.unbind(database);
+        BindableUtils.unbind(routeTable);
     }
     
     @Override

@@ -20,7 +20,7 @@ import org.ardverk.dht.DHT;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.Value;
-import org.ardverk.io.Bindable;
+import org.ardverk.lang.Bindable;
 
 /**
  * 

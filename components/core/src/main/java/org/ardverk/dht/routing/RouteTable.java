@@ -21,7 +21,7 @@ import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.config.PingConfig;
 import org.ardverk.dht.entity.PingEntity;
 import org.ardverk.dht.routing.RouteTable.ContactPinger;
-import org.ardverk.io.Bindable;
+import org.ardverk.lang.Bindable;
 
 public interface RouteTable extends Bindable<ContactPinger>, IoErrorCallback {
     

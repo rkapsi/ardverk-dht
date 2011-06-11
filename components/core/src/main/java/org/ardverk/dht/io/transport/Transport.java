@@ -18,7 +18,7 @@ package org.ardverk.dht.io.transport;
 
 import java.net.SocketAddress;
 
-import org.ardverk.io.Bindable;
+import org.ardverk.lang.Bindable;
 
 /**
  * The {@link Transport} provides a generic interface for the DHT to 

@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.io.transport.Transport;
-import org.ardverk.io.Bindable;
+import org.ardverk.lang.Bindable;
 import org.ardverk.lang.TimeStamp;
 
 
