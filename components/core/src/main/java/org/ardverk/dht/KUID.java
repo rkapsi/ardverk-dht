@@ -16,9 +16,6 @@
 
 package org.ardverk.dht;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.util.Arrays;
@@ -31,15 +28,15 @@ import org.ardverk.dht.lang.Identifier;
 import org.ardverk.dht.lang.Negation;
 import org.ardverk.dht.lang.Xor;
 import org.ardverk.dht.security.SecurityUtils;
-import org.ardverk.io.Writable;
+import org.ardverk.lang.ByteArray;
 import org.ardverk.lang.Bytes;
 
 
 /**
  * Kademlia Unique Identifier ({@link KUID}) 
  */
-public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>, 
-        Writable, Serializable, Comparable<KUID>, Cloneable {
+public class KUID extends ByteArray<KUID> implements Identifier, 
+        Key<KUID>, Xor<KUID>, Negation<KUID>, Cloneable {
 
     private static final long serialVersionUID = -4611363711131603626L;
     
@@ -110,14 +107,14 @@ public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>,
         // 2) Overwrite the prefix bytes
         ++bitIndex;
         int length = bitIndex/8;
-        System.arraycopy(prefix.key, 0, dst, 0, length);
+        System.arraycopy(prefix.value, 0, dst, 0, length);
         
         // 3) Overwrite the remaining bits
         int bitsToCopy = bitIndex % 8;
         if (bitsToCopy != 0) {
             // Mask has the low-order (8-bits) bits set
             int mask = (1 << (8-bitsToCopy)) - 1;
-            int prefixByte = prefix.key[length];
+            int prefixByte = prefix.value[length];
             int randByte   = dst[length];
             dst[length] = (byte) ((prefixByte & ~mask) | (randByte & mask));
         }
@@ -141,18 +138,8 @@ public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>,
         return new KUID(maxKey);
     }
     
-    private final byte[] key;
-    
-    private final int hashCode;
-    
     private KUID(byte[] key) {
-        if (key.length == 0) {
-            throw new IllegalArgumentException(
-                    "key.length=" + key.length);
-        }
-        
-        this.key = key;
-        this.hashCode = Arrays.hashCode(key);
+        super(key);
     }
     
     @Override
@@ -169,44 +156,22 @@ public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>,
     }
     
     /**
-     * Returns the {@link KUID}'s bytes.
-     */
-    public byte[] getBytes() {
-        return key.clone();
-    }
-    
-    /**
-     * Copies the {@link KUID}'s bytes into the given byte array.
-     */
-    public byte[] getBytes(byte[] dst, int destPos) {
-        System.arraycopy(key, 0, dst, destPos, key.length);
-        return dst;
-    }
-    
-    /**
      * Calls {@link MessageDigest#update(byte[])} with the {@link KUID}'s bytes.
      */
     public void update(MessageDigest md) {
-        md.update(key);
-    }
-    
-    /**
-     * Returns the length of the {@link KUID} in bytes.
-     */
-    public int length() {
-        return key.length;
+        md.update(value);
     }
     
     @Override
     public int lengthInBits() {
-        return key.length * Byte.SIZE;
+        return length() * Byte.SIZE;
     }
     
     @Override
     public boolean isBitSet(int bitIndex) {
         int index = (int)(bitIndex / Byte.SIZE);
         int bit = (int)(bitIndex % Byte.SIZE);
-        return (key[index] & mask(bit)) != 0;
+        return (value[index] & mask(bit)) != 0;
     }
     
     @Override
@@ -216,9 +181,9 @@ public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>,
         }
         
         boolean allNull = true;
-        for (int i = 0; i < key.length; i++) {
-            byte b1 = key[i];
-            byte b2 = otherId.key[i];
+        for (int i = 0; i < value.length; i++) {
+            byte b1 = value[i];
+            byte b2 = otherId.value[i];
             
             if (b1 != b2) {
                 int xor = b1 ^ b2;
@@ -243,12 +208,12 @@ public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>,
 
     @Override
     public boolean isPrefixedBy(KUID prefix) {
-        if (key.length < prefix.key.length) {
+        if (value.length < prefix.value.length) {
             return false;
         }
         
-        for (int i = 0; i < prefix.key.length; i++) {
-            if (key[i] != prefix.key[i]) {
+        for (int i = 0; i < prefix.value.length; i++) {
+            if (value[i] != prefix.value[i]) {
                 return false;
             }
         }
@@ -263,8 +228,8 @@ public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>,
         }
 
         byte[] data = new byte[length()];
-        for (int i = 0; i < key.length; i++) {
-            data[i] = (byte) (key[i] ^ otherId.key[i]);
+        for (int i = 0; i < value.length; i++) {
+            data[i] = (byte) (value[i] ^ otherId.value[i]);
         }
 
         return new KUID(data);
@@ -273,8 +238,8 @@ public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>,
     @Override
     public KUID negate() {
         byte[] data = new byte[length()];
-        for (int i = 0; i < key.length; i++) {
-            data[i] = (byte)(~key[i]);
+        for (int i = 0; i < value.length; i++) {
+            data[i] = (byte)(~value[i]);
         }
         
         return new KUID(data);
@@ -329,15 +294,15 @@ public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>,
         int bit = (int)(bitIndex % Byte.SIZE);
         
         int mask = mask(bit);
-        int value = (int)(key[index] & 0xFF);
+        int b = (int)(value[index] & 0xFF);
         
-        if (on != ((value & mask) != 0x00)) {
+        if (on != ((b & mask) != 0x00)) {
             byte[] copy = getBytes();
             
             if (on) {
-                copy[index] = (byte)(value | mask);
+                copy[index] = (byte)(b | mask);
             } else {
-                copy[index] = (byte)(value & ~mask);
+                copy[index] = (byte)(b & ~mask);
             }
             return new KUID(copy);
         }
@@ -382,8 +347,8 @@ public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>,
      * all the given expected value.
      */
     private boolean compare(byte expected) {
-        for (int i = 0; i < key.length; i++) {
-            if (expected != key[i]) {
+        for (int i = 0; i < value.length; i++) {
+            if (expected != value[i]) {
                 return false;
             }
         }
@@ -413,7 +378,7 @@ public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>,
         
         int length = length();
         for (int i = 0; i < length; i++) {
-            int diff = Bytes.compareUnsigned(key[i], otherId.key[i]);
+            int diff = Bytes.compareUnsigned(value[i], otherId.value[i]);
             if (diff != 0) {
                 return diff;
             }
@@ -421,59 +386,17 @@ public class KUID implements Identifier, Key<KUID>, Xor<KUID>, Negation<KUID>,
         
         return 0;
     }
-    
-    @Override
-    public int hashCode() {
-        return hashCode;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        } else if (!(obj instanceof KUID)) {
-            return false;
-        }
-
-        KUID otherId = (KUID) obj;
-        return Arrays.equals(key, otherId.key);
-    }
 
     @Override
     public KUID clone() {
         return this;
-    }
-    
-    @Override
-    public void writeTo(OutputStream out) throws IOException {
-        out.write(key);
     }
 
     /**
      * Returns the {@link KUID}'s value as an {@link BigInteger}
      */
     public BigInteger toBigInteger() {
-        return new BigInteger(1 /* unsigned */, key);
-    }
-    
-    /**
-     * Returns the {@link KUID}'s value as a Base 16 (hex) encoded String.
-     */
-    public String toHexString() {
-        return CodingUtils.encodeBase16(key);
-    }
-    
-    /**
-     * Returns the {@link KUID}'s value as a Base 2 (bin) encoded String.
-     */
-    public String toBinString() {
-        return CodingUtils.encodeBase2(key);
-    }
-    
-    @Override
-    public String toString() {
-        return toHexString();
-        //return toBinString();
+        return new BigInteger(1 /* unsigned */, value);
     }
     
     /**

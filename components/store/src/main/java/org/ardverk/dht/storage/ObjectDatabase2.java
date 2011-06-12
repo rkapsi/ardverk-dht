@@ -11,12 +11,14 @@ import java.io.OutputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.protocol.HTTP;
 import org.ardverk.coding.CodingUtils;
+import org.ardverk.dht.KUID;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.io.DataUtils;
@@ -65,46 +67,41 @@ public class ObjectDatabase2 extends AbstractObjectDatabase {
     }
     
     private File mkIndexFile(Key key, boolean mkdirs) {
-        return mkfile(index, key.getPath(), mkdirs);
-    }
-    
-    private File mkContextFile(Key key, String vtag, boolean mkdirs) {
-        return mkfile(context, key.getPath() + "/" + vtag, mkdirs);
-    }
-    
-    private File mkContentsFile(Key key, String vtag, boolean mkdirs) {
-        return mkfile(content, key.getPath() + "/" + vtag, mkdirs);
-    }
-    
-    private static File mkfile(File dir, String path, boolean mkdirs) {
-        File file = new File(dir, path);
+        File file = new File(index, key.getPath());
         if (mkdirs) {
             file.getParentFile().mkdirs();
         }
         return file;
     }
     
-    private File mkTmpFile(Key key) throws IOException {
-        String hash = hashPath(key);
+    private File mkContextFile(Key key, KUID valueId, boolean mkdirs) {
+        return mkContextFile(key, valueId.toHexString(), mkdirs);
+    }
+    
+    private File mkContextFile(Key key, String valueId, boolean mkdirs) {
+        return mkfile(context, key, valueId, mkdirs);
+    }
+    
+    private File mkContentFile(Key key, KUID valueId, boolean mkdirs) {
+        return mkContentFile(key, valueId.toHexString(), mkdirs);
+    }
+    
+    private File mkContentFile(Key key, String valueId, boolean mkdirs) {
+        return mkfile(content, key, valueId, mkdirs);
+    }
+    
+    private static File mkfile(File parent, Key key, String name, boolean mkdirs) {
+        File dir = new File(parent, key.getPath());
+        File file = new File(dir, name);
         
-        File dir = new File(tmp, hash.substring(0, 2));
-        if (!dir.exists()) {
+        if (mkdirs) {
             dir.mkdirs();
         }
         
-        String bucketId = key.getId().toHexString();
-        return File.createTempFile(bucketId, null, dir);
+        return file;
     }
     
-    private static String hashPath(Key key) {
-        byte[] path = StringUtils.getBytes(key.getPath());
-        MessageDigest md = MessageDigestUtils.createSHA1();
-        byte[] digest = md.digest(path);
-        return CodingUtils.encodeBase16(digest);
-    }
-    
-    private Index index(Key key) throws IOException {
-        File file = mkIndexFile(key, false);
+    private static Index index(File file, Key key) throws IOException {
         if (file.exists()) {
             return Index.valueOf(file);
         }
@@ -116,8 +113,6 @@ public class ObjectDatabase2 extends AbstractObjectDatabase {
     protected Response handlePut(Contact src, Key key, Request request,
             InputStream in) throws IOException {
         
-        Index index = index(key);
-        
         Context context = request.getContext();
         
         MessageDigest md5 = MessageDigestUtils.createMD5();
@@ -126,11 +121,18 @@ public class ObjectDatabase2 extends AbstractObjectDatabase {
         DigestInputStream dis = new DigestInputStream(
                 in, MessageDigestUtils.wrap(md5, sha1));
         
-        File tmpFile = writeContent(key, context, dis);
-        File file = null;
+        // Create a random ID
+        KUID valueId = KUID.createRandom(key.getId());
+        
+        File contentFile = null;
+        File contextFile = null;
         
         boolean success = false;
         try {
+            
+            contentFile = mkContentFile(key, valueId, true);
+            writeContent(context, contentFile, dis);
+            
             if (!digest(context, Constants.CONTENT_MD5, md5)) {
                 return Response.INTERNAL_SERVER_ERROR;
             }
@@ -139,69 +141,50 @@ public class ObjectDatabase2 extends AbstractObjectDatabase {
                 return Response.INTERNAL_SERVER_ERROR;
             }
             
-            upsertVclock(context);
+            Vclock vclock = upsertVclock(context);
             
-            file = mkContentsFile(key, true);
-            FileUtils.renameTo(tmpFile, file);
+            contextFile = mkContextFile(key, valueId, true);
+            write(contextFile, context);
             
-            writeContext(key, context);
+            File indexFile = mkIndexFile(key, true);
+            Index index = index(indexFile, key);
+            
+            index.put("current", valueId.toHexString());
+            index.put(vclock.getVTag(), valueId.toHexString());
+            
+            write(indexFile, index);
             
             success = true;
             return ResponseFactory.createOk();
             
         } finally {
             if (!success) {
-                FileUtils.deleteAll(tmpFile, file);
+                FileUtils.deleteAll(contentFile, contextFile);
             }
         }
     }
     
-    private File writeContent(Key key, Context context, InputStream in) throws IOException {
-        File file = mkTmpFile(key);
+    private static void writeContent(Context context, 
+            File file, InputStream in) throws IOException {
         
-        boolean success = false;
+        OutputStream out = new BufferedOutputStream(
+                new FileOutputStream(file));
         try {
-            OutputStream out = new BufferedOutputStream(
-                    new FileOutputStream(file));
-            try {
-                long length = context.getLongValue(HTTP.CONTENT_LEN, 0L);
-                StreamUtils.copy(in, out, length);
-                success = true;
-            } finally {
-                IoUtils.close(out);
-            }
+            long length = context.getLongValue(HTTP.CONTENT_LEN, 0L);
+            StreamUtils.copy(in, out, length);
         } finally {
-            if (!success) {
-                FileUtils.delete(file);
-            }
+            IoUtils.close(out);
         }
-        
-        return file;
     }
     
-    private File writeContext(Key key, Context context) throws IOException {
-        File file = mkContextFile(key, true);
-        return writeContext(file, context);
-    }
-    
-    private static File writeContext(File file, Context context) throws IOException {
-        boolean success = false;
+    private static void write(File file, Writable writable) throws IOException {
+        OutputStream out = new BufferedOutputStream(
+                new FileOutputStream(file));
         try {
-            OutputStream out = new BufferedOutputStream(
-                    new FileOutputStream(file));
-            try {
-                context.writeTo(out);
-                success = true;
-            } finally {
-                IoUtils.close(out);
-            }
+            writable.writeTo(out);
         } finally {
-            if (!success) {
-                FileUtils.delete(file);
-            }
+            IoUtils.close(out);
         }
-        
-        return file;
     }
     
     private static boolean digest(Context context, 
@@ -239,12 +222,23 @@ public class ObjectDatabase2 extends AbstractObjectDatabase {
     protected Response handleDelete(Contact src, Key key, Request request,
             InputStream in) throws IOException {
         
-        File file = mkContextFile(key, false);
-        if (!file.exists()) {
+        File indexFile = mkIndexFile(key, false);
+        if (!indexFile.exists()) {
             return ResponseFactory.createNotFound();
         }
         
-        Context context = Context.valueOf(file);
+        Index index = Index.valueOf(indexFile);
+        String valueId = index.get("current");
+        if (valueId == null) {
+            return ResponseFactory.createNotFound();
+        }
+        
+        File contextFile = mkContextFile(key, valueId, false);
+        if (!contextFile.exists()) {
+            return ResponseFactory.createNotFound();
+        }
+        
+        Context context = Context.valueOf(contextFile);
         
         if (context.containsHeader(Constants.TOMBSTONE)) {
             return ResponseFactory.createNotFound();
@@ -253,10 +247,10 @@ public class ObjectDatabase2 extends AbstractObjectDatabase {
         context.addHeader(Constants.tombstone());
         
         // TODO: Vclock!!!
-        writeContext(file, context);
+        write(contextFile, context);
         
-        File contents = mkContentsFile(key, false);
-        FileUtils.delete(contents);
+        File contentFile = mkContentFile(key, valueId, false);
+        FileUtils.delete(contentFile);
         
         return ResponseFactory.createOk();
     }
@@ -265,12 +259,23 @@ public class ObjectDatabase2 extends AbstractObjectDatabase {
     protected Response handleHead(Contact src, Key key, Request request,
             InputStream in) throws IOException {
         
-        File file = mkContextFile(key, false);
-        if (!file.exists()) {
+        File indexFile = mkIndexFile(key, false);
+        if (!indexFile.exists()) {
             return ResponseFactory.createNotFound();
         }
         
-        Context context = Context.valueOf(file);
+        Index index = Index.valueOf(indexFile);
+        String valueId = index.get("current");
+        if (valueId == null) {
+            return ResponseFactory.createNotFound();
+        }
+        
+        File contextFile = mkContextFile(key, valueId, false);
+        if (!contextFile.exists()) {
+            return ResponseFactory.createNotFound();
+        }
+        
+        Context context = Context.valueOf(contextFile);
         if (context.containsHeader(Constants.TOMBSTONE)) {
             return ResponseFactory.createNotFound();
         }
@@ -292,23 +297,34 @@ public class ObjectDatabase2 extends AbstractObjectDatabase {
             }
         }
             
-        File file = mkContextFile(key, false);
-        if (!file.exists() || !file.isFile()) {
+        File indexFile = mkIndexFile(key, false);
+        if (!indexFile.exists()) {
             return null;
         }
         
-        Context context = Context.valueOf(file);
+        Index index = Index.valueOf(indexFile);
+        String valueId = index.get("current");
+        if (valueId == null) {
+            return null;
+        }
+        
+        File contextFile = mkContextFile(key, valueId, false);
+        if (!contextFile.exists()) {
+            return null;
+        }
+        
+        Context context = Context.valueOf(contextFile);
         if (context.containsHeader(Constants.TOMBSTONE)) {
             return null;
         }
         
-        File contents = mkContentsFile(key, false);
-        if (!contents.exists()) {
+        File contentFile = mkContentFile(key, valueId, false);
+        if (!contentFile.exists()) {
             return null;
         }
         
         return new Response(StatusLine.OK, context, 
-                new FileValueEntity(contents));
+                new FileValueEntity(contentFile));
     }
     
     protected Response list(Contact src, Key key, Map<String, String> query) {
@@ -325,8 +341,27 @@ public class ObjectDatabase2 extends AbstractObjectDatabase {
         
         private final String path;
         
+        private final Map<String, String> properties;
+        
         public Index(String path) {
+            this(path, new HashMap<String, String>());
+        }
+        
+        public Index(String path, Map<String, String> properties) {
             this.path = path;
+            this.properties = properties;
+        }
+        
+        public String put(String key, String value) {
+            return properties.put(key, value);
+        }
+        
+        public String get(String key) {
+            return properties.get(key);
+        }
+        
+        public String remove(String key) {
+            return properties.remove(key);
         }
         
         @Override
@@ -351,6 +386,14 @@ public class ObjectDatabase2 extends AbstractObjectDatabase {
             out.write(VERSION);
             
             StringUtils.writeString(path, out);
+            
+            int size = properties.size();
+            DataUtils.int2beb(size, out);
+            
+            for (Map.Entry<String, String> entry : properties.entrySet()) {
+                StringUtils.writeString(entry.getKey(), out);
+                StringUtils.writeString(entry.getValue(), out);
+            }
         }
         
         public static Index valueOf(File file) throws IOException {
@@ -371,7 +414,19 @@ public class ObjectDatabase2 extends AbstractObjectDatabase {
             
             String path = StringUtils.readString(in);
             
-            return new Index(path);
+            int size = DataUtils.beb2int(in);
+            Map<String, String> properties 
+                = new HashMap<String, String>(size);
+            
+            while (0 < size) {
+                String key = StringUtils.readString(in);
+                String value = StringUtils.readString(in);
+                
+                properties.put(key, value);
+                --size;
+            }
+            
+            return new Index(path, properties);
         }
     }
 }

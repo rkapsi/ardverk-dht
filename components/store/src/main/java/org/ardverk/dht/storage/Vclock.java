@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -15,6 +16,7 @@ import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
 import org.apache.commons.codec.binary.Base64;
+import org.ardverk.coding.CodingUtils;
 import org.ardverk.io.DataUtils;
 import org.ardverk.io.IoUtils;
 import org.ardverk.io.Writable;
@@ -33,7 +35,7 @@ public class Vclock implements Version<Vclock>, Writable, Serializable {
         return new Vclock(VectorClock.<String>create());
     }
     
-    private final String vtag;
+    private final byte[] vtag;
     
     private final VectorClock<String> vclock;
     
@@ -41,7 +43,7 @@ public class Vclock implements Version<Vclock>, Writable, Serializable {
         this(vtag(vclock), vclock);
     }
     
-    private Vclock(String vtag, VectorClock<String> vclock) {
+    private Vclock(byte[] vtag, VectorClock<String> vclock) {
         this.vtag = vtag;
         this.vclock = vclock;
     }
@@ -51,7 +53,7 @@ public class Vclock implements Version<Vclock>, Writable, Serializable {
     }
     
     public String getVTag() {
-        return vtag;
+        return Base64.encodeBase64URLSafeString(vtag);
     }
     
     public long getCreationTime() {
@@ -77,7 +79,7 @@ public class Vclock implements Version<Vclock>, Writable, Serializable {
 
     @Override
     public int hashCode() {
-        return vtag.hashCode();
+        return Arrays.hashCode(vtag);
     }
     
     @Override
@@ -89,7 +91,7 @@ public class Vclock implements Version<Vclock>, Writable, Serializable {
         }
         
         Vclock other = (Vclock)o;
-        return vtag.equals(other.vtag);
+        return Arrays.equals(vtag, other.vtag);
     }
 
     @Override
@@ -113,7 +115,7 @@ public class Vclock implements Version<Vclock>, Writable, Serializable {
             return Base64.encodeBase64String(baos.toByteArray());
         }
         
-        return vtag + "/" + vclock.toString();
+        return CodingUtils.encodeBase16(vtag) + "/" + vclock.toString();
     }
     
     @Override
@@ -181,7 +183,7 @@ public class Vclock implements Version<Vclock>, Writable, Serializable {
             }
         }
         
-        String vtag = vtag(md);
+        byte[] vtag = md.digest();
         VectorClock<String> vclock = VectorClock.create(creationTime, map);
         
         return new Vclock(vtag, vclock);
@@ -190,7 +192,7 @@ public class Vclock implements Version<Vclock>, Writable, Serializable {
     /**
      * Calculates and returns the VTag.
      */
-    private static String vtag(VectorClock<String> vclock) {
+    private static byte[] vtag(VectorClock<String> vclock) {
         final MessageDigest md = MessageDigestUtils.createSHA1();
         
         OutputStream out = new OutputStream() {
@@ -224,11 +226,6 @@ public class Vclock implements Version<Vclock>, Writable, Serializable {
             IoUtils.close(out);
         }
         
-        return vtag(md);
-    }
-    
-    private static String vtag(MessageDigest md) {
-        byte[] digest = md.digest();
-        return Base64.encodeBase64URLSafeString(digest);
+        return md.digest();
     }
 }

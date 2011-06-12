@@ -153,9 +153,10 @@ public final class Context implements Properties, Writable, Cloneable {
         Context context = new Context();
         
         int count = DataUtils.beb2ushort(in);
-        for (int i = 0; i < count; i++) {
+        while (0 < count) {
             Header header = readHeader(in);
             context.addHeader(header);
+            --count;
         }
         
         return context;
