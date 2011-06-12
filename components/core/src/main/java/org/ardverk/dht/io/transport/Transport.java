@@ -16,6 +16,7 @@
 
 package org.ardverk.dht.io.transport;
 
+import java.io.IOException;
 import java.net.SocketAddress;
 
 import org.ardverk.lang.Bindable;
@@ -26,6 +27,12 @@ import org.ardverk.lang.Bindable;
  */
 public interface Transport extends Endpoint, Bindable<TransportCallback> {
 
+    @Override
+    public void bind(TransportCallback callback) throws IOException;
+    
+    @Override
+    public void unbind() throws IOException;
+    
     /**
      * Returns the local {@link SocketAddress}
      */

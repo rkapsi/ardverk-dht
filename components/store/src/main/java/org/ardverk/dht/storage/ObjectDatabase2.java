@@ -61,9 +61,9 @@ public class ObjectDatabase2 extends AbstractObjectDatabase {
     public ObjectDatabase2(File directory) throws IOException {
         this.directory = directory;
         
-        this.index = FileUtils.mkdirs(directory, "index");
-        this.context = FileUtils.mkdirs(directory, "context");
-        this.content = FileUtils.mkdirs(directory, "content");
+        this.index = FileUtils.mkdirs(directory, "index", true);
+        this.context = FileUtils.mkdirs(directory, "context", true);
+        this.content = FileUtils.mkdirs(directory, "content", true);
     }
     
     private File mkIndexFile(Key key, boolean mkdirs) {
@@ -159,7 +159,7 @@ public class ObjectDatabase2 extends AbstractObjectDatabase {
             
         } finally {
             if (!success) {
-                FileUtils.deleteAll(contentFile, contextFile);
+                deleteAll(contentFile, contextFile);
             }
         }
     }
@@ -250,7 +250,7 @@ public class ObjectDatabase2 extends AbstractObjectDatabase {
         write(contextFile, context);
         
         File contentFile = mkContentFile(key, valueId, false);
-        FileUtils.delete(contentFile);
+        deleteAll(contentFile);
         
         return ResponseFactory.createOk();
     }
@@ -333,6 +333,12 @@ public class ObjectDatabase2 extends AbstractObjectDatabase {
     
     protected Response vtag(Contact src, Key key, Map<String, String> query) {
         return null;
+    }
+    
+    private static void deleteAll(File... files) {
+        for (File file : files) {
+            org.apache.commons.io.FileUtils.deleteQuietly(file);
+        }
     }
     
     private static class Index implements Writable {

@@ -59,4 +59,10 @@ interface TransportService extends Bindable<Transport> {
      * @see #bind(Transport)
      */
     public void bind(SocketAddress address) throws IOException;
+    
+    @Override
+    public void bind(Transport transport) throws IOException;
+    
+    @Override
+    public void unbind() throws IOException;
 }
