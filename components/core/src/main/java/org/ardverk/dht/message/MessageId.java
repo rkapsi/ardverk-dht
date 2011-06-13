@@ -16,23 +16,16 @@
 
 package org.ardverk.dht.message;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Random;
 
 import org.ardverk.coding.CodingUtils;
 import org.ardverk.dht.security.SecurityUtils;
-import org.ardverk.io.Writable;
-import org.ardverk.lang.Precoditions;
-import org.ardverk.utils.ByteArrayComparator;
+import org.ardverk.lang.ByteArray;
 
 /**
  * A {@link MessageId} is a randomly generated identifier for {@link Message}s.
  */
-public final class MessageId implements Writable, Serializable, 
-        Comparable<MessageId>, Cloneable {
+public final class MessageId extends ByteArray<MessageId> implements Cloneable {
 
     private static final long serialVersionUID = 6653397095695641792L;
     
@@ -79,13 +72,8 @@ public final class MessageId implements Writable, Serializable,
         return create(CodingUtils.decodeBase16(messageId));
     }
     
-    private final byte[] messageId;
-    
-    private final int hashCode;
-    
     private MessageId(byte[] messageId) {
-        this.messageId = Precoditions.notNull(messageId, "messageId");
-        this.hashCode = Arrays.hashCode(messageId);
+        super(messageId);
     }
     
     /**
@@ -95,66 +83,10 @@ public final class MessageId implements Writable, Serializable,
     public boolean isCompatible(MessageId otherId) {
         return otherId != null && length() == otherId.length();
     }
-
-    @Override
-    public int compareTo(MessageId o) {
-        return ByteArrayComparator.COMPARATOR.compare(messageId, o.messageId);
-    }
-
-    @Override
-    public void writeTo(OutputStream out) throws IOException {
-        out.write(messageId);
-    }
-
-    /**
-     * Returns the {@link MessageId}'s {@code byte[]}s.
-     */
-    public byte[] getBytes() {
-        return messageId.clone();
-    }
-
-    /**
-     * Copies the {@link MessageId}'s into the given {@code byte[]}.
-     */
-    public byte[] getBytes(byte[] dst, int destPos) {
-        System.arraycopy(messageId, 0, dst, destPos, messageId.length);
-        return dst;
-    }
-    
-    /**
-     * Returns the length of the {@link MessageId}.
-     */
-    public int length() {
-        return messageId.length;
-    }
     
     @Override
     public MessageId clone() {
         return this;
-    }
-    
-    @Override
-    public int hashCode() {
-        return hashCode;
-    }
-    
-    @Override
-    public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        } else if (!(o instanceof MessageId)) {
-            return false;
-        }
-        
-        MessageId other = (MessageId)o;
-        return Arrays.equals(messageId, other.messageId);
-    }
-    
-    /**
-     * Returns the {@link MessageId} as a Base-16 (hex) encoded string.
-     */
-    public String toHexString() {
-        return CodingUtils.encodeBase16(messageId);
     }
     
     @Override
