@@ -288,6 +288,11 @@ public class ObjectDatabase2 extends AbstractObjectDatabase {
     protected Response handleGet(Contact src, 
             Key key, boolean store) throws IOException {
         
+        File indexFile = mkIndexFile(key, false);
+        if (!indexFile.exists()) {
+            return null;
+        }
+        
         Map<String, String> query = key.getQueryString();
         if (query != null && !query.isEmpty()) {
             if (query.containsKey(LIST)) {
@@ -295,11 +300,6 @@ public class ObjectDatabase2 extends AbstractObjectDatabase {
             } else if (query.containsKey(VTAG)) {
                 return vtag(src, key, query);
             }
-        }
-            
-        File indexFile = mkIndexFile(key, false);
-        if (!indexFile.exists()) {
-            return null;
         }
         
         Index index = Index.valueOf(indexFile);
@@ -435,4 +435,22 @@ public class ObjectDatabase2 extends AbstractObjectDatabase {
             return new Index(path, properties);
         }
     }
+    
+    /*private static class Entry implements Writable {
+        
+        private final long creationTime;
+
+        public Entry() {
+            this(System.currentTimeMillis());
+        }
+        
+        public Entry(long creationTime) {
+            this.creationTime = creationTime;
+        }
+        
+        @Override
+        public void writeTo(OutputStream out) throws IOException {
+            DataUtils.long2beb(creationTime, out);
+        }
+    }*/
 }
