@@ -10,7 +10,11 @@
 	<dependencies>
 	  <dependency org="ardverk" name="ardverk-dht-core" rev="latest.integration"/>
 	  
+	  <dependency org="apache" name="httpclient" rev="4.1.1"/>
 	  <dependency org="apache" name="httpcore" rev="4.1"/>
 	  <dependency org="apache" name="httpmime" rev="4.1.1"/>
+	  <dependency org="apache" name="commons-codec" rev="1.5"/>
+	  <dependency org="apache" name="commons-lang" rev="2.6"/>
+	  <dependency org="apache" name="commons-io" rev="2.0.1"/>
 	</dependencies>
 </ivy-module>

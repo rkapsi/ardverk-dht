@@ -26,5 +26,6 @@
 	<classpathentry kind="lib" path="lib/apache/httpclient/jars/httpclient-4.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/apache/commons-io/jars/commons-io-2.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/jdbm/jdbm/jars/jdbm-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/hsqldb/hsqldb/jars/hsqldb-2.2.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
