@@ -16,7 +16,7 @@
 
 package org.ardverk.dht.rsrc;
 
-import static org.ardverk.utils.StringUtils.decode;
+import static org.ardverk.utils.StringUtils.decodeURL;
 import static org.ardverk.utils.StringUtils.isEmpty;
 import static org.ardverk.utils.StringUtils.trim;
 
@@ -89,7 +89,7 @@ public class DefaultKey extends AbstractKey {
         List<String> dst = new ArrayList<String>(tokens.length);
         
         for (String token : tokens) {
-            String normalized = trim(decode(token), '.');
+            String normalized = trim(decodeURL(token), '.');
             
             if (!isEmpty(normalized)) {
                 dst.add(normalized);

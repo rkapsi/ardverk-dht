@@ -39,7 +39,7 @@ class MultipleChoicesResponse extends Response {
             XMLOutputFactory factory = XMLOutputFactory.newFactory();
             
             XMLStreamWriter xml = factory.createXMLStreamWriter(
-                    new OutputStreamWriter(baos, StringUtils.UTF_8));
+                    new OutputStreamWriter(baos, StringUtils.UTF8));
             
             try {
                 xml.writeStartDocument();
