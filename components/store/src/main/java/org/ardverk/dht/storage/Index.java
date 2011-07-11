@@ -10,9 +10,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.http.Header;
 import org.ardverk.collection.CollectionUtils;
@@ -83,7 +84,34 @@ public class Index implements Closeable {
         }
     }
     
-    public Context[] get(Key key) throws SQLException {
+    public boolean containsKey(Key key) throws SQLException {
+        String path = key.getPath();
+        byte[] kid = hash(path);
+        return containsKey(kid);
+    }
+    
+    private boolean containsKey(byte[] kid) throws SQLException {
+        PreparedStatement ps 
+            = connection.prepareStatement("SELECT COUNT(id) FROM keys WHERE id = ?");
+        try {
+            ps.setBytes(1, kid);
+            ResultSet rs = ps.executeQuery();
+            try {
+                if (rs.next()) {
+                    return 0 < rs.getInt(1);
+                }
+            } finally {
+                close(rs);
+            }
+        } finally {
+            close(ps);
+        }
+        
+        return false;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public Map.Entry<KUID, Context>[] get(Key key) throws SQLException {
         String path = key.getPath();
         byte[] kid = hash(path);
         
@@ -98,17 +126,17 @@ public class Index implements Closeable {
             try {
                 if (rs.next()) {
                     
-                    List<Context> list = new ArrayList<Context>();
+                    Map<KUID, Context> map = new HashMap<KUID, Context>();
                     Context context = null;
                     
                     byte[] current = null;
                     
                     do {
-                        byte[] id = rs.getBytes(1);
+                        byte[] vid = rs.getBytes(1);
                         
-                        if (!Arrays.equals(current, id)) {
+                        if (!Arrays.equals(current, vid)) {
                             context = new Context();
-                            list.add(context);
+                            map.put(KUID.create(vid), context);
                         }
                         
                         String name = rs.getString(2);
@@ -116,7 +144,8 @@ public class Index implements Closeable {
                         context.addHeader(name, value);
                     } while (rs.next());
                     
-                    return CollectionUtils.toArray(list, Context.class);
+                    Set<Map.Entry<KUID, Context>> entries = map.entrySet();
+                    return CollectionUtils.toArray(entries, Map.Entry.class);
                 }
                 
                 return null;
@@ -164,46 +193,52 @@ public class Index implements Closeable {
         String path = key.getPath();
         byte[] kid = hash(path);
         
-        PreparedStatement keys 
-            = connection.prepareStatement(
+        if (!containsKey(kid)) {
+            PreparedStatement ps 
+                = connection.prepareStatement(
                     "INSERT INTO keys NAMES(id, key) VALUES(?, ?)");
-        try {
-            keys.setBytes(1, kid);
-            keys.setString(2, path);
-            keys.executeUpdate();
-        } catch (SQLException err) {
-            // IGNORE
-        } finally {
-            close(keys);
+            try {
+                ps.setBytes(1, kid);
+                ps.setString(2, path);
+                ps.executeUpdate();
+            } finally {
+                close(ps);
+            }
         }
         
         byte[] vid = valueId.getBytes();
         
-        PreparedStatement values 
-            = connection.prepareStatement(
-                "INSERT INTO entries NAMES(id, kid) VALUES(?, ?)");
-        try {
-            values.setBytes(1, vid);
-            values.setBytes(2, kid);
-            values.executeUpdate();
-        } finally {
-            close(values);
+        // ENTRIES
+        {
+            PreparedStatement ps 
+                = connection.prepareStatement(
+                    "INSERT INTO entries NAMES(id, kid) VALUES(?, ?)");
+            try {
+                ps.setBytes(1, vid);
+                ps.setBytes(2, kid);
+                ps.executeUpdate();
+            } finally {
+                close(ps);
+            }
         }
         
-        PreparedStatement properties 
-            = connection.prepareStatement(
-                "INSERT INTO properties NAMES(vid, name, value) VALUES(?, ?, ?)");
-        try {
-            for (Header header : context.getHeaders()) {
-                properties.setBytes(1, vid);
-                properties.setString(2, header.getName());
-                properties.setString(3, header.getValue());
-                properties.addBatch();
+        // PROPERTIES
+        {
+            PreparedStatement ps 
+                = connection.prepareStatement(
+                    "INSERT INTO properties NAMES(vid, name, value) VALUES(?, ?, ?)");
+            try {
+                for (Header header : context.getHeaders()) {
+                    ps.setBytes(1, vid);
+                    ps.setString(2, header.getName());
+                    ps.setString(3, header.getValue());
+                    ps.addBatch();
+                }
+                
+                ps.executeBatch();
+            } finally {
+                close(ps);
             }
-            
-            properties.executeBatch();
-        } finally {
-            close(properties);
         }
     }
     
