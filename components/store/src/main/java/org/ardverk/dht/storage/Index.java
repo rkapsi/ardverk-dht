@@ -206,16 +206,17 @@ public class Index implements Closeable {
     }
     
     public void add(Key key, Context context, KUID valueId) throws SQLException {
+        
         long now = System.currentTimeMillis();
         
         Date created = new Date(now);
         Timestamp modified = new Timestamp(now);
         
+        String path = key.getPath();
+        byte[] kid = hash(path);
+        
         try {
             connection.setAutoCommit(false);
-            
-            String path = key.getPath();
-            byte[] kid = hash(path);
             
             // KEYS
             {
