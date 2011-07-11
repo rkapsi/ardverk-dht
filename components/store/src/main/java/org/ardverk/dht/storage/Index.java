@@ -5,11 +5,13 @@ import java.io.File;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,13 +31,16 @@ public class Index implements Closeable {
     private static final String CREATE_KEYS
         = "CREATE TABLE keys ("
         + "id BINARY(20) PRIMARY KEY," // sha1(key)
-        + "key VARCHAR(16384) UNIQUE NOT NULL"
+        + "key VARCHAR(16384) UNIQUE NOT NULL,"
+        + "created DATETIME NOT NULL,"
+        + "modified TIMESTAMP NOT NULL"
         + ")";
     
     private static final String CREATE_VALUES
         = "CREATE TABLE entries (" // Using 'entries' because 'values' is a reserved keyword
         + "id BINARY(20) PRIMARY KEY,"
-        + "kid BINARY(20) FOREIGN KEY REFERENCES keys(id)"
+        + "kid BINARY(20) FOREIGN KEY REFERENCES keys(id),"
+        + "created DATETIME NOT NULL"
         + ")";
     
     private static final String CREATE_PROPERTIES 
@@ -91,10 +96,21 @@ public class Index implements Closeable {
     }
     
     private boolean containsKey(byte[] kid) throws SQLException {
-        PreparedStatement ps 
-            = connection.prepareStatement("SELECT COUNT(id) FROM keys WHERE id = ?");
+        return contains("SELECT COUNT(id) FROM keys WHERE id = ?", kid);
+    }
+    
+    public boolean containsValue(KUID valueId) throws SQLException {
+        return containsValue(valueId.getBytes(false));
+    }
+    
+    private boolean containsValue(byte[] vid) throws SQLException {
+        return contains("SELECT COUNT(id) FROM entries WHERE id = ?", vid);
+    }
+    
+    private boolean contains(String sql, byte[] key) throws SQLException {
+        PreparedStatement ps = connection.prepareStatement(sql);
         try {
-            ps.setBytes(1, kid);
+            ps.setBytes(1, key);
             ResultSet rs = ps.executeQuery();
             try {
                 if (rs.next()) {
@@ -190,55 +206,82 @@ public class Index implements Closeable {
     }
     
     public void add(Key key, Context context, KUID valueId) throws SQLException {
-        String path = key.getPath();
-        byte[] kid = hash(path);
+        long now = System.currentTimeMillis();
         
-        if (!containsKey(kid)) {
-            PreparedStatement ps 
-                = connection.prepareStatement(
-                    "INSERT INTO keys NAMES(id, key) VALUES(?, ?)");
-            try {
-                ps.setBytes(1, kid);
-                ps.setString(2, path);
-                ps.executeUpdate();
-            } finally {
-                close(ps);
-            }
-        }
+        Date created = new Date(now);
+        Timestamp modified = new Timestamp(now);
         
-        byte[] vid = valueId.getBytes();
-        
-        // ENTRIES
-        {
-            PreparedStatement ps 
-                = connection.prepareStatement(
-                    "INSERT INTO entries NAMES(id, kid) VALUES(?, ?)");
-            try {
-                ps.setBytes(1, vid);
-                ps.setBytes(2, kid);
-                ps.executeUpdate();
-            } finally {
-                close(ps);
-            }
-        }
-        
-        // PROPERTIES
-        {
-            PreparedStatement ps 
-                = connection.prepareStatement(
-                    "INSERT INTO properties NAMES(vid, name, value) VALUES(?, ?, ?)");
-            try {
-                for (Header header : context.getHeaders()) {
-                    ps.setBytes(1, vid);
-                    ps.setString(2, header.getName());
-                    ps.setString(3, header.getValue());
-                    ps.addBatch();
+        try {
+            connection.setAutoCommit(false);
+            
+            String path = key.getPath();
+            byte[] kid = hash(path);
+            
+            // KEYS
+            {
+                PreparedStatement ps = null;
+                try {
+                    if (!containsKey(kid)) {
+                        ps = connection.prepareStatement(
+                                "INSERT INTO keys NAMES(id, key, created, modified) VALUES(?, ?, ?, ?)");
+                        ps.setBytes(1, kid);
+                        ps.setString(2, path);
+                        ps.setDate(3, created);
+                        ps.setTimestamp(4, modified);
+                    } else {
+                        ps = connection.prepareStatement(
+                                "UPDATE keys SET modified = ? WHERE id = ?");
+                        
+                        ps.setTimestamp(1, modified);
+                        ps.setBytes(2, kid);
+                    }
+                    
+                    ps.executeUpdate();
+                } finally {
+                    close(ps);
                 }
-                
-                ps.executeBatch();
-            } finally {
-                close(ps);
             }
+            
+            byte[] vid = valueId.getBytes(false);
+            
+            // ENTRIES
+            {
+                PreparedStatement ps 
+                    = connection.prepareStatement(
+                        "INSERT INTO entries NAMES(id, kid, created) VALUES(?, ?, ?)");
+                try {
+                    ps.setBytes(1, vid);
+                    ps.setBytes(2, kid);
+                    ps.setDate(3, created);
+                    ps.executeUpdate();
+                } finally {
+                    close(ps);
+                }
+            }
+            
+            // PROPERTIES
+            {
+                PreparedStatement ps 
+                    = connection.prepareStatement(
+                        "INSERT INTO properties NAMES(vid, name, value) VALUES(?, ?, ?)");
+                try {
+                    for (Header header : context.getHeaders()) {
+                        ps.setBytes(1, vid);
+                        ps.setString(2, header.getName());
+                        ps.setString(3, header.getValue());
+                        ps.addBatch();
+                    }
+                    
+                    ps.executeBatch();
+                } finally {
+                    close(ps);
+                }
+            }
+            
+            connection.commit();
+            
+        } finally {
+            connection.setAutoCommit(true);
         }
     }
     
