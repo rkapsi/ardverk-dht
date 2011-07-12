@@ -24,7 +24,6 @@ import org.ardverk.dht.routing.DefaultRouteTable;
 import org.ardverk.dht.routing.Localhost;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Datastore;
-import org.ardverk.dht.storage.ObjectDatastore2;
 
 public class EasyFactory {
     
@@ -56,5 +55,6 @@ public class EasyFactory {
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
+        //return new ObjectDatastore();
     }
 }
