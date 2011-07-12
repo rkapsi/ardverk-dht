@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.http.Header;
 import org.ardverk.collection.CollectionUtils;
@@ -52,11 +53,17 @@ public class DefaultIndex implements Index {
         + "value VARCHAR(16384) NOT NULL,"
         + ")";
     
+    private static final AtomicInteger COUNTER = new AtomicInteger();
+    
     public static Index create(File dir) {
         try {
             Class.forName("org.hsqldb.jdbcDriver");
             
-            String url = "jdbc:hsqldb:mem:index";
+            //String url = "jdbc:hsqldb:mem:index-" + COUNTER.incrementAndGet();
+            
+            String path = dir.getAbsolutePath() + "/index-" + COUNTER.incrementAndGet();
+            String url = "jdbc:hsqldb:file:" + path;
+            
             String user = "sa";
             String password = "";
             Connection connection = DriverManager.getConnection(url, user, password);

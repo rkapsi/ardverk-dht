@@ -22,7 +22,6 @@ import org.ardverk.dht.rsrc.Key;
 import org.ardverk.io.FileUtils;
 import org.ardverk.io.IoUtils;
 import org.ardverk.io.StreamUtils;
-import org.ardverk.io.Writable;
 import org.ardverk.security.MessageDigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +37,7 @@ public class ObjectDatastore2 extends AbstractObjectDatastore implements Closeab
     
     private static final String VTAG = "vtag";
     
-    private final Index index = DefaultIndex.create(null);
+    private final Index index;
     
     private final File directory;
     
@@ -55,6 +54,8 @@ public class ObjectDatastore2 extends AbstractObjectDatastore implements Closeab
     public ObjectDatastore2(File directory) throws IOException {
         this.directory = directory;
         this.content = FileUtils.mkdirs(directory, "content", true);
+        
+        index = DefaultIndex.create(directory);
     }
     
     @Override
@@ -97,7 +98,6 @@ public class ObjectDatastore2 extends AbstractObjectDatastore implements Closeab
         KUID valueId = KUID.createRandom(key.getId());
         
         File contentFile = null;
-        File contextFile = null;
         
         boolean success = false;
         try {
@@ -115,23 +115,26 @@ public class ObjectDatastore2 extends AbstractObjectDatastore implements Closeab
             
             Vclock vclock = upsertVclock(context);
             
-            contextFile = mkContextFile(key, valueId, true);
-            write(contextFile, context);
-            
-            File indexFile = mkIndexFile(key, true);
+            /*File indexFile = mkIndexFile(key, true);
             Index index = index(indexFile, key);
             
             index.put("current", valueId.toHexString());
             index.put(vclock.getVTag(), valueId.toHexString());
             
-            write(indexFile, index);
+            write(indexFile, index);*/
+            
+            try {
+                index.add(key, context, valueId);
+            } catch (Exception err) {
+                throw new IOException("Exception", err);
+            }
             
             success = true;
             return ResponseFactory.createOk();
             
         } finally {
             if (!success) {
-                deleteAll(contentFile, contextFile);
+                deleteAll(contentFile);
             }
         }
     }
@@ -144,16 +147,6 @@ public class ObjectDatastore2 extends AbstractObjectDatastore implements Closeab
         try {
             long length = context.getLongValue(HTTP.CONTENT_LEN, 0L);
             StreamUtils.copy(in, out, length);
-        } finally {
-            IoUtils.close(out);
-        }
-    }
-    
-    private static void write(File file, Writable writable) throws IOException {
-        OutputStream out = new BufferedOutputStream(
-                new FileOutputStream(file));
-        try {
-            writable.writeTo(out);
         } finally {
             IoUtils.close(out);
         }
@@ -194,23 +187,20 @@ public class ObjectDatastore2 extends AbstractObjectDatastore implements Closeab
     protected Response handleDelete(Contact src, Key key, Request request,
             InputStream in) throws IOException {
         
-        File indexFile = mkIndexFile(key, false);
-        if (!indexFile.exists()) {
+        Map.Entry<KUID, Context>[] values = null;
+        try {
+            values = index.get(key);
+        } catch (Exception err) {
+            throw new IOException("Exception", err);
+        }
+        
+        if (values == null || values.length == 0) {
             return ResponseFactory.createNotFound();
         }
         
-        Index index = Index.valueOf(indexFile);
-        String valueId = index.get("current");
-        if (valueId == null) {
-            return ResponseFactory.createNotFound();
-        }
-        
-        File contextFile = mkContextFile(key, valueId, false);
-        if (!contextFile.exists()) {
-            return ResponseFactory.createNotFound();
-        }
-        
-        Context context = Context.valueOf(contextFile);
+        // TODO
+        KUID valueId = values[values.length-1].getKey();
+        Context context = values[values.length-1].getValue();
         
         if (context.containsHeader(Constants.TOMBSTONE)) {
             return ResponseFactory.createNotFound();
@@ -218,11 +208,15 @@ public class ObjectDatastore2 extends AbstractObjectDatastore implements Closeab
         
         context.addHeader(Constants.tombstone());
         
-        // TODO: Vclock!!!
-        write(contextFile, context);
-        
         File contentFile = mkContentFile(key, valueId, false);
         deleteAll(contentFile);
+        
+        // TODO: Write the Vclock and a Tombstone instead
+        try {
+            index.remove(key, valueId);
+        } catch (Exception err) {
+            throw new IOException("Exception", err);
+        }
         
         return ResponseFactory.createOk();
     }
@@ -231,23 +225,21 @@ public class ObjectDatastore2 extends AbstractObjectDatastore implements Closeab
     protected Response handleHead(Contact src, Key key, Request request,
             InputStream in) throws IOException {
         
-        File indexFile = mkIndexFile(key, false);
-        if (!indexFile.exists()) {
+        Map.Entry<KUID, Context>[] values = null;
+        try {
+            values = index.get(key);
+        } catch (Exception err) {
+            throw new IOException("Exception", err);
+        }
+        
+        if (values == null || values.length == 0) {
             return ResponseFactory.createNotFound();
         }
         
-        Index index = Index.valueOf(indexFile);
-        String valueId = index.get("current");
-        if (valueId == null) {
-            return ResponseFactory.createNotFound();
-        }
+        // TODO
+        KUID valueId = values[values.length-1].getKey();
+        Context context = values[values.length-1].getValue();
         
-        File contextFile = mkContextFile(key, valueId, false);
-        if (!contextFile.exists()) {
-            return ResponseFactory.createNotFound();
-        }
-        
-        Context context = Context.valueOf(contextFile);
         if (context.containsHeader(Constants.TOMBSTONE)) {
             return ResponseFactory.createNotFound();
         }
@@ -260,8 +252,14 @@ public class ObjectDatastore2 extends AbstractObjectDatastore implements Closeab
     protected Response handleGet(Contact src, 
             Key key, boolean store) throws IOException {
         
-        File indexFile = mkIndexFile(key, false);
-        if (!indexFile.exists()) {
+        Map.Entry<KUID, Context>[] values = null;
+        try {
+            values = index.get(key);
+        } catch (Exception err) {
+            throw new IOException("Exception", err);
+        }
+        
+        if (values == null || values.length == 0) {
             return null;
         }
         
@@ -274,18 +272,10 @@ public class ObjectDatastore2 extends AbstractObjectDatastore implements Closeab
             }
         }
         
-        Index index = Index.valueOf(indexFile);
-        String valueId = index.get("current");
-        if (valueId == null) {
-            return null;
-        }
+        // TODO
+        KUID valueId = values[values.length-1].getKey();
+        Context context = values[values.length-1].getValue();
         
-        File contextFile = mkContextFile(key, valueId, false);
-        if (!contextFile.exists()) {
-            return null;
-        }
-        
-        Context context = Context.valueOf(contextFile);
         if (context.containsHeader(Constants.TOMBSTONE)) {
             return null;
         }
