@@ -26,7 +26,7 @@ import org.ardverk.dht.message.StoreRequest;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.Value;
-import org.ardverk.dht.storage.Database;
+import org.ardverk.dht.storage.Datastore;
 
 
 /**
@@ -35,21 +35,21 @@ import org.ardverk.dht.storage.Database;
  */
 public class StoreRequestHandler extends AbstractRequestHandler {
     
-    private final Database database;
+    private final Datastore datastore;
     
     public StoreRequestHandler(
             MessageDispatcher messageDispatcher,
-            Database database) {
+            Datastore datastore) {
         super(messageDispatcher);
         
-        this.database = database;
+        this.datastore = datastore;
     }
 
     private Value store(StoreRequest request) {
         Contact src = request.getContact();
         Key key = request.getKey();
         Value value = request.getValue();
-        return database.store(src, key, value);
+        return datastore.store(src, key, value);
     }
     
     @Override

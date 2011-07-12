@@ -46,7 +46,7 @@ import org.ardverk.dht.routing.DefaultRouteTable;
 import org.ardverk.dht.rsrc.DefaultKey;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.Value;
-import org.ardverk.dht.storage.Database;
+import org.ardverk.dht.storage.Datastore;
 import org.ardverk.io.IoUtils;
 import org.ardverk.utils.StringUtils;
 import org.ardverk.version.VectorClock;
@@ -182,9 +182,9 @@ public class ArdverkUtils {
         frame.start();*/
         
         /*for (EasyDHT dht : dhts) {
-            Database database = dht.getDatabase();
-            database.getDatabaseConfig().setStoreForward(false);
-            database.getDatabaseConfig().setCheckBucket(false);
+            Database datastore = dht.getDatabase();
+            datastore.getDatabaseConfig().setStoreForward(false);
+            datastore.getDatabaseConfig().setCheckBucket(false);
         }*/
         
         final DefaultPutConfig putConfig = new DefaultPutConfig();
@@ -227,8 +227,8 @@ public class ArdverkUtils {
         int total = 0;
         
         /*for (EasyDHT dht : dhts) {
-            Database database = dht.getDatabase();
-            int size = database.size();
+            Database datastore = dht.getDatabase();
+            int size = datastore.size();
             total += size;
             
             if (size < min) {

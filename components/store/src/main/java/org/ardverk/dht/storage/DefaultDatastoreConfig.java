@@ -21,9 +21,9 @@ import org.ardverk.dht.config.DefaultStoreConfig;
 import org.ardverk.dht.config.StoreConfig;
 
 /**
- * A default implementation of {@link DatabaseConfig}.
+ * A default implementation of {@link DatastoreConfig}.
  */
-public class DefaultDatabaseConfig implements DatabaseConfig {
+public class DefaultDatastoreConfig implements DatastoreConfig {
 
     private volatile StoreConfig storeConfig = new DefaultStoreConfig();
     

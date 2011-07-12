@@ -19,10 +19,10 @@ package org.ardverk.dht.storage;
 import org.ardverk.dht.config.StoreConfig;
 
 /**
- * The {@link DatabaseConfig} defines a few basic settings that are 
+ * The {@link DatastoreConfig} defines a few basic settings that are 
  * needed by the DHT.
  */
-public interface DatabaseConfig {
+public interface DatastoreConfig {
 
     /**
      * Returns {@code true} if store-forwarding is enabled.

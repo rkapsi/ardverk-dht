@@ -1,9 +1,8 @@
 package org.ardverk.dht.storage;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.Closeable;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,7 +10,6 @@ import java.io.OutputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -21,20 +19,18 @@ import org.ardverk.coding.CodingUtils;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.rsrc.Key;
-import org.ardverk.io.DataUtils;
 import org.ardverk.io.FileUtils;
 import org.ardverk.io.IoUtils;
 import org.ardverk.io.StreamUtils;
 import org.ardverk.io.Writable;
 import org.ardverk.security.MessageDigestUtils;
-import org.ardverk.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ObjectDatabase2 extends AbstractObjectDatabase {
+public class ObjectDatastore2 extends AbstractObjectDatastore implements Closeable {
 
     private static final Logger LOG 
-        = LoggerFactory.getLogger(ObjectDatabase2.class);
+        = LoggerFactory.getLogger(ObjectDatastore2.class);
 
     private static final AtomicInteger COUNTER = new AtomicInteger();
     
@@ -42,44 +38,28 @@ public class ObjectDatabase2 extends AbstractObjectDatabase {
     
     private static final String VTAG = "vtag";
     
+    private final Index index = DefaultIndex.create(null);
+    
     private final File directory;
-    
-    private final File index;
-    
-    private final File context;
     
     private final File content;
     
-    public ObjectDatabase2() throws IOException {
+    public ObjectDatastore2() throws IOException {
         this("data/" + COUNTER.incrementAndGet());
     }
     
-    public ObjectDatabase2(String path) throws IOException {
+    public ObjectDatastore2(String path) throws IOException {
         this(new File(path));
     }
     
-    public ObjectDatabase2(File directory) throws IOException {
+    public ObjectDatastore2(File directory) throws IOException {
         this.directory = directory;
-        
-        this.index = FileUtils.mkdirs(directory, "index", true);
-        this.context = FileUtils.mkdirs(directory, "context", true);
         this.content = FileUtils.mkdirs(directory, "content", true);
     }
     
-    private File mkIndexFile(Key key, boolean mkdirs) {
-        File file = new File(index, key.getPath());
-        if (mkdirs) {
-            file.getParentFile().mkdirs();
-        }
-        return file;
-    }
-    
-    private File mkContextFile(Key key, KUID valueId, boolean mkdirs) {
-        return mkContextFile(key, valueId.toHexString(), mkdirs);
-    }
-    
-    private File mkContextFile(Key key, String valueId, boolean mkdirs) {
-        return mkfile(context, key, valueId, mkdirs);
+    @Override
+    public void close() throws IOException {
+        index.close();
     }
     
     private File mkContentFile(Key key, KUID valueId, boolean mkdirs) {
@@ -99,14 +79,6 @@ public class ObjectDatabase2 extends AbstractObjectDatabase {
         }
         
         return file;
-    }
-    
-    private static Index index(File file, Key key) throws IOException {
-        if (file.exists()) {
-            return Index.valueOf(file);
-        }
-        
-        return new Index(key.getPath());
     }
     
     @Override
@@ -340,117 +312,4 @@ public class ObjectDatabase2 extends AbstractObjectDatabase {
             org.apache.commons.io.FileUtils.deleteQuietly(file);
         }
     }
-    
-    private static class Index implements Writable {
-
-        private static final int VERSION = 0;
-        
-        private final String path;
-        
-        private final Map<String, String> properties;
-        
-        public Index(String path) {
-            this(path, new HashMap<String, String>());
-        }
-        
-        public Index(String path, Map<String, String> properties) {
-            this.path = path;
-            this.properties = properties;
-        }
-        
-        public String put(String key, String value) {
-            return properties.put(key, value);
-        }
-        
-        public String get(String key) {
-            return properties.get(key);
-        }
-        
-        public String remove(String key) {
-            return properties.remove(key);
-        }
-        
-        @Override
-        public int hashCode() {
-            return path.hashCode();
-        }
-        
-        @Override
-        public boolean equals(Object o) {
-            if (o == this) {
-                return true;
-            } else if (!(o instanceof Index)) {
-                return false;
-            }
-            
-            Index other = (Index)o;
-            return path.equals(other.path);
-        }
-        
-        @Override
-        public void writeTo(OutputStream out) throws IOException {
-            out.write(VERSION);
-            
-            StringUtils.writeString(path, out);
-            
-            int size = properties.size();
-            DataUtils.int2beb(size, out);
-            
-            for (Map.Entry<String, String> entry : properties.entrySet()) {
-                StringUtils.writeString(entry.getKey(), out);
-                StringUtils.writeString(entry.getValue(), out);
-            }
-        }
-        
-        public static Index valueOf(File file) throws IOException {
-            InputStream in = new BufferedInputStream(
-                    new FileInputStream(file));
-            try {
-                return valueOf(in);
-            } finally {
-                IoUtils.close(in);
-            }
-        }
-
-        public static Index valueOf(InputStream in) throws IOException {
-            int version = DataUtils.read(in);
-            if (version != VERSION) {
-                throw new IOException();
-            }
-            
-            String path = StringUtils.readString(in);
-            
-            int size = DataUtils.beb2int(in);
-            Map<String, String> properties 
-                = new HashMap<String, String>(size);
-            
-            while (0 < size) {
-                String key = StringUtils.readString(in);
-                String value = StringUtils.readString(in);
-                
-                properties.put(key, value);
-                --size;
-            }
-            
-            return new Index(path, properties);
-        }
-    }
-    
-    /*private static class Entry implements Writable {
-        
-        private final long creationTime;
-
-        public Entry() {
-            this(System.currentTimeMillis());
-        }
-        
-        public Entry(long creationTime) {
-            this.creationTime = creationTime;
-        }
-        
-        @Override
-        public void writeTo(OutputStream out) throws IOException {
-            DataUtils.long2beb(creationTime, out);
-        }
-    }*/
 }

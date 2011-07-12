@@ -11,8 +11,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -89,7 +91,7 @@ public class DefaultIndex implements Index {
     }
     
     @Override
-    public int getCount(Key key) throws Exception {
+    public int getCount(Key key) throws SQLException {
         String path = key.getPath();
         byte[] kid = hash(path);
         return getCount(kid);
@@ -151,11 +153,12 @@ public class DefaultIndex implements Index {
             ps.setBytes(1, kid);
             
             ResultSet rs = ps.executeQuery();
-            
             try {
+                
+                Map<KUID, Context> map = new HashMap<KUID, Context>();
+                
                 if (rs.next()) {
                     
-                    Map<KUID, Context> map = new HashMap<KUID, Context>();
                     Context context = null;
                     
                     byte[] current = null;
@@ -172,12 +175,11 @@ public class DefaultIndex implements Index {
                         String value = rs.getString(3);
                         context.addHeader(name, value);
                     } while (rs.next());
-                    
-                    Set<Map.Entry<KUID, Context>> entries = map.entrySet();
-                    return CollectionUtils.toArray(entries, Map.Entry.class);
                 }
                 
-                return null;
+                Set<Map.Entry<KUID, Context>> entries = map.entrySet();
+                return CollectionUtils.toArray(entries, Map.Entry.class);
+                
             } finally {
                 close(rs);
             }
@@ -339,13 +341,25 @@ public class DefaultIndex implements Index {
             
             // KEYS
             {
-                // TODO: Check if there are no values
-                PreparedStatement ps 
-                    = connection.prepareStatement(
-                        "DELETE FROM keys WHERE id = ?");
+                int count = getCount(kid);
+                PreparedStatement ps = null;
                 try {
-                    ps.setBytes(1, kid);
+                    if (count < 1) {
+                        ps = connection.prepareStatement(
+                                "DELETE FROM keys WHERE id = ?");
+                        ps.setBytes(1, kid);
+                        
+                    } else {
+                        ps = connection.prepareStatement(
+                                "UPDATE keys SET modified = ? WHERE id = ?");
+                        
+                        ps.setTimestamp(1, new Timestamp(
+                                System.currentTimeMillis()));
+                        ps.setBytes(2, kid);
+                    }
+                    
                     ps.executeUpdate();
+                    
                 } finally {
                     close(ps);
                 }
@@ -367,6 +381,7 @@ public class DefaultIndex implements Index {
         Index index = DefaultIndex.create(null);
         
         Key key = KeyFactory.parseKey("ardverk:///hello/world");
+        List<KUID> bla = new ArrayList<KUID>();
         
         for (int i = 0; i < 10; i++) {
             KUID valueId = KUID.createRandom(key.getId());
@@ -377,11 +392,17 @@ public class DefaultIndex implements Index {
             
             index.add(key, context, valueId);
             
-            
             System.out.println(index.get(valueId));
+            bla.add(valueId);
         }
         
         System.out.println(Arrays.toString(index.get(key)));
+        
+        for (KUID valueId : bla) {
+            index.remove(key, valueId);
+            
+            System.out.println("A: " + index.get(key).length);
+        }
     }
     
     private static void close(Statement s) {

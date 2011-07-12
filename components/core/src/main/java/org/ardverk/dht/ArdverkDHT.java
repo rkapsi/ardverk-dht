@@ -45,7 +45,7 @@ import org.ardverk.dht.routing.Localhost;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.Value;
-import org.ardverk.dht.storage.Database;
+import org.ardverk.dht.storage.Datastore;
 import org.ardverk.lang.BindableUtils;
 
 
@@ -66,31 +66,31 @@ public class ArdverkDHT extends AbstractDHT {
     
     private final RouteTable routeTable;
     
-    private final Database database;
+    private final Datastore datastore;
     
     private final MessageDispatcher messageDispatcher;
     
-    public ArdverkDHT(int keySize, Database database) {
-        this(new Localhost(keySize), database);
+    public ArdverkDHT(int keySize, Datastore datastore) {
+        this(new Localhost(keySize), datastore);
     }
     
-    public ArdverkDHT(Localhost localhost, Database database) {
-        this(new DefaultRouteTable(localhost), database);
+    public ArdverkDHT(Localhost localhost, Datastore datastore) {
+        this(new DefaultRouteTable(localhost), datastore);
     }
     
-    public ArdverkDHT(RouteTable routeTable, Database database) {
+    public ArdverkDHT(RouteTable routeTable, Datastore datastore) {
         this(new DefaultMessageFactory(
-                routeTable.getLocalhost()), routeTable, database);
+                routeTable.getLocalhost()), routeTable, datastore);
     }
     
     public ArdverkDHT(MessageFactory messageFactory, 
-            RouteTable routeTable, Database database) {
+            RouteTable routeTable, Datastore datastore) {
         
         this.routeTable = routeTable;
-        this.database = database;
+        this.datastore = datastore;
         
         messageDispatcher = new DefaultMessageDispatcher(
-                messageFactory, routeTable, database);
+                messageFactory, routeTable, datastore);
         
         pingManager = new PingManager(this, messageDispatcher);
         bootstrapManager = new BootstrapManager(this);
@@ -109,7 +109,7 @@ public class ArdverkDHT extends AbstractDHT {
             }
         });
         
-        BindableUtils.bind(database, this);
+        BindableUtils.bind(datastore, this);
     }
     
     @Override
@@ -117,7 +117,7 @@ public class ArdverkDHT extends AbstractDHT {
         super.close();
         messageDispatcher.close();
         
-        BindableUtils.unbind(database);
+        BindableUtils.unbind(datastore);
         BindableUtils.unbind(routeTable);
     }
     
@@ -127,8 +127,8 @@ public class ArdverkDHT extends AbstractDHT {
     }
 
     @Override
-    public Database getDatabase() {
-        return database;
+    public Datastore getDatabase() {
+        return datastore;
     }
     
     /**

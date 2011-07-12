@@ -10,10 +10,10 @@ import org.ardverk.io.IoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-abstract class AbstractObjectDatabase extends AbstractDatabase {
+abstract class AbstractObjectDatastore extends AbstractDatastore {
 
     private static final Logger LOG 
-        = LoggerFactory.getLogger(AbstractObjectDatabase.class);
+        = LoggerFactory.getLogger(AbstractObjectDatastore.class);
     
     @Override
     public Response store(Contact src, Key key, Value value) {

@@ -21,9 +21,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.ardverk.dht.DHT;
 
 /**
- * An abstract implementation of {@link Database}.
+ * An abstract implementation of {@link Datastore}.
  */
-public abstract class AbstractDatabase implements Database {
+public abstract class AbstractDatastore implements Datastore {
     
     private final AtomicReference<DHT> dhtRef = new AtomicReference<DHT>();
     

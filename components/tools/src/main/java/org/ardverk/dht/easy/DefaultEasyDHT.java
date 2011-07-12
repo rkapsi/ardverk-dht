@@ -33,7 +33,7 @@ import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.Value;
-import org.ardverk.dht.storage.Database;
+import org.ardverk.dht.storage.Datastore;
 
 
 public class DefaultEasyDHT extends ArdverkDHT implements EasyDHT {
@@ -41,8 +41,8 @@ public class DefaultEasyDHT extends ArdverkDHT implements EasyDHT {
     private final EasyConfig config;
     
     public DefaultEasyDHT(EasyConfig config, MessageFactory messageFactory, 
-            RouteTable routeTable, Database database) {
-        super(messageFactory, routeTable, database);
+            RouteTable routeTable, Datastore datastore) {
+        super(messageFactory, routeTable, datastore);
         this.config = config;
     }
     

@@ -48,21 +48,21 @@ import org.ardverk.utils.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ObjectDatabase extends AbstractDatabase {
+public class ObjectDatastore extends AbstractDatastore {
     
     private static final Logger LOG 
-        = LoggerFactory.getLogger(ObjectDatabase.class);
+        = LoggerFactory.getLogger(ObjectDatastore.class);
     
-    private final Trie<KUID, Bucket> database 
+    private final Trie<KUID, Bucket> datastore 
         = new PatriciaTrie<KUID, Bucket>();
     
-    private final DatabaseConfig config;
+    private final DatastoreConfig config;
     
-    public ObjectDatabase() {
-        this(new DefaultDatabaseConfig());
+    public ObjectDatastore() {
+        this(new DefaultDatastoreConfig());
     }
     
-    public ObjectDatabase(DatabaseConfig config) {
+    public ObjectDatastore(DatastoreConfig config) {
         this.config = config;
     }
     
@@ -142,10 +142,10 @@ public class ObjectDatabase extends AbstractDatabase {
         
         KUID bucketId = key.getId();
         
-        Bucket bucket = database.get(bucketId);
+        Bucket bucket = datastore.get(bucketId);
         if (bucket == null) {
             bucket = new Bucket(bucketId);
-            database.put(bucketId, bucket);
+            datastore.put(bucketId, bucket);
         }
         
         Key normalized = key.strip();
@@ -169,7 +169,7 @@ public class ObjectDatabase extends AbstractDatabase {
     }
     
     public synchronized Set<KUID> getBuckets() {
-        return new HashSet<KUID>(database.keySet());
+        return new HashSet<KUID>(datastore.keySet());
     }
 
     @Override
@@ -198,7 +198,7 @@ public class ObjectDatabase extends AbstractDatabase {
     }
     
     private synchronized VclockMap.Entry[] getValues(Key key, String vtag) {
-        Bucket bucket = database.get(key.getId());
+        Bucket bucket = datastore.get(key.getId());
         if (bucket == null) {
             return null;
         }
@@ -220,7 +220,7 @@ public class ObjectDatabase extends AbstractDatabase {
     }
     
     private synchronized Response list(Key prefix) {
-        Bucket bucket = database.get(prefix.getId());
+        Bucket bucket = datastore.get(prefix.getId());
         if (bucket == null) {
             return null;
         }
@@ -240,7 +240,7 @@ public class ObjectDatabase extends AbstractDatabase {
     @Override
     public synchronized String toString() {
         StringBuilder sb = new StringBuilder();
-        for (Bucket bucket : database.values()) {
+        for (Bucket bucket : datastore.values()) {
             sb.append(bucket).append("\n");
         }
         return sb.toString();

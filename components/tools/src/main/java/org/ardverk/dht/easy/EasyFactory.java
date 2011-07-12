@@ -23,8 +23,8 @@ import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.routing.DefaultRouteTable;
 import org.ardverk.dht.routing.Localhost;
 import org.ardverk.dht.routing.RouteTable;
-import org.ardverk.dht.storage.Database;
-import org.ardverk.dht.storage.ObjectDatabase2;
+import org.ardverk.dht.storage.Datastore;
+import org.ardverk.dht.storage.ObjectDatastore2;
 
 public class EasyFactory {
     
@@ -39,20 +39,20 @@ public class EasyFactory {
         MessageFactory messageFactory 
             = new DefaultMessageFactory(keySize, localhost);
         
-        Database database = createDatabase();
-        //Database database = new SimpleDatabase(new File("database", localhost.getId().toHexString()));
+        Datastore datastore = createDatabase();
+        //Database datastore = new SimpleDatabase(new File("datastore", localhost.getId().toHexString()));
         RouteTable routeTable = new DefaultRouteTable(localhost);
         
         return new DefaultEasyDHT(config, messageFactory, 
-                routeTable, database);
+                routeTable, datastore);
     }
     
     private EasyFactory() {}
     
     
-    private static Database createDatabase() {
+    private static Datastore createDatabase() {
         try {
-            return new ObjectDatabase2();
+            return new ObjectDatastore2();
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
