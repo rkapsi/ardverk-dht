@@ -116,4 +116,9 @@ public class RequestEntity implements Identifier {
         
         return false;
     }
+    
+    @Override
+    public String toString() {
+        return "RequestEntity: contactId=" + contactId + ", request=" + request;
+    }
 }
