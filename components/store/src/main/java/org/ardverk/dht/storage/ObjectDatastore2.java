@@ -187,20 +187,20 @@ public class ObjectDatastore2 extends AbstractObjectDatastore implements Closeab
     protected Response handleDelete(Contact src, Key key, Request request,
             InputStream in) throws IOException {
         
-        Map.Entry<KUID, Context>[] values = null;
+        Map.Entry<KUID, Context> value = null;
         try {
-            values = index.get(key);
+            value = index.getCurrent(key);
         } catch (Exception err) {
             throw new IOException("Exception", err);
         }
         
-        if (values == null || values.length == 0) {
+        if (value == null) {
             return ResponseFactory.createNotFound();
         }
         
         // TODO
-        KUID valueId = values[values.length-1].getKey();
-        Context context = values[values.length-1].getValue();
+        KUID valueId = value.getKey();
+        Context context = value.getValue();
         
         if (context.containsHeader(Constants.TOMBSTONE)) {
             return ResponseFactory.createNotFound();
@@ -225,20 +225,20 @@ public class ObjectDatastore2 extends AbstractObjectDatastore implements Closeab
     protected Response handleHead(Contact src, Key key, Request request,
             InputStream in) throws IOException {
         
-        Map.Entry<KUID, Context>[] values = null;
+        Map.Entry<KUID, Context> value = null;
         try {
-            values = index.get(key);
+            value = index.getCurrent(key);
         } catch (Exception err) {
             throw new IOException("Exception", err);
         }
         
-        if (values == null || values.length == 0) {
+        if (value == null) {
             return ResponseFactory.createNotFound();
         }
         
         // TODO
-        KUID valueId = values[values.length-1].getKey();
-        Context context = values[values.length-1].getValue();
+        KUID valueId = value.getKey();
+        Context context = value.getValue();
         
         if (context.containsHeader(Constants.TOMBSTONE)) {
             return ResponseFactory.createNotFound();
@@ -252,14 +252,14 @@ public class ObjectDatastore2 extends AbstractObjectDatastore implements Closeab
     protected Response handleGet(Contact src, 
             Key key, boolean store) throws IOException {
         
-        Map.Entry<KUID, Context>[] values = null;
+        Map.Entry<KUID, Context> value = null;
         try {
-            values = index.get(key);
+            value = index.getCurrent(key);
         } catch (Exception err) {
             throw new IOException("Exception", err);
         }
         
-        if (values == null || values.length == 0) {
+        if (value == null) {
             return null;
         }
         
@@ -273,8 +273,8 @@ public class ObjectDatastore2 extends AbstractObjectDatastore implements Closeab
         }
         
         // TODO
-        KUID valueId = values[values.length-1].getKey();
-        Context context = values[values.length-1].getValue();
+        KUID valueId = value.getKey();
+        Context context = value.getValue();
         
         if (context.containsHeader(Constants.TOMBSTONE)) {
             return null;

@@ -14,6 +14,8 @@ public interface Index extends Closeable {
 
     public Map.Entry<KUID, Context>[] get(Key key) throws Exception;
 
+    public Map.Entry<KUID, Context> getCurrent(Key key) throws Exception;
+    
     public Context get(KUID valueId) throws Exception;
 
     public void add(Key key, Context context, KUID valueId) throws Exception;

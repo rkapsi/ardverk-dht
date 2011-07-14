@@ -196,6 +196,59 @@ public class DefaultIndex implements Index {
     }
     
     @Override
+    public Map.Entry<KUID, Context> getCurrent(Key key) throws SQLException {
+        String path = key.getPath();
+        byte[] kid = hash(path);
+        
+        PreparedStatement ps 
+            = connection.prepareStatement(
+                "SELECT e.id, p.name, p.value, max(e.created) FROM entries e, properties p WHERE e.kid = ? AND e.id = p.vid");
+        try {
+            ps.setBytes(1, kid);
+            
+            ResultSet rs = ps.executeQuery();
+            try {
+                
+                if (rs.next()) {
+                    final KUID valueId = KUID.create(rs.getBytes(1));
+                    final Context context = new Context();
+                            
+                    do {
+                        String name = rs.getString(2);
+                        String value = rs.getString(3);
+                        context.addHeader(name, value);
+                    } while (rs.next());
+                    
+                    return new Map.Entry<KUID, Context>() {
+
+                        @Override
+                        public KUID getKey() {
+                            return valueId;
+                        }
+
+                        @Override
+                        public Context getValue() {
+                            return context;
+                        }
+
+                        @Override
+                        public Context setValue(Context value) {
+                            throw new UnsupportedOperationException();
+                        }
+                        
+                    };
+                }
+                
+                return null;
+            } finally {
+                close(rs);
+            }
+        } finally {
+            close(ps);
+        }
+    }
+    
+    @Override
     public Context get(KUID valueId) throws SQLException {
         byte[] vid = valueId.getBytes();
         
