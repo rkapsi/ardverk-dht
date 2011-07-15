@@ -1,6 +1,7 @@
 package org.ardverk.dht.storage;
 
 import java.io.Closeable;
+import java.util.List;
 import java.util.Map;
 
 import org.ardverk.dht.KUID;
@@ -8,6 +9,8 @@ import org.ardverk.dht.rsrc.Key;
 
 public interface Index extends Closeable {
 
+    public List<Key> list(Key prefix, int maxCount) throws Exception;
+    
     public boolean containsKey(Key key) throws Exception;
 
     public boolean containsValue(KUID valueId) throws Exception;

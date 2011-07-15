@@ -2,6 +2,7 @@ package org.ardverk.dht.storage;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.Date;
@@ -13,6 +14,7 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.http.Header;
 import org.ardverk.collection.CollectionUtils;
 import org.ardverk.dht.KUID;
+import org.ardverk.dht.rsrc.DefaultKey;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.KeyFactory;
 import org.ardverk.security.MessageDigestUtils;
@@ -32,8 +35,9 @@ public class DefaultIndex implements Index {
 
     private static final String CREATE_KEYS
         = "CREATE TABLE keys ("
-        + "id BINARY(20) PRIMARY KEY," // sha1(key)
-        + "key VARCHAR(16384) UNIQUE NOT NULL,"
+        + "id BINARY(20) PRIMARY KEY," // sha1(uri)
+        + "bucket BINARY(20) NOT NULL," // key.id
+        + "uri VARCHAR(16384) UNIQUE NOT NULL,"
         + "created DATETIME NOT NULL,"
         + "modified TIMESTAMP NOT NULL"
         + ")";
@@ -59,10 +63,10 @@ public class DefaultIndex implements Index {
         try {
             Class.forName("org.hsqldb.jdbcDriver");
             
-            //String url = "jdbc:hsqldb:mem:index-" + COUNTER.incrementAndGet();
+            String url = "jdbc:hsqldb:mem:index-" + COUNTER.incrementAndGet();
             
-            String path = dir.getAbsolutePath() + "/index-" + COUNTER.incrementAndGet();
-            String url = "jdbc:hsqldb:file:" + path;
+            //String path = dir.getAbsolutePath() + "/index-" + COUNTER.incrementAndGet();
+            //String url = "jdbc:hsqldb:file:" + path;
             
             String user = "sa";
             String password = "";
@@ -98,9 +102,48 @@ public class DefaultIndex implements Index {
     }
     
     @Override
+    public List<Key> list(Key prefix, int maxCount) throws Exception {
+        if (0 < maxCount) {
+            PreparedStatement ps = connection.prepareStatement(
+                    "SELECT uri FROM keys WHERE (bucket = ? AND uri LIKE ?) TOP ?");
+            try {
+                
+                KUID bucket = prefix.getId();
+                URI uri = prefix.getURI();
+                
+                ps.setBytes(1, bucket.getBytes(false));
+                ps.setString(2, uri.toString() + "%");
+                ps.setInt(3, maxCount);
+                
+                ResultSet rs = ps.executeQuery();
+                try {
+                    
+                    if (rs.next()) {
+                        List<Key> keys = new ArrayList<Key>();
+                        
+                        do {
+                            String key = rs.getString(1);
+                            keys.add(DefaultKey.valueOf(key));
+                        } while (keys.size() < maxCount && rs.next());
+                        
+                        return keys;
+                    }
+                    
+                } finally {
+                    close(rs);
+                }
+            } finally {
+                close(ps);
+            }
+        }
+        
+        return Collections.emptyList();
+    }
+
+    @Override
     public int getCount(Key key) throws SQLException {
-        String path = key.getPath();
-        byte[] kid = hash(path);
+        URI uri = key.getURI();
+        byte[] kid = hash(uri);
         return getCount(kid);
     }
 
@@ -110,8 +153,8 @@ public class DefaultIndex implements Index {
     
     @Override
     public boolean containsKey(Key key) throws SQLException {
-        String path = key.getPath();
-        byte[] kid = hash(path);
+        URI uri = key.getURI();
+        byte[] kid = hash(uri);
         return containsKey(kid);
     }
     
@@ -150,8 +193,8 @@ public class DefaultIndex implements Index {
     @Override
     @SuppressWarnings("unchecked")
     public Map.Entry<KUID, Context>[] get(Key key) throws SQLException {
-        String path = key.getPath();
-        byte[] kid = hash(path);
+        URI uri = key.getURI();
+        byte[] kid = hash(uri);
         
         PreparedStatement ps 
             = connection.prepareStatement(
@@ -197,8 +240,8 @@ public class DefaultIndex implements Index {
     
     @Override
     public Map.Entry<KUID, Context> getCurrent(Key key) throws SQLException {
-        String path = key.getPath();
-        byte[] kid = hash(path);
+        URI uri = key.getURI();
+        byte[] kid = hash(uri);
         
         PreparedStatement ps 
             = connection.prepareStatement(
@@ -289,8 +332,12 @@ public class DefaultIndex implements Index {
         Date created = new Date(now);
         Timestamp modified = new Timestamp(now);
         
-        String path = key.getPath();
-        byte[] kid = hash(path);
+        KUID bucket = key.getId();
+        
+        URI uri = key.getURI();
+        byte[] kid = hash(uri);
+        
+        byte[] bucketId = bucket.getBytes(false);
         byte[] vid = valueId.getBytes(false);
         
         try {
@@ -302,11 +349,12 @@ public class DefaultIndex implements Index {
                 try {
                     if (!containsKey(kid)) {
                         ps = connection.prepareStatement(
-                                "INSERT INTO keys NAMES(id, key, created, modified) VALUES(?, ?, ?, ?)");
+                                "INSERT INTO keys NAMES(id, bucket, uri, created, modified) VALUES(?, ?, ?, ?, ?)");
                         ps.setBytes(1, kid);
-                        ps.setString(2, path);
-                        ps.setDate(3, created);
-                        ps.setTimestamp(4, modified);
+                        ps.setBytes(2, bucketId);
+                        ps.setString(3, uri.toString());
+                        ps.setDate(4, created);
+                        ps.setTimestamp(5, modified);
                     } else {
                         ps = connection.prepareStatement(
                                 "UPDATE keys SET modified = ? WHERE id = ?");
@@ -338,20 +386,25 @@ public class DefaultIndex implements Index {
             
             // PROPERTIES
             {
-                PreparedStatement ps 
-                    = connection.prepareStatement(
-                        "INSERT INTO properties NAMES(vid, name, value) VALUES(?, ?, ?)");
-                try {
-                    for (Header header : context.getHeaders()) {
-                        ps.setBytes(1, vid);
-                        ps.setString(2, header.getName());
-                        ps.setString(3, header.getValue());
-                        ps.addBatch();
+                
+                Header[] headers = context.getHeaders();
+                
+                if (headers != null && 0 < headers.length) {
+                    PreparedStatement ps 
+                        = connection.prepareStatement(
+                            "INSERT INTO properties NAMES(vid, name, value) VALUES(?, ?, ?)");
+                    try {
+                        for (Header header : headers) {
+                            ps.setBytes(1, vid);
+                            ps.setString(2, header.getName());
+                            ps.setString(3, header.getValue());
+                            ps.addBatch();
+                        }
+                        
+                        ps.executeBatch();
+                    } finally {
+                        close(ps);
                     }
-                    
-                    ps.executeBatch();
-                } finally {
-                    close(ps);
                 }
             }
             
@@ -365,8 +418,8 @@ public class DefaultIndex implements Index {
     @Override
     public void remove(Key key, KUID valueId) throws SQLException {
         
-        String path = key.getPath();
-        byte[] kid = hash(path);
+        URI uri = key.getURI();
+        byte[] kid = hash(uri);
         
         byte[] vid = valueId.getBytes(false);
         
@@ -432,7 +485,11 @@ public class DefaultIndex implements Index {
         }
     }
 
-    private static byte[] hash(String value) {
+    private static byte[] hash(URI uri) {
+        return _hash(uri.toString());
+    }
+    
+    private static byte[] _hash(String value) {
         MessageDigest md = MessageDigestUtils.createSHA1();
         return md.digest(StringUtils.getBytes(value));
     }
@@ -440,7 +497,7 @@ public class DefaultIndex implements Index {
     public static void main(String[] args) throws Exception {
         Index index = DefaultIndex.create(null);
         
-        Key key = KeyFactory.parseKey("ardverk:///hello/world");
+        /*Key key = KeyFactory.parseKey("ardverk:///hello/world");
         List<KUID> bla = new ArrayList<KUID>();
         
         for (int i = 0; i < 10; i++) {
@@ -462,7 +519,20 @@ public class DefaultIndex implements Index {
             index.remove(key, valueId);
             
             System.out.println("A: " + index.get(key).length);
+        }*/
+        
+        for (int i = 0; i < 10; i++) {
+            Key key = KeyFactory.parseKey("ardverk:///hello/world-" + i);
+            KUID valueId = KUID.createRandom(key.getId());
+            Context context = new Context();
+            
+            index.add(key, context, valueId);
         }
+        
+        Key prefix = KeyFactory.parseKey("ardverk:///hello/wor");
+        List<Key> keys = index.list(prefix, 10);
+        
+        System.out.println(keys);
     }
     
     private static void close(Statement s) {
