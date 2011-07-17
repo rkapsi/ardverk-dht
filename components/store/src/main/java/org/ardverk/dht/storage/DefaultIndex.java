@@ -145,7 +145,7 @@ public class DefaultIndex extends AbstractIndex {
     public List<Key> listKeys(Key prefix, int maxCount) throws SQLException {
         if (0 < maxCount) {
             PreparedStatement ps = connection.prepareStatement(
-                    "SELECT uri FROM keys WHERE (bid = ? AND uri LIKE ?)");
+                    "SELECT uri FROM keys WHERE (bid = ? AND uri LIKE ?) LIMIT ?, ?");
             try {
                 
                 KUID bucketId = prefix.getId();
@@ -153,7 +153,8 @@ public class DefaultIndex extends AbstractIndex {
                 
                 setBytes(ps, 1, bucketId);
                 ps.setString(2, uri.toString() + "%");
-                //ps.setInt(3, maxCount);
+                ps.setInt(3, 0);
+                ps.setInt(4, maxCount);
                 
                 ResultSet rs = ps.executeQuery();
                 try {
