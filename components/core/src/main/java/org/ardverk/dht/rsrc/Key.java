@@ -30,6 +30,11 @@ public interface Key extends Comparable<Key>, Identifier {
     /**
      * 
      */
+    public String getBucket();
+    
+    /**
+     * 
+     */
     public Key strip();
     
     /**

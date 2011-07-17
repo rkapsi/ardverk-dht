@@ -9,7 +9,11 @@ import org.ardverk.dht.rsrc.Key;
 
 public interface Index extends Closeable {
 
-    public List<Key> list(Key prefix, int maxCount) throws Exception;
+    public List<String> listBuckets(int maxCount) throws Exception;
+    
+    public List<String> listBuckets(String marker, int maxCount) throws Exception;
+    
+    public List<Key> listKeys(Key prefix, int maxCount) throws Exception;
     
     public boolean containsKey(Key key) throws Exception;
 
@@ -25,5 +29,5 @@ public interface Index extends Closeable {
     
     public void remove(Key key, KUID valueId) throws Exception;
     
-    public int getCount(Key key) throws Exception;
+    public int getValueCount(Key key) throws Exception;
 }

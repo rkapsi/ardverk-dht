@@ -81,7 +81,7 @@ public class DefaultKey extends AbstractKey {
             sb.append('?').append(query);
         }
         
-        return new DefaultKey(create(bucket), URI.create(sb.toString()));
+        return new DefaultKey(bucket, URI.create(sb.toString()));
     }
     
     private static List<String> normalize(String value) {
@@ -101,13 +101,25 @@ public class DefaultKey extends AbstractKey {
     
     private final KUID bucketId;
     
+    private final String bucket;
+    
     private final URI uri;
     
-    private DefaultKey(KUID bucketId, URI uri) {
+    private DefaultKey(String bucket, URI uri) {
+        this(create(bucket), bucket, uri);
+    }
+    
+    private DefaultKey(KUID bucketId, String bucket, URI uri) {
         this.bucketId = bucketId;
+        this.bucket = bucket;
         this.uri = uri;
     }
     
+    @Override
+    public String getBucket() {
+        return bucket;
+    }
+
     @Override
     public Key strip() {
         String query = uri.getQuery();
@@ -132,7 +144,7 @@ public class DefaultKey extends AbstractKey {
         
         sb.append(path);
         
-        return new DefaultKey(bucketId, 
+        return new DefaultKey(bucketId, bucket,
                 URI.create(sb.toString()));
     }
 

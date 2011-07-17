@@ -28,15 +28,24 @@ import org.ardverk.dht.rsrc.DefaultKey;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.KeyFactory;
 import org.ardverk.security.MessageDigestUtils;
+import org.ardverk.utils.DefaultEntry;
 import org.ardverk.utils.StringUtils;
 
 
-public class DefaultIndex implements Index {
+public class DefaultIndex extends AbstractIndex {
 
+    private static final String CREATE_BUCKETS
+        = "CREATE TABLE buckets ("
+        + "id BINARY(20) PRIMARY KEY," // sha1(name) but we get it straight from the Key!
+        + "name VARCHAR(16384) UNIQUE NOT NULL,"
+        + "created DATETIME NOT NULL,"
+        + "modified TIMESTAMP NOT NULL,"
+        + ")";
+    
     private static final String CREATE_KEYS
         = "CREATE TABLE keys ("
         + "id BINARY(20) PRIMARY KEY," // sha1(uri)
-        + "bucket BINARY(20) NOT NULL," // key.id
+        + "bid BINARY(20) FOREIGN KEY REFERENCES buckets(id),"
         + "uri VARCHAR(16384) UNIQUE NOT NULL,"
         + "created DATETIME NOT NULL,"
         + "modified TIMESTAMP NOT NULL"
@@ -73,9 +82,11 @@ public class DefaultIndex implements Index {
             Connection connection = DriverManager.getConnection(url, user, password);
             
             Statement statement = connection.createStatement();
-            statement.execute(CREATE_KEYS);
-            statement.execute(CREATE_VALUES);
-            statement.execute(CREATE_PROPERTIES);
+            statement.addBatch(CREATE_BUCKETS);
+            statement.addBatch(CREATE_KEYS);
+            statement.addBatch(CREATE_VALUES);
+            statement.addBatch(CREATE_PROPERTIES);
+            statement.executeBatch();
             statement.close();
             
             return new DefaultIndex(connection);
@@ -101,19 +112,48 @@ public class DefaultIndex implements Index {
         }
     }
     
+    public List<String> listBuckets(String marker, int maxCount) throws SQLException {
+        if (0 < maxCount) {
+            PreparedStatement ps = null;
+            if (marker != null) {
+                ps = connection.prepareStatement("SELECT name FROM buckets WHERE name LIKE ?");
+                ps.setString(1, marker + "%");
+            } else {
+                ps = connection.prepareStatement("SELECT name FROM buckets");
+            }
+            
+            try {
+                ResultSet rs = ps.executeQuery();
+                try {
+                    List<String> names = new ArrayList<String>();
+                    while (rs.next() && names.size() < maxCount) {
+                        String name = rs.getString(1);
+                        names.add(name);
+                    }
+                    return names;
+                } finally {
+                    close(rs);
+                }
+            } finally {
+                close(ps);
+            }
+        }
+        return Collections.emptyList();
+    }
+    
     @Override
-    public List<Key> list(Key prefix, int maxCount) throws Exception {
+    public List<Key> listKeys(Key prefix, int maxCount) throws SQLException {
         if (0 < maxCount) {
             PreparedStatement ps = connection.prepareStatement(
-                    "SELECT uri FROM keys WHERE (bucket = ? AND uri LIKE ?) TOP ?");
+                    "SELECT uri FROM keys WHERE (bid = ? AND uri LIKE ?)");
             try {
                 
-                KUID bucket = prefix.getId();
+                KUID bucketId = prefix.getId();
                 URI uri = prefix.getURI();
                 
-                ps.setBytes(1, bucket.getBytes(false));
+                setBytes(ps, 1, bucketId);
                 ps.setString(2, uri.toString() + "%");
-                ps.setInt(3, maxCount);
+                //ps.setInt(3, maxCount);
                 
                 ResultSet rs = ps.executeQuery();
                 try {
@@ -140,41 +180,43 @@ public class DefaultIndex implements Index {
         return Collections.emptyList();
     }
 
-    @Override
-    public int getCount(Key key) throws SQLException {
-        URI uri = key.getURI();
-        byte[] kid = hash(uri);
-        return getCount(kid);
+    private int getKeyCount(KUID bucketId) throws SQLException {
+        return count("SELECT COUNT(id) FROM keys WHERE bid = ?", bucketId);
     }
 
-    private int getCount(byte[] kid) throws SQLException {
-        return count("SELECT COUNT(id) FROM entries WHERE kid = ?", kid);
+    @Override
+    public int getValueCount(Key key) throws SQLException {
+        KUID keyId = createKeyId(key);
+        return getValueCount(keyId);
+    }
+
+    private int getValueCount(KUID keyId) throws SQLException {
+        return count("SELECT COUNT(id) FROM entries WHERE kid = ?", keyId);
     }
     
     @Override
     public boolean containsKey(Key key) throws SQLException {
-        URI uri = key.getURI();
-        byte[] kid = hash(uri);
+        KUID kid = createKeyId(key);
         return containsKey(kid);
     }
     
-    private boolean containsKey(byte[] kid) throws SQLException {
-        return 0 < count("SELECT COUNT(id) FROM keys WHERE id = ?", kid);
+    private boolean containsKey(KUID keyId) throws SQLException {
+        return 0 < count("SELECT COUNT(id) FROM keys WHERE id = ?", keyId);
     }
     
     @Override
     public boolean containsValue(KUID valueId) throws SQLException {
-        return containsValue(valueId.getBytes(false));
+        return 0 < count("SELECT COUNT(id) FROM entries WHERE id = ?", valueId);
     }
     
-    private boolean containsValue(byte[] vid) throws SQLException {
-        return 0 < count("SELECT COUNT(id) FROM entries WHERE id = ?", vid);
+    private boolean hasBucket(KUID bucketId) throws SQLException {
+        return 0 < count("SELECT COUNT(id) FROM buckets WHERE id = ?", bucketId);
     }
     
-    private int count(String sql, byte[] key) throws SQLException {
+    private int count(String sql, KUID key) throws SQLException {
         PreparedStatement ps = connection.prepareStatement(sql);
         try {
-            ps.setBytes(1, key);
+            setBytes(ps, 1, key);
             ResultSet rs = ps.executeQuery();
             try {
                 if (rs.next()) {
@@ -193,14 +235,13 @@ public class DefaultIndex implements Index {
     @Override
     @SuppressWarnings("unchecked")
     public Map.Entry<KUID, Context>[] get(Key key) throws SQLException {
-        URI uri = key.getURI();
-        byte[] kid = hash(uri);
+        KUID kid = createKeyId(key);
         
         PreparedStatement ps 
             = connection.prepareStatement(
                 "SELECT e.id, p.name, p.value FROM entries e, properties p WHERE e.kid = ? AND e.id = p.vid");
         try {
-            ps.setBytes(1, kid);
+            setBytes(ps, 1, kid);
             
             ResultSet rs = ps.executeQuery();
             try {
@@ -240,14 +281,13 @@ public class DefaultIndex implements Index {
     
     @Override
     public Map.Entry<KUID, Context> getCurrent(Key key) throws SQLException {
-        URI uri = key.getURI();
-        byte[] kid = hash(uri);
+        KUID keyId = createKeyId(key);
         
         PreparedStatement ps 
             = connection.prepareStatement(
-                "SELECT e.id, p.name, p.value, max(e.created) FROM entries e, properties p WHERE e.kid = ? AND e.id = p.vid");
+                "SELECT e.id, p.name, p.value, MAX(e.created) FROM entries e, properties p WHERE e.kid = ? AND e.id = p.vid");
         try {
-            ps.setBytes(1, kid);
+            setBytes(ps, 1, keyId);
             
             ResultSet rs = ps.executeQuery();
             try {
@@ -262,24 +302,7 @@ public class DefaultIndex implements Index {
                         context.addHeader(name, value);
                     } while (rs.next());
                     
-                    return new Map.Entry<KUID, Context>() {
-
-                        @Override
-                        public KUID getKey() {
-                            return valueId;
-                        }
-
-                        @Override
-                        public Context getValue() {
-                            return context;
-                        }
-
-                        @Override
-                        public Context setValue(Context value) {
-                            throw new UnsupportedOperationException();
-                        }
-                        
-                    };
+                    return new DefaultEntry<KUID, Context>(valueId, context);
                 }
                 
                 return null;
@@ -293,13 +316,12 @@ public class DefaultIndex implements Index {
     
     @Override
     public Context get(KUID valueId) throws SQLException {
-        byte[] vid = valueId.getBytes();
         
         PreparedStatement ps 
             = connection.prepareStatement(
                 "SELECT name, value FROM properties WHERE vid = ?");
         try {
-            ps.setBytes(1, vid);
+            setBytes(ps, 1, valueId);
             
             ResultSet rs = ps.executeQuery();
             try {
@@ -332,26 +354,49 @@ public class DefaultIndex implements Index {
         Date created = new Date(now);
         Timestamp modified = new Timestamp(now);
         
-        KUID bucket = key.getId();
+        KUID bucketId = key.getId();
+        String bucket = key.getBucket();
         
         URI uri = key.getURI();
-        byte[] kid = hash(uri);
-        
-        byte[] bucketId = bucket.getBytes(false);
-        byte[] vid = valueId.getBytes(false);
+        KUID keyId = createKeyId(key);
         
         try {
             connection.setAutoCommit(false);
+            
+            // BUCKETS
+            {
+                PreparedStatement ps = null;
+                try {
+                    if (!hasBucket(bucketId)) {
+                        ps = connection.prepareStatement(
+                                "INSERT INTO buckets NAMES(id, name, created, modified) VALUES(?, ?, ?, ?)");
+                        setBytes(ps, 1, bucketId);
+                        ps.setString(2, bucket);
+                        ps.setDate(3, created);
+                        ps.setTimestamp(4, modified);
+                    } else {
+                        ps = connection.prepareStatement(
+                                "UPDATE buckets SET modified = ? WHERE id = ?");
+                        
+                        ps.setTimestamp(1, modified);
+                        setBytes(ps, 2, bucketId);
+                    }
+                    
+                    ps.executeUpdate();
+                } finally {
+                    close(ps);
+                }
+            }
             
             // KEYS
             {
                 PreparedStatement ps = null;
                 try {
-                    if (!containsKey(kid)) {
+                    if (!containsKey(keyId)) {
                         ps = connection.prepareStatement(
-                                "INSERT INTO keys NAMES(id, bucket, uri, created, modified) VALUES(?, ?, ?, ?, ?)");
-                        ps.setBytes(1, kid);
-                        ps.setBytes(2, bucketId);
+                                "INSERT INTO keys NAMES(id, bid, uri, created, modified) VALUES(?, ?, ?, ?, ?)");
+                        setBytes(ps, 1, keyId);
+                        setBytes(ps, 2, bucketId);
                         ps.setString(3, uri.toString());
                         ps.setDate(4, created);
                         ps.setTimestamp(5, modified);
@@ -360,7 +405,7 @@ public class DefaultIndex implements Index {
                                 "UPDATE keys SET modified = ? WHERE id = ?");
                         
                         ps.setTimestamp(1, modified);
-                        ps.setBytes(2, kid);
+                        setBytes(ps, 2, keyId);
                     }
                     
                     ps.executeUpdate();
@@ -375,8 +420,8 @@ public class DefaultIndex implements Index {
                     = connection.prepareStatement(
                         "INSERT INTO entries NAMES(id, kid, created) VALUES(?, ?, ?)");
                 try {
-                    ps.setBytes(1, vid);
-                    ps.setBytes(2, kid);
+                    setBytes(ps, 1, valueId);
+                    setBytes(ps, 2, keyId);
                     ps.setDate(3, created);
                     ps.executeUpdate();
                 } finally {
@@ -386,7 +431,6 @@ public class DefaultIndex implements Index {
             
             // PROPERTIES
             {
-                
                 Header[] headers = context.getHeaders();
                 
                 if (headers != null && 0 < headers.length) {
@@ -395,7 +439,7 @@ public class DefaultIndex implements Index {
                             "INSERT INTO properties NAMES(vid, name, value) VALUES(?, ?, ?)");
                     try {
                         for (Header header : headers) {
-                            ps.setBytes(1, vid);
+                            setBytes(ps, 1, valueId);
                             ps.setString(2, header.getName());
                             ps.setString(3, header.getValue());
                             ps.addBatch();
@@ -418,10 +462,12 @@ public class DefaultIndex implements Index {
     @Override
     public void remove(Key key, KUID valueId) throws SQLException {
         
-        URI uri = key.getURI();
-        byte[] kid = hash(uri);
+        long now = System.currentTimeMillis();
+        Timestamp modified = new Timestamp(now);
         
-        byte[] vid = valueId.getBytes(false);
+        KUID bucketId = key.getId();
+        
+        KUID keyId = createKeyId(key);
         
         try {
             connection.setAutoCommit(false);
@@ -432,7 +478,7 @@ public class DefaultIndex implements Index {
                     = connection.prepareStatement(
                         "DELETE FROM properties WHERE vid = ?");
                 try {
-                    ps.setBytes(1, vid);
+                    setBytes(ps, 1, valueId);
                     ps.executeUpdate();
                 } finally {
                     close(ps);
@@ -445,7 +491,7 @@ public class DefaultIndex implements Index {
                     = connection.prepareStatement(
                         "DELETE FROM entries WHERE id = ?");
                 try {
-                    ps.setBytes(1, vid);
+                    setBytes(ps, 1, valueId);
                     ps.executeUpdate();
                 } finally {
                     close(ps);
@@ -454,21 +500,44 @@ public class DefaultIndex implements Index {
             
             // KEYS
             {
-                int count = getCount(kid);
+                int count = getValueCount(keyId);
                 PreparedStatement ps = null;
                 try {
                     if (count < 1) {
                         ps = connection.prepareStatement(
                                 "DELETE FROM keys WHERE id = ?");
-                        ps.setBytes(1, kid);
-                        
+                        setBytes(ps, 1, keyId);
                     } else {
                         ps = connection.prepareStatement(
                                 "UPDATE keys SET modified = ? WHERE id = ?");
                         
-                        ps.setTimestamp(1, new Timestamp(
-                                System.currentTimeMillis()));
-                        ps.setBytes(2, kid);
+                        ps.setTimestamp(1, modified);
+                        setBytes(ps, 1, keyId);
+                    }
+                    
+                    ps.executeUpdate();
+                    
+                } finally {
+                    close(ps);
+                }
+            }
+            
+            // BUCKETS
+            {
+                int count = getKeyCount(bucketId);
+                PreparedStatement ps = null;
+                try {
+                    if (count < 1) {
+                        ps = connection.prepareStatement(
+                                "DELETE FROM buckets WHERE id = ?");
+                        setBytes(ps, 1, keyId);
+                        
+                    } else {
+                        ps = connection.prepareStatement(
+                                "UPDATE buckets SET modified = ? WHERE id = ?");
+                        
+                        ps.setTimestamp(1, modified);
+                        setBytes(ps, 2, keyId);
                     }
                     
                     ps.executeUpdate();
@@ -485,11 +554,12 @@ public class DefaultIndex implements Index {
         }
     }
 
-    private static byte[] hash(URI uri) {
-        return _hash(uri.toString());
+    private static KUID createKeyId(Key key) {
+        byte[] keyId = hash(key.getURI().toString());
+        return KUID.create(keyId);
     }
     
-    private static byte[] _hash(String value) {
+    private static byte[] hash(String value) {
         MessageDigest md = MessageDigestUtils.createSHA1();
         return md.digest(StringUtils.getBytes(value));
     }
@@ -530,7 +600,7 @@ public class DefaultIndex implements Index {
         }
         
         Key prefix = KeyFactory.parseKey("ardverk:///hello/wor");
-        List<Key> keys = index.list(prefix, 10);
+        List<Key> keys = index.listKeys(prefix, 10);
         
         System.out.println(keys);
     }
@@ -549,5 +619,9 @@ public class DefaultIndex implements Index {
                 rs.close();
             } catch (SQLException err) {}
         }
+    }
+    
+    private static void setBytes(PreparedStatement ps, int index, KUID id) throws SQLException {
+        ps.setBytes(index, id.getBytes(false));
     }
 }
