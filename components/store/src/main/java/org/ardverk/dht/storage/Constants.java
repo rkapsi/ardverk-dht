@@ -14,6 +14,8 @@ public class Constants {
 
     public static final String VTAG = "X-Ardverk-Vtag";
     
+    public static final String VALUE_ID = "X-Ardverk-ValueId";
+    
     public static final String CONTENT_MD5 = "Content-MD5";
     
     public static final String CONTENT_SHA1 = "Content-SHA1";

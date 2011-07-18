@@ -15,14 +15,12 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.http.Header;
-import org.ardverk.collection.CollectionUtils;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.rsrc.DefaultKey;
 import org.ardverk.dht.rsrc.Key;
@@ -55,7 +53,8 @@ public class DefaultIndex extends AbstractIndex {
         = "CREATE TABLE entries (" // Using 'entries' because 'values' is a reserved keyword
         + "id BINARY(20) PRIMARY KEY,"
         + "kid BINARY(20) FOREIGN KEY REFERENCES keys(id),"
-        + "created DATETIME NOT NULL"
+        + "created DATETIME NOT NULL,"
+        + "tombstone DATETIME"
         + ")";
     
     private static final String CREATE_PROPERTIES 
@@ -243,22 +242,21 @@ public class DefaultIndex extends AbstractIndex {
     }
     
     @Override
-    @SuppressWarnings("unchecked")
-    public Map.Entry<KUID, Context>[] get(Key key) throws SQLException {
-        KUID kid = createKeyId(key);
+    public Map<KUID, Context> get(Key key) throws SQLException {
+        KUID keyId = createKeyId(key);
         
         PreparedStatement ps 
             = connection.prepareStatement(
                 "SELECT e.id, p.name, p.value FROM entries e, properties p WHERE e.kid = ? AND e.id = p.vid");
         try {
-            setBytes(ps, 1, kid);
+            setBytes(ps, 1, keyId);
             
             ResultSet rs = ps.executeQuery();
             try {
                 
-                Map<KUID, Context> map = new HashMap<KUID, Context>();
-                
                 if (rs.next()) {
+                    
+                    Map<KUID, Context> map = new LinkedHashMap<KUID, Context>();
                     
                     Context context = null;
                     
@@ -276,10 +274,9 @@ public class DefaultIndex extends AbstractIndex {
                         String value = rs.getString(3);
                         context.addHeader(name, value);
                     } while (rs.next());
+                    
+                    return map;
                 }
-                
-                Set<Map.Entry<KUID, Context>> entries = map.entrySet();
-                return CollectionUtils.toArray(entries, Map.Entry.class);
                 
             } finally {
                 close(rs);
@@ -287,6 +284,8 @@ public class DefaultIndex extends AbstractIndex {
         } finally {
             close(ps);
         }
+        
+        return Collections.emptyMap();
     }
     
     @Override
@@ -464,6 +463,52 @@ public class DefaultIndex extends AbstractIndex {
             
             connection.commit();
             
+        } finally {
+            connection.setAutoCommit(true);
+        }
+    }
+    
+    @Override
+    public Map<KUID, Context> delete(Key key, KUID valueId) throws SQLException {
+        long now = System.currentTimeMillis();
+        Date tombstone = new Date(now);
+        
+        KUID keyId = createKeyId(key);
+        
+        try {
+            connection.setAutoCommit(false);
+            
+            PreparedStatement ps = null;
+            try {
+                if (valueId != null) {
+                   ps = connection.prepareStatement("UPDATE entries SET tombstone = ? WHERE id = ?"); 
+                   
+                   ps.setDate(1, tombstone);
+                   setBytes(ps, 1, valueId);
+                } else {
+                   ps = connection.prepareStatement("UPDATE entries SET tombstone = ? WHERE kid = ?"); 
+                   
+                   ps.setDate(1, tombstone);
+                   setBytes(ps, 1, keyId);
+                }
+                
+                ps.executeUpdate();
+                
+            } finally {
+                close(ps);
+            }
+            
+            connection.commit();
+            
+            if (valueId != null) {
+                Context context = get(valueId);
+                if (context != null) {
+                    return Collections.singletonMap(valueId, context);
+                }
+                return Collections.emptyMap();
+            }
+            
+            return get(key);
         } finally {
             connection.setAutoCommit(true);
         }

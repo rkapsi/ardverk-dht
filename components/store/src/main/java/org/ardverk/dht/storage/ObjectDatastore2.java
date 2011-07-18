@@ -113,6 +113,9 @@ public class ObjectDatastore2 extends AbstractObjectDatastore implements Closeab
                 return Response.INTERNAL_SERVER_ERROR;
             }
             
+            context.addHeader(Constants.VALUE_ID, 
+                    valueId.toHexString());
+            
             Vclock vclock = upsertVclock(context);
             
             /*File indexFile = mkIndexFile(key, true);
@@ -213,7 +216,7 @@ public class ObjectDatastore2 extends AbstractObjectDatastore implements Closeab
         
         // TODO: Write the Vclock and a Tombstone instead
         try {
-            index.remove(key, valueId);
+            index.delete(key, valueId);
         } catch (Exception err) {
             throw new IOException("Exception", err);
         }
