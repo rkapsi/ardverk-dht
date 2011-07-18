@@ -112,25 +112,34 @@ public class DefaultIndex extends AbstractIndex {
         }
     }
     
+    @Override
     public List<String> listBuckets(String marker, int maxCount) throws SQLException {
         if (0 < maxCount) {
             PreparedStatement ps = null;
             if (marker != null) {
-                ps = connection.prepareStatement("SELECT name FROM buckets WHERE name LIKE ?");
+                ps = connection.prepareStatement("SELECT name FROM buckets WHERE (name LIKE ?) LIMIT ?, ?");
                 ps.setString(1, marker + "%");
+                ps.setInt(2, 0);
+                ps.setInt(3, maxCount);
             } else {
-                ps = connection.prepareStatement("SELECT name FROM buckets");
+                ps = connection.prepareStatement("SELECT name FROM buckets LIMIT ?, ?");
+                ps.setInt(1, 0);
+                ps.setInt(2, maxCount);
             }
             
             try {
                 ResultSet rs = ps.executeQuery();
                 try {
-                    List<String> names = new ArrayList<String>();
-                    while (rs.next() && names.size() < maxCount) {
-                        String name = rs.getString(1);
-                        names.add(name);
+                    if (rs.next()) {
+                        List<String> names = new ArrayList<String>();
+                        
+                        do {
+                            String name = rs.getString(1);
+                            names.add(name);
+                        } while (names.size() < maxCount && rs.next());
+                        
+                        return names;
                     }
-                    return names;
                 } finally {
                     close(rs);
                 }
@@ -601,9 +610,10 @@ public class DefaultIndex extends AbstractIndex {
         }
         
         Key prefix = KeyFactory.parseKey("ardverk:///hello/wor");
-        List<Key> keys = index.listKeys(prefix, 10);
+        List<Key> keys = index.listKeys(prefix, 5);
         
-        System.out.println(keys);
+        System.out.println(keys.size());
+        System.out.println(index.listBuckets(Integer.MAX_VALUE));
     }
     
     private static void close(Statement s) {
