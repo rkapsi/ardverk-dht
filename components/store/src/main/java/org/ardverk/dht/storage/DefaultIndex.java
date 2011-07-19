@@ -115,18 +115,19 @@ public class DefaultIndex extends AbstractIndex {
     public List<String> listBuckets(String marker, int maxCount) throws SQLException {
         if (0 < maxCount) {
             PreparedStatement ps = null;
-            if (marker != null) {
-                ps = connection.prepareStatement("SELECT name FROM buckets WHERE (name LIKE ?) LIMIT ?, ?");
-                ps.setString(1, marker + "%");
-                ps.setInt(2, 0);
-                ps.setInt(3, maxCount);
-            } else {
-                ps = connection.prepareStatement("SELECT name FROM buckets LIMIT ?, ?");
-                ps.setInt(1, 0);
-                ps.setInt(2, maxCount);
-            }
             
             try {
+                if (marker != null) {
+                    ps = connection.prepareStatement("SELECT name FROM buckets WHERE (name LIKE ?) LIMIT ?, ?");
+                    ps.setString(1, marker + "%");
+                    ps.setInt(2, 0);
+                    ps.setInt(3, maxCount);
+                } else {
+                    ps = connection.prepareStatement("SELECT name FROM buckets LIMIT ?, ?");
+                    ps.setInt(1, 0);
+                    ps.setInt(2, maxCount);
+                }
+                
                 ResultSet rs = ps.executeQuery();
                 try {
                     if (rs.next()) {
@@ -150,19 +151,30 @@ public class DefaultIndex extends AbstractIndex {
     }
     
     @Override
-    public List<Key> listKeys(Key prefix, int maxCount) throws SQLException {
+    public List<Key> listKeys(Key marker, int maxCount) throws SQLException {
         if (0 < maxCount) {
-            PreparedStatement ps = connection.prepareStatement(
-                    "SELECT uri FROM keys WHERE (bid = ? AND uri LIKE ?) LIMIT ?, ?");
+            
+            PreparedStatement ps = null;
             try {
+                if (marker != null) {
+                    ps = connection.prepareStatement(
+                            "SELECT uri FROM keys WHERE (bid = ? AND uri LIKE ?) LIMIT ?, ?");
                 
-                KUID bucketId = prefix.getId();
-                URI uri = prefix.getURI();
-                
-                setBytes(ps, 1, bucketId);
-                ps.setString(2, uri.toString() + "%");
-                ps.setInt(3, 0);
-                ps.setInt(4, maxCount);
+                    KUID bucketId = marker.getId();
+                    URI uri = marker.getURI();
+                    
+                    setBytes(ps, 1, bucketId);
+                    ps.setString(2, uri.toString() + "%");
+                    ps.setInt(3, 0);
+                    ps.setInt(4, maxCount);
+                    
+                } else {
+                    ps = connection.prepareStatement(
+                            "SELECT uri FROM keys LIMIT ?, ?");
+                    
+                    ps.setInt(1, 0);
+                    ps.setInt(2, maxCount);
+                }
                 
                 ResultSet rs = ps.executeQuery();
                 try {
@@ -176,6 +188,59 @@ public class DefaultIndex extends AbstractIndex {
                         } while (keys.size() < maxCount && rs.next());
                         
                         return keys;
+                    }
+                    
+                } finally {
+                    close(rs);
+                }
+            } finally {
+                close(ps);
+            }
+        }
+        
+        return Collections.emptyList();
+    }
+    
+    @Override
+    public List<KUID> listValues(Key key, KUID marker, int maxCount) throws SQLException {
+        if (0 < maxCount) {
+            
+            KUID keyId = createKeyId(key);
+            
+            PreparedStatement ps = null;
+            try {
+                if (marker != null) {
+                    // TODO
+                    ps = connection.prepareStatement(
+                            "SELECT id FROM entries WHERE (kid = ? AND id LIKE ?) LIMIT ?, ?",
+                            ResultSet.TYPE_SCROLL_INSENSITIVE,
+                            ResultSet.CONCUR_READ_ONLY);
+                    
+                    setBytes(ps, 1, keyId);
+                    setBytes(ps, 2, marker);
+                    ps.setInt(3, 0);
+                    ps.setInt(4, maxCount);
+                    
+                } else {
+                    ps = connection.prepareStatement(
+                            "SELECT id FROM entries WHERE (kid = ?) LIMIT ?, ?");
+                    
+                    setBytes(ps, 1, keyId);
+                    ps.setInt(2, 0);
+                    ps.setInt(3, maxCount);
+                }
+                
+                ResultSet rs = ps.executeQuery();
+                try {
+                    if (rs.next()) {
+                        List<KUID> values = new ArrayList<KUID>();
+                        
+                        do {
+                            KUID valueId = KUID.create(rs.getBytes(1));
+                            values.add(valueId);
+                        } while (values.size() < maxCount && rs.next());
+                        
+                        return values;
                     }
                     
                 } finally {
@@ -646,7 +711,7 @@ public class DefaultIndex extends AbstractIndex {
             System.out.println("A: " + index.get(key).length);
         }*/
         
-        for (int i = 0; i < 10; i++) {
+        /*for (int i = 0; i < 10; i++) {
             Key key = KeyFactory.parseKey("ardverk:///hello/world-" + i);
             KUID valueId = KUID.createRandom(key.getId());
             Context context = new Context();
@@ -658,7 +723,30 @@ public class DefaultIndex extends AbstractIndex {
         List<Key> keys = index.listKeys(prefix, 5);
         
         System.out.println(keys.size());
-        System.out.println(index.listBuckets(Integer.MAX_VALUE));
+        System.out.println(index.listBuckets(Integer.MAX_VALUE));*/
+        
+        Key key = KeyFactory.parseKey("ardverk:///hello/world");
+        List<KUID> test = new ArrayList<KUID>();
+        for (int i = 0; i < 10; i++) {
+            KUID valueId = KUID.createRandom(key.getId());
+            Context context = new Context();
+            
+            index.add(key, context, valueId);
+            
+            test.add(valueId);
+        }
+        
+        List<KUID> values = index.listValues(key, Integer.MAX_VALUE);
+        
+        System.out.println(values.size());
+        System.out.println(values);
+        System.out.println(values.containsAll(test));
+        
+        values = index.listValues(key, test.get(5), Integer.MAX_VALUE);
+        
+        System.out.println(values.size());
+        System.out.println(values);
+        System.out.println(values.containsAll(test));
     }
     
     private static void close(Statement s) {

@@ -13,7 +13,13 @@ public interface Index extends Closeable {
     
     public List<String> listBuckets(String marker, int maxCount) throws Exception;
     
+    public List<Key> listKeys(int maxCount) throws Exception;
+    
     public List<Key> listKeys(Key prefix, int maxCount) throws Exception;
+    
+    public List<KUID> listValues(Key key, int maxCount) throws Exception;
+    
+    public List<KUID> listValues(Key key, KUID marker, int maxCount) throws Exception;
     
     public boolean containsKey(Key key) throws Exception;
 
