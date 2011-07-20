@@ -210,14 +210,23 @@ public class DefaultIndex extends AbstractIndex {
             PreparedStatement ps = null;
             try {
                 if (marker != null) {
+                    
+                    System.out.println("M: " + marker);
+                    
                     // TODO
                     ps = connection.prepareStatement(
-                            "SELECT id FROM entries WHERE (kid = ? AND id LIKE ?) LIMIT ?, ?",
+                            "SELECT id FROM entries WHERE (kid = ? AND id >= ?) ORDER BY (id) ASC LIMIT ?, ?",
                             ResultSet.TYPE_SCROLL_INSENSITIVE,
                             ResultSet.CONCUR_READ_ONLY);
                     
                     setBytes(ps, 1, keyId);
                     setBytes(ps, 2, marker);
+                    
+                    /*byte[] dst = new byte[marker.length()+1];
+                    marker.getBytes(dst, 0);
+                    dst[dst.length-1] = '%';
+                    ps.setBytes(2, dst);*/
+                    
                     ps.setInt(3, 0);
                     ps.setInt(4, maxCount);
                     
@@ -735,6 +744,8 @@ public class DefaultIndex extends AbstractIndex {
             
             test.add(valueId);
         }
+        
+        Collections.sort(test);
         
         List<KUID> values = index.listValues(key, Integer.MAX_VALUE);
         
