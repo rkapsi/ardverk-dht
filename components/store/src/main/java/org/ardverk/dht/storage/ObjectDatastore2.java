@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -216,7 +217,7 @@ public class ObjectDatastore2 extends AbstractObjectDatastore implements Closeab
         
         // TODO: Write the Vclock and a Tombstone instead
         try {
-            index.delete(key, valueId);
+            index.delete(key, Collections.singleton(valueId));
         } catch (Exception err) {
             throw new IOException("Exception", err);
         }

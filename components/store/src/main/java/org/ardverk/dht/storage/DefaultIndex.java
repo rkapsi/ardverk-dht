@@ -14,8 +14,8 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -67,7 +67,7 @@ public class DefaultIndex extends AbstractIndex {
     
     private static final AtomicInteger COUNTER = new AtomicInteger();
     
-    public static Index create(File dir) {
+    public static DefaultIndex create(File dir) {
         try {
             Class.forName("org.hsqldb.jdbcDriver");
             
@@ -118,12 +118,14 @@ public class DefaultIndex extends AbstractIndex {
             
             try {
                 if (marker != null) {
-                    ps = connection.prepareStatement("SELECT name FROM buckets WHERE (name LIKE ?) LIMIT ?, ?");
+                    ps = connection.prepareStatement(
+                            "SELECT name FROM buckets WHERE (name LIKE ?) ORDER BY(name) ASC LIMIT ?, ?");
                     ps.setString(1, marker + "%");
                     ps.setInt(2, 0);
                     ps.setInt(3, maxCount);
                 } else {
-                    ps = connection.prepareStatement("SELECT name FROM buckets LIMIT ?, ?");
+                    ps = connection.prepareStatement(
+                            "SELECT name FROM buckets ORDER BY(name) ASC LIMIT ?, ?");
                     ps.setInt(1, 0);
                     ps.setInt(2, maxCount);
                 }
@@ -158,7 +160,7 @@ public class DefaultIndex extends AbstractIndex {
             try {
                 if (marker != null) {
                     ps = connection.prepareStatement(
-                            "SELECT uri FROM keys WHERE (bid = ? AND uri LIKE ?) LIMIT ?, ?");
+                            "SELECT uri FROM keys WHERE (bid = ? AND uri LIKE ?) ORDER BY(uri) ASC LIMIT ?, ?");
                 
                     KUID bucketId = marker.getId();
                     URI uri = marker.getURI();
@@ -170,7 +172,7 @@ public class DefaultIndex extends AbstractIndex {
                     
                 } else {
                     ps = connection.prepareStatement(
-                            "SELECT uri FROM keys LIMIT ?, ?");
+                            "SELECT uri FROM keys ORDER BY(uri) ASC LIMIT ?, ?");
                     
                     ps.setInt(1, 0);
                     ps.setInt(2, maxCount);
@@ -202,38 +204,43 @@ public class DefaultIndex extends AbstractIndex {
     }
     
     @Override
-    public List<KUID> listValues(Key key, KUID marker, int maxCount) throws SQLException {
+    public List<KUID> listValues(Key key, KUID marker, int maxCount, Selector selector) throws SQLException {
         if (0 < maxCount) {
+            
+            StringBuilder query = new StringBuilder();
+            query.append("SELECT id FROM entries WHERE (kid = ?");
+            
+            if (marker != null) {
+                query.append(" AND id >= ?");
+            }
+            
+            switch (selector) {
+                case EVERYTHING:
+                    break;
+                case CURRENT:
+                    query.append(" AND tombstone IS NULL");
+                    break;
+                case DELETED:
+                    query.append(" AND tombstone IS NOT NULL");
+                    break;
+                default:
+                    throw new IllegalArgumentException("selector=" + selector);
+            }
+            
+            query.append(") ORDER BY(id) LIMIT ?, ?");
             
             KUID keyId = createKeyId(key);
             
-            PreparedStatement ps = null;
+            PreparedStatement ps = connection.prepareStatement(query.toString());
             try {
                 if (marker != null) {
-                    
-                    System.out.println("M: " + marker);
-                    
-                    // TODO
-                    ps = connection.prepareStatement(
-                            "SELECT id FROM entries WHERE (kid = ? AND id >= ?) ORDER BY (id) ASC LIMIT ?, ?",
-                            ResultSet.TYPE_SCROLL_INSENSITIVE,
-                            ResultSet.CONCUR_READ_ONLY);
-                    
                     setBytes(ps, 1, keyId);
                     setBytes(ps, 2, marker);
-                    
-                    /*byte[] dst = new byte[marker.length()+1];
-                    marker.getBytes(dst, 0);
-                    dst[dst.length-1] = '%';
-                    ps.setBytes(2, dst);*/
                     
                     ps.setInt(3, 0);
                     ps.setInt(4, maxCount);
                     
                 } else {
-                    ps = connection.prepareStatement(
-                            "SELECT id FROM entries WHERE (kid = ?) LIMIT ?, ?");
-                    
                     setBytes(ps, 1, keyId);
                     ps.setInt(2, 0);
                     ps.setInt(3, maxCount);
@@ -316,32 +323,66 @@ public class DefaultIndex extends AbstractIndex {
     }
     
     @Override
-    public Map<KUID, Context> get(Key key) throws SQLException {
+    public List<Map.Entry<KUID, Context>> get(Key key, KUID marker, int maxCount, Selector selector) throws SQLException {
+        
+        StringBuilder query = new StringBuilder();
+        
+        query.append("SELECT e.id, p.name, p.value FROM entries e, properties p")
+            .append(" WHERE (e.kid = ? AND e.id = p.vid");
+        
+        if (marker != null) {
+            query.append(" AND e.id >= ?");
+        }
+        
+        switch (selector) {
+            case EVERYTHING:
+                break;
+            case CURRENT:
+                query.append(" AND e.tombstone IS NULL");
+                break;
+            case DELETED:
+                query.append(" AND e.tombstone IS NOT NULL");
+                break;
+            default:
+                throw new IllegalArgumentException("selector=" + selector);
+        }
+        
+        query.append(") ORDER BY(e.created) DESC LIMIT ?, ?");
+        
         KUID keyId = createKeyId(key);
         
-        PreparedStatement ps 
-            = connection.prepareStatement(
-                "SELECT e.id, p.name, p.value FROM entries e, properties p WHERE e.kid = ? AND e.id = p.vid");
+        PreparedStatement ps = connection.prepareStatement(query.toString());
         try {
-            setBytes(ps, 1, keyId);
+            
+            if (marker != null) {
+                setBytes(ps, 1, keyId);
+                setBytes(ps, 2, marker);
+                ps.setInt(3, 0);
+                ps.setInt(4, maxCount);
+            } else {
+                setBytes(ps, 1, keyId);
+                ps.setInt(2, 0);
+                ps.setInt(3, maxCount);
+            }
             
             ResultSet rs = ps.executeQuery();
             try {
                 
                 if (rs.next()) {
                     
-                    Map<KUID, Context> map = new LinkedHashMap<KUID, Context>();
+                    List<Map.Entry<KUID, Context>> list 
+                        = new ArrayList<Map.Entry<KUID,Context>>();
                     
                     Context context = null;
-                    
                     byte[] current = null;
                     
                     do {
-                        byte[] vid = rs.getBytes(1);
+                        byte[] valueId = rs.getBytes(1);
                         
-                        if (!Arrays.equals(current, vid)) {
+                        if (!Arrays.equals(current, valueId)) {
                             context = new Context();
-                            map.put(KUID.create(vid), context);
+                            list.add(new DefaultEntry<KUID, Context>(
+                                    KUID.create(valueId), context));
                         }
                         
                         String name = rs.getString(2);
@@ -349,7 +390,7 @@ public class DefaultIndex extends AbstractIndex {
                         context.addHeader(name, value);
                     } while (rs.next());
                     
-                    return map;
+                    return list;
                 }
                 
             } finally {
@@ -359,78 +400,17 @@ public class DefaultIndex extends AbstractIndex {
             close(ps);
         }
         
-        return Collections.emptyMap();
-    }
-    
-    @Override
-    public Map.Entry<KUID, Context> getCurrent(Key key) throws SQLException {
-        KUID keyId = createKeyId(key);
-        
-        PreparedStatement ps 
-            = connection.prepareStatement(
-                "SELECT e.id, p.name, p.value, MAX(e.created) FROM entries e, properties p WHERE e.kid = ? AND e.id = p.vid");
-        try {
-            setBytes(ps, 1, keyId);
-            
-            ResultSet rs = ps.executeQuery();
-            try {
-                
-                if (rs.next()) {
-                    final KUID valueId = KUID.create(rs.getBytes(1));
-                    final Context context = new Context();
-                            
-                    do {
-                        String name = rs.getString(2);
-                        String value = rs.getString(3);
-                        context.addHeader(name, value);
-                    } while (rs.next());
-                    
-                    return new DefaultEntry<KUID, Context>(valueId, context);
-                }
-                
-                return null;
-            } finally {
-                close(rs);
-            }
-        } finally {
-            close(ps);
-        }
-    }
-    
-    @Override
-    public Context get(KUID valueId) throws SQLException {
-        
-        PreparedStatement ps 
-            = connection.prepareStatement(
-                "SELECT name, value FROM properties WHERE vid = ?");
-        try {
-            setBytes(ps, 1, valueId);
-            
-            ResultSet rs = ps.executeQuery();
-            try {
-                Context context = null;
-                
-                if (rs.next()) {
-                    context = new Context();
-                    
-                    do {
-                        String name = rs.getString(1);
-                        String value = rs.getString(2);
-                        context.addHeader(name, value);
-                    } while (rs.next());
-                }
-                
-                return context;
-            } finally {
-                close(rs);
-            }
-        } finally {
-            close(ps);
-        }
+        return Collections.emptyList();
     }
     
     @Override
     public void add(Key key, Context context, KUID valueId) throws SQLException {
+        
+        // Don't add if the Context doesn't have anything
+        Header[] headers = context.getHeaders();
+        if (headers == null || headers.length == 0) {
+            return;
+        }
         
         long now = System.currentTimeMillis();
         
@@ -514,24 +494,20 @@ public class DefaultIndex extends AbstractIndex {
             
             // PROPERTIES
             {
-                Header[] headers = context.getHeaders();
-                
-                if (headers != null && 0 < headers.length) {
-                    PreparedStatement ps 
-                        = connection.prepareStatement(
-                            "INSERT INTO properties NAMES(vid, name, value) VALUES(?, ?, ?)");
-                    try {
-                        for (Header header : headers) {
-                            setBytes(ps, 1, valueId);
-                            ps.setString(2, header.getName());
-                            ps.setString(3, header.getValue());
-                            ps.addBatch();
-                        }
-                        
-                        ps.executeBatch();
-                    } finally {
-                        close(ps);
+                PreparedStatement ps 
+                    = connection.prepareStatement(
+                        "INSERT INTO properties NAMES(vid, name, value) VALUES(?, ?, ?)");
+                try {
+                    for (Header header : headers) {
+                        setBytes(ps, 1, valueId);
+                        ps.setString(2, header.getName());
+                        ps.setString(3, header.getValue());
+                        ps.addBatch();
                     }
+                    
+                    ps.executeBatch();
+                } finally {
+                    close(ps);
                 }
             }
             
@@ -543,7 +519,12 @@ public class DefaultIndex extends AbstractIndex {
     }
     
     @Override
-    public Map<KUID, Context> delete(Key key, KUID valueId) throws SQLException {
+    public void delete(Key key, Collection<KUID> values) throws SQLException {
+        
+        if (values != null && values.isEmpty()) {
+            throw new IllegalArgumentException("values=" + values);
+        }
+        
         long now = System.currentTimeMillis();
         Date tombstone = new Date(now);
         
@@ -554,42 +535,44 @@ public class DefaultIndex extends AbstractIndex {
             
             PreparedStatement ps = null;
             try {
-                if (valueId != null) {
-                   ps = connection.prepareStatement("UPDATE entries SET tombstone = ? WHERE id = ?"); 
-                   
-                   ps.setDate(1, tombstone);
-                   setBytes(ps, 1, valueId);
+                if (values != null) {
+                    
+                    ps = connection.prepareStatement("UPDATE entries SET tombstone = ? WHERE id = ?"); 
+                    
+                    for (KUID valueId : values) {
+                        
+                        ps.setDate(1, tombstone);
+                        setBytes(ps, 2, valueId);
+                        
+                        ps.addBatch();
+                    }
                 } else {
-                   ps = connection.prepareStatement("UPDATE entries SET tombstone = ? WHERE kid = ?"); 
-                   
-                   ps.setDate(1, tombstone);
-                   setBytes(ps, 1, keyId);
+                    
+                    ps = connection.prepareStatement("UPDATE entries SET tombstone = ? WHERE kid = ?");
+                    
+                    ps.setDate(1, tombstone);
+                    setBytes(ps, 2, keyId);
+                    ps.addBatch();
                 }
                 
-                ps.executeUpdate();
+                ps.executeBatch();
                 
             } finally {
                 close(ps);
             }
             
             connection.commit();
-            
-            if (valueId != null) {
-                Context context = get(valueId);
-                if (context != null) {
-                    return Collections.singletonMap(valueId, context);
-                }
-                return Collections.emptyMap();
-            }
-            
-            return get(key);
         } finally {
             connection.setAutoCommit(true);
         }
     }
     
     @Override
-    public void remove(Key key, KUID valueId) throws SQLException {
+    public void remove(Key key, Collection<KUID> values) throws SQLException {
+        
+        if (values != null && values.isEmpty()) {
+            throw new IllegalArgumentException("values=" + values);
+        }
         
         long now = System.currentTimeMillis();
         Timestamp modified = new Timestamp(now);
@@ -603,12 +586,24 @@ public class DefaultIndex extends AbstractIndex {
             
             // PROPERTIES
             {
-                PreparedStatement ps 
-                    = connection.prepareStatement(
-                        "DELETE FROM properties WHERE vid = ?");
+                PreparedStatement ps = null;
                 try {
-                    setBytes(ps, 1, valueId);
-                    ps.executeUpdate();
+                    if (values != null) {
+                        ps = connection.prepareStatement(
+                                "DELETE FROM properties WHERE vid = ?");
+                       for (KUID valueId : values) {
+                           setBytes(ps, 1, valueId);
+                           ps.addBatch();
+                       }
+                    } else {
+                        ps = connection.prepareStatement(
+                                "DELETE p FROM properties p INNER JOIN entries e ON p.vid = e.id WHERE e.kid = ?");
+                        
+                        setBytes(ps, 1, keyId);
+                        ps.addBatch();
+                    }
+                    
+                    ps.executeBatch();
                 } finally {
                     close(ps);
                 }
@@ -616,12 +611,26 @@ public class DefaultIndex extends AbstractIndex {
             
             // VALUES
             {
-                PreparedStatement ps 
-                    = connection.prepareStatement(
-                        "DELETE FROM entries WHERE id = ?");
+                PreparedStatement ps = null;
                 try {
-                    setBytes(ps, 1, valueId);
-                    ps.executeUpdate();
+                    if (values != null) {
+                        ps = connection.prepareStatement(
+                            "DELETE FROM entries WHERE id = ?");
+                        
+                        for (KUID valueId : values) {
+                            setBytes(ps, 1, valueId);
+                            ps.addBatch();
+                        }
+                    } else {
+                        ps = connection.prepareStatement(
+                                "DELETE FROM entries WHERE kid = ?");
+                        
+                        setBytes(ps, 1, keyId);
+                        ps.addBatch();
+                    }
+                    
+                    ps.executeBatch();
+                    
                 } finally {
                     close(ps);
                 }
@@ -694,7 +703,7 @@ public class DefaultIndex extends AbstractIndex {
     }
     
     public static void main(String[] args) throws Exception {
-        Index index = DefaultIndex.create(null);
+        DefaultIndex index = DefaultIndex.create(null);
         
         /*Key key = KeyFactory.parseKey("ardverk:///hello/world");
         List<KUID> bla = new ArrayList<KUID>();
@@ -736,28 +745,35 @@ public class DefaultIndex extends AbstractIndex {
         
         Key key = KeyFactory.parseKey("ardverk:///hello/world");
         List<KUID> test = new ArrayList<KUID>();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 10; i++) {Thread.sleep(500);
             KUID valueId = KUID.createRandom(key.getId());
             Context context = new Context();
+            context.addHeader("X-Key", "" + i);
             
             index.add(key, context, valueId);
             
             test.add(valueId);
         }
         
-        Collections.sort(test);
+        //Collections.sort(test);
         
-        List<KUID> values = index.listValues(key, Integer.MAX_VALUE);
-        
-        System.out.println(values.size());
-        System.out.println(values);
-        System.out.println(values.containsAll(test));
-        
-        values = index.listValues(key, test.get(5), Integer.MAX_VALUE);
+        /*List<KUID> values = index.listValues(key, Integer.MAX_VALUE, null);
         
         System.out.println(values.size());
         System.out.println(values);
         System.out.println(values.containsAll(test));
+        
+        values = index.listValues(key, test.get(5), Integer.MAX_VALUE, null);
+        
+        System.out.println(values.size());
+        System.out.println(values);
+        System.out.println(values.containsAll(test));*/
+        
+        System.out.println(createKeyId(key));
+        
+        List<Map.Entry<KUID, Context>> values = index.get(key, 2, Selector.EVERYTHING);
+        System.out.println(test);
+        System.out.println(values);
     }
     
     private static void close(Statement s) {
