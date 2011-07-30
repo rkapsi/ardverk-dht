@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="components/core/src/main/java"/>
+	<classpathentry kind="src" path="components/store/src/test/java"/>
 	<classpathentry kind="src" path="components/core/src/main/resources"/>
 	<classpathentry kind="src" path="components/core/src/test/java"/>
 	<classpathentry excluding="org/ardverk/dht/storage/SimpleValueFactory.java|org/ardverk/dht/storage/Status.java|org/ardverk/dht/storage/ListBucketResult.java" kind="src" path="components/store/src/main/java"/>
