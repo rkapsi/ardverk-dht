@@ -10,7 +10,7 @@ import org.ardverk.dht.storage.Vclock;
 import org.ardverk.dht.storage.sql.DefaultIndex2.Values;
 import org.junit.Test;
 
-public class IndexText {
+public class IndexTest {
 
     @Test
     public void add() throws SQLException {
