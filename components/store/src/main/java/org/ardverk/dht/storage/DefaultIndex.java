@@ -57,6 +57,13 @@ public class DefaultIndex extends AbstractIndex {
         + "tombstone DATETIME"
         + ")";
     
+    private static final String CREATE_VTAGS
+        = "CREATE TABLE vtags ("
+        + "id BIGINT PRIMARY KEY IDENTITY,"
+        + "vtag BINARY(20) NOT NULL,"
+        + "vid BINARY(20) NOT NULL FOREIGN KEY REFERENCES entries(id)"
+        + ")";
+    
     private static final String CREATE_PROPERTIES 
         = "CREATE TABLE properties ("
         + "id BIGINT PRIMARY KEY IDENTITY,"
@@ -84,6 +91,7 @@ public class DefaultIndex extends AbstractIndex {
             statement.addBatch(CREATE_BUCKETS);
             statement.addBatch(CREATE_KEYS);
             statement.addBatch(CREATE_VALUES);
+            statement.addBatch(CREATE_VTAGS);
             statement.addBatch(CREATE_PROPERTIES);
             statement.executeBatch();
             statement.close();
@@ -404,7 +412,7 @@ public class DefaultIndex extends AbstractIndex {
     }
     
     @Override
-    public void add(Key key, Context context, KUID valueId) throws SQLException {
+    public void add(Key key, Context context, Vclock vclock, KUID valueId) throws SQLException {
         
         // Don't add if the Context doesn't have anything
         Header[] headers = context.getHeaders();

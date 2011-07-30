@@ -36,7 +36,7 @@ public interface Index extends Closeable {
     
     public List<Map.Entry<KUID, Context>> get(Key key, KUID marker, int maxCount, Selector selector) throws Exception;
     
-    public void add(Key key, Context context, KUID valueId) throws Exception;
+    public void add(Key key, Context context, Vclock vclock, KUID valueId) throws Exception;
     
     public void deleteAll(Key key) throws Exception;
     

@@ -5,12 +5,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.ardverk.collection.CollectionUtils;
+import org.ardverk.dht.KUID;
 import org.ardverk.version.Occured;
 
 class VclockMap {
     
-    private final Map<String, Entry> map 
-        = new LinkedHashMap<String, Entry>();
+    private final Map<KUID, Entry> map 
+        = new LinkedHashMap<KUID, Entry>();
     
     public void upsert(Vclock vclock, Context context, ValueEntity value) {
         
@@ -33,12 +34,11 @@ class VclockMap {
             }
         }
         
-        String vtag = vclock.getVTag();
-        map.put(vtag, new Entry(vclock, context, value));
+        map.put(vclock.vtag(), new Entry(vclock, context, value));
     }
     
     public boolean remove(Vclock vclock) {
-        return map.remove(vclock.getVTag()) != null;
+        return map.remove(vclock.vtag()) != null;
     }
     
     public Entry value(String vtag) {

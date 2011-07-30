@@ -56,7 +56,7 @@ class MultipleChoicesResponse extends Response {
                     xml.writeStartElement("value");
                     
                     xml.writeStartElement("vtag");
-                    xml.writeCharacters(vclock.getVTag());
+                    xml.writeCharacters(vclock.vtag64());
                     xml.writeEndElement();
                     
                     xml.writeStartElement("creationTime");

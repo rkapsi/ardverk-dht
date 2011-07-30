@@ -5,8 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Serializable;
-import java.security.DigestInputStream;
+import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Map;
@@ -17,8 +16,11 @@ import java.util.zip.InflaterInputStream;
 
 import org.apache.commons.codec.binary.Base64;
 import org.ardverk.coding.CodingUtils;
+import org.ardverk.dht.KUID;
+import org.ardverk.dht.rsrc.Key;
 import org.ardverk.io.DataUtils;
 import org.ardverk.io.IoUtils;
+import org.ardverk.io.NopOutputStream;
 import org.ardverk.io.Writable;
 import org.ardverk.security.MessageDigestUtils;
 import org.ardverk.utils.StringUtils;
@@ -27,33 +29,67 @@ import org.ardverk.version.Vector;
 import org.ardverk.version.VectorClock;
 import org.ardverk.version.Version;
 
-public class Vclock implements Version<Vclock>, Writable, Serializable {
+public class Vclock implements Version<Vclock>, Writable {
     
-    private static final long serialVersionUID = -8465932555084986397L;
-    
-    public static Vclock create() {
-        return new Vclock(VectorClock.<String>create());
+    public static Vclock create(Key key) {
+        return new Vclock(key, VectorClock.<String>create());
     }
     
-    private final byte[] vtag;
+    private final Key key;
     
     private final VectorClock<String> vclock;
     
-    private Vclock(VectorClock<String> vclock) {
-        this(vtag(vclock), vclock);
-    }
+    private byte[] vtag = null;
     
-    private Vclock(byte[] vtag, VectorClock<String> vclock) {
-        this.vtag = vtag;
+    private Vclock(Key key, VectorClock<String> vclock) {
+        this.key = key;
         this.vclock = vclock;
     }
-    
-    public Vclock update(String key) {
-        return new Vclock(vclock.update(key));
+
+    private byte[] calculate() {
+        if (vtag == null) {
+            MessageDigest md = MessageDigestUtils.createSHA1();
+            
+            String uri = key.strip().getURI().toString();
+            md.update(StringUtils.getBytes(uri));
+            
+            DigestOutputStream out = new DigestOutputStream(
+                    NopOutputStream.OUT, md);
+            
+            try {
+                
+                DataUtils.short2beb(vclock.size(), out);
+                
+                for (Map.Entry<String, ? extends Vector> entry 
+                        : vclock.entrySet()) {
+                    String key = entry.getKey();
+                    Vector value = entry.getValue();
+                    
+                    StringUtils.writeString(key, out);
+                    DataUtils.int2beb(value.getValue(), out);
+                }
+                
+            } catch (IOException err) {
+                throw new IllegalStateException("IOException", err);
+            } finally {
+                IoUtils.close(out);
+            }
+            
+            vtag = md.digest();
+        }
+        return vtag;
     }
     
-    public String getVTag() {
-        return Base64.encodeBase64URLSafeString(vtag);
+    public KUID vtag() {
+        return KUID.create(calculate());
+    }
+    
+    public String vtag16() {
+        return CodingUtils.encodeBase16(calculate());
+    }
+    
+    public String vtag64() {
+        return Base64.encodeBase64URLSafeString(calculate());
     }
     
     public long getCreationTime() {
@@ -62,6 +98,10 @@ public class Vclock implements Version<Vclock>, Writable, Serializable {
     
     public long getLastModified() {
         return vclock.getLastModified();
+    }
+    
+    public Vclock update(String id) {
+        return new Vclock(key, vclock.update(id));
     }
     
     public int size() {
@@ -76,10 +116,10 @@ public class Vclock implements Version<Vclock>, Writable, Serializable {
     public Occured compareTo(Vclock other) {
         return vclock.compareTo(other.vclock);
     }
-
+    
     @Override
     public int hashCode() {
-        return Arrays.hashCode(vtag);
+        return Arrays.hashCode(calculate());
     }
     
     @Override
@@ -91,9 +131,9 @@ public class Vclock implements Version<Vclock>, Writable, Serializable {
         }
         
         Vclock other = (Vclock)o;
-        return Arrays.equals(vtag, other.vtag);
+        return Arrays.equals(calculate(), other.calculate());
     }
-
+    
     @Override
     public String toString() {
         return toString(true);
@@ -115,7 +155,7 @@ public class Vclock implements Version<Vclock>, Writable, Serializable {
             return Base64.encodeBase64String(baos.toByteArray());
         }
         
-        return CodingUtils.encodeBase16(vtag) + "/" + vclock.toString();
+        return vtag16() + "/" + vclock.toString();
     }
     
     @Override
@@ -139,93 +179,40 @@ public class Vclock implements Version<Vclock>, Writable, Serializable {
         }
     }
     
-    public static Vclock valueOf(String value) throws IOException {
+    public static Vclock valueOf(Key key, String value) throws IOException {
         byte[] data = Base64.decodeBase64(value);
         ByteArrayInputStream bais = new ByteArrayInputStream(data);
         InflaterInputStream inflater = new InflaterInputStream(bais);
         
         try {
-            return valueOf(inflater);
+            return valueOf(key, inflater);
         } finally {
             IoUtils.close(inflater);
         }
     }
     
-    public static Vclock valueOf(InputStream in) throws IOException {
+    public static Vclock valueOf(Key key, InputStream in) throws IOException {
         
         long creationTime = System.currentTimeMillis();
         SortedMap<String, Vector> map = new TreeMap<String, Vector>();
         
-        // Calculate the VTag on-the-fly!
-        MessageDigest md = MessageDigestUtils.createSHA1();
-        DigestInputStream dis = new DigestInputStream(in, md);
-        
-        int size = DataUtils.beb2ushort(dis);
+        int size = DataUtils.beb2ushort(in);
         
         if (size != 0) {
             
-            // Ignore the creationTime
-            dis.on(false);
-            creationTime = DataUtils.beb2long(dis);
-            dis.on(true);
+            creationTime = DataUtils.beb2long(in);
             
             for (int i = 0; i < size; i++) {
-                String key = StringUtils.readString(in);
+                String id = StringUtils.readString(in);
                 
-                // Ignore the timeStamp
-                dis.on(false);
-                long timeStamp = DataUtils.beb2long(dis);
-                dis.on(true);
+                long timeStamp = DataUtils.beb2long(in);
+                int value = DataUtils.beb2int(in);
                 
-                int value = DataUtils.beb2int(dis);
-                
-                map.put(key, new Vector(timeStamp, value));
+                map.put(id, new Vector(timeStamp, value));
             }
         }
         
-        byte[] vtag = md.digest();
         VectorClock<String> vclock = VectorClock.create(creationTime, map);
-        
-        return new Vclock(vtag, vclock);
-    }
-    
-    /**
-     * Calculates and returns the VTag.
-     */
-    private static byte[] vtag(VectorClock<String> vclock) {
-        final MessageDigest md = MessageDigestUtils.createSHA1();
-        
-        OutputStream out = new OutputStream() {
-            @Override
-            public void write(int b) throws IOException {
-                md.update((byte)b);
-            }
-
-            @Override
-            public void write(byte[] b, int off, int len) throws IOException {
-                md.update(b, off, len);
-            }
-        };
-        
-        try {
-            
-            DataUtils.short2beb(vclock.size(), out);
-            
-            for (Map.Entry<String, ? extends Vector> entry 
-                    : vclock.entrySet()) {
-                String key = entry.getKey();
-                Vector value = entry.getValue();
-                
-                StringUtils.writeString(key, out);
-                DataUtils.int2beb(value.getValue(), out);
-            }
-            
-        } catch (IOException err) {
-            throw new IllegalStateException("IOException", err);
-        } finally {
-            IoUtils.close(out);
-        }
-        
-        return md.digest();
+        return new Vclock(key, vclock);
     }
 }
