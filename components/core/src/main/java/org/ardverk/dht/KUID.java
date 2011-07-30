@@ -29,13 +29,14 @@ import org.ardverk.dht.lang.Negation;
 import org.ardverk.dht.lang.Xor;
 import org.ardverk.dht.security.SecurityUtils;
 import org.ardverk.lang.ByteArray;
+import org.ardverk.security.Digestable;
 
 
 /**
  * Kademlia Unique Identifier ({@link KUID}) 
  */
 public class KUID extends ByteArray<KUID> implements Identifier, 
-        Key<KUID>, Xor<KUID>, Negation<KUID>, Cloneable {
+        Key<KUID>, Xor<KUID>, Negation<KUID>, Cloneable, Digestable {
 
     private static final long serialVersionUID = -4611363711131603626L;
     
@@ -154,9 +155,7 @@ public class KUID extends ByteArray<KUID> implements Identifier,
         return otherId != null && length() == otherId.length();
     }
     
-    /**
-     * Calls {@link MessageDigest#update(byte[])} with the {@link KUID}'s bytes.
-     */
+    @Override
     public void update(MessageDigest md) {
         md.update(value);
     }
