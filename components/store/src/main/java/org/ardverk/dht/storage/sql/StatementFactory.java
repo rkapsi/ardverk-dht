@@ -21,6 +21,8 @@ class StatementFactory {
     
     public static final String PROPERTIES = pfx("properties");
     
+    public static final String VALUE_SEQUENCE = pfx("value_sequence");
+    
     public static final int BUCKETS_NAME_LENGTH = 16384;
     
     public static final int KEYS_URI_LENGTH = 16384;
@@ -54,8 +56,10 @@ class StatementFactory {
             + ")";
     }
     
+    public static final String CREATE_VALUE_SEQUENCE = "CREATE SEQUENCE " + VALUE_SEQUENCE;
+    
     public String createValues() {
-        return "CREATE TABLE " + VALUES + " (" 
+        return "CREATE TABLE " + VALUES + " ("
             + "id BINARY(" + length + ") PRIMARY KEY,"
             + "keyId BINARY(" + length + ") FOREIGN KEY REFERENCES " + KEYS + "(id),"
             + "created DATETIME NOT NULL,"
@@ -94,26 +98,35 @@ class StatementFactory {
             + " WHEN NOT MATCHED THEN INSERT VALUES vals.id, vals.bucketId, vals.uri, vals.created, vals.modified";
     }
     
-    public static final String INSERT_VALUES = "INSERT INTO " + VALUES + " NAMES(id, keyId, created) VALUES(?, ?, ?)";
+    public static final String UPDATE_BUCKET = "UPDATE " + BUCKETS + " SET (modified = ?) WHERE id = ?";
+    
+    public static final String UPDATE_KEY = "UPDATE " + KEYS + " SET (modified = ?) WHERE id = ?";
+    
+    public static final String INSERT_VALUE = "INSERT INTO " + VALUES + " NAMES(id, keyId, created) VALUES(?, ?, ?)";
+    
+    public static final String UPDATE_VALUE = "UPDATE " + VALUES + " SET (tombstone = ?) WHERE id = ?";
     
     public static final String INSERT_VTAGS = "INSERT INTO " + VTAGS + " NAMES(vtag, valueId) VALUES(?, ?)";
     
-    public static final String INSERT_PROPERTIES = "INSERT INTO " + PROPERTIES + " NAMES(valueId, name, value) VALUES(?, ?, ?)";
+    public static final String INSERT_PROPERTY = "INSERT INTO " + PROPERTIES + " NAMES(valueId, name, value) VALUES(?, ?, ?)";
+    
+    public static final String DELETE_PROPERTIES = "DELETE FROM " + PROPERTIES + " WHERE valueId = ?";
+    
+    public static final String VALUE_COUNT = "SELECT COUNT(id) FROM " + VALUES + " WHERE keyId = ?";
     
     public static String getValues(KUID marker) {
         StringBuilder sb = new StringBuilder();
-        
-        sb.append("SELECT v.id, p.name, p.value, COUNT(v.id) AS total FROM ")
-            .append(VALUES).append(" v, ").append(PROPERTIES).append(" p")
-            .append(" WHERE (v.keyId = ? AND v.id = p.valueId AND v.tombstone IS NOT NULL");
+        sb.append("SELECT valueId, name, value FROM ").append(PROPERTIES)
+            .append(" WHERE valueId IN (")
+                .append("SELECT id FROM ").append(VALUES)
+                .append(" WHERE keyId = ?");
         
         if (marker != null) {
-            sb.append(" AND v.id >= ?");
+            sb.append(" AND id >= ?");
         }
         
-        sb.append(") ORDER BY(v.created) DESC TOP ?");
+        sb.append(" ORDER BY id LIMIT ?)");
         
-        System.out.println(sb);
         return sb.toString();
     }
 }
