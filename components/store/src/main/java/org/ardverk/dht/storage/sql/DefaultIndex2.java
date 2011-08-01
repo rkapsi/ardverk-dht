@@ -4,12 +4,11 @@ import static org.ardverk.dht.storage.sql.SQLUtils.beginTxn;
 import static org.ardverk.dht.storage.sql.SQLUtils.endTxn;
 import static org.ardverk.dht.storage.sql.SQLUtils.setBytes;
 import static org.ardverk.dht.storage.sql.StatementFactory.BUCKET_MODIFIED;
-import static org.ardverk.dht.storage.sql.StatementFactory.DELETE_PROPERTIES;
 import static org.ardverk.dht.storage.sql.StatementFactory.INSERT_PROPERTY;
 import static org.ardverk.dht.storage.sql.StatementFactory.INSERT_VALUE;
 import static org.ardverk.dht.storage.sql.StatementFactory.KEY_MODIFIED;
-import static org.ardverk.dht.storage.sql.StatementFactory.VALUE_COUNT;
-import static org.ardverk.dht.storage.sql.StatementFactory.VALUE_DELETED;
+import static org.ardverk.dht.storage.sql.StatementFactory.SET_TOMBSTONE;
+import static org.ardverk.dht.storage.sql.StatementFactory.VALUE_COUNT_BY_KEY_ID;
 
 import java.io.Closeable;
 import java.io.File;
@@ -184,11 +183,11 @@ public class DefaultIndex2 implements Closeable {
         }
     }
     
-    protected int getValueCount(KUID keyId) throws SQLException {
-        return count(VALUE_COUNT, keyId);
+    private int getValueCount(KUID keyId) throws SQLException {
+        return count(VALUE_COUNT_BY_KEY_ID, keyId);
     }
     
-    protected int count(String sql, KUID id) throws SQLException {
+    private int count(String sql, KUID id) throws SQLException {
         PreparedStatement ps = connection.prepareStatement(sql);
         try {
             setBytes(ps, 1, id);
@@ -208,20 +207,24 @@ public class DefaultIndex2 implements Closeable {
         return 0;
     }
     
+    public Keys listKeys(String marker, int maxCount) throws SQLException {
+        
+        return null;
+    }
+    
     public Context get(Key key, KUID valueId) throws SQLException {
-        Values values = get(key, valueId, 1);
+        Values values = listValues(key, valueId, 1);
         return values != null ? values.get(valueId) : null;
     }
     
-    public Values get(Key key, KUID marker, int maxCount) throws SQLException {
+    public Values listValues(Key key, KUID marker, int maxCount) throws SQLException {
         Values values = null;
         
         KUID keyId = KeyId.valueOf(key);
+        Operation operation = Operation.valueOf(marker, maxCount);
         
         try {
             beginTxn(connection);
-            
-            Operation operation = lookup(marker, maxCount);
             
             PreparedStatement ps = connection.prepareStatement(
                     StatementFactory.getValues(operation));
@@ -273,10 +276,6 @@ public class DefaultIndex2 implements Closeable {
         return values;
     }
     
-    public void delete(Key key) throws SQLException {
-        
-    }
-    
     public void delete(Key key, KUID valueId) throws SQLException {
         
         long now = System.currentTimeMillis();
@@ -290,37 +289,19 @@ public class DefaultIndex2 implements Closeable {
         try {
             beginTxn(connection);
             
-            // PROPERTIES (delete physically)
+            // VALUES (set tombstone)
             {
-                PreparedStatement ps = connection.prepareStatement(DELETE_PROPERTIES);
-                try {
-                    setBytes(ps, 1, valueId);
-                    int success = ps.executeUpdate();
-                } finally {
-                    SQLUtils.close(ps);
-                }
-            }
-            
-            // VALUES (set tmobstone)
-            {
-                PreparedStatement ps = connection.prepareStatement(VALUE_DELETED);
-                try {
-                    ps.setDate(1, tombstone);
-                    setBytes(ps, 2, valueId);
-                    int success = ps.executeUpdate();
-                } finally {
-                    SQLUtils.close(ps);
-                }
+                int success = updateDate(SET_TOMBSTONE, valueId, tombstone);
             }
             
             // KEYS (update modified)
             {
-                int success = update(KEY_MODIFIED, keyId, modified);
+                int success = updateDate(KEY_MODIFIED, keyId, modified);
             }
             
             // BUCKETS (update modified)
             {
-                int success = update(BUCKET_MODIFIED, bucketId, modified);
+                int success = updateDate(BUCKET_MODIFIED, bucketId, modified);
             }
             
             connection.commit();
@@ -330,10 +311,18 @@ public class DefaultIndex2 implements Closeable {
         }
     }
     
-    private int update(String sql, KUID id, Timestamp ts) throws SQLException {
+    private int updateDate(String sql, KUID id, java.util.Date date) throws SQLException {
         PreparedStatement ps = connection.prepareStatement(sql);
         try {
-            ps.setTimestamp(1, ts);
+            
+            if (date instanceof java.sql.Date) {
+                ps.setDate(1, (java.sql.Date)date);
+            } else if (date instanceof java.sql.Timestamp) {
+                ps.setTimestamp(1, (java.sql.Timestamp)date);                
+            } else {
+                throw new IllegalArgumentException("date=" + date);
+            }
+            
             setBytes(ps, 2, id);
             return ps.executeUpdate();
         } finally {
@@ -341,13 +330,11 @@ public class DefaultIndex2 implements Closeable {
         }
     }
     
-    private static Operation lookup(KUID marker, int maxCount) {
-        if (marker != null) {
-            return maxCount == 1 
-                    ? Operation.EQUAL_TO 
-                    : Operation.GREATER_THAN_OR_EQUAL_TO;
+    public static class Keys {
+        
+        private Keys() {
+            
         }
-        return null;
     }
     
     public static class Values extends OrderedHashMap<KUID, Context> {

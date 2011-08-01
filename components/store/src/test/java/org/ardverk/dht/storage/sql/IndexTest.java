@@ -34,7 +34,7 @@ public class IndexTest {
         }
         
         KUID marker = CollectionUtils.nth(k, k.size()/2-1);
-        Values values = index.get(key, marker, 6);
+        Values values = index.listValues(key, marker, 6);
         System.out.println(values);
     }
 }

@@ -92,13 +92,13 @@ class StatementFactory {
     
     public static final String INSERT_VALUE = "INSERT INTO " + VALUES + " NAMES(id, keyId, created) VALUES(?, ?, ?)";
     
-    public static final String VALUE_DELETED = "UPDATE " + VALUES + " SET (tombstone = ?) WHERE id = ?";
+    public static final String SET_TOMBSTONE = "UPDATE " + VALUES + " SET (tombstone = ?) WHERE id = ?";
     
     public static final String INSERT_PROPERTY = "INSERT INTO " + PROPERTIES + " NAMES(valueId, name, value) VALUES(?, ?, ?)";
     
     public static final String DELETE_PROPERTIES = "DELETE FROM " + PROPERTIES + " WHERE valueId = ?";
     
-    public static final String VALUE_COUNT = "SELECT COUNT(id) FROM " + VALUES + " WHERE keyId = ?";
+    public static final String VALUE_COUNT_BY_KEY_ID = "SELECT COUNT(id) FROM " + VALUES + " WHERE keyId = ?";
     
     public static enum Operation {
         LESS_THAN("<"),
@@ -116,6 +116,15 @@ class StatementFactory {
         
         public String stringValue() {
             return value;
+        }
+        
+        public static Operation valueOf(KUID marker, int maxCount) {
+            if (marker != null) {
+                return maxCount == 1 
+                        ? Operation.EQUAL_TO 
+                        : Operation.GREATER_THAN_OR_EQUAL_TO;
+            }
+            return null;
         }
     }
     
