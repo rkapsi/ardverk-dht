@@ -3,6 +3,13 @@ package org.ardverk.dht.storage.sql;
 import static org.ardverk.dht.storage.sql.SQLUtils.beginTxn;
 import static org.ardverk.dht.storage.sql.SQLUtils.endTxn;
 import static org.ardverk.dht.storage.sql.SQLUtils.setBytes;
+import static org.ardverk.dht.storage.sql.StatementFactory.BUCKET_MODIFIED;
+import static org.ardverk.dht.storage.sql.StatementFactory.DELETE_PROPERTIES;
+import static org.ardverk.dht.storage.sql.StatementFactory.INSERT_PROPERTY;
+import static org.ardverk.dht.storage.sql.StatementFactory.INSERT_VALUE;
+import static org.ardverk.dht.storage.sql.StatementFactory.KEY_MODIFIED;
+import static org.ardverk.dht.storage.sql.StatementFactory.VALUE_COUNT;
+import static org.ardverk.dht.storage.sql.StatementFactory.VALUE_DELETED;
 
 import java.io.Closeable;
 import java.io.File;
@@ -26,7 +33,7 @@ import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.storage.Constants;
 import org.ardverk.dht.storage.Context;
 import org.ardverk.dht.storage.DateUtils;
-import org.ardverk.dht.storage.Vclock;
+import org.ardverk.dht.storage.sql.StatementFactory.Operation;
 import org.ardverk.security.MessageDigestUtils;
 import org.ardverk.utils.StringUtils;
 
@@ -58,9 +65,7 @@ public class DefaultIndex2 implements Closeable {
             Statement statement = connection.createStatement();
             statement.addBatch(factory.createBuckets());
             statement.addBatch(factory.createKeys());
-            statement.addBatch(StatementFactory.CREATE_VALUE_SEQUENCE);
             statement.addBatch(factory.createValues());
-            statement.addBatch(factory.createVTags());
             statement.addBatch(factory.createProperties());
             statement.executeBatch();
             statement.close();
@@ -87,25 +92,22 @@ public class DefaultIndex2 implements Closeable {
         SQLUtils.close(connection);
     }
     
-    public void add(Key key, Vclock vclock, 
-            Context context, KUID valueId) throws SQLException {
+    public void add(Key key, Context context, KUID valueId) throws SQLException {
         
         long now = System.currentTimeMillis();
         Date created = new Date(now);
         Timestamp modified = new Timestamp(now);
         
         context.addHeader(Constants.VALUE_ID, valueId.toHexString());
-        context.addHeader(Constants.VCLOCK, vclock.toString());
-        context.addHeader(Constants.VTAG, vclock.vtag64());
+        //context.addHeader(Constants.VCLOCK, vclock.toString());
+        //context.addHeader(Constants.VTAG, vclock.vtag64());
         context.addHeader(Constants.DATE, DateUtils.format(now));
         
         KUID bucketId = key.getId();
         String bucket = key.getBucket();
         
         URI uri = key.getURI();
-        KUID keyId = createKeyId(key);
-        
-        KUID vtag = vclock.vtag();
+        KUID keyId = KeyId.valueOf(key);
         
         try {
             beginTxn(connection);
@@ -143,8 +145,7 @@ public class DefaultIndex2 implements Closeable {
             
             // VALUES
             {
-                PreparedStatement ps = connection.prepareStatement(
-                        StatementFactory.INSERT_VALUE);
+                PreparedStatement ps = connection.prepareStatement(INSERT_VALUE);
                 try {
                     setBytes(ps, 1, valueId);
                     setBytes(ps, 2, keyId);
@@ -155,23 +156,9 @@ public class DefaultIndex2 implements Closeable {
                 }
             }
             
-            // VTAGS
-            {
-                PreparedStatement ps = connection.prepareStatement(
-                        StatementFactory.INSERT_VTAGS);
-                try {
-                    setBytes(ps, 1, vtag);
-                    setBytes(ps, 2, valueId);
-                    ps.executeUpdate();
-                } finally {
-                    SQLUtils.close(ps);
-                }
-            }
-            
             // PROPERTIES
             {
-                PreparedStatement ps = connection.prepareStatement(
-                        StatementFactory.INSERT_PROPERTY);
+                PreparedStatement ps = connection.prepareStatement(INSERT_PROPERTY);
                 try {
                     
                     for (Header header : context.getHeaders()) {
@@ -198,7 +185,7 @@ public class DefaultIndex2 implements Closeable {
     }
     
     protected int getValueCount(KUID keyId) throws SQLException {
-        return count(StatementFactory.VALUE_COUNT, keyId);
+        return count(VALUE_COUNT, keyId);
     }
     
     protected int count(String sql, KUID id) throws SQLException {
@@ -229,13 +216,15 @@ public class DefaultIndex2 implements Closeable {
     public Values get(Key key, KUID marker, int maxCount) throws SQLException {
         Values values = null;
         
-        KUID keyId = createKeyId(key);
+        KUID keyId = KeyId.valueOf(key);
         
         try {
             beginTxn(connection);
             
+            Operation operation = lookup(marker, maxCount);
+            
             PreparedStatement ps = connection.prepareStatement(
-                    StatementFactory.getValues(marker));
+                    StatementFactory.getValues(operation));
             try {
                 
                 int index = 0;
@@ -255,7 +244,7 @@ public class DefaultIndex2 implements Closeable {
                         
                         do {
                             byte[] valueId = rs.getBytes(1);
-                            Context context = values.getOrCreateContext(valueId, maxCount);
+                            Context context = values.getOrCreate(valueId, maxCount);
                             
                             if (context == null) {
                                 break;
@@ -291,18 +280,19 @@ public class DefaultIndex2 implements Closeable {
     public void delete(Key key, KUID valueId) throws SQLException {
         
         long now = System.currentTimeMillis();
+        
+        Date tombstone = new Date(now);
         Timestamp modified = new Timestamp(now);
         
         KUID bucketId = key.getId();
-        KUID keyId = createKeyId(key);
+        KUID keyId = KeyId.valueOf(key);
         
         try {
             beginTxn(connection);
             
-            // PROPERTIES
+            // PROPERTIES (delete physically)
             {
-                PreparedStatement ps = connection.prepareStatement(
-                        StatementFactory.DELETE_PROPERTIES);
+                PreparedStatement ps = connection.prepareStatement(DELETE_PROPERTIES);
                 try {
                     setBytes(ps, 1, valueId);
                     int success = ps.executeUpdate();
@@ -311,12 +301,11 @@ public class DefaultIndex2 implements Closeable {
                 }
             }
             
-            // VALUES
+            // VALUES (set tmobstone)
             {
-                PreparedStatement ps = connection.prepareStatement(
-                        StatementFactory.UPDATE_VALUE);
+                PreparedStatement ps = connection.prepareStatement(VALUE_DELETED);
                 try {
-                    ps.setDate(1, new Date(now));
+                    ps.setDate(1, tombstone);
                     setBytes(ps, 2, valueId);
                     int success = ps.executeUpdate();
                 } finally {
@@ -324,32 +313,14 @@ public class DefaultIndex2 implements Closeable {
                 }
             }
             
-            // KEYS
+            // KEYS (update modified)
             {
-                PreparedStatement ps = connection.prepareStatement(
-                        StatementFactory.UPDATE_KEY);
-                try {
-                    ps.setTimestamp(1, modified);
-                    setBytes(ps, 2, keyId);
-                    int success = ps.executeUpdate();
-                } finally {
-                    SQLUtils.close(ps);
-                }
+                int success = update(KEY_MODIFIED, keyId, modified);
             }
             
-            // BUCKETS
+            // BUCKETS (update modified)
             {
-                PreparedStatement ps = connection.prepareStatement(
-                        StatementFactory.UPDATE_BUCKET);
-                try {
-                    ps.setTimestamp(1, modified);
-                    setBytes(ps, 2, bucketId);
-                    int success = ps.executeUpdate();
-                } finally {
-                    SQLUtils.close(ps);
-                }
-                
-                
+                int success = update(BUCKET_MODIFIED, bucketId, modified);
             }
             
             connection.commit();
@@ -359,14 +330,24 @@ public class DefaultIndex2 implements Closeable {
         }
     }
     
-    private static KUID createKeyId(Key key) {
-        byte[] keyId = hash(key.getURI().toString());
-        return KUID.create(keyId);
+    private int update(String sql, KUID id, Timestamp ts) throws SQLException {
+        PreparedStatement ps = connection.prepareStatement(sql);
+        try {
+            ps.setTimestamp(1, ts);
+            setBytes(ps, 2, id);
+            return ps.executeUpdate();
+        } finally {
+            SQLUtils.close(ps);
+        }
     }
     
-    private static byte[] hash(String value) {
-        MessageDigest md = MessageDigestUtils.createSHA1();
-        return md.digest(StringUtils.getBytes(value));
+    private static Operation lookup(KUID marker, int maxCount) {
+        if (marker != null) {
+            return maxCount == 1 
+                    ? Operation.EQUAL_TO 
+                    : Operation.GREATER_THAN_OR_EQUAL_TO;
+        }
+        return null;
     }
     
     public static class Values extends OrderedHashMap<KUID, Context> {
@@ -390,7 +371,7 @@ public class DefaultIndex2 implements Closeable {
             return count;
         }
         
-        private Context getOrCreateContext(byte[] valueId, int maxCount) {
+        private Context getOrCreate(byte[] valueId, int maxCount) {
             return getOrCreateContext(KUID.create(valueId), maxCount);
         }
         
@@ -418,6 +399,21 @@ public class DefaultIndex2 implements Closeable {
             
             sb.append("}");
             return sb.toString();
+        }
+    }
+    
+    private static class KeyId {
+        
+        private KeyId() {}
+        
+        public static KUID valueOf(Key key) {
+            byte[] keyId = hash(key.getURI().toString());
+            return KUID.create(keyId);
+        }
+        
+        private static byte[] hash(String value) {
+            MessageDigest md = MessageDigestUtils.createSHA1();
+            return md.digest(StringUtils.getBytes(value));
         }
     }
 }

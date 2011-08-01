@@ -8,7 +8,6 @@ import org.ardverk.dht.KUID;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.KeyFactory;
 import org.ardverk.dht.storage.Context;
-import org.ardverk.dht.storage.Vclock;
 import org.ardverk.dht.storage.sql.DefaultIndex2.Values;
 import org.junit.Test;
 
@@ -25,9 +24,7 @@ public class IndexTest {
             Context context = new Context();
             context.addHeader("X-Key", "" + i);
             
-            Vclock vclock = Vclock.create(key);
-            
-            index.add(key, vclock, context, valueId);
+            index.add(key, context, valueId);
             k.add(valueId);
             //Thread.sleep(1000);
         }

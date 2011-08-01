@@ -17,8 +17,6 @@ class StatementFactory {
     
     public static final String VALUES = pfx("values"); 
     
-    public static final String VTAGS = pfx("vtags");
-    
     public static final String PROPERTIES = pfx("properties");
     
     public static final String VALUE_SEQUENCE = pfx("value_sequence");
@@ -56,22 +54,12 @@ class StatementFactory {
             + ")";
     }
     
-    public static final String CREATE_VALUE_SEQUENCE = "CREATE SEQUENCE " + VALUE_SEQUENCE;
-    
     public String createValues() {
         return "CREATE TABLE " + VALUES + " ("
             + "id BINARY(" + length + ") PRIMARY KEY,"
             + "keyId BINARY(" + length + ") FOREIGN KEY REFERENCES " + KEYS + "(id),"
             + "created DATETIME NOT NULL,"
             + "tombstone DATETIME"
-            + ")";
-    }
-    
-    public String createVTags() {
-        return "CREATE TABLE " + VTAGS + " ("
-            + "id BIGINT PRIMARY KEY IDENTITY,"
-            + "vtag BINARY(" + length + ") NOT NULL,"
-            + "valueId BINARY(" + length + ") FOREIGN KEY REFERENCES " + VALUES + "(id)"
             + ")";
     }
     
@@ -98,15 +86,13 @@ class StatementFactory {
             + " WHEN NOT MATCHED THEN INSERT VALUES vals.id, vals.bucketId, vals.uri, vals.created, vals.modified";
     }
     
-    public static final String UPDATE_BUCKET = "UPDATE " + BUCKETS + " SET (modified = ?) WHERE id = ?";
+    public static final String BUCKET_MODIFIED = "UPDATE " + BUCKETS + " SET (modified = ?) WHERE id = ?";
     
-    public static final String UPDATE_KEY = "UPDATE " + KEYS + " SET (modified = ?) WHERE id = ?";
+    public static final String KEY_MODIFIED = "UPDATE " + KEYS + " SET (modified = ?) WHERE id = ?";
     
     public static final String INSERT_VALUE = "INSERT INTO " + VALUES + " NAMES(id, keyId, created) VALUES(?, ?, ?)";
     
-    public static final String UPDATE_VALUE = "UPDATE " + VALUES + " SET (tombstone = ?) WHERE id = ?";
-    
-    public static final String INSERT_VTAGS = "INSERT INTO " + VTAGS + " NAMES(vtag, valueId) VALUES(?, ?)";
+    public static final String VALUE_DELETED = "UPDATE " + VALUES + " SET (tombstone = ?) WHERE id = ?";
     
     public static final String INSERT_PROPERTY = "INSERT INTO " + PROPERTIES + " NAMES(valueId, name, value) VALUES(?, ?, ?)";
     
@@ -114,15 +100,38 @@ class StatementFactory {
     
     public static final String VALUE_COUNT = "SELECT COUNT(id) FROM " + VALUES + " WHERE keyId = ?";
     
+    public static enum Operation {
+        LESS_THAN("<"),
+        EQUAL_TO("="),
+        GREATER_THAN(">"),
+        LESS_THAN_OR_EQUAL_TO("<="),
+        GREATER_THAN_OR_EQUAL_TO(">="),
+        NOT_EQUAL_TO("<>");
+        
+        private final String value;
+        
+        private Operation(String value) {
+            this.value = value;
+        }
+        
+        public String stringValue() {
+            return value;
+        }
+    }
+    
     public static String getValues(KUID marker) {
+        return getValues(marker != null ? Operation.GREATER_THAN_OR_EQUAL_TO : null);
+    }
+    
+    public static String getValues(Operation operation) {
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT valueId, name, value FROM ").append(PROPERTIES)
             .append(" WHERE valueId IN (")
                 .append("SELECT id FROM ").append(VALUES)
                 .append(" WHERE keyId = ?");
         
-        if (marker != null) {
-            sb.append(" AND id >= ?");
+        if (operation != null) {
+            sb.append(" AND id ").append(operation.stringValue()).append("?");
         }
         
         sb.append(" ORDER BY id LIMIT ?)");
