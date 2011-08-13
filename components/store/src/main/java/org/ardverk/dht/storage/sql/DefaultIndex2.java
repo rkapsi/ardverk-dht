@@ -4,8 +4,13 @@ import static org.ardverk.dht.storage.sql.SQLUtils.beginTxn;
 import static org.ardverk.dht.storage.sql.SQLUtils.endTxn;
 import static org.ardverk.dht.storage.sql.SQLUtils.setBytes;
 import static org.ardverk.dht.storage.sql.StatementFactory.BUCKET_MODIFIED;
+import static org.ardverk.dht.storage.sql.StatementFactory.DELETE_BUCKET;
+import static org.ardverk.dht.storage.sql.StatementFactory.DELETE_KEY;
+import static org.ardverk.dht.storage.sql.StatementFactory.DELETE_PROPERTIES;
+import static org.ardverk.dht.storage.sql.StatementFactory.DELETE_VALUE;
 import static org.ardverk.dht.storage.sql.StatementFactory.INSERT_PROPERTY;
 import static org.ardverk.dht.storage.sql.StatementFactory.INSERT_VALUE;
+import static org.ardverk.dht.storage.sql.StatementFactory.KEY_COUNT_BY_BUCKET_ID;
 import static org.ardverk.dht.storage.sql.StatementFactory.KEY_MODIFIED;
 import static org.ardverk.dht.storage.sql.StatementFactory.SET_TOMBSTONE;
 import static org.ardverk.dht.storage.sql.StatementFactory.VALUE_COUNT_BY_KEY_ID;
@@ -22,12 +27,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.http.Header;
 import org.ardverk.collection.OrderedHashMap;
 import org.ardverk.dht.KUID;
+import org.ardverk.dht.rsrc.DefaultKey;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.storage.Constants;
 import org.ardverk.dht.storage.Context;
@@ -183,6 +191,10 @@ public class DefaultIndex2 implements Closeable {
         }
     }
     
+    private int getKeyCount(KUID bucketId) throws SQLException {
+        return count(KEY_COUNT_BY_BUCKET_ID, bucketId);
+    }
+    
     private int getValueCount(KUID keyId) throws SQLException {
         return count(VALUE_COUNT_BY_KEY_ID, keyId);
     }
@@ -209,7 +221,68 @@ public class DefaultIndex2 implements Closeable {
     
     public Keys listKeys(String marker, int maxCount) throws SQLException {
         
-        return null;
+        Keys keys = null;
+        
+        PreparedStatement ps = connection.prepareStatement(
+                StatementFactory.listKeys(marker));
+        
+        try {
+            
+            int index = 0;
+            if (marker != null) {
+                ps.setString(++index, marker);
+            }
+            ps.setInt(++index, maxCount);
+            
+            ResultSet rs = ps.executeQuery();
+            try {
+                if (rs.next()) {
+                    
+                    keys = new Keys();
+                    
+                    do {
+                        String uri = rs.getString(1);
+                        
+                        Key key = DefaultKey.valueOf(uri);
+                        List<KUID> values = listValueIds(key);
+                        
+                        if (values != null) {
+                            keys.put(key, values);
+                        }
+                        
+                    } while (rs.next());
+                }
+            } finally {
+                SQLUtils.close(rs);
+            }
+        } finally {
+            SQLUtils.close(ps);
+        }
+        
+        return keys;
+    }
+    
+    private List<KUID> listValueIds(Key key) throws SQLException {
+        
+        KUID keyId = KeyId.valueOf(key);
+        
+        List<KUID> keys = null;
+        
+        PreparedStatement ps = connection.prepareStatement("");
+        try {
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                keys = new ArrayList<KUID>();
+                
+                do {
+                    
+                } while (rs.next());
+            }
+        } finally {
+            SQLUtils.close(ps);
+        }
+        
+        return keys;
     }
     
     public Context get(Key key, KUID valueId) throws SQLException {
@@ -227,7 +300,7 @@ public class DefaultIndex2 implements Closeable {
             beginTxn(connection);
             
             PreparedStatement ps = connection.prepareStatement(
-                    StatementFactory.getValues(operation));
+                    StatementFactory.listValues(operation));
             try {
                 
                 int index = 0;
@@ -291,17 +364,17 @@ public class DefaultIndex2 implements Closeable {
             
             // VALUES (set tombstone)
             {
-                int success = updateDate(SET_TOMBSTONE, valueId, tombstone);
+                boolean success = update(SET_TOMBSTONE, valueId, tombstone);
             }
             
             // KEYS (update modified)
             {
-                int success = updateDate(KEY_MODIFIED, keyId, modified);
+                boolean success = update(KEY_MODIFIED, keyId, modified);
             }
             
             // BUCKETS (update modified)
             {
-                int success = updateDate(BUCKET_MODIFIED, bucketId, modified);
+                boolean success = update(BUCKET_MODIFIED, bucketId, modified);
             }
             
             connection.commit();
@@ -311,7 +384,57 @@ public class DefaultIndex2 implements Closeable {
         }
     }
     
-    private int updateDate(String sql, KUID id, java.util.Date date) throws SQLException {
+    public void remove(Key key, KUID valueId) throws SQLException {
+        
+        long now = System.currentTimeMillis();
+        Timestamp modified = new Timestamp(now);
+        
+        KUID bucketId = key.getId();
+        KUID keyId = KeyId.valueOf(key);
+        
+        try {
+            beginTxn(connection);
+            
+            // PROPERTIES
+            {
+                boolean success = delete(DELETE_PROPERTIES, valueId);
+            }
+            
+            // VALUES
+            {
+                boolean success = delete(DELETE_VALUE, valueId);
+            }
+            
+            // KEYS
+            {
+                boolean success = false;
+                int count = getValueCount(keyId);
+                if (0 < count) {
+                    success = update(KEY_MODIFIED, keyId, modified);
+                } else {
+                    success = delete(DELETE_KEY, keyId);
+                }
+            }
+            
+            // BUCKETS
+            {
+                boolean success = false;
+                int count = getKeyCount(bucketId);
+                if (0 < count) {
+                    success = update(BUCKET_MODIFIED, bucketId, modified);
+                } else {
+                    success = delete(DELETE_BUCKET, bucketId);
+                }
+            }
+            
+            connection.commit();
+            
+        } finally {
+            endTxn(connection);
+        }
+    }
+    
+    private boolean update(String sql, KUID id, java.util.Date date) throws SQLException {
         PreparedStatement ps = connection.prepareStatement(sql);
         try {
             
@@ -324,16 +447,37 @@ public class DefaultIndex2 implements Closeable {
             }
             
             setBytes(ps, 2, id);
-            return ps.executeUpdate();
+            return ps.executeUpdate() == 1;
         } finally {
             SQLUtils.close(ps);
         }
     }
     
-    public static class Keys {
+    private boolean delete(String sql, KUID id) throws SQLException {
+        PreparedStatement ps = connection.prepareStatement(sql);
+        try {
+            setBytes(ps, 1, id);
+            return ps.executeUpdate() == 1;
+        } finally {
+            SQLUtils.close(ps);
+        }
+    }
+    
+    public static class Keys extends OrderedHashMap<Key, List<KUID>> {
         
+        private static final long serialVersionUID = 6551875468885150502L;
+
         private Keys() {
             
+        }
+        
+        private void add(Key key, KUID valueId) {
+            List<KUID> list = get(key);
+            if (list != null) {
+                list = new ArrayList<KUID>();
+                put(key, list);
+            }
+            list.add(valueId);
         }
     }
     

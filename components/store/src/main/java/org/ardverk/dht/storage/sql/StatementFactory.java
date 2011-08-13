@@ -37,38 +37,38 @@ class StatementFactory {
     
     public String createBuckets() {
         return "CREATE TABLE " + BUCKETS + " ("
-            + "id BINARY(" + length + ") PRIMARY KEY," // sha1(name) but we get it straight from the Key!
-            + "name VARCHAR(" + BUCKETS_NAME_LENGTH + ") UNIQUE NOT NULL,"
-            + "created DATETIME NOT NULL,"
-            + "modified TIMESTAMP NOT NULL,"
+            + "id BINARY(" + length + ") PRIMARY KEY" // sha1(name) but we get it straight from the Key!
+            + ", name VARCHAR(" + BUCKETS_NAME_LENGTH + ") UNIQUE NOT NULL"
+            + ", created DATETIME NOT NULL"
+            + ", modified TIMESTAMP NOT NULL"
             + ")";
     }
     
     public String createKeys() {
         return "CREATE TABLE " + KEYS + " ("
-            + "id BINARY(" + length + ") PRIMARY KEY," // sha1(uri)
-            + "bucketId BINARY(" + length + ") FOREIGN KEY REFERENCES " + BUCKETS + "(id),"
-            + "uri VARCHAR(" + KEYS_URI_LENGTH + ") UNIQUE NOT NULL,"
-            + "created DATETIME NOT NULL,"
-            + "modified TIMESTAMP NOT NULL"
+            + "id BINARY(" + length + ") PRIMARY KEY" // sha1(uri)
+            + ", bucketId BINARY(" + length + ") FOREIGN KEY REFERENCES " + BUCKETS + "(id)"
+            + ", uri VARCHAR(" + KEYS_URI_LENGTH + ") UNIQUE NOT NULL"
+            + ", created DATETIME NOT NULL"
+            + ", modified TIMESTAMP NOT NULL"
             + ")";
     }
     
     public String createValues() {
         return "CREATE TABLE " + VALUES + " ("
-            + "id BINARY(" + length + ") PRIMARY KEY,"
-            + "keyId BINARY(" + length + ") FOREIGN KEY REFERENCES " + KEYS + "(id),"
-            + "created DATETIME NOT NULL,"
-            + "tombstone DATETIME"
+            + "id BINARY(" + length + ") PRIMARY KEY"
+            + ", keyId BINARY(" + length + ") FOREIGN KEY REFERENCES " + KEYS + "(id)"
+            + ", created DATETIME NOT NULL"
+            + ", tombstone DATETIME"
             + ")";
     }
     
     public String createProperties() {
         return "CREATE TABLE " + PROPERTIES + " ("
-            + "id BIGINT PRIMARY KEY IDENTITY,"
-            + "valueId BINARY(" + length + ") FOREIGN KEY REFERENCES " + VALUES + "(id),"
-            + "name VARCHAR(" + PROPERTIES_NAME_LENGTH + ") NOT NULL,"
-            + "value VARCHAR(" + PROPERTIES_VALUE_LENGTH + ") NOT NULL,"
+            + "id BIGINT PRIMARY KEY IDENTITY"
+            + ", valueId BINARY(" + length + ") FOREIGN KEY REFERENCES " + VALUES + "(id)"
+            + ", name VARCHAR(" + PROPERTIES_NAME_LENGTH + ") NOT NULL"
+            + ", value VARCHAR(" + PROPERTIES_VALUE_LENGTH + ") NOT NULL"
             + ")";
     }
     
@@ -98,7 +98,15 @@ class StatementFactory {
     
     public static final String DELETE_PROPERTIES = "DELETE FROM " + PROPERTIES + " WHERE valueId = ?";
     
+    public static final String DELETE_VALUE = "DELETE FROM " + VALUES + " WHERE id = ?";
+    
+    public static final String DELETE_KEY = "DELETE FROM " + KEYS + " WHERE id = ?";
+    
+    public static final String DELETE_BUCKET = "DELETE FROM " + BUCKETS + " WHERE id = ?";
+    
     public static final String VALUE_COUNT_BY_KEY_ID = "SELECT COUNT(id) FROM " + VALUES + " WHERE keyId = ?";
+    
+    public static final String KEY_COUNT_BY_BUCKET_ID = "SELECT COUNT(id) FROM " + KEYS + " WHERE bucketId = ?";
     
     public static enum Operation {
         LESS_THAN("<"),
@@ -114,7 +122,8 @@ class StatementFactory {
             this.value = value;
         }
         
-        public String stringValue() {
+        @Override
+        public String toString() {
             return value;
         }
         
@@ -128,19 +137,33 @@ class StatementFactory {
         }
     }
     
-    public static String getValues(KUID marker) {
-        return getValues(marker != null ? Operation.GREATER_THAN_OR_EQUAL_TO : null);
+    public static String listKeys(String marker) {
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append("SELECT uri FROM ").append(KEYS);
+        
+        if (marker != null) {
+            sb.append(" WHERE uri >= ?");
+        }
+        
+        sb.append(" ORDER BY uri LIMIT ?");
+        
+        return sb.toString();
     }
     
-    public static String getValues(Operation operation) {
+    public static String listValues(KUID marker) {
+        return listValues(marker != null ? Operation.GREATER_THAN_OR_EQUAL_TO : null);
+    }
+    
+    public static String listValues(Operation operation) {
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT valueId, name, value FROM ").append(PROPERTIES)
             .append(" WHERE valueId IN (")
                 .append("SELECT id FROM ").append(VALUES)
-                .append(" WHERE keyId = ?");
+                .append(" WHERE keyId = ? AND tombstone IS NULL");
         
         if (operation != null) {
-            sb.append(" AND id ").append(operation.stringValue()).append("?");
+            sb.append(" AND id ").append(operation).append(" ?");
         }
         
         sb.append(" ORDER BY id LIMIT ?)");

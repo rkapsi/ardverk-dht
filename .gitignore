@@ -5,3 +5,7 @@ build
 dist
 *.hprof
 data
+.settings
+.classpath
+.project
+target
