@@ -2,15 +2,15 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
   
   <properties>
-  	<ardverk-dht.version>0.1</ardverk-dht.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   
-  <modelVersion>4.0.0</modelVersion>
   <groupId>org.ardverk</groupId>
   <artifactId>ardverk-dht</artifactId>
-  <version>${ardverk-dht.version}</version>
+  <version>0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   
   <modules>
@@ -20,19 +20,4 @@
   	<module>components/store</module>
   	<module>components/tools</module> 
   </modules>
-  
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.3.2</version>
-        <configuration>
-            <source>1.6</source>
-            <target>1.6</target>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-  
 </project>
