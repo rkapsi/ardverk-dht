@@ -18,6 +18,6 @@
   	<module>components/examples</module>
   	<module>components/http</module>
   	<module>components/store</module>
-  	<module>components/tools</module> 
+  	<module>components/tools</module>
   </modules>
 </project>

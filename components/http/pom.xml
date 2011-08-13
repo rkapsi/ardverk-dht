@@ -13,7 +13,7 @@
     <groupId>org.ardverk</groupId>
     <artifactId>ardverk-dht</artifactId>
     <version>0.1-SNAPSHOT</version>
-    <relativePath>.../.../pom.xml</relativePath>
+    <relativePath>../../pom.xml</relativePath>
   </parent>
   
   <groupId>org.ardverk</groupId>
