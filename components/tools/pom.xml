@@ -53,5 +53,12 @@
       <artifactId>ardverk-dht-http</artifactId>
       <version>0.1-SNAPSHOT</version>
     </dependency>
+    
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.8.2</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 </project>

@@ -38,7 +38,7 @@
   <dependencies>
   	<dependency>
       <groupId>org.ardverk</groupId>
-      <artifactId>ardverk-core</artifactId>
+      <artifactId>ardverk-dht-core</artifactId>
       <version>0.1-SNAPSHOT</version>
     </dependency>
     
