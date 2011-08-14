@@ -1,4 +1,4 @@
-package org.ardverk.dht.storage;
+package org.ardverk.dht.storage.memory;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +25,7 @@ import org.ardverk.dht.KUID;
 import org.ardverk.dht.rsrc.DefaultKey;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.KeyFactory;
+import org.ardverk.dht.storage.message.Context;
 import org.ardverk.security.MessageDigestUtils;
 import org.ardverk.utils.DefaultEntry;
 import org.ardverk.utils.StringUtils;

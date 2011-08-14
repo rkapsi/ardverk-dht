@@ -6,11 +6,16 @@ import java.io.InputStream;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.Value;
+import org.ardverk.dht.storage.message.ExceptionResponse;
+import org.ardverk.dht.storage.message.Method;
+import org.ardverk.dht.storage.message.Request;
+import org.ardverk.dht.storage.message.Response;
+import org.ardverk.dht.storage.message.ResponseFactory;
 import org.ardverk.io.IoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-abstract class AbstractObjectDatastore extends AbstractDatastore {
+public abstract class AbstractObjectDatastore extends AbstractDatastore {
 
     private static final Logger LOG 
         = LoggerFactory.getLogger(AbstractObjectDatastore.class);
@@ -65,7 +70,7 @@ abstract class AbstractObjectDatastore extends AbstractDatastore {
         
         Response response = handleGet(src, key, true);
         if (response == null) {
-            response = ResponseFactory.createNotFound();
+            response = ResponseFactory.notFound();
         }
         
         return response;

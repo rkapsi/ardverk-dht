@@ -1,6 +1,7 @@
-package org.ardverk.dht.storage;
+package org.ardverk.dht.storage.message;
 
 import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.storage.Constants;
 
 public class DefaultRequest extends Request {
 

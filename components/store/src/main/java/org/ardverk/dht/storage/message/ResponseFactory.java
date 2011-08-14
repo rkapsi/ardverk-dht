@@ -1,4 +1,4 @@
-package org.ardverk.dht.storage;
+package org.ardverk.dht.storage.message;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
@@ -9,14 +9,31 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.http.Header;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.rsrc.Key;
-import org.ardverk.dht.storage.sql.DefaultIndex2.Values;
+import org.ardverk.dht.storage.Constants;
 import org.ardverk.utils.StringUtils;
 
-class ListValuesResponse extends Response {
+public class ResponseFactory {
+
+    private ResponseFactory() {}
     
-    public static Response create(StatusLine status, Key key, Values values) {
+    public static Response notFound() {
+        return new Response(StatusLine.NOT_FOUND);
+    }
+
+    public static Response ok(Header... headers) {
+        Response response = new Response(StatusLine.OK);
+        response.addHeaders(headers);
+        return response;
+    }
+
+    public static Response ok(Context context, ValueEntity value) {
+        return new Response(StatusLine.OK, context, value);
+    }
+    
+    public static Response list(StatusLine status, Key key, Map<? extends KUID, ? extends Context> values) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             XMLOutputFactory factory = XMLOutputFactory.newFactory();
@@ -33,9 +50,9 @@ class ListValuesResponse extends Response {
                 xml.writeEndElement();
                 
                 xml.writeStartElement("values");
-                for (Map.Entry<KUID, Context> entry : values.entrySet()) {
+                for (Map.Entry<? extends KUID, ? extends Context> entry : values.entrySet()) {
                     KUID valueId = entry.getKey();
-                    Context context = entry.getValue();
+                    //Context context = entry.getValue();
                     
                     xml.writeStartElement("value");
                     
@@ -60,19 +77,14 @@ class ListValuesResponse extends Response {
                 xml.close();
             }
             
-            return new ListValuesResponse(status, 
+            return new Response(status, 
                     new ByteArrayValueEntity(
                             Constants.XML_TEXT_TYPE, 
                             baos.toByteArray()));
-            
         } catch (UnsupportedEncodingException err) {
             throw new IllegalStateException("UnsupportedEncodingException", err);
         } catch (XMLStreamException err) {
             throw new IllegalStateException("XMLStreamException", err);
         }
-    }
-    
-    private ListValuesResponse(StatusLine status, ValueEntity entity) {
-        super(status, entity);
     }
 }

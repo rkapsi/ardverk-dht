@@ -1,4 +1,4 @@
-package org.ardverk.dht.storage;
+package org.ardverk.dht.storage.message;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

@@ -1,18 +1,18 @@
-package org.ardverk.dht.storage.sql;
+package org.ardverk.dht.storage.persistence;
 
-import static org.ardverk.dht.storage.sql.SQLUtils.setBytes;
-import static org.ardverk.dht.storage.sql.StatementFactory.BUCKET_MODIFIED;
-import static org.ardverk.dht.storage.sql.StatementFactory.DELETE_BUCKET;
-import static org.ardverk.dht.storage.sql.StatementFactory.DELETE_KEY;
-import static org.ardverk.dht.storage.sql.StatementFactory.DELETE_PROPERTIES;
-import static org.ardverk.dht.storage.sql.StatementFactory.DELETE_VALUE;
-import static org.ardverk.dht.storage.sql.StatementFactory.INSERT_PROPERTY;
-import static org.ardverk.dht.storage.sql.StatementFactory.INSERT_VALUE;
-import static org.ardverk.dht.storage.sql.StatementFactory.KEY_COUNT_BY_BUCKET_ID;
-import static org.ardverk.dht.storage.sql.StatementFactory.KEY_MODIFIED;
-import static org.ardverk.dht.storage.sql.StatementFactory.LIST_VALUE_ID;
-import static org.ardverk.dht.storage.sql.StatementFactory.SET_TOMBSTONE;
-import static org.ardverk.dht.storage.sql.StatementFactory.VALUE_COUNT_BY_KEY_ID;
+import static org.ardverk.dht.storage.persistence.SQLUtils.setBytes;
+import static org.ardverk.dht.storage.persistence.StatementFactory.BUCKET_MODIFIED;
+import static org.ardverk.dht.storage.persistence.StatementFactory.DELETE_BUCKET;
+import static org.ardverk.dht.storage.persistence.StatementFactory.DELETE_KEY;
+import static org.ardverk.dht.storage.persistence.StatementFactory.DELETE_PROPERTIES;
+import static org.ardverk.dht.storage.persistence.StatementFactory.DELETE_VALUE;
+import static org.ardverk.dht.storage.persistence.StatementFactory.INSERT_PROPERTY;
+import static org.ardverk.dht.storage.persistence.StatementFactory.INSERT_VALUE;
+import static org.ardverk.dht.storage.persistence.StatementFactory.KEY_COUNT_BY_BUCKET_ID;
+import static org.ardverk.dht.storage.persistence.StatementFactory.KEY_MODIFIED;
+import static org.ardverk.dht.storage.persistence.StatementFactory.LIST_VALUE_ID;
+import static org.ardverk.dht.storage.persistence.StatementFactory.SET_TOMBSTONE;
+import static org.ardverk.dht.storage.persistence.StatementFactory.VALUE_COUNT_BY_KEY_ID;
 
 import java.io.Closeable;
 import java.io.File;
@@ -26,7 +26,6 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.http.Header;
 import org.ardverk.collection.OrderedHashMap;
@@ -34,21 +33,22 @@ import org.ardverk.dht.KUID;
 import org.ardverk.dht.rsrc.DefaultKey;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.storage.Constants;
-import org.ardverk.dht.storage.Context;
 import org.ardverk.dht.storage.DateUtils;
-import org.ardverk.dht.storage.sql.StatementFactory.Operation;
+import org.ardverk.dht.storage.collections.Values;
+import org.ardverk.dht.storage.message.Context;
+import org.ardverk.dht.storage.persistence.StatementFactory.Operation;
 import org.ardverk.security.MessageDigestUtils;
 import org.ardverk.utils.StringUtils;
 
-public class DefaultIndex2 implements Closeable {
+class Index implements Closeable {
     
     public static final int LENGTH = 20;
     
-    public static DefaultIndex2 create(File dir) {
+    public static Index create(File dir) {
         return create(dir, LENGTH);
     }
     
-    public static DefaultIndex2 create(File dir, int length) {
+    public static Index create(File dir, int length) {
         try {
             
             ConnectionManager cm = ConnectionManager.newInstance();
@@ -62,7 +62,7 @@ public class DefaultIndex2 implements Closeable {
             statement.executeBatch();
             statement.close();
             
-            return new DefaultIndex2(factory, cm);
+            return new Index(factory, cm);
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException("ClassNotFoundException", e);
         } catch (SQLException e) {
@@ -74,7 +74,7 @@ public class DefaultIndex2 implements Closeable {
     
     private final ConnectionManager cm;
     
-    private DefaultIndex2(StatementFactory factory, ConnectionManager connection) {
+    private Index(StatementFactory factory, ConnectionManager connection) {
         this.factory = factory;
         this.cm = connection;
     }
@@ -91,8 +91,6 @@ public class DefaultIndex2 implements Closeable {
         Timestamp modified = new Timestamp(now);
         
         context.addHeader(Constants.VALUE_ID, valueId.toHexString());
-        //context.addHeader(Constants.VCLOCK, vclock.toString());
-        //context.addHeader(Constants.VTAG, vclock.vtag64());
         context.addHeader(Constants.DATE, DateUtils.format(now));
         
         KUID bucketId = key.getId();
@@ -338,7 +336,7 @@ public class DefaultIndex2 implements Closeable {
         return values;
     }
     
-    public void delete(Key key, KUID valueId) throws SQLException {
+    public boolean delete(Key key, KUID valueId) throws SQLException {
         
         long now = System.currentTimeMillis();
         
@@ -348,22 +346,24 @@ public class DefaultIndex2 implements Closeable {
         KUID bucketId = key.getId();
         KUID keyId = KeyId.valueOf(key);
         
+        boolean success = true;
+        
         try {
             cm.beginTxn();
             
             // VALUES (set tombstone)
             {
-                boolean success = update(SET_TOMBSTONE, valueId, tombstone);
+                success &= update(SET_TOMBSTONE, valueId, tombstone);
             }
             
             // KEYS (update modified)
             {
-                boolean success = update(KEY_MODIFIED, keyId, modified);
+                success &= update(KEY_MODIFIED, keyId, modified);
             }
             
             // BUCKETS (update modified)
             {
-                boolean success = update(BUCKET_MODIFIED, bucketId, modified);
+                success &= update(BUCKET_MODIFIED, bucketId, modified);
             }
             
             cm.commit();
@@ -371,6 +371,8 @@ public class DefaultIndex2 implements Closeable {
         } finally {
             cm.endTxn();
         }
+        
+        return success;
     }
     
     public void remove(Key key, KUID valueId) throws SQLException {
@@ -467,58 +469,6 @@ public class DefaultIndex2 implements Closeable {
                 put(key, list);
             }
             list.add(valueId);
-        }
-    }
-    
-    public static class Values extends OrderedHashMap<KUID, Context> {
-        
-        private static final long serialVersionUID = -1211452362899524359L;
-
-        private final KUID marker;
-        
-        private final int count;
-        
-        private Values(KUID marker, int count) {
-            this.marker = marker;
-            this.count = count;
-        }
-        
-        public KUID getMarker() {
-            return marker;
-        }
-        
-        public int getCount() {
-            return count;
-        }
-        
-        private Context getOrCreate(byte[] valueId, int maxCount) {
-            return getOrCreateContext(KUID.create(valueId), maxCount);
-        }
-        
-        private Context getOrCreateContext(KUID valueId, int maxCount) {
-            Context context = get(valueId);
-            if (context == null) {
-                assert (size() < maxCount) : "Check the SQL query!";
-                
-                context = new Context();
-                put(valueId, context);
-            }
-            return context;
-        }
-        
-        @Override
-        public String toString() {
-            StringBuilder sb = new StringBuilder();
-            sb.append("count=").append(count)
-                .append(", size=").append(size())
-                .append(", values: {\n");
-            
-            for (Map.Entry<KUID, Context> entry : entrySet()) {
-                sb.append(" ").append(entry).append("\n");
-            }
-            
-            sb.append("}");
-            return sb.toString();
         }
     }
     

@@ -1,4 +1,4 @@
-package org.ardverk.dht.storage;
+package org.ardverk.dht.storage.message;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -7,6 +7,7 @@ import java.util.Iterator;
 import org.apache.http.Header;
 import org.apache.http.protocol.HTTP;
 import org.ardverk.dht.rsrc.DefaultValue;
+import org.ardverk.dht.storage.Constants;
 
 abstract class ContextValue extends DefaultValue implements Properties {
 

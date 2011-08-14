@@ -1,4 +1,4 @@
-package org.ardverk.dht.storage;
+package org.ardverk.dht.storage.message;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -15,6 +15,7 @@ import java.util.Map;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
+import org.ardverk.dht.storage.Constants;
 import org.ardverk.io.DataUtils;
 import org.ardverk.io.IoUtils;
 import org.ardverk.io.Writable;

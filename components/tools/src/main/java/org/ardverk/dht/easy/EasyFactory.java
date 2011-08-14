@@ -24,7 +24,7 @@ import org.ardverk.dht.routing.DefaultRouteTable;
 import org.ardverk.dht.routing.Localhost;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Datastore;
-import org.ardverk.dht.storage.ObjectDatastore2;
+import org.ardverk.dht.storage.persistence.PersistentDatastore;
 
 public class EasyFactory {
     
@@ -52,7 +52,7 @@ public class EasyFactory {
     
     private static Datastore createDatabase() {
         try {
-            return new ObjectDatastore2();
+            return new PersistentDatastore();
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }

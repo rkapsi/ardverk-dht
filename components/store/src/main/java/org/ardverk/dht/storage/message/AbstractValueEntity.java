@@ -1,4 +1,4 @@
-package org.ardverk.dht.storage;
+package org.ardverk.dht.storage.message;
 
 import org.apache.http.protocol.HTTP;
 import org.ardverk.dht.rsrc.DefaultValue;

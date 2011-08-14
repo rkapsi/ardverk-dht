@@ -7,15 +7,16 @@ import org.ardverk.collection.CollectionUtils;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.KeyFactory;
-import org.ardverk.dht.storage.Context;
-import org.ardverk.dht.storage.sql.DefaultIndex2.Values;
+import org.ardverk.dht.storage.message.Context;
+import org.ardverk.dht.storage.persistence.Index;
+import org.ardverk.dht.storage.persistence.Index.Values;
 import org.junit.Test;
 
 public class IndexTest {
 
     @Test
     public void add() throws Exception {
-        DefaultIndex2 index = DefaultIndex2.create(null);
+        Index index = Index.create(null);
         
         Set<KUID> k = new TreeSet<KUID>();
         Key key = KeyFactory.parseKey("ardverk:///hello/world");

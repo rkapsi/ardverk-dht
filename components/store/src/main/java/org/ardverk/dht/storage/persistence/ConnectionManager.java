@@ -1,4 +1,4 @@
-package org.ardverk.dht.storage.sql;
+package org.ardverk.dht.storage.persistence;
 
 import java.io.Closeable;
 import java.sql.Connection;

@@ -6,6 +6,8 @@ import java.util.Map;
 
 import org.ardverk.collection.CollectionUtils;
 import org.ardverk.dht.KUID;
+import org.ardverk.dht.storage.message.Context;
+import org.ardverk.dht.storage.message.ValueEntity;
 import org.ardverk.version.Occured;
 
 class VclockMap {

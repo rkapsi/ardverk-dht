@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.ardverk.dht.storage;
+package org.ardverk.dht.storage.memory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,6 +41,20 @@ import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.KeyUtils;
 import org.ardverk.dht.rsrc.Value;
+import org.ardverk.dht.storage.AbstractDatastore;
+import org.ardverk.dht.storage.Constants;
+import org.ardverk.dht.storage.DatastoreConfig;
+import org.ardverk.dht.storage.DefaultDatastoreConfig;
+import org.ardverk.dht.storage.ListBucketResponse;
+import org.ardverk.dht.storage.Vclock;
+import org.ardverk.dht.storage.VclockUtils;
+import org.ardverk.dht.storage.message.ByteArrayValueEntity;
+import org.ardverk.dht.storage.message.Context;
+import org.ardverk.dht.storage.message.Method;
+import org.ardverk.dht.storage.message.Request;
+import org.ardverk.dht.storage.message.Response;
+import org.ardverk.dht.storage.message.ResponseFactory;
+import org.ardverk.dht.storage.message.ValueEntity;
 import org.ardverk.io.IoUtils;
 import org.ardverk.io.StreamUtils;
 import org.ardverk.security.MessageDigestUtils;
@@ -48,21 +62,21 @@ import org.ardverk.utils.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ObjectDatastore extends AbstractDatastore {
+public class VolatileDatastore extends AbstractDatastore {
     
     private static final Logger LOG 
-        = LoggerFactory.getLogger(ObjectDatastore.class);
+        = LoggerFactory.getLogger(VolatileDatastore.class);
     
     private final Trie<KUID, Bucket> datastore 
         = new PatriciaTrie<KUID, Bucket>();
     
     private final DatastoreConfig config;
     
-    public ObjectDatastore() {
+    public VolatileDatastore() {
         this(new DefaultDatastoreConfig());
     }
     
-    public ObjectDatastore(DatastoreConfig config) {
+    public VolatileDatastore(DatastoreConfig config) {
         this.config = config;
     }
     
@@ -77,7 +91,7 @@ public class ObjectDatastore extends AbstractDatastore {
             
             Response response = store(src, key, request, in);
             if (response == null) {
-                response = ResponseFactory.createNotFound();
+                response = ResponseFactory.notFound();
             }
             return response;
             
@@ -134,7 +148,7 @@ public class ObjectDatastore extends AbstractDatastore {
         
         Header[] response = put(key, context, entity);
         
-        return ResponseFactory.createOk(response);
+        return ResponseFactory.ok(response);
     }
     
     private synchronized Header[] put(Key key, 
@@ -186,12 +200,12 @@ public class ObjectDatastore extends AbstractDatastore {
         
         VclockMap.Entry[] values = getValues(key, vtag);
         if (ArrayUtils.isEmpty(values)) {
-            return ResponseFactory.createNotFound();
+            return ResponseFactory.notFound();
         }
         
         if (values.length == 1) {
             VclockMap.Entry entry = CollectionUtils.first(values);
-            return ResponseFactory.createOk(entry.getContext(), entry.getValueEntity());
+            return ResponseFactory.ok(entry.getContext(), entry.getValueEntity());
         }
         
         return ListValuesResponse.create(key, values);

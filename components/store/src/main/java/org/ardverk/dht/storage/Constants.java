@@ -3,6 +3,7 @@ package org.ardverk.dht.storage;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
+import org.ardverk.dht.storage.message.Properties;
 
 public class Constants {
     

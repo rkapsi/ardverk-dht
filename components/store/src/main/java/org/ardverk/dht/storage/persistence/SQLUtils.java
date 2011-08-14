@@ -1,4 +1,4 @@
-package org.ardverk.dht.storage.sql;
+package org.ardverk.dht.storage.persistence;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

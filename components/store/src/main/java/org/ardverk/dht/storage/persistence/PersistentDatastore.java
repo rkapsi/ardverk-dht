@@ -1,4 +1,4 @@
-package org.ardverk.dht.storage;
+package org.ardverk.dht.storage.persistence;
 
 import java.io.BufferedOutputStream;
 import java.io.Closeable;
@@ -11,7 +11,6 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -21,8 +20,17 @@ import org.ardverk.coding.CodingUtils;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.rsrc.Key;
-import org.ardverk.dht.storage.sql.DefaultIndex2;
-import org.ardverk.dht.storage.sql.DefaultIndex2.Values;
+import org.ardverk.dht.storage.AbstractObjectDatastore;
+import org.ardverk.dht.storage.Constants;
+import org.ardverk.dht.storage.Vclock;
+import org.ardverk.dht.storage.VclockUtils;
+import org.ardverk.dht.storage.collections.Values;
+import org.ardverk.dht.storage.message.Context;
+import org.ardverk.dht.storage.message.FileValueEntity;
+import org.ardverk.dht.storage.message.Request;
+import org.ardverk.dht.storage.message.Response;
+import org.ardverk.dht.storage.message.ResponseFactory;
+import org.ardverk.dht.storage.message.StatusLine;
 import org.ardverk.io.FileUtils;
 import org.ardverk.io.IoUtils;
 import org.ardverk.io.StreamUtils;
@@ -30,16 +38,14 @@ import org.ardverk.security.MessageDigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ObjectDatastore2 extends AbstractObjectDatastore implements Closeable {
+public class PersistentDatastore extends AbstractObjectDatastore implements Closeable {
 
     private static final Logger LOG 
-        = LoggerFactory.getLogger(ObjectDatastore2.class);
+        = LoggerFactory.getLogger(PersistentDatastore.class);
 
     private static final AtomicInteger COUNTER = new AtomicInteger();
     
     private static final String LIST = "list";
-    
-    private static final String VTAG = "vtag";
     
     private static final String VALUE_ID = "valueId";
     
@@ -47,25 +53,25 @@ public class ObjectDatastore2 extends AbstractObjectDatastore implements Closeab
     
     private static final String MAX_COUNT = "max-count";
     
-    private final DefaultIndex2 index;
+    private final Index index;
     
     private final File directory;
     
     private final File content;
     
-    public ObjectDatastore2() throws IOException {
+    public PersistentDatastore() throws IOException {
         this("data/" + COUNTER.incrementAndGet());
     }
     
-    public ObjectDatastore2(String path) throws IOException {
+    public PersistentDatastore(String path) throws IOException {
         this(new File(path));
     }
     
-    public ObjectDatastore2(File directory) throws IOException {
+    public PersistentDatastore(File directory) throws IOException {
         this.directory = directory;
         this.content = FileUtils.mkdirs(directory, "content", true);
         
-        index = DefaultIndex2.create(directory);
+        index = Index.create(directory);
     }
     
     @Override
@@ -126,7 +132,7 @@ public class ObjectDatastore2 extends AbstractObjectDatastore implements Closeab
             context.addHeader(Constants.VALUE_ID, 
                     valueId.toHexString());
             
-            Vclock vclock = upsertVclock(context);
+            Vclock vclock = upsertVclock(key, context);
             
             /*File indexFile = mkIndexFile(key, true);
             Index index = index(indexFile, key);
@@ -143,7 +149,7 @@ public class ObjectDatastore2 extends AbstractObjectDatastore implements Closeab
             }
             
             success = true;
-            return ResponseFactory.createOk();
+            return ResponseFactory.ok();
             
         } finally {
             if (!success) {
@@ -189,10 +195,10 @@ public class ObjectDatastore2 extends AbstractObjectDatastore implements Closeab
         return true;
     }
 
-    private static Vclock upsertVclock(Context context) throws IOException {
-        Vclock vclock = VclockUtils.valueOf(context);
+    private static Vclock upsertVclock(Key key, Context context) throws IOException {
+        Vclock vclock = VclockUtils.valueOf(key, context);
         context.addHeader(Constants.VCLOCK, vclock.toString());
-        context.addHeader(Constants.VTAG, vclock.getVTag());
+        context.addHeader(Constants.VTAG, vclock.vtag64());
         return vclock;
     }
     
@@ -200,67 +206,96 @@ public class ObjectDatastore2 extends AbstractObjectDatastore implements Closeab
     protected Response handleDelete(Contact src, Key key, Request request,
             InputStream in) throws IOException {
         
-        Map.Entry<KUID, Context> value = null;
+        Map<String, String> query = key.getQueryString();
+        if (query != null && !query.isEmpty()) {
+            if (query.containsKey(VALUE_ID)) {
+                return delete(src, key, query);
+            }
+        }
+        
+        Values values = listValues(src, key, query);
+        if (values == null) {
+            return ResponseFactory.notFound();
+        }
+        
+        if (values.size() == 1) {
+            Map.Entry<KUID, Context> value = values.firstEntry();
+            return delete(src, key, value.getKey());
+        }
+        
+        return ResponseFactory.list(
+                StatusLine.MULTIPLE_CHOICES, key, values);
+    }
+    
+    private Response delete(Contact src, Key key, Map<String, String> query) throws IOException {
+        KUID valueId = getValueId(query);
+        return delete(src, key, valueId);
+    }
+    
+    private Response delete(Contact src, Key key, KUID valueId) throws IOException {
+        boolean success = false;
+        
         try {
-            value = index.getCurrent(key);
-        } catch (Exception err) {
-            throw new IOException("Exception", err);
+            success = index.delete(key, valueId);
+        } catch (SQLException err) {
+            throw new IOException("SQLException", err);
         }
         
-        if (value == null) {
-            return ResponseFactory.createNotFound();
+        if (!success) {
+            return ResponseFactory.notFound();
         }
         
-        // TODO
-        KUID valueId = value.getKey();
-        Context context = value.getValue();
+        File value = mkContentFile(key, valueId, false);
+        deleteAll(value);
         
-        if (context.containsHeader(Constants.TOMBSTONE)) {
-            return ResponseFactory.createNotFound();
-        }
-        
-        context.addHeader(Constants.tombstone());
-        
-        File contentFile = mkContentFile(key, valueId, false);
-        deleteAll(contentFile);
-        
-        // TODO: Write the Vclock and a Tombstone instead
-        try {
-            index.delete(key, Collections.singleton(valueId));
-        } catch (Exception err) {
-            throw new IOException("Exception", err);
-        }
-        
-        return ResponseFactory.createOk();
+        return ResponseFactory.ok();
     }
     
     @Override
     protected Response handleHead(Contact src, Key key, Request request,
             InputStream in) throws IOException {
         
-        Map.Entry<KUID, Context> value = null;
-        try {
-            value = index.getCurrent(key);
-        } catch (Exception err) {
-            throw new IOException("Exception", err);
+        Map<String, String> query = key.getQueryString();
+        if (query != null && !query.isEmpty()) {
+            if (query.containsKey(VALUE_ID)) {
+                return head(src, key, query);
+            }
         }
         
-        if (value == null) {
-            return ResponseFactory.createNotFound();
+        Values values = listValues(src, key, query);
+        if (values == null) {
+            return ResponseFactory.notFound();
         }
         
-        // TODO
-        KUID valueId = value.getKey();
-        Context context = value.getValue();
-        
-        if (context.containsHeader(Constants.TOMBSTONE)) {
-            return ResponseFactory.createNotFound();
+        if (values.size() == 1) {
+            Map.Entry<KUID, Context> value = values.firstEntry();
+            return head(src, key, value.getKey());
         }
         
-        context.addHeader(Constants.NO_CONTENT);
-        return new Response(StatusLine.OK, context);
+        return ResponseFactory.list(
+                StatusLine.MULTIPLE_CHOICES, key, values);
     }
 
+    private Response head(Contact src, Key key, Map<String, String> query) throws IOException {
+        KUID valueId = getValueId(query);
+        return head(src, key, valueId);
+    }
+
+    private Response head(Contact src, Key key, KUID valueId) throws IOException {
+        Context context = null;
+        try {
+            context = index.get(key, valueId);
+        } catch (SQLException err) {
+            throw new IOException("SQLException", err);
+        }
+        
+        if (context == null) {
+            return ResponseFactory.notFound();
+        }
+        
+        return new Response(StatusLine.OK, context);
+    }
+    
     @Override
     protected Response handleGet(Contact src, 
             Key key, boolean store) throws IOException {
@@ -284,9 +319,8 @@ public class ObjectDatastore2 extends AbstractObjectDatastore implements Closeab
             return value(src, key, value.getKey(), value.getValue());
         }
         
-        return ListValuesResponse.create(
+        return ResponseFactory.list(
                 StatusLine.MULTIPLE_CHOICES, key, values);
-        
     }
     
     private Values listValues(Contact src, Key key, Map<String, String> query) throws IOException {
@@ -303,7 +337,7 @@ public class ObjectDatastore2 extends AbstractObjectDatastore implements Closeab
     private Response list(Contact src, Key key, Map<String, String> query) throws IOException {
         Values values = listValues(src, key, query);
         if (values != null) {
-            return ListValuesResponse.create(StatusLine.OK, key, values);
+            return ResponseFactory.list(StatusLine.OK, key, values);
         }
         return null;
     }

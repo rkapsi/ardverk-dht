@@ -5,6 +5,7 @@ import java.util.NoSuchElementException;
 
 import org.apache.http.Header;
 import org.ardverk.dht.rsrc.Key;
+import org.ardverk.dht.storage.message.Context;
 import org.ardverk.version.Occured;
 
 public class VclockUtils {

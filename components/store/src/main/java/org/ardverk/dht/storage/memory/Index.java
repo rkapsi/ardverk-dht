@@ -1,4 +1,4 @@
-package org.ardverk.dht.storage;
+package org.ardverk.dht.storage.memory;
 
 import java.io.Closeable;
 import java.util.Collection;
@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.rsrc.Key;
+import org.ardverk.dht.storage.message.Context;
 
 public interface Index extends Closeable {
 

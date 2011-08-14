@@ -1,10 +1,11 @@
-package org.ardverk.dht.storage;
+package org.ardverk.dht.storage.memory;
 
 import java.util.List;
 import java.util.Map;
 
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.rsrc.Key;
+import org.ardverk.dht.storage.message.Context;
 
 public abstract class AbstractIndex implements Index {
     

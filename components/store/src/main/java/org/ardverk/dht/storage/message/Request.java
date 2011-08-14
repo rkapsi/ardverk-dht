@@ -1,8 +1,9 @@
-package org.ardverk.dht.storage;
+package org.ardverk.dht.storage.message;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
 
 public class Request extends ContextValue {
 
