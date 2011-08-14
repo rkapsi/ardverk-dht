@@ -1,7 +1,5 @@
 package org.ardverk.dht.storage.sql;
 
-import static org.ardverk.dht.storage.sql.SQLUtils.beginTxn;
-import static org.ardverk.dht.storage.sql.SQLUtils.endTxn;
 import static org.ardverk.dht.storage.sql.SQLUtils.setBytes;
 import static org.ardverk.dht.storage.sql.StatementFactory.BUCKET_MODIFIED;
 import static org.ardverk.dht.storage.sql.StatementFactory.DELETE_BUCKET;
@@ -12,6 +10,7 @@ import static org.ardverk.dht.storage.sql.StatementFactory.INSERT_PROPERTY;
 import static org.ardverk.dht.storage.sql.StatementFactory.INSERT_VALUE;
 import static org.ardverk.dht.storage.sql.StatementFactory.KEY_COUNT_BY_BUCKET_ID;
 import static org.ardverk.dht.storage.sql.StatementFactory.KEY_MODIFIED;
+import static org.ardverk.dht.storage.sql.StatementFactory.LIST_VALUE_ID;
 import static org.ardverk.dht.storage.sql.StatementFactory.SET_TOMBSTONE;
 import static org.ardverk.dht.storage.sql.StatementFactory.VALUE_COUNT_BY_KEY_ID;
 
@@ -19,9 +18,7 @@ import java.io.Closeable;
 import java.io.File;
 import java.net.URI;
 import java.security.MessageDigest;
-import java.sql.Connection;
 import java.sql.Date;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,7 +27,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.http.Header;
 import org.ardverk.collection.OrderedHashMap;
@@ -48,28 +44,17 @@ public class DefaultIndex2 implements Closeable {
     
     public static final int LENGTH = 20;
     
-    private static final AtomicInteger COUNTER = new AtomicInteger();
-    
     public static DefaultIndex2 create(File dir) {
         return create(dir, LENGTH);
     }
     
     public static DefaultIndex2 create(File dir, int length) {
         try {
-            Class.forName("org.hsqldb.jdbcDriver");
             
-            String url = "jdbc:hsqldb:mem:index-" + COUNTER.incrementAndGet();
-            
-            //String path = dir.getAbsolutePath() + "/index-" + COUNTER.incrementAndGet();
-            //String url = "jdbc:hsqldb:file:" + path;
-            
-            String user = "sa";
-            String password = "";
-            Connection connection = DriverManager.getConnection(url, user, password);
-            
+            ConnectionManager cm = ConnectionManager.newInstance();
             StatementFactory factory = new StatementFactory(length);
             
-            Statement statement = connection.createStatement();
+            Statement statement = cm.createStatement();
             statement.addBatch(factory.createBuckets());
             statement.addBatch(factory.createKeys());
             statement.addBatch(factory.createValues());
@@ -77,7 +62,7 @@ public class DefaultIndex2 implements Closeable {
             statement.executeBatch();
             statement.close();
             
-            return new DefaultIndex2(factory, connection);
+            return new DefaultIndex2(factory, cm);
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException("ClassNotFoundException", e);
         } catch (SQLException e) {
@@ -87,16 +72,16 @@ public class DefaultIndex2 implements Closeable {
     
     private final StatementFactory factory;
     
-    private final Connection connection;
+    private final ConnectionManager cm;
     
-    private DefaultIndex2(StatementFactory factory, Connection connection) {
+    private DefaultIndex2(StatementFactory factory, ConnectionManager connection) {
         this.factory = factory;
-        this.connection = connection;
+        this.cm = connection;
     }
     
     @Override
     public void close() {
-        SQLUtils.close(connection);
+        cm.close();
     }
     
     public void add(Key key, Context context, KUID valueId) throws SQLException {
@@ -117,11 +102,11 @@ public class DefaultIndex2 implements Closeable {
         KUID keyId = KeyId.valueOf(key);
         
         try {
-            beginTxn(connection);
+            cm.beginTxn();
             
             // BUCKETS
             {
-                PreparedStatement ps = connection.prepareStatement(
+                PreparedStatement ps = cm.prepareStatement(
                         factory.upsertBuckets());
                 try {
                     setBytes(ps, 1, bucketId);
@@ -136,7 +121,7 @@ public class DefaultIndex2 implements Closeable {
             
             // KEYS
             {
-                PreparedStatement ps = connection.prepareStatement(
+                PreparedStatement ps = cm.prepareStatement(
                         factory.upsertKeys());
                 try {
                     setBytes(ps, 1, keyId);
@@ -152,7 +137,7 @@ public class DefaultIndex2 implements Closeable {
             
             // VALUES
             {
-                PreparedStatement ps = connection.prepareStatement(INSERT_VALUE);
+                PreparedStatement ps = cm.prepareStatement(INSERT_VALUE);
                 try {
                     setBytes(ps, 1, valueId);
                     setBytes(ps, 2, keyId);
@@ -165,7 +150,7 @@ public class DefaultIndex2 implements Closeable {
             
             // PROPERTIES
             {
-                PreparedStatement ps = connection.prepareStatement(INSERT_PROPERTY);
+                PreparedStatement ps = cm.prepareStatement(INSERT_PROPERTY);
                 try {
                     
                     for (Header header : context.getHeaders()) {
@@ -184,10 +169,10 @@ public class DefaultIndex2 implements Closeable {
                 }
             }
             
-            connection.commit();
+            cm.commit();
             
         } finally {
-            endTxn(connection);
+            cm.endTxn();
         }
     }
     
@@ -200,7 +185,7 @@ public class DefaultIndex2 implements Closeable {
     }
     
     private int count(String sql, KUID id) throws SQLException {
-        PreparedStatement ps = connection.prepareStatement(sql);
+        PreparedStatement ps = cm.prepareStatement(sql);
         try {
             setBytes(ps, 1, id);
             
@@ -223,7 +208,7 @@ public class DefaultIndex2 implements Closeable {
         
         Keys keys = null;
         
-        PreparedStatement ps = connection.prepareStatement(
+        PreparedStatement ps = cm.prepareStatement(
                 StatementFactory.listKeys(marker));
         
         try {
@@ -268,14 +253,18 @@ public class DefaultIndex2 implements Closeable {
         
         List<KUID> keys = null;
         
-        PreparedStatement ps = connection.prepareStatement("");
+        PreparedStatement ps = cm.prepareStatement(LIST_VALUE_ID);
         try {
+            
+            setBytes(ps, 1, keyId);
+            
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 keys = new ArrayList<KUID>();
                 
                 do {
-                    
+                    KUID valueId = KUID.create(rs.getBytes(1));
+                    keys.add(valueId);
                 } while (rs.next());
             }
         } finally {
@@ -297,9 +286,9 @@ public class DefaultIndex2 implements Closeable {
         Operation operation = Operation.valueOf(marker, maxCount);
         
         try {
-            beginTxn(connection);
+            cm.beginTxn();
             
-            PreparedStatement ps = connection.prepareStatement(
+            PreparedStatement ps = cm.prepareStatement(
                     StatementFactory.listValues(operation));
             try {
                 
@@ -343,7 +332,7 @@ public class DefaultIndex2 implements Closeable {
             }
             
         } finally {
-            endTxn(connection);
+            cm.endTxn();
         }
         
         return values;
@@ -360,7 +349,7 @@ public class DefaultIndex2 implements Closeable {
         KUID keyId = KeyId.valueOf(key);
         
         try {
-            beginTxn(connection);
+            cm.beginTxn();
             
             // VALUES (set tombstone)
             {
@@ -377,10 +366,10 @@ public class DefaultIndex2 implements Closeable {
                 boolean success = update(BUCKET_MODIFIED, bucketId, modified);
             }
             
-            connection.commit();
+            cm.commit();
             
         } finally {
-            endTxn(connection);
+            cm.endTxn();
         }
     }
     
@@ -393,7 +382,7 @@ public class DefaultIndex2 implements Closeable {
         KUID keyId = KeyId.valueOf(key);
         
         try {
-            beginTxn(connection);
+            cm.beginTxn();
             
             // PROPERTIES
             {
@@ -427,15 +416,15 @@ public class DefaultIndex2 implements Closeable {
                 }
             }
             
-            connection.commit();
+            cm.commit();
             
         } finally {
-            endTxn(connection);
+            cm.endTxn();
         }
     }
     
     private boolean update(String sql, KUID id, java.util.Date date) throws SQLException {
-        PreparedStatement ps = connection.prepareStatement(sql);
+        PreparedStatement ps = cm.prepareStatement(sql);
         try {
             
             if (date instanceof java.sql.Date) {
@@ -454,7 +443,7 @@ public class DefaultIndex2 implements Closeable {
     }
     
     private boolean delete(String sql, KUID id) throws SQLException {
-        PreparedStatement ps = connection.prepareStatement(sql);
+        PreparedStatement ps = cm.prepareStatement(sql);
         try {
             setBytes(ps, 1, id);
             return ps.executeUpdate() == 1;

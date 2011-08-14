@@ -3,37 +3,20 @@ package org.ardverk.dht.storage;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
-import java.util.Comparator;
+import java.util.Map;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.ardverk.dht.KUID;
 import org.ardverk.dht.rsrc.Key;
-import org.ardverk.dht.storage.VclockMap.Entry;
-import org.ardverk.lang.Longs;
+import org.ardverk.dht.storage.sql.DefaultIndex2.Values;
 import org.ardverk.utils.StringUtils;
 
-class MultipleChoicesResponse extends Response {
-
-    private static final Comparator<VclockMap.Entry> COMPARATOR 
-            = new Comparator<VclockMap.Entry>() {
-        @Override
-        public int compare(Entry o1, Entry o2) {
-            
-            Vclock vc1 = o1.getVclock();
-            Vclock vc2 = o2.getVclock();
-            
-            return Longs.compare(
-                    vc2.getLastModified(), 
-                    vc1.getLastModified());
-        }
-    };
+class ListValuesResponse extends Response {
     
-    public static Response create(Key key, VclockMap.Entry[] entries) {
-        
-        Arrays.sort(entries, COMPARATOR);
+    public static Response create(StatusLine status, Key key, Values values) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             XMLOutputFactory factory = XMLOutputFactory.newFactory();
@@ -43,40 +26,41 @@ class MultipleChoicesResponse extends Response {
             
             try {
                 xml.writeStartDocument();
-                xml.writeStartElement("MultipleChoices");
+                xml.writeStartElement("List");
                 
                 xml.writeStartElement("key");
                 xml.writeCharacters(key.toString());
                 xml.writeEndElement();
                 
                 xml.writeStartElement("values");
-                for (VclockMap.Entry entry : entries) {
-                    Vclock vclock = entry.getVclock();
+                for (Map.Entry<KUID, Context> entry : values.entrySet()) {
+                    KUID valueId = entry.getKey();
+                    Context context = entry.getValue();
                     
                     xml.writeStartElement("value");
                     
-                    xml.writeStartElement("vtag");
-                    xml.writeCharacters(vclock.vtag64());
+                    xml.writeStartElement("id");
+                    xml.writeCharacters(valueId.toHexString());
                     xml.writeEndElement();
                     
-                    xml.writeStartElement("creationTime");
-                    xml.writeCharacters(DateUtils.format(vclock.getCreationTime()));
-                    xml.writeEndElement();
+                    //xml.writeStartElement("creationTime");
+                    //xml.writeCharacters(DateUtils.format(vclock.getCreationTime()));
+                    //xml.writeEndElement();
                     
-                    xml.writeStartElement("lastModified");
-                    xml.writeCharacters(DateUtils.format(vclock.getLastModified()));
-                    xml.writeEndElement();
+                    //xml.writeStartElement("lastModified");
+                    //xml.writeCharacters(DateUtils.format(vclock.getLastModified()));
+                    //xml.writeEndElement();
                     
                     xml.writeEndElement(); // value
                 }
                 xml.writeEndElement(); // values
-                xml.writeEndElement(); // MultipleChoices
+                xml.writeEndElement(); // List
                 xml.writeEndDocument();
             } finally {
                 xml.close();
             }
             
-            return new MultipleChoicesResponse(StatusLine.MULTIPLE_CHOICES, 
+            return new ListValuesResponse(status, 
                     new ByteArrayValueEntity(
                             Constants.XML_TEXT_TYPE, 
                             baos.toByteArray()));
@@ -88,7 +72,7 @@ class MultipleChoicesResponse extends Response {
         }
     }
     
-    private MultipleChoicesResponse(StatusLine status, ValueEntity entity) {
+    private ListValuesResponse(StatusLine status, ValueEntity entity) {
         super(status, entity);
     }
 }

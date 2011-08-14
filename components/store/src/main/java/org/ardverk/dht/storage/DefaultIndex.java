@@ -412,7 +412,7 @@ public class DefaultIndex extends AbstractIndex {
     }
     
     @Override
-    public void add(Key key, Context context, Vclock vclock, KUID valueId) throws SQLException {
+    public void add(Key key, Context context, KUID valueId) throws SQLException {
         
         // Don't add if the Context doesn't have anything
         Header[] headers = context.getHeaders();

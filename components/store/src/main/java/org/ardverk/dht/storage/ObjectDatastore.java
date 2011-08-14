@@ -194,7 +194,7 @@ public class ObjectDatastore extends AbstractDatastore {
             return ResponseFactory.createOk(entry.getContext(), entry.getValueEntity());
         }
         
-        return MultipleChoicesResponse.create(key, values);
+        return ListValuesResponse.create(key, values);
     }
     
     private synchronized VclockMap.Entry[] getValues(Key key, String vtag) {

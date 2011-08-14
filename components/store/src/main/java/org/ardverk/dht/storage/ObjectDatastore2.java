@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
@@ -20,6 +21,8 @@ import org.ardverk.coding.CodingUtils;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.rsrc.Key;
+import org.ardverk.dht.storage.sql.DefaultIndex2;
+import org.ardverk.dht.storage.sql.DefaultIndex2.Values;
 import org.ardverk.io.FileUtils;
 import org.ardverk.io.IoUtils;
 import org.ardverk.io.StreamUtils;
@@ -38,7 +41,13 @@ public class ObjectDatastore2 extends AbstractObjectDatastore implements Closeab
     
     private static final String VTAG = "vtag";
     
-    private final Index index;
+    private static final String VALUE_ID = "valueId";
+    
+    private static final String MARKER = "marker";
+    
+    private static final String MAX_COUNT = "max-count";
+    
+    private final DefaultIndex2 index;
     
     private final File directory;
     
@@ -56,7 +65,7 @@ public class ObjectDatastore2 extends AbstractObjectDatastore implements Closeab
         this.directory = directory;
         this.content = FileUtils.mkdirs(directory, "content", true);
         
-        index = DefaultIndex.create(directory);
+        index = DefaultIndex2.create(directory);
     }
     
     @Override
@@ -256,34 +265,67 @@ public class ObjectDatastore2 extends AbstractObjectDatastore implements Closeab
     protected Response handleGet(Contact src, 
             Key key, boolean store) throws IOException {
         
-        Map.Entry<KUID, Context> value = null;
-        try {
-            value = index.getCurrent(key);
-        } catch (Exception err) {
-            throw new IOException("Exception", err);
-        }
-        
-        if (value == null) {
-            return null;
-        }
-        
         Map<String, String> query = key.getQueryString();
         if (query != null && !query.isEmpty()) {
-            if (query.containsKey(LIST)) {
+            if (query.containsKey(VALUE_ID)) {
+                return value(src, key, query);
+            } else if (query.containsKey(LIST)) {
                 return list(src, key, query);
-            } else if (query.containsKey(VTAG)) {
-                return vtag(src, key, query);
             }
         }
         
-        // TODO
-        KUID valueId = value.getKey();
-        Context context = value.getValue();
-        
-        if (context.containsHeader(Constants.TOMBSTONE)) {
+        Values values = listValues(src, key, query);
+        if (values == null) {
             return null;
         }
         
+        if (values.size() == 1) {
+            Map.Entry<KUID, Context> value = values.firstEntry();
+            return value(src, key, value.getKey(), value.getValue());
+        }
+        
+        return ListValuesResponse.create(
+                StatusLine.MULTIPLE_CHOICES, key, values);
+        
+    }
+    
+    private Values listValues(Contact src, Key key, Map<String, String> query) throws IOException {
+        KUID marker = getMarker(query);
+        int maxCount = getMaxCount(query, 1000);
+        
+        try {
+            return index.listValues(key, marker, maxCount);
+        } catch (SQLException err) {
+            throw new IOException("SQLException", err);
+        }
+    }
+    
+    private Response list(Contact src, Key key, Map<String, String> query) throws IOException {
+        Values values = listValues(src, key, query);
+        if (values != null) {
+            return ListValuesResponse.create(StatusLine.OK, key, values);
+        }
+        return null;
+    }
+    
+    private Response value(Contact src, Key key, Map<String, String> query) throws IOException {
+        KUID valueId = getValueId(query);
+        
+        Context context = null;
+        try {
+            context = index.get(key, valueId);
+        } catch (SQLException err) {
+            throw new IOException("SQLException", err);
+        }
+        
+        if (context != null) {
+            return value(src, key, valueId, context);
+        }
+        
+        return null;
+    }
+    
+    private Response value(Contact src, Key key, KUID valueId, Context context) {
         File contentFile = mkContentFile(key, valueId, false);
         if (!contentFile.exists()) {
             return null;
@@ -293,17 +335,30 @@ public class ObjectDatastore2 extends AbstractObjectDatastore implements Closeab
                 new FileValueEntity(contentFile));
     }
     
-    protected Response list(Contact src, Key key, Map<String, String> query) {
-        return null;
-    }
-    
-    protected Response vtag(Contact src, Key key, Map<String, String> query) {
-        return null;
-    }
-    
     private static void deleteAll(File... files) {
         for (File file : files) {
             org.apache.commons.io.FileUtils.deleteQuietly(file);
         }
+    }
+    
+    private static KUID getMarker(Map<String, String> query) {
+        return getKUID(MARKER, query);
+    }
+    
+    private static KUID getValueId(Map<String, String> query) {
+        return getKUID(VALUE_ID, query);
+    }
+    
+    private static KUID getKUID(String key, Map<String, String> query) {
+        String marker = query != null ? query.get(key) : null;
+        return marker != null ? KUID.create(marker, 16) : null;
+    }
+    
+    private static int getMaxCount(Map<String, String> query, int defaultValue) {
+        String maxCount = query != null ? query.get(MAX_COUNT) : null;
+        if (maxCount != null) {
+            return Math.min(defaultValue, Integer.parseInt(maxCount));
+        }
+        return defaultValue;
     }
 }

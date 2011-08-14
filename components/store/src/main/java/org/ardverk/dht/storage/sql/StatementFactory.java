@@ -108,6 +108,8 @@ class StatementFactory {
     
     public static final String KEY_COUNT_BY_BUCKET_ID = "SELECT COUNT(id) FROM " + KEYS + " WHERE bucketId = ?";
     
+    public static final String LIST_VALUE_ID = "SELECT id FROM " + VALUES + " WHERE keyId = ?";
+    
     public static enum Operation {
         LESS_THAN("<"),
         EQUAL_TO("="),
