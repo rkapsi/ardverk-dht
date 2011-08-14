@@ -1,4 +1,4 @@
-package org.ardverk.dht.storage.sql;
+package org.ardverk.dht.storage.persistence;
 
 import java.util.Set;
 import java.util.TreeSet;
@@ -8,8 +8,6 @@ import org.ardverk.dht.KUID;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.KeyFactory;
 import org.ardverk.dht.storage.message.Context;
-import org.ardverk.dht.storage.persistence.Index;
-import org.ardverk.dht.storage.persistence.Index.Values;
 import org.junit.Test;
 
 public class IndexTest {

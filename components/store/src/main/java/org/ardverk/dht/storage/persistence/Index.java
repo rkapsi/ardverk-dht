@@ -34,7 +34,6 @@ import org.ardverk.dht.rsrc.DefaultKey;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.storage.Constants;
 import org.ardverk.dht.storage.DateUtils;
-import org.ardverk.dht.storage.collections.Values;
 import org.ardverk.dht.storage.message.Context;
 import org.ardverk.dht.storage.persistence.StatementFactory.Operation;
 import org.ardverk.security.MessageDigestUtils;

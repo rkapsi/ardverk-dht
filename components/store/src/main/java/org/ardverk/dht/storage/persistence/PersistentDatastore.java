@@ -24,7 +24,6 @@ import org.ardverk.dht.storage.AbstractObjectDatastore;
 import org.ardverk.dht.storage.Constants;
 import org.ardverk.dht.storage.Vclock;
 import org.ardverk.dht.storage.VclockUtils;
-import org.ardverk.dht.storage.collections.Values;
 import org.ardverk.dht.storage.message.Context;
 import org.ardverk.dht.storage.message.FileValueEntity;
 import org.ardverk.dht.storage.message.Request;

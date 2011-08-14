@@ -1,4 +1,4 @@
-package org.ardverk.dht.storage.collections;
+package org.ardverk.dht.storage.persistence;
 
 import java.util.Map;
 
