@@ -10,22 +10,14 @@ import org.ardverk.dht.KUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class SQLUtils {
+class Utils {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SQLUtils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
     
-    private SQLUtils() {}
+    private Utils() {}
     
     public static void setBytes(PreparedStatement ps, int index, KUID value) throws SQLException {
         ps.setBytes(index, value.getBytes(false));
-    }
-    
-    public static void beginTxn(Connection connection) throws SQLException {
-        connection.setAutoCommit(false);
-    }
-    
-    public static void endTxn(Connection connection) throws SQLException {
-        connection.setAutoCommit(true);
     }
     
     public static void close(Connection c) {

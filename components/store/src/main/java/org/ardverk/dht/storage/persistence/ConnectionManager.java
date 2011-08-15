@@ -39,7 +39,7 @@ class ConnectionManager implements Closeable {
     
     @Override
     public void close() {
-        SQLUtils.close(connection);
+        Utils.close(connection);
     }
     
     public Connection getConnection() {

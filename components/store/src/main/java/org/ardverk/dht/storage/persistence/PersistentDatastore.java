@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -30,17 +29,16 @@ import org.ardverk.dht.storage.message.Request;
 import org.ardverk.dht.storage.message.Response;
 import org.ardverk.dht.storage.message.ResponseFactory;
 import org.ardverk.dht.storage.message.StatusLine;
+import org.ardverk.dht.storage.persistence.Index.Values;
 import org.ardverk.io.FileUtils;
 import org.ardverk.io.IoUtils;
 import org.ardverk.io.StreamUtils;
 import org.ardverk.security.MessageDigestUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class PersistentDatastore extends AbstractObjectDatastore implements Closeable {
 
-    private static final Logger LOG 
-        = LoggerFactory.getLogger(PersistentDatastore.class);
+    //private static final Logger LOG 
+    //    = LoggerFactory.getLogger(PersistentDatastore.class);
 
     private static final AtomicInteger COUNTER = new AtomicInteger();
     
@@ -70,7 +68,7 @@ public class PersistentDatastore extends AbstractObjectDatastore implements Clos
         this.directory = directory;
         this.content = FileUtils.mkdirs(directory, "content", true);
         
-        index = Index.create(directory);
+        index = PersistedIndex.create(directory);
     }
     
     @Override
@@ -131,15 +129,7 @@ public class PersistentDatastore extends AbstractObjectDatastore implements Clos
             context.addHeader(Constants.VALUE_ID, 
                     valueId.toHexString());
             
-            Vclock vclock = upsertVclock(key, context);
-            
-            /*File indexFile = mkIndexFile(key, true);
-            Index index = index(indexFile, key);
-            
-            index.put("current", valueId.toHexString());
-            index.put(vclock.getVTag(), valueId.toHexString());
-            
-            write(indexFile, index);*/
+            upsertVclock(key, context);
             
             try {
                 index.add(key, context, valueId);
@@ -236,7 +226,7 @@ public class PersistentDatastore extends AbstractObjectDatastore implements Clos
         
         try {
             success = index.delete(key, valueId);
-        } catch (SQLException err) {
+        } catch (Exception err) {
             throw new IOException("SQLException", err);
         }
         
@@ -284,8 +274,8 @@ public class PersistentDatastore extends AbstractObjectDatastore implements Clos
         Context context = null;
         try {
             context = index.get(key, valueId);
-        } catch (SQLException err) {
-            throw new IOException("SQLException", err);
+        } catch (Exception err) {
+            throw newIoException("Exception", err);
         }
         
         if (context == null) {
@@ -327,9 +317,9 @@ public class PersistentDatastore extends AbstractObjectDatastore implements Clos
         int maxCount = getMaxCount(query, 1000);
         
         try {
-            return index.listValues(key, marker, maxCount);
-        } catch (SQLException err) {
-            throw new IOException("SQLException", err);
+            return index.values(key, marker, maxCount);
+        } catch (Exception err) {
+            throw newIoException("Exception", err);
         }
     }
     
@@ -347,8 +337,8 @@ public class PersistentDatastore extends AbstractObjectDatastore implements Clos
         Context context = null;
         try {
             context = index.get(key, valueId);
-        } catch (SQLException err) {
-            throw new IOException("SQLException", err);
+        } catch (Exception err) {
+            throw newIoException("Exception", err);
         }
         
         if (context != null) {
@@ -393,5 +383,13 @@ public class PersistentDatastore extends AbstractObjectDatastore implements Clos
             return Math.min(defaultValue, Integer.parseInt(maxCount));
         }
         return defaultValue;
+    }
+    
+    private static IOException newIoException(String message, Throwable t) {
+        if (t instanceof IOException) {
+            return (IOException)t;
+        }
+        
+        return new IOException(message, t);
     }
 }

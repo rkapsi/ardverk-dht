@@ -110,35 +110,6 @@ class StatementFactory {
     
     public static final String LIST_VALUE_ID = "SELECT id FROM " + VALUES + " WHERE keyId = ?";
     
-    public static enum Operation {
-        LESS_THAN("<"),
-        EQUAL_TO("="),
-        GREATER_THAN(">"),
-        LESS_THAN_OR_EQUAL_TO("<="),
-        GREATER_THAN_OR_EQUAL_TO(">="),
-        NOT_EQUAL_TO("<>");
-        
-        private final String value;
-        
-        private Operation(String value) {
-            this.value = value;
-        }
-        
-        @Override
-        public String toString() {
-            return value;
-        }
-        
-        public static Operation valueOf(KUID marker, int maxCount) {
-            if (marker != null) {
-                return maxCount == 1 
-                        ? Operation.EQUAL_TO 
-                        : Operation.GREATER_THAN_OR_EQUAL_TO;
-            }
-            return null;
-        }
-    }
-    
     public static String listKeys(String marker) {
         StringBuilder sb = new StringBuilder();
         
@@ -154,10 +125,19 @@ class StatementFactory {
     }
     
     public static String listValues(KUID marker) {
-        return listValues(marker != null ? Operation.GREATER_THAN_OR_EQUAL_TO : null);
+        return listValues(marker != null ? ">=" : null);
     }
     
-    public static String listValues(Operation operation) {
+    public static String listValues(KUID marker, int maxCount) {
+        String operation = null;
+        if (marker != null) {
+            operation = (maxCount == 1) ? "=" : ">=";
+        }
+        
+        return listValues(operation);
+    }
+    
+    public static String listValues(String operation) {
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT valueId, name, value FROM ").append(PROPERTIES)
             .append(" WHERE valueId IN (")

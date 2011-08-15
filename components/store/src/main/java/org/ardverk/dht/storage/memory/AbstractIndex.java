@@ -7,7 +7,7 @@ import org.ardverk.dht.KUID;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.storage.message.Context;
 
-public abstract class AbstractIndex implements Index {
+public abstract class AbstractIndex implements PersistedIndex {
     
     @Override
     public List<String> listBuckets(int maxCount) throws Exception {
@@ -16,7 +16,7 @@ public abstract class AbstractIndex implements Index {
     
     @Override
     public List<Key> listKeys(int maxCount) throws Exception {
-        return listKeys(null, maxCount);
+        return keys(null, maxCount);
     }
     
     @Override
