@@ -227,7 +227,7 @@ public class PersistentDatastore extends AbstractObjectDatastore implements Clos
         try {
             success = index.delete(key, valueId);
         } catch (Exception err) {
-            throw new IOException("SQLException", err);
+            throw new IOException("Exception", err);
         }
         
         if (!success) {
