@@ -16,33 +16,12 @@
 
 package org.ardverk.dht.storage;
 
-import java.util.concurrent.atomic.AtomicReference;
-
 import org.ardverk.dht.DHT;
+import org.ardverk.lang.BindableObject;
 
 /**
  * An abstract implementation of {@link Datastore}.
  */
-public abstract class AbstractDatastore implements Datastore {
+public abstract class AbstractDatastore extends BindableObject<DHT> implements Datastore {
     
-    private final AtomicReference<DHT> dhtRef = new AtomicReference<DHT>();
-    
-    protected DHT getDHT() {
-        return dhtRef.get();
-    }
-    
-    @Override
-    public void bind(DHT dht) {
-        dhtRef.set(dht);
-    }
-
-    @Override
-    public boolean isBound() {
-        return dhtRef.get() != null;
-    }
-
-    @Override
-    public void unbind() {
-        dhtRef.set(null);
-    }
 }
