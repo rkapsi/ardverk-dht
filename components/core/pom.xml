@@ -5,10 +5,6 @@
                    
   <modelVersion>4.0.0</modelVersion>
   
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-  
   <parent>
     <groupId>org.ardverk</groupId>
     <artifactId>ardverk-dht</artifactId>
@@ -16,9 +12,7 @@
     <relativePath>../../pom.xml</relativePath>
   </parent>
   
-  <groupId>org.ardverk</groupId>
   <artifactId>ardverk-dht-core</artifactId>
-  <version>0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
   
   <dependencies>
@@ -31,7 +25,7 @@
     <dependency>
       <groupId>org.ardverk</groupId>
       <artifactId>bee-encode</artifactId>
-      <version>0.3</version>
+      <version>0.3-SNAPSHOT</version>
     </dependency>
     
     <dependency>
@@ -50,13 +44,6 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
       <version>1.6.1</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.8.2</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>
