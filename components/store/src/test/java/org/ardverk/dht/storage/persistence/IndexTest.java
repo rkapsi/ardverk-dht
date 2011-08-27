@@ -9,15 +9,15 @@ import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.KeyFactory;
 import org.ardverk.dht.storage.Index;
 import org.ardverk.dht.storage.message.Context;
-import org.ardverk.dht.storage.sql.PersistedIndex;
-import org.ardverk.dht.storage.sql.PersistedIndex.Values;
+import org.ardverk.dht.storage.sql.DefaultIndex;
+import org.ardverk.dht.storage.sql.DefaultIndex.Values;
 import org.junit.Test;
 
 public class IndexTest {
 
     @Test
     public void add() throws Exception {
-        Index index = PersistedIndex.create(null);
+        Index index = DefaultIndex.create(null);
         
         Set<KUID> k = new TreeSet<KUID>();
         Key key = KeyFactory.parseKey("ardverk:///hello/world");

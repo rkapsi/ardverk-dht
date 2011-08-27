@@ -38,15 +38,15 @@ import org.ardverk.io.IoUtils;
 import org.ardverk.security.MessageDigestUtils;
 import org.ardverk.utils.StringUtils;
 
-public class PersistedIndex implements Index {
+public class DefaultIndex implements Index {
     
     public static final int LENGTH = 20;
     
-    public static PersistedIndex create(File dir) {
+    public static DefaultIndex create(File dir) {
         return create(dir, LENGTH);
     }
     
-    public static PersistedIndex create(File dir, int length) {
+    public static DefaultIndex create(File dir, int length) {
         try {
             
             ConnectionManager cm = ConnectionManager.newInstance();
@@ -60,7 +60,7 @@ public class PersistedIndex implements Index {
             statement.executeBatch();
             statement.close();
             
-            return new PersistedIndex(factory, cm);
+            return new DefaultIndex(factory, cm);
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException("ClassNotFoundException", e);
         } catch (SQLException e) {
@@ -72,7 +72,7 @@ public class PersistedIndex implements Index {
     
     private final ConnectionManager cm;
     
-    private PersistedIndex(StatementFactory factory, ConnectionManager connection) {
+    private DefaultIndex(StatementFactory factory, ConnectionManager connection) {
         this.factory = factory;
         this.cm = connection;
     }

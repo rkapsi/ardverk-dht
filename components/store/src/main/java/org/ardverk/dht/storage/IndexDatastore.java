@@ -26,7 +26,7 @@ import org.ardverk.dht.storage.message.Request;
 import org.ardverk.dht.storage.message.Response;
 import org.ardverk.dht.storage.message.ResponseFactory;
 import org.ardverk.dht.storage.message.StatusLine;
-import org.ardverk.dht.storage.sql.PersistedIndex;
+import org.ardverk.dht.storage.sql.DefaultIndex;
 import org.ardverk.io.FileUtils;
 import org.ardverk.io.IoUtils;
 import org.ardverk.io.StreamUtils;
@@ -46,8 +46,6 @@ public class IndexDatastore extends AbstractIndexDatastore implements Closeable 
     
     private final Index index;
     
-    private final File directory;
-    
     private final File content;
     
     public IndexDatastore() throws IOException {
@@ -59,10 +57,9 @@ public class IndexDatastore extends AbstractIndexDatastore implements Closeable 
     }
     
     public IndexDatastore(File directory) throws IOException {
-        this.directory = directory;
         this.content = FileUtils.mkdirs(directory, "content", true);
         
-        index = PersistedIndex.create(directory);
+        index = DefaultIndex.create(directory);
     }
     
     @Override
