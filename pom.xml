@@ -21,6 +21,13 @@
     </repository>
   </distributionManagement>
   
+  <repositories>
+    <repository>
+      <id>ardverk.org</id>
+      <url>http://ardverk.org/repository</url>
+    </repository>
+  </repositories>
+  
   <build>
     <extensions>
       <extension>
