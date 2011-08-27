@@ -73,7 +73,14 @@
       </plugin>
     </plugins>
   </build>
-      
+  
+  <licenses>
+    <license>
+      <name>Ardverk DHT License</name>
+      <url>LICENSE</url>
+    </license>
+  </licenses>
+  
   <modules>
   	<module>components/core</module>
   	<module>components/examples</module>

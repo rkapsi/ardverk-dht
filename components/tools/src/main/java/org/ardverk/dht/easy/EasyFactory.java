@@ -17,6 +17,7 @@
 package org.ardverk.dht.easy;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import org.ardverk.dht.message.DefaultMessageFactory;
 import org.ardverk.dht.message.MessageFactory;
@@ -25,6 +26,7 @@ import org.ardverk.dht.routing.Localhost;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Datastore;
 import org.ardverk.dht.storage.IndexDatastore;
+import org.ardverk.dht.storage.SimpleDatastore;
 
 public class EasyFactory {
     
@@ -51,11 +53,13 @@ public class EasyFactory {
     
     
     private static Datastore createDatabase() {
-        try {
+        /*try {
             return new IndexDatastore();
         } catch (IOException e) {
             throw new IllegalStateException(e);
-        }
+        }*/
         //return new ObjectDatastore();
+        
+        return new SimpleDatastore(-1L, TimeUnit.MILLISECONDS);
     }
 }
