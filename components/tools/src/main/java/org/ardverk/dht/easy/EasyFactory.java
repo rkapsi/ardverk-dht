@@ -24,7 +24,7 @@ import org.ardverk.dht.routing.DefaultRouteTable;
 import org.ardverk.dht.routing.Localhost;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Datastore;
-import org.ardverk.dht.storage.persistence.IndexDatastore;
+import org.ardverk.dht.storage.IndexDatastore;
 
 public class EasyFactory {
     

@@ -1,4 +1,4 @@
-package org.ardverk.dht.storage.persistence;
+package org.ardverk.dht.storage;
 
 import java.io.Closeable;
 import java.util.List;
@@ -51,7 +51,7 @@ public interface Index extends Closeable {
         
         private static final long serialVersionUID = 6551875468885150502L;
         
-        protected Keys() {}
+        public Keys() {}
     }
     
     /**
@@ -65,7 +65,7 @@ public interface Index extends Closeable {
         
         private final int count;
         
-        protected Values(KUID marker, int count) {
+        public Values(KUID marker, int count) {
             this.marker = marker;
             this.count = count;
         }

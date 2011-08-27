@@ -15,7 +15,7 @@ import org.ardverk.io.IoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractIndexDatastore extends AbstractDatastore {
+abstract class AbstractIndexDatastore extends AbstractDatastore {
 
     private static final Logger LOG 
         = LoggerFactory.getLogger(AbstractIndexDatastore.class);

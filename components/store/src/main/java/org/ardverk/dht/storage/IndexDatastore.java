@@ -1,4 +1,4 @@
-package org.ardverk.dht.storage.persistence;
+package org.ardverk.dht.storage;
 
 import java.io.BufferedOutputStream;
 import java.io.Closeable;
@@ -19,17 +19,14 @@ import org.ardverk.coding.CodingUtils;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.rsrc.Key;
-import org.ardverk.dht.storage.AbstractIndexDatastore;
-import org.ardverk.dht.storage.Constants;
-import org.ardverk.dht.storage.Vclock;
-import org.ardverk.dht.storage.VclockUtils;
+import org.ardverk.dht.storage.Index.Values;
 import org.ardverk.dht.storage.message.Context;
 import org.ardverk.dht.storage.message.FileValueEntity;
 import org.ardverk.dht.storage.message.Request;
 import org.ardverk.dht.storage.message.Response;
 import org.ardverk.dht.storage.message.ResponseFactory;
 import org.ardverk.dht.storage.message.StatusLine;
-import org.ardverk.dht.storage.persistence.Index.Values;
+import org.ardverk.dht.storage.persistence.PersistedIndex;
 import org.ardverk.io.FileUtils;
 import org.ardverk.io.IoUtils;
 import org.ardverk.io.StreamUtils;

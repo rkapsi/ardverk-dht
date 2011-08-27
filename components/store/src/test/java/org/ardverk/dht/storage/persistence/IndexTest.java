@@ -7,6 +7,7 @@ import org.ardverk.collection.CollectionUtils;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.KeyFactory;
+import org.ardverk.dht.storage.Index;
 import org.ardverk.dht.storage.message.Context;
 import org.ardverk.dht.storage.persistence.PersistedIndex.Values;
 import org.junit.Test;

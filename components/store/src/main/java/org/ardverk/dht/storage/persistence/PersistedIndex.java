@@ -32,12 +32,13 @@ import org.ardverk.dht.rsrc.DefaultKey;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.storage.Constants;
 import org.ardverk.dht.storage.DateUtils;
+import org.ardverk.dht.storage.Index;
 import org.ardverk.dht.storage.message.Context;
 import org.ardverk.io.IoUtils;
 import org.ardverk.security.MessageDigestUtils;
 import org.ardverk.utils.StringUtils;
 
-class PersistedIndex implements Index {
+public class PersistedIndex implements Index {
     
     public static final int LENGTH = 20;
     
