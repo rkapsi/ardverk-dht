@@ -22,9 +22,9 @@ import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.utils.ArrayUtils;
 
-public class DatabaseUtils {
+public class DatastoreUtils {
 
-    private DatabaseUtils() {}
+    private DatastoreUtils() {}
     
     public static boolean isInBucket(Key key, RouteTable routeTable) {
         KUID bucketId = key.getId();
