@@ -5,6 +5,10 @@
                    
   <modelVersion>4.0.0</modelVersion>
   
+  <properties>
+    <slf4j.version>[1.6.1,)</slf4j.version>
+  </properties>
+  
   <parent>
     <groupId>org.ardverk</groupId>
     <artifactId>ardverk-dht</artifactId>
@@ -19,7 +23,7 @@
   	<dependency>
       <groupId>org.ardverk</groupId>
       <artifactId>ardverk-commons</artifactId>
-      <version>0.1</version>
+      <version>[0.1,)</version>
     </dependency>
     
     <dependency>
@@ -31,19 +35,19 @@
     <dependency>
       <groupId>org.ardverk</groupId>
       <artifactId>patricia-trie</artifactId>
-      <version>0.6</version>
+      <version>[0.6,)</version>
     </dependency>
     
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>1.6.1</version>
+      <version>${slf4j.version}</version>
     </dependency>
     
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
-      <version>1.6.1</version>
+      <version>${slf4j.version}</version>
     </dependency>
   </dependencies>
 </project>
