@@ -12,8 +12,24 @@
   <artifactId>ardverk-dht</artifactId>
   <version>0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
+  <url>https://github.com/rkapsi/ardverk-dht</url>
+  
+  <distributionManagement>
+    <repository>
+      <id>ardverk.org</id>
+      <url>scp://ardverk.org/repository</url>
+    </repository>
+  </distributionManagement>
   
   <build>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-ssh</artifactId>
+        <version>1.0</version>
+      </extension>
+    </extensions>
+    
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
