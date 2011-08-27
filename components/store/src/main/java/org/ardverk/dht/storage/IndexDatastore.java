@@ -26,7 +26,7 @@ import org.ardverk.dht.storage.message.Request;
 import org.ardverk.dht.storage.message.Response;
 import org.ardverk.dht.storage.message.ResponseFactory;
 import org.ardverk.dht.storage.message.StatusLine;
-import org.ardverk.dht.storage.persistence.PersistedIndex;
+import org.ardverk.dht.storage.sql.PersistedIndex;
 import org.ardverk.io.FileUtils;
 import org.ardverk.io.IoUtils;
 import org.ardverk.io.StreamUtils;

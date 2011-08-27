@@ -9,7 +9,8 @@ import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.KeyFactory;
 import org.ardverk.dht.storage.Index;
 import org.ardverk.dht.storage.message.Context;
-import org.ardverk.dht.storage.persistence.PersistedIndex.Values;
+import org.ardverk.dht.storage.sql.PersistedIndex;
+import org.ardverk.dht.storage.sql.PersistedIndex.Values;
 import org.junit.Test;
 
 public class IndexTest {

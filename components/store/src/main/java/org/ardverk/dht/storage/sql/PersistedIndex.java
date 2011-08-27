@@ -1,18 +1,18 @@
-package org.ardverk.dht.storage.persistence;
+package org.ardverk.dht.storage.sql;
 
-import static org.ardverk.dht.storage.persistence.StatementFactory.BUCKET_MODIFIED;
-import static org.ardverk.dht.storage.persistence.StatementFactory.DELETE_BUCKET;
-import static org.ardverk.dht.storage.persistence.StatementFactory.DELETE_KEY;
-import static org.ardverk.dht.storage.persistence.StatementFactory.DELETE_PROPERTIES;
-import static org.ardverk.dht.storage.persistence.StatementFactory.DELETE_VALUE;
-import static org.ardverk.dht.storage.persistence.StatementFactory.INSERT_PROPERTY;
-import static org.ardverk.dht.storage.persistence.StatementFactory.INSERT_VALUE;
-import static org.ardverk.dht.storage.persistence.StatementFactory.KEY_COUNT_BY_BUCKET_ID;
-import static org.ardverk.dht.storage.persistence.StatementFactory.KEY_MODIFIED;
-import static org.ardverk.dht.storage.persistence.StatementFactory.LIST_VALUE_ID;
-import static org.ardverk.dht.storage.persistence.StatementFactory.SET_TOMBSTONE;
-import static org.ardverk.dht.storage.persistence.StatementFactory.VALUE_COUNT_BY_KEY_ID;
-import static org.ardverk.dht.storage.persistence.Utils.setBytes;
+import static org.ardverk.dht.storage.sql.StatementFactory.BUCKET_MODIFIED;
+import static org.ardverk.dht.storage.sql.StatementFactory.DELETE_BUCKET;
+import static org.ardverk.dht.storage.sql.StatementFactory.DELETE_KEY;
+import static org.ardverk.dht.storage.sql.StatementFactory.DELETE_PROPERTIES;
+import static org.ardverk.dht.storage.sql.StatementFactory.DELETE_VALUE;
+import static org.ardverk.dht.storage.sql.StatementFactory.INSERT_PROPERTY;
+import static org.ardverk.dht.storage.sql.StatementFactory.INSERT_VALUE;
+import static org.ardverk.dht.storage.sql.StatementFactory.KEY_COUNT_BY_BUCKET_ID;
+import static org.ardverk.dht.storage.sql.StatementFactory.KEY_MODIFIED;
+import static org.ardverk.dht.storage.sql.StatementFactory.LIST_VALUE_ID;
+import static org.ardverk.dht.storage.sql.StatementFactory.SET_TOMBSTONE;
+import static org.ardverk.dht.storage.sql.StatementFactory.VALUE_COUNT_BY_KEY_ID;
+import static org.ardverk.dht.storage.sql.Utils.setBytes;
 
 import java.io.File;
 import java.net.URI;

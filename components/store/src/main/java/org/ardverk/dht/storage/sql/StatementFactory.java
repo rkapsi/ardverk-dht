@@ -1,4 +1,4 @@
-package org.ardverk.dht.storage.persistence;
+package org.ardverk.dht.storage.sql;
 
 import org.ardverk.dht.KUID;
 
