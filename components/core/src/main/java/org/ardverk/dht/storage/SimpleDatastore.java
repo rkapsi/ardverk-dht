@@ -21,6 +21,9 @@ import org.ardverk.io.IoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A very simple implementation of {@link Datastore}.
+ */
 public class SimpleDatastore extends AbstractDatastore implements Closeable {
 
     private static final Logger LOG 
