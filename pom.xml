@@ -6,6 +6,7 @@
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <scm.uri>scm:git:git@github.com:rkapsi/ardverk-dht.git</scm.uri>
   </properties>
   
   <groupId>org.ardverk</groupId>
@@ -16,17 +17,31 @@
   
   <distributionManagement>
     <repository>
-      <id>ardverk.org</id>
-      <url>scp://ardverk.org/repository</url>
+      <id>ardverk-release</id>
+      <url>scp://mvn.ardverk.org/repository/release</url>
     </repository>
+    <snapshotRepository>
+      <id>ardverk-snapshot</id>
+      <url>scp://mvn.ardverk.org/repository/snapshot</url>
+    </snapshotRepository>
   </distributionManagement>
   
   <repositories>
     <repository>
-      <id>ardverk.org</id>
-      <url>http://ardverk.org/repository</url>
+      <id>ardverk-release</id>
+      <url>http://mvn.ardverk.org/repository/release</url>
+    </repository>
+    <repository>
+      <id>ardverk-snapshot</id>
+      <url>http://mvn.ardverk.org/repository/snapshot</url>
     </repository>
   </repositories>
+  
+  <scm>
+    <connection>${scm.uri}</connection>
+    <url>${scm.uri}</url>
+    <developerConnection>${scm.uri}</developerConnection>
+  </scm>
   
   <build>
     <extensions>
@@ -46,6 +61,11 @@
             <source>1.6</source>
             <target>1.6</target>
         </configuration>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
       </plugin>
     </plugins>
   </build>
