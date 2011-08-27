@@ -19,7 +19,7 @@ import org.ardverk.coding.CodingUtils;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.rsrc.Key;
-import org.ardverk.dht.storage.AbstractObjectDatastore;
+import org.ardverk.dht.storage.AbstractIndexDatastore;
 import org.ardverk.dht.storage.Constants;
 import org.ardverk.dht.storage.Vclock;
 import org.ardverk.dht.storage.VclockUtils;
@@ -35,11 +35,8 @@ import org.ardverk.io.IoUtils;
 import org.ardverk.io.StreamUtils;
 import org.ardverk.security.MessageDigestUtils;
 
-public class PersistentDatastore extends AbstractObjectDatastore implements Closeable {
-
-    //private static final Logger LOG 
-    //    = LoggerFactory.getLogger(PersistentDatastore.class);
-
+public class IndexDatastore extends AbstractIndexDatastore implements Closeable {
+    
     private static final AtomicInteger COUNTER = new AtomicInteger();
     
     private static final String LIST = "list";
@@ -56,15 +53,15 @@ public class PersistentDatastore extends AbstractObjectDatastore implements Clos
     
     private final File content;
     
-    public PersistentDatastore() throws IOException {
+    public IndexDatastore() throws IOException {
         this("data/" + COUNTER.incrementAndGet());
     }
     
-    public PersistentDatastore(String path) throws IOException {
+    public IndexDatastore(String path) throws IOException {
         this(new File(path));
     }
     
-    public PersistentDatastore(File directory) throws IOException {
+    public IndexDatastore(File directory) throws IOException {
         this.directory = directory;
         this.content = FileUtils.mkdirs(directory, "content", true);
         
