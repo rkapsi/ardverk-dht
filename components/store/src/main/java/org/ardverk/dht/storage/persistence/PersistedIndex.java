@@ -33,6 +33,7 @@ import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.storage.Constants;
 import org.ardverk.dht.storage.DateUtils;
 import org.ardverk.dht.storage.message.Context;
+import org.ardverk.io.IoUtils;
 import org.ardverk.security.MessageDigestUtils;
 import org.ardverk.utils.StringUtils;
 
@@ -68,16 +69,16 @@ class PersistedIndex implements Index {
     
     private final StatementFactory factory;
     
-    private final ConnectionManager cm;
+    private final IConnectionManager cm;
     
-    private PersistedIndex(StatementFactory factory, ConnectionManager connection) {
+    private PersistedIndex(StatementFactory factory, IConnectionManager connection) {
         this.factory = factory;
         this.cm = connection;
     }
     
     @Override
     public void close() {
-        cm.close();
+        IoUtils.close(cm);
     }
     
     @Override
