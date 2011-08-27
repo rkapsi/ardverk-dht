@@ -15,7 +15,7 @@ import org.ardverk.dht.storage.message.Context;
 import org.ardverk.dht.storage.sql.DefaultIndex;
 import org.junit.Test;
 
-public class IndexTest {
+public class DefaultIndexTest {
 
     @Test
     public void add() throws Exception {
