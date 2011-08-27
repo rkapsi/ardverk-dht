@@ -3,40 +3,45 @@ package org.ardverk.dht.storage.persistence;
 import java.util.Set;
 import java.util.TreeSet;
 
+import junit.framework.TestCase;
+
 import org.ardverk.collection.CollectionUtils;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.KeyFactory;
 import org.ardverk.dht.storage.Index;
+import org.ardverk.dht.storage.Index.Values;
 import org.ardverk.dht.storage.message.Context;
 import org.ardverk.dht.storage.sql.DefaultIndex;
-import org.ardverk.dht.storage.sql.DefaultIndex.Values;
 import org.junit.Test;
 
 public class IndexTest {
 
     @Test
     public void add() throws Exception {
+        
+        final int count = 10;
+        
         Index index = DefaultIndex.create(null);
         
-        Set<KUID> k = new TreeSet<KUID>();
+        Set<KUID> dst = new TreeSet<KUID>();
         Key key = KeyFactory.parseKey("ardverk:///hello/world");
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < count; i++) {
             KUID valueId = KUID.createRandom(key.getId());
             Context context = new Context();
-            context.addHeader("X-Key", "" + i);
+            context.addHeader("X-Index", Integer.toString(i));
             
             index.add(key, context, valueId);
-            k.add(valueId);
-            //Thread.sleep(1000);
+            dst.add(valueId);
         }
         
-        for (KUID kk : k) {
-            System.out.println(kk);
-        }
+        final int m = dst.size()/2-1;
+        final int maxCount = 6;
         
-        KUID marker = CollectionUtils.nth(k, k.size()/2-1);
-        Values values = index.values(key, marker, 6);
-        System.out.println(values);
+        KUID marker = CollectionUtils.nth(dst, m);
+        Values values = index.values(key, marker, maxCount);
+        
+        TestCase.assertEquals(marker, values.firstKey());
+        TestCase.assertTrue(values.size() <= maxCount);
     }
 }
