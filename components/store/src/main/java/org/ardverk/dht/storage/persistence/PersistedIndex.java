@@ -69,9 +69,9 @@ class PersistedIndex implements Index {
     
     private final StatementFactory factory;
     
-    private final IConnectionManager cm;
+    private final ConnectionManager cm;
     
-    private PersistedIndex(StatementFactory factory, IConnectionManager connection) {
+    private PersistedIndex(StatementFactory factory, ConnectionManager connection) {
         this.factory = factory;
         this.cm = connection;
     }
