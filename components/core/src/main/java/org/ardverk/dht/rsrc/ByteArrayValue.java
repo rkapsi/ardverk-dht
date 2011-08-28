@@ -98,7 +98,7 @@ public class ByteArrayValue extends DefaultValue {
     public static ByteArrayValue valueOf(InputStream in) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            byte[] buffer = new byte[4*1-24];
+            byte[] buffer = new byte[4*1024];
             int len = -1;
             while ((len = in.read(buffer)) != -1) {
                 baos.write(buffer, 0, len);
