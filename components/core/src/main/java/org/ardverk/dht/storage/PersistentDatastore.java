@@ -36,7 +36,8 @@ public class PersistentDatastore extends SimpleDatastore {
         this(dir, frequency, frequency, unit);
     }
     
-    public PersistentDatastore(File dir, long frequency, long timeout, final TimeUnit unit) {
+    public PersistentDatastore(File dir, long frequency, 
+            long timeout, final TimeUnit unit) {
         super(frequency, timeout, unit);
         
         this.store = mkdirs(new File(dir, "store"));
@@ -85,7 +86,6 @@ public class PersistentDatastore extends SimpleDatastore {
             try {
                 
                 long length = consume(value, tmp);
-                
                 File file = createStoreFile(name);
                 
                 if (length == 0L) {
