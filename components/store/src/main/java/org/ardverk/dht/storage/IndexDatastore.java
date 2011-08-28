@@ -11,7 +11,6 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.protocol.HTTP;
@@ -34,8 +33,6 @@ import org.ardverk.security.MessageDigestUtils;
 
 public class IndexDatastore extends AbstractIndexDatastore implements Closeable {
     
-    private static final AtomicInteger COUNTER = new AtomicInteger();
-    
     private static final String LIST = "list";
     
     private static final String VALUE_ID = "valueId";
@@ -47,10 +44,6 @@ public class IndexDatastore extends AbstractIndexDatastore implements Closeable 
     private final Index index;
     
     private final File content;
-    
-    public IndexDatastore() throws IOException {
-        this("data/" + COUNTER.incrementAndGet());
-    }
     
     public IndexDatastore(String path) throws IOException {
         this(new File(path));

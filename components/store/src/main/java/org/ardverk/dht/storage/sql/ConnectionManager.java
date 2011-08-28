@@ -1,27 +1,22 @@
 package org.ardverk.dht.storage.sql;
 
 import java.io.Closeable;
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.concurrent.atomic.AtomicInteger;
 
 class ConnectionManager implements Closeable {
-
-    private static final AtomicInteger COUNTER = new AtomicInteger();
-
-    public static ConnectionManager newInstance() 
+    
+    public static ConnectionManager newInstance(File dir) 
             throws SQLException, ClassNotFoundException {
         
         Class.forName("org.hsqldb.jdbcDriver");
-
-        String url = "jdbc:hsqldb:mem:index-" + COUNTER.incrementAndGet();
-
-        // String path = dir.getAbsolutePath() + "/index-" +
-        // COUNTER.incrementAndGet();
-        // String url = "jdbc:hsqldb:file:" + path;
+        
+        String path = dir.getAbsolutePath() + "/index";
+        String url = "jdbc:hsqldb:file:" + path;
 
         String user = "sa";
         String password = "";

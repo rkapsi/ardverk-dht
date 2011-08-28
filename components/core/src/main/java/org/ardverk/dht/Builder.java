@@ -1,5 +1,6 @@
 package org.ardverk.dht;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketAddress;
@@ -11,7 +12,8 @@ import org.ardverk.dht.routing.DefaultRouteTable;
 import org.ardverk.dht.routing.Localhost;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Datastore;
-import org.ardverk.dht.storage.SimpleDatastore;
+import org.ardverk.dht.storage.PersistentDatastore;
+import org.ardverk.dht.storage.TransientDatastore;
 
 public class Builder {
 
@@ -37,6 +39,10 @@ public class Builder {
     
     private long timeoutInMillis = frequencyInMillis;
     
+    private boolean useTransientStore = true;
+    
+    private File directory = null;
+    
     private Builder(int keySize) {
         this.keySize = keySize;
     }
@@ -51,15 +57,35 @@ public class Builder {
         return this;
     }
     
+    public Builder setUseTransientStore(boolean useTransientStore) {
+        this.useTransientStore = useTransientStore;
+        return this;
+    }
+    
+    public Builder setDatastoreLocation(File directory) {
+        this.directory = directory;
+        return this;
+    }
+    
     public DHT newDHT() {
         Localhost localhost = new Localhost(keySize);
         
         MessageFactory messageFactory 
             = new DefaultMessageFactory(localhost);
         
-        Datastore datastore 
-            = new SimpleDatastore(frequencyInMillis, 
-                timeoutInMillis, TimeUnit.MILLISECONDS);
+        Datastore datastore = null;
+        if (useTransientStore) {
+            datastore = new TransientDatastore(frequencyInMillis, 
+                    timeoutInMillis, TimeUnit.MILLISECONDS);
+        } else {
+            
+            if (directory == null) {
+                directory = new File("datastore");
+            }
+            
+            datastore = new PersistentDatastore(directory,
+                    frequencyInMillis, timeoutInMillis, TimeUnit.MILLISECONDS);
+        }
         
         RouteTable routeTable = new DefaultRouteTable(localhost);
         

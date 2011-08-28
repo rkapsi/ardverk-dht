@@ -49,7 +49,7 @@ public class DefaultIndex implements Index {
     public static DefaultIndex create(File dir, int length) {
         try {
             
-            ConnectionManager cm = ConnectionManager.newInstance();
+            ConnectionManager cm = ConnectionManager.newInstance(dir);
             StatementFactory factory = new StatementFactory(length);
             
             Statement statement = cm.createStatement();
