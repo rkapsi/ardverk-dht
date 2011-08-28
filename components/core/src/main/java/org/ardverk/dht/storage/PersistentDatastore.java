@@ -62,6 +62,18 @@ public class PersistentDatastore extends SimpleDatastore {
                 return false;
             }
         });
+        
+        tmp.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File file) {
+                if (file.isFile()) {
+                    if ((now - file.lastModified()) >= timeoutInMillis) {
+                        file.delete();
+                    }
+                }
+                return false;
+            }
+        });
     }
     
     @Override
@@ -73,6 +85,7 @@ public class PersistentDatastore extends SimpleDatastore {
             try {
                 
                 long length = consume(value, tmp);
+                
                 File file = createStoreFile(name);
                 
                 if (length == 0L) {
@@ -119,7 +132,7 @@ public class PersistentDatastore extends SimpleDatastore {
     }
     
     private File createTmpFile(String name) throws IOException {
-        return File.createTempFile(name, ".tmp", tmp);
+        return File.createTempFile(name + "-", ".tmp", tmp);
     }
     
     private static long consume(Value value, File dst) throws IOException {
@@ -139,7 +152,6 @@ public class PersistentDatastore extends SimpleDatastore {
                     out.write(buffer, 0, len);
                     length += len;
                 }
-                
                 return length;
             } finally {
                 IoUtils.close(in);

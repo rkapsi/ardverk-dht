@@ -3,7 +3,6 @@ import org.ardverk.dht.codec.*;
 import org.ardverk.dht.codec.bencode.*;
 import org.ardverk.dht.concurrent.*;
 import org.ardverk.dht.config.*;
-import org.ardverk.dht.easy.*;
 import org.ardverk.dht.entity.*;
 import org.ardverk.dht.event.*;
 import org.ardverk.dht.io.*;
@@ -41,8 +40,8 @@ int current = 0;
 // Creates a DHT that is bound to the given port
 createDHT(int port) {
 	
-	EasyConfig config = new EasyConfig();
-	DHT dht = EasyFactory.create(config);
+	Builder builder = Builder.sha1();
+	DHT dht = builder.newDHT();
 	
 	MessageCodec codec = new BencodeMessageCodec();
 	//dht.bind(new DatagramTransport(codec, port));
@@ -74,7 +73,7 @@ bootstrapAll() {
 	bootstrap(first, dhts);
 	
 	first.getRouteTable().clear();
-	first.bootstrap(dhts.get(1).getLocalhost()).get();
+	first.bootstrap(dhts.get(1).getLocalhost(), null).get();
 }
 
 // Bootstraps a list of DHTs
@@ -83,7 +82,7 @@ bootstrap(DHT root, java.util.List dhts) {
 	for (DHT dht : dhts) {
 		if (dht != root) {
 			//dht.bootstrap(foo).get();
-			dht.bootstrap(root.getLocalhost()).get();
+			dht.bootstrap(root.getLocalhost(), null).get();
 		}
 	}
 }
@@ -91,7 +90,7 @@ bootstrap(DHT root, java.util.List dhts) {
 // Calls quicken() on a list of DHTs
 quicken() {
 	for (DHT dht : dhts) {
-		dht.quicken().get();
+		dht.quicken(null).get();
 	}
 }
 
@@ -125,11 +124,12 @@ put(String key, String value) {
 
 // Stores the given key-value
 put(DHT dht, String key, String value) {
-	DHTFuture future = dht.put(toKey(key), toValue(value));
+	DHTFuture future = dht.put(toKey(key), toValue(value), null);
 		
 	PutEntity entity = future.get();
 	for (StoreResponse response : entity.getStoreResponses()) {
-	  org.ardverk.dht.storage.Response status = org.ardverk.dht.storage.Response.valueOf(response.getValue());
+	  	//org.ardverk.dht.storage.Response status = org.ardverk.dht.storage.Response.valueOf(response.getValue());
+		org.ardverk.dht.rsrc.StringValue status = org.ardverk.dht.rsrc.StringValue.valueOf(response.getValue());
 		print("PUT: " + response.getContact().getId() + " -> " + status);
 	}
 }
@@ -141,10 +141,11 @@ get(String key) {
 
 // Retrieves the given key-value
 get(DHT dht, String key) {
-	DHTFuture future = dht.get(toKey(key));
+	DHTFuture future = dht.get(toKey(key), null);
 	
 	org.ardverk.dht.entity.ValueEntity entity = future.get();
-	org.ardverk.dht.storage.Response value = org.ardverk.dht.storage.Response.valueOf(entity.getValue());
+	//org.ardverk.dht.storage.Response value = org.ardverk.dht.storage.Response.valueOf(entity.getValue());
+	org.ardverk.dht.rsrc.ByteArrayValue value = org.ardverk.dht.rsrc.ByteArrayValue.valueOf(entity.getValue());
 	
 	KUID senderId = entity.getSender().getId();
 	KUID creatorId = null;
@@ -163,10 +164,11 @@ toKey(String key) {
 }
 
 toValue(String value) {
-  //byte[] raw = StringUtils.getBytes(value);
-  //byte[] data = new byte[1024 * 1024];
-  //System.arraycopy(raw, 0, data, 0, raw.length);
-	return new org.ardverk.dht.storage.DefaultRequest(dhts.get(current).getLocalhost(), new ByteArrayValueEntity(StringUtils.getBytes(value)));
+  	//byte[] raw = StringUtils.getBytes(value);
+  	//byte[] data = new byte[1024 * 1024];
+  	//System.arraycopy(raw, 0, data, 0, raw.length);
+	//return new org.ardverk.dht.storage.message.DefaultRequest(dhts.get(current).getLocalhost(), new ByteArrayValueEntity(StringUtils.getBytes(value)));
+	return new org.ardverk.dht.rsrc.StringValue(value);
 }
 
 // Closes all DHTs
@@ -193,8 +195,8 @@ init() {
 }
 
 init(boolean withUI) {
-	INSTANCE_COUNT = 256;
-	//INSTANCE_COUNT = 30;
+	//INSTANCE_COUNT = 256;
+	INSTANCE_COUNT = 30;
 	INITIAL_PORT = 13000;
 
 	print("Creating DHTs...");
@@ -208,7 +210,7 @@ init(boolean withUI) {
 	print("Bootstrapping all DHTs...");
 	bootstrapAll();
 
-  quicken();
+	quicken();
   
 	print("\nStoring a Key-Value...");
 	put("Hello", "World");

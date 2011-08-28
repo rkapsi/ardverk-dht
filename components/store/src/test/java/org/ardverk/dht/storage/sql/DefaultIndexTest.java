@@ -1,5 +1,6 @@
 package org.ardverk.dht.storage.sql;
 
+import java.io.File;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -12,7 +13,6 @@ import org.ardverk.dht.rsrc.KeyFactory;
 import org.ardverk.dht.storage.Index;
 import org.ardverk.dht.storage.Index.Values;
 import org.ardverk.dht.storage.message.Context;
-import org.ardverk.dht.storage.sql.DefaultIndex;
 import org.junit.Test;
 
 public class DefaultIndexTest {
@@ -22,7 +22,8 @@ public class DefaultIndexTest {
         
         final int count = 10;
         
-        Index index = DefaultIndex.create(null);
+        File dir = new File("data/test");
+        Index index = DefaultIndex.create(dir);
         
         Set<KUID> dst = new TreeSet<KUID>();
         Key key = KeyFactory.parseKey("ardverk:///hello/world");

@@ -39,7 +39,7 @@ public class Builder {
     
     private long timeoutInMillis = frequencyInMillis;
     
-    private boolean useTransientStore = true;
+    private boolean useTransientStore = false;
     
     private File directory = null;
     
