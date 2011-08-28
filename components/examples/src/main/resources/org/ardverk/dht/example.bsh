@@ -129,7 +129,8 @@ put(DHT dht, String key, String value) {
 	PutEntity entity = future.get();
 	for (StoreResponse response : entity.getStoreResponses()) {
 	  	//org.ardverk.dht.storage.Response status = org.ardverk.dht.storage.Response.valueOf(response.getValue());
-		org.ardverk.dht.rsrc.StringValue status = org.ardverk.dht.rsrc.StringValue.valueOf(response.getValue());
+		org.ardverk.dht.rsrc.StringValue status = org.ardverk.dht.rsrc.ValueUtils.valueOf(
+			org.ardverk.dht.rsrc.StringValue.class, response.getValue());
 		print("PUT: " + response.getContact().getId() + " -> " + status);
 	}
 }
@@ -145,7 +146,8 @@ get(DHT dht, String key) {
 	
 	org.ardverk.dht.entity.ValueEntity entity = future.get();
 	//org.ardverk.dht.storage.Response value = org.ardverk.dht.storage.Response.valueOf(entity.getValue());
-	org.ardverk.dht.rsrc.StringValue value = org.ardverk.dht.rsrc.StringValue.valueOf(entity.getValue());
+	org.ardverk.dht.rsrc.StringValue value = org.ardverk.dht.rsrc.ValueUtils.valueOf(
+		org.ardverk.dht.rsrc.StringValue.class, entity.getValue());
 	
 	KUID senderId = entity.getSender().getId();
 	KUID creatorId = null;

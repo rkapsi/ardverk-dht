@@ -17,12 +17,10 @@
 package org.ardverk.dht.rsrc;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.ardverk.io.IoUtils;
 import org.ardverk.utils.StringUtils;
 
 public class ByteArrayValue extends DefaultValue {
@@ -84,28 +82,5 @@ public class ByteArrayValue extends DefaultValue {
     @Override
     public String toString() {
         return StringUtils.toString(getContentAsBytes());
-    }
-    
-    public static ByteArrayValue valueOf(Value value) throws IOException {
-        InputStream in = value.getContent();
-        try {
-            return valueOf(in);
-        } finally {
-            IoUtils.close(in);
-        }
-    }
-    
-    public static ByteArrayValue valueOf(InputStream in) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            byte[] buffer = new byte[4*1024];
-            int len = -1;
-            while ((len = in.read(buffer)) != -1) {
-                baos.write(buffer, 0, len);
-            }
-        } finally {
-            IoUtils.close(baos);
-        }
-        return new ByteArrayValue(baos.toByteArray());
     }
 }
