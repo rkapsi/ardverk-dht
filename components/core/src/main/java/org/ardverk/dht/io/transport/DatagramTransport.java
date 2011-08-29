@@ -198,8 +198,8 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
                 }
             }
             
-            private void handleResponse(ResponseMessage response) throws IOException {
-                DatagramTransport.this.handleResponse(response);
+            private boolean handleResponse(ResponseMessage response) throws IOException {
+                return DatagramTransport.this.handleResponse(response);
             }
         };
         
