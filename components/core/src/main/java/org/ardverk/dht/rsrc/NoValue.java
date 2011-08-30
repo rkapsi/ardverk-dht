@@ -3,7 +3,7 @@ package org.ardverk.dht.rsrc;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class NoValue extends DefaultValue {
+public class NoValue extends AbstractValue {
 
     public static final Value EMPTY = new NoValue();
     
@@ -16,6 +16,11 @@ public class NoValue extends DefaultValue {
     
     private NoValue() {}
     
+    @Override
+    public long getContentLength() {
+        return 0L;
+    }
+
     @Override
     public InputStream getContent() {
         return in;

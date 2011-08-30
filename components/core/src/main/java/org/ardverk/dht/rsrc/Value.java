@@ -30,6 +30,11 @@ import org.ardverk.io.Writable;
 public interface Value extends Writable {
     
     /**
+     * Returns the length of the value in {@code byte}s.
+     */
+    public long getContentLength();
+    
+    /**
      * Returns the {@link Value}'s data as an {@link InputStream}.
      * 
      * NOTE: The caller (you) is responsible for closing the {@link InputStream}.

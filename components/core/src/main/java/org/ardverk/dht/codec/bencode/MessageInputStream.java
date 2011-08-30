@@ -180,7 +180,8 @@ public class MessageInputStream extends BencodingInputStream {
     }
     
     public Value readValue() throws IOException {
-        return new InputStreamValue(this);
+        long length = readLong();
+        return new InputStreamValue(length, this);
     }
     
     public Message readMessage(SocketAddress src) throws IOException {

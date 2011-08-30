@@ -23,8 +23,19 @@ import java.io.OutputStream;
 import org.ardverk.io.IoUtils;
 import org.ardverk.io.StreamUtils;
 
-public class DefaultValue implements Value {
-    
+public abstract class AbstractValue implements Value {
+
+    @Override
+    public void writeTo(OutputStream out) throws IOException {
+        long length = getContentLength();
+        InputStream in = getContent();
+        try {
+            StreamUtils.copy(in, out, length);
+        } finally {
+            IoUtils.close(in);
+        }
+    }
+
     @Override
     public boolean isRepeatable() {
         return false;
@@ -33,20 +44,5 @@ public class DefaultValue implements Value {
     @Override
     public boolean isStreaming() {
         return false;
-    }
-
-    @Override
-    public InputStream getContent() throws IOException {
-        throw new IOException();
-    }
-
-    @Override
-    public void writeTo(OutputStream out) throws IOException {
-        InputStream in = getContent();
-        try {
-            StreamUtils.copy(in, out);
-        } finally {
-            IoUtils.close(in);
-        }
     }
 }
