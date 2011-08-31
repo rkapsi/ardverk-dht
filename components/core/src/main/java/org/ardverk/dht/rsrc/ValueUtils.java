@@ -7,6 +7,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import org.ardverk.io.IoUtils;
+import org.ardverk.io.StreamUtils;
 
 public class ValueUtils {
 
@@ -22,11 +23,7 @@ public class ValueUtils {
     public static <T extends Value> T valueOf(Class<T> clazz, InputStream in) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            byte[] buffer = new byte[4*1024];
-            int len = -1;
-            while ((len = in.read(buffer)) != -1) {
-                baos.write(buffer, 0, len);
-            }
+            StreamUtils.copy(in, baos);
         } finally {
             IoUtils.close(baos);
         }
