@@ -16,7 +16,6 @@
 
 package org.ardverk.dht.codec.bencode;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -55,7 +54,6 @@ import org.ardverk.dht.rsrc.ByteArrayValue;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.KeyFactory;
 import org.ardverk.dht.rsrc.Value;
-import org.ardverk.io.IoUtils;
 import org.ardverk.io.StreamUtils;
 import org.ardverk.net.NetworkUtils;
 import org.ardverk.version.Vector;
@@ -185,15 +183,14 @@ public class MessageInputStream extends BencodingInputStream {
     public Value readValue() throws IOException {
         long length = readLong();
         
-        // TODO: This is kinda wasteful but doing for now because it's easy.
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            StreamUtils.copy(this, baos, length);
-        } finally {
-            IoUtils.close(baos);
+        if (length < 0 || Integer.MAX_VALUE < length) {
+            throw new IOException("length=" + length);
         }
         
-        return new ByteArrayValue(baos.toByteArray());
+        // TODO: This is kinda wasteful but doing for now because it's easy.
+        byte[] data = new byte[(int)length];
+        StreamUtils.readFully(in, data);
+        return new ByteArrayValue(data);
     }
     
     public Message readMessage(SocketAddress src) throws IOException {
