@@ -23,7 +23,7 @@ import java.io.OutputStream;
 
 import org.ardverk.utils.StringUtils;
 
-public class ByteArrayValue extends DefaultValue {
+public class ByteArrayValue extends AbstractValue {
     
     private final byte[] data;
     
@@ -60,6 +60,11 @@ public class ByteArrayValue extends DefaultValue {
     }
     
     @Override
+    public long getContentLength() {
+        return length;
+    }
+
+    @Override
     public InputStream getContent() {
         return new ByteArrayInputStream(data, offset, length);
     }
@@ -72,11 +77,6 @@ public class ByteArrayValue extends DefaultValue {
     @Override
     public boolean isRepeatable() {
         return true;
-    }
-
-    @Override
-    public boolean isStreaming() {
-        return false;
     }
 
     @Override

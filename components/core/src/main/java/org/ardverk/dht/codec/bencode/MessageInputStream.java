@@ -50,10 +50,11 @@ import org.ardverk.dht.message.ValueRequest;
 import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.DefaultContact;
-import org.ardverk.dht.rsrc.InputStreamValue;
+import org.ardverk.dht.rsrc.ByteArrayValue;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.KeyFactory;
 import org.ardverk.dht.rsrc.Value;
+import org.ardverk.io.StreamUtils;
 import org.ardverk.net.NetworkUtils;
 import org.ardverk.version.Vector;
 import org.ardverk.version.VectorClock;
@@ -180,7 +181,16 @@ public class MessageInputStream extends BencodingInputStream {
     }
     
     public Value readValue() throws IOException {
-        return new InputStreamValue(this);
+        long length = readLong();
+        
+        if (length < 0 || Integer.MAX_VALUE < length) {
+            throw new IOException("length=" + length);
+        }
+        
+        // TODO: This is kinda wasteful but doing for now because it's easy.
+        byte[] data = new byte[(int)length];
+        StreamUtils.readFully(in, data);
+        return new ByteArrayValue(data);
     }
     
     public Message readMessage(SocketAddress src) throws IOException {

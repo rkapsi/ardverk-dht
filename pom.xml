@@ -1,0 +1,116 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <scm.uri>scm:git:git@github.com:rkapsi/ardverk-dht.git</scm.uri>
+    
+    <slf4j.version>[1.6.1,)</slf4j.version>
+  </properties>
+  
+  <groupId>org.ardverk</groupId>
+  <artifactId>ardverk-dht</artifactId>
+  <version>0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <url>https://github.com/rkapsi/ardverk-dht</url>
+  
+  <distributionManagement>
+    <repository>
+      <id>ardverk-release</id>
+      <url>scp://mvn.ardverk.org/repository/release</url>
+    </repository>
+    <snapshotRepository>
+      <id>ardverk-snapshot</id>
+      <url>scp://mvn.ardverk.org/repository/snapshot</url>
+    </snapshotRepository>
+  </distributionManagement>
+  
+  <repositories>
+    <repository>
+      <id>ardverk-release</id>
+      <url>http://mvn.ardverk.org/repository/release</url>
+      <releases><enabled>true</enabled></releases>
+      <snapshots><enabled>false</enabled></snapshots>
+    </repository>
+    <repository>
+      <id>ardverk-snapshot</id>
+      <url>http://mvn.ardverk.org/repository/snapshot</url>
+      <releases><enabled>false</enabled></releases>
+      <snapshots><enabled>true</enabled></snapshots>
+    </repository>
+  </repositories>
+  
+  <scm>
+    <connection>${scm.uri}</connection>
+    <developerConnection>${scm.uri}</developerConnection>
+    <url>${project.url}</url>
+  </scm>
+  
+  <build>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-ssh</artifactId>
+        <version>1.0</version>
+      </extension>
+    </extensions>
+    
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.2</version>
+        <configuration>
+            <source>1.6</source>
+            <target>1.6</target>
+        </configuration>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+  
+  <licenses>
+    <license>
+      <name>Ardverk DHT License</name>
+      <url>LICENSE</url>
+    </license>
+  </licenses>
+  
+  <modules>
+  	<module>components/core</module>
+  	<module>components/examples</module>
+  	<module>components/http</module>
+  	<module>components/store</module>
+  	<module>components/tools</module>
+  </modules>
+  
+  <dependencies>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>${slf4j.version}</version>
+      <optional>true</optional>
+    </dependency>
+    
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>[4.8.2,)</version>
+      <optional>false</optional>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>

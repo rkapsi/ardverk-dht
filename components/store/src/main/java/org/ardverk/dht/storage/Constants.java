@@ -3,6 +3,7 @@ package org.ardverk.dht.storage;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
+import org.ardverk.dht.storage.message.Properties;
 
 public class Constants {
     
@@ -13,6 +14,10 @@ public class Constants {
     public static final String VCLOCK = "X-Ardverk-Vclock";
 
     public static final String VTAG = "X-Ardverk-Vtag";
+    
+    public static final String VALUE_ID = "X-Ardverk-ValueId";
+    
+    public static final String DATE = "X-Ardverk-SD";
     
     public static final String CONTENT_MD5 = "Content-MD5";
     

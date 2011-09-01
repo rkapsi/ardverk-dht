@@ -5,3 +5,10 @@ build
 dist
 *.hprof
 data
+datastore
+.settings
+.classpath
+.project
+target
+pom.xml.releaseBackup
+release.properties

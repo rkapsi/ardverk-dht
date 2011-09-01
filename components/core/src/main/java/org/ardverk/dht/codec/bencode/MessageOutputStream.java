@@ -39,6 +39,7 @@ import org.ardverk.dht.message.ValueRequest;
 import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.rsrc.Key;
+import org.ardverk.dht.rsrc.NoValue;
 import org.ardverk.dht.rsrc.Value;
 import org.ardverk.version.Vector;
 import org.ardverk.version.VectorClock;
@@ -150,6 +151,7 @@ public class MessageOutputStream extends BencodingOutputStream {
     }
     
     public void writeValue(Value value) throws IOException {
+        writeLong(value.getContentLength());
         value.writeTo(this);
     }
     
@@ -194,7 +196,10 @@ public class MessageOutputStream extends BencodingOutputStream {
                 throw new IllegalArgumentException("opcode=" + opcode);
         }
         
-        writeValue(message.getValue());
+        Value value = message.getValue();
+        if (!(value instanceof NoValue)) {
+            writeValue(value);
+        }
     }
     
     private void writePingRequest(PingRequest message) throws IOException {

@@ -19,7 +19,7 @@ package org.ardverk.dht;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.Localhost;
 import org.ardverk.dht.routing.RouteTable;
-import org.ardverk.dht.storage.Database;
+import org.ardverk.dht.storage.Datastore;
 
 /**
  * The default interface for a DHT.
@@ -40,7 +40,7 @@ public interface DHT extends DHTService, BootstrapService,
     public RouteTable getRouteTable();
     
     /**
-     * Returns the {@link DHT}'s {@link Database}.
+     * Returns the {@link DHT}'s {@link Datastore}.
      */
-    public Database getDatabase();
+    public Datastore getDatabase();
 }

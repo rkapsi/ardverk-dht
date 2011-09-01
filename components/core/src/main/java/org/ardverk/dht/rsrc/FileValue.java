@@ -25,7 +25,7 @@ import java.io.InputStream;
 /**
  * {@link FileValue} reads its data from a {@link File}.
  */
-public class FileValue extends DefaultValue {
+public class FileValue extends AbstractValue {
     
     private final File file;
     
@@ -37,6 +37,11 @@ public class FileValue extends DefaultValue {
         return file;
     }
     
+    @Override
+    public long getContentLength() {
+        return file.length();
+    }
+
     @Override
     public InputStream getContent() throws IOException {
         return new FileInputStream(file);

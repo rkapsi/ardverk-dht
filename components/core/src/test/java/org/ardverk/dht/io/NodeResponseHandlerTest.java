@@ -16,20 +16,28 @@
 
 package org.ardverk.dht.io;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import junit.framework.TestCase;
 
-import org.ardverk.dht.ArdverkUtils;
+import org.ardverk.dht.Builder;
+import org.ardverk.dht.DHT;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.concurrent.DHTFuture;
+import org.ardverk.dht.concurrent.ExecutorKey;
+import org.ardverk.dht.config.BootstrapConfig;
+import org.ardverk.dht.config.DefaultBootstrapConfig;
 import org.ardverk.dht.config.DefaultLookupConfig;
 import org.ardverk.dht.config.LookupConfig;
-import org.ardverk.dht.easy.EasyDHT;
+import org.ardverk.dht.entity.BootstrapEntity;
 import org.ardverk.dht.entity.NodeEntity;
 import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.DefaultRouteTable;
 import org.ardverk.dht.utils.XorComparator;
 import org.ardverk.io.IoUtils;
 import org.junit.Test;
@@ -37,22 +45,83 @@ import org.junit.Test;
 
 public class NodeResponseHandlerTest {
     
+    private static List<DHT> createDHTs(int count, int port) throws IOException {
+        Builder builder = Builder.sha1();
+        
+        List<DHT> dhts = new ArrayList<DHT>(count);
+        
+        boolean success = false;
+        try {
+            for (int i = 0; i < count; i++) {
+                dhts.add(builder.newDHT(port+i));
+            }
+            success = true;
+        } finally {
+            if (!success) {
+                IoUtils.closeAll(dhts);
+            }
+        }
+        
+        return dhts;
+    }
+    
+    private static List<DHTFuture<BootstrapEntity>> bootstrap(List<? extends DHT> dhts) throws InterruptedException, ExecutionException {
+        if (dhts.size() <= 1) {
+            throw new IllegalArgumentException();
+        }
+        
+        // Bootstrap everyone from the first DHT
+        DHT first = dhts.get(0);
+        List<DHTFuture<BootstrapEntity>> futures1 
+            = bootstrap(first.getLocalhost(), dhts, 1, dhts.size()-1);
+        
+        // The RouteTable is all messed up! Clear it and bootstrap
+        // the first DHT from the others.
+        ((DefaultRouteTable)first.getRouteTable()).clear();
+        TestCase.assertEquals(1, first.getRouteTable().size());
+        
+        List<DHTFuture<BootstrapEntity>> futures2 
+            = bootstrap(dhts.get(1).getLocalhost(), dhts, 0, 1);
+        
+        futures2.addAll(futures1);
+        return futures2;
+    }
+    
+    public static List<DHTFuture<BootstrapEntity>> bootstrap(Contact from, 
+            List<? extends DHT> dhts, int offset, int length) 
+                throws InterruptedException, ExecutionException {
+        
+        List<DHTFuture<BootstrapEntity>> futures 
+            = new ArrayList<DHTFuture<BootstrapEntity>>();
+        
+        BootstrapConfig config = new DefaultBootstrapConfig();
+        config.setExecutorKey(ExecutorKey.BACKEND);
+        
+        for (int i = 0; i < length; i++) {
+            DHTFuture<BootstrapEntity> future 
+                = dhts.get(offset+i).bootstrap(from, config);
+            futures.add(future);
+            future.get();
+        }
+        
+        return futures;
+    }
     @Test
     public void lookup() throws Exception {
-        List<EasyDHT> dhts = ArdverkUtils.createDHTs(256, 2000);
+        List<DHT> dhts = createDHTs(256, 2000);
         try {
-            ArdverkUtils.bootstrap(dhts);
+            bootstrap(dhts);
             
             KUID lookupId = KUID.createRandom(20);
             
             // Sort the DHTs by their XOR distance to the given lookupId.
             TreeSet<KUID> expected = new TreeSet<KUID>(
                     new XorComparator(lookupId));
-            for (EasyDHT dht : dhts) {
+            for (DHT dht : dhts) {
                 expected.add(dht.getLocalhost().getId());
             }
             
-            EasyDHT first = dhts.get(0);
+            DHT first = dhts.get(0);
             
             LookupConfig config = new DefaultLookupConfig();
             config.setLookupTimeout(20L, TimeUnit.SECONDS);

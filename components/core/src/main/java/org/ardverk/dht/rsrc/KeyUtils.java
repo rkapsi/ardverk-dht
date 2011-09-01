@@ -99,7 +99,7 @@ public class KeyUtils {
     
     private static String decode(String value) {
         try {
-            return URLDecoder.decode(value, StringUtils.UTF_8);
+            return URLDecoder.decode(value, StringUtils.UTF8);
         } catch (UnsupportedEncodingException err) {
             throw new IllegalArgumentException("UnsupportedEncodingException", err);
         }

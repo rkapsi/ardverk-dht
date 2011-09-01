@@ -28,7 +28,7 @@ import org.ardverk.dht.message.ResponseMessage;
 import org.ardverk.dht.message.StoreRequest;
 import org.ardverk.dht.message.ValueRequest;
 import org.ardverk.dht.routing.RouteTable;
-import org.ardverk.dht.storage.Database;
+import org.ardverk.dht.storage.Datastore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,14 +52,14 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
     private final StoreRequestHandler store;
     
     public DefaultMessageDispatcher(MessageFactory factory, 
-            RouteTable routeTable, Database database) {
+            RouteTable routeTable, Datastore datastore) {
         super(factory);
         
         defaultHandler = new DefaultMessageHandler(routeTable);
         ping = new PingRequestHandler(this);
         node = new NodeRequestHandler(this, routeTable);
-        value = new ValueRequestHandler(this, routeTable, database);
-        store = new StoreRequestHandler(this, database);
+        value = new ValueRequestHandler(this, routeTable, datastore);
+        store = new StoreRequestHandler(this, datastore);
     }
     
     /**

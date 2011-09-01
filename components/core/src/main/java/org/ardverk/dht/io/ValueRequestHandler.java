@@ -27,7 +27,7 @@ import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.Value;
-import org.ardverk.dht.storage.Database;
+import org.ardverk.dht.storage.Datastore;
 
 
 /**
@@ -38,16 +38,16 @@ public class ValueRequestHandler extends AbstractRequestHandler {
 
     private final RouteTable routeTable;
     
-    private final Database database;
+    private final Datastore datastore;
     
     public ValueRequestHandler(
             MessageDispatcher messageDispatcher, 
             RouteTable routeTable, 
-            Database database) {
+            Datastore datastore) {
         super(messageDispatcher);
         
         this.routeTable = routeTable;
-        this.database = database;
+        this.datastore = datastore;
     }
     
     @Override
@@ -56,7 +56,7 @@ public class ValueRequestHandler extends AbstractRequestHandler {
         
         Contact src = request.getContact();
         Key key = request.getKey();
-        Value value = database.get(src, key);
+        Value value = datastore.get(src, key);
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
         ResponseMessage response = null;
