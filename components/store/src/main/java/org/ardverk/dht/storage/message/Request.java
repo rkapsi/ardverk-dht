@@ -4,24 +4,25 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.ardverk.dht.rsrc.Value;
 
-public class Request extends ContextValue {
+
+public class Request extends ContextMessage<Request> {
 
     private final Method method;
     
-    public Request(ValueEntity entity) {
-        this(Method.PUT, entity);
+    public Request(Value value) {
+        this(Method.PUT, value);
     }
     
-    public Request(Method method, ValueEntity entity) {
-        super(entity);
+    public Request(Method method, Value value) {
+        super(value);
         
         this.method = method;
     }
     
     private Request(Method method, Context context) {
         super(context);
-        
         this.method = method;
     }
     
@@ -30,11 +31,11 @@ public class Request extends ContextValue {
     }
     
     @Override
-    protected void writeHeader(OutputStream out) throws IOException {
+    protected void postCommitContext(OutputStream out) throws IOException {
+        super.postCommitContext(out);
         method.writeTo(out);
-        super.writeHeader(out);
     }
-    
+
     @Override
     public String toString() {
         return method + " - " + super.toString();
