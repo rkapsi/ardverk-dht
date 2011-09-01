@@ -77,7 +77,7 @@ abstract class ContextMessage<T extends ContextMessage<?>> {
             IoUtils.close(baos);
         }
         
-        return new ResponseValue(baos.toByteArray(), value);
+        return new ContextValue(baos.toByteArray(), value);
     }
     
     protected void preCommit() {
@@ -102,13 +102,13 @@ abstract class ContextMessage<T extends ContextMessage<?>> {
     protected void postCommitContext(OutputStream out) throws IOException {
     }
     
-    private static class ResponseValue extends AbstractValue {
+    private static class ContextValue extends AbstractValue {
         
         private final byte[] context;
         
         private final Value value;
         
-        public ResponseValue(byte[] context, Value value) {
+        public ContextValue(byte[] context, Value value) {
             this.context = context;
             this.value = value;
         }
