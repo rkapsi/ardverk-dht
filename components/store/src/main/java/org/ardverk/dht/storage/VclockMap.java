@@ -6,8 +6,8 @@ import java.util.Map;
 
 import org.ardverk.collection.CollectionUtils;
 import org.ardverk.dht.KUID;
+import org.ardverk.dht.rsrc.Value;
 import org.ardverk.dht.storage.message.Context;
-import org.ardverk.dht.storage.message.ValueEntity;
 import org.ardverk.version.Occured;
 
 class VclockMap {
@@ -15,7 +15,7 @@ class VclockMap {
     private final Map<KUID, Entry> map 
         = new LinkedHashMap<KUID, Entry>();
     
-    public void upsert(Vclock vclock, Context context, ValueEntity value) {
+    public void upsert(Vclock vclock, Context context, Value value) {
         
         Iterator<Entry> it = map.values().iterator();
         while (it.hasNext()) {
@@ -69,12 +69,12 @@ class VclockMap {
         
         private final Context context;
         
-        private final ValueEntity entity;
+        private final Value value;
 
-        public Entry(Vclock vclock, Context context, ValueEntity entity) {
+        public Entry(Vclock vclock, Context context, Value value) {
             this.vclock = vclock;
             this.context = context;
-            this.entity = entity;
+            this.value = value;
         }
 
         public Vclock getVclock() {
@@ -85,8 +85,8 @@ class VclockMap {
             return context;
         }
 
-        public ValueEntity getValueEntity() {
-            return entity;
+        public Value getValue() {
+            return value;
         }
     }
 }
