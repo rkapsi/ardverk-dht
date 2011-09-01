@@ -17,13 +17,14 @@ import org.apache.http.protocol.HTTP;
 import org.ardverk.coding.CodingUtils;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.rsrc.FileValue;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.storage.Index.Values;
 import org.ardverk.dht.storage.message.Context;
-import org.ardverk.dht.storage.message.FileValueEntity;
+import org.ardverk.dht.storage.message.ContextMessage;
 import org.ardverk.dht.storage.message.Request;
-import org.ardverk.dht.storage.message.Response;
-import org.ardverk.dht.storage.message.ResponseFactory;
+import org.ardverk.dht.storage.message.Response2;
+import org.ardverk.dht.storage.message.ResponseFactory2;
 import org.ardverk.dht.storage.message.StatusLine;
 import org.ardverk.dht.storage.sql.DefaultIndex;
 import org.ardverk.io.FileUtils;
@@ -80,7 +81,7 @@ public class IndexDatastore extends AbstractIndexDatastore implements Closeable 
     }
     
     @Override
-    protected Response handlePut(Contact src, Key key, Request request,
+    protected Response2 handlePut(Contact src, Key key, Request request,
             InputStream in) throws IOException {
         
         Context context = request.getContext();
@@ -103,11 +104,11 @@ public class IndexDatastore extends AbstractIndexDatastore implements Closeable 
             writeContent(context, contentFile, dis);
             
             if (!digest(context, Constants.CONTENT_MD5, md5)) {
-                return Response.INTERNAL_SERVER_ERROR;
+                return ResponseFactory2.INTERNAL_SERVER_ERROR;
             }
             
             if (!digest(context, Constants.CONTENT_SHA1, sha1)) {
-                return Response.INTERNAL_SERVER_ERROR;
+                return ResponseFactory2.INTERNAL_SERVER_ERROR;
             }
             
             context.addHeader(Constants.VALUE_ID, 
@@ -122,7 +123,7 @@ public class IndexDatastore extends AbstractIndexDatastore implements Closeable 
             }
             
             success = true;
-            return ResponseFactory.ok();
+            return ResponseFactory2.ok();
             
         } finally {
             if (!success) {
@@ -176,7 +177,7 @@ public class IndexDatastore extends AbstractIndexDatastore implements Closeable 
     }
     
     @Override
-    protected Response handleDelete(Contact src, Key key, Request request,
+    protected Response2 handleDelete(Contact src, Key key, Request request,
             InputStream in) throws IOException {
         
         Map<String, String> query = key.getQueryString();
@@ -188,7 +189,7 @@ public class IndexDatastore extends AbstractIndexDatastore implements Closeable 
         
         Values values = listValues(src, key, query);
         if (values == null) {
-            return ResponseFactory.notFound();
+            return ResponseFactory2.notFound();
         }
         
         if (values.size() == 1) {
@@ -196,16 +197,16 @@ public class IndexDatastore extends AbstractIndexDatastore implements Closeable 
             return delete(src, key, value.getKey());
         }
         
-        return ResponseFactory.list(
+        return ResponseFactory2.list(
                 StatusLine.MULTIPLE_CHOICES, key, values);
     }
     
-    private Response delete(Contact src, Key key, Map<String, String> query) throws IOException {
+    private Response2 delete(Contact src, Key key, Map<String, String> query) throws IOException {
         KUID valueId = getValueId(query);
         return delete(src, key, valueId);
     }
     
-    private Response delete(Contact src, Key key, KUID valueId) throws IOException {
+    private Response2 delete(Contact src, Key key, KUID valueId) throws IOException {
         boolean success = false;
         
         try {
@@ -215,17 +216,17 @@ public class IndexDatastore extends AbstractIndexDatastore implements Closeable 
         }
         
         if (!success) {
-            return ResponseFactory.notFound();
+            return ResponseFactory2.notFound();
         }
         
         File value = mkContentFile(key, valueId, false);
         deleteAll(value);
         
-        return ResponseFactory.ok();
+        return ResponseFactory2.ok();
     }
     
     @Override
-    protected Response handleHead(Contact src, Key key, Request request,
+    protected Response2 handleHead(Contact src, Key key, Request request,
             InputStream in) throws IOException {
         
         Map<String, String> query = key.getQueryString();
@@ -237,7 +238,7 @@ public class IndexDatastore extends AbstractIndexDatastore implements Closeable 
         
         Values values = listValues(src, key, query);
         if (values == null) {
-            return ResponseFactory.notFound();
+            return ResponseFactory2.notFound();
         }
         
         if (values.size() == 1) {
@@ -245,16 +246,16 @@ public class IndexDatastore extends AbstractIndexDatastore implements Closeable 
             return head(src, key, value.getKey());
         }
         
-        return ResponseFactory.list(
+        return ResponseFactory2.list(
                 StatusLine.MULTIPLE_CHOICES, key, values);
     }
 
-    private Response head(Contact src, Key key, Map<String, String> query) throws IOException {
+    private Response2 head(Contact src, Key key, Map<String, String> query) throws IOException {
         KUID valueId = getValueId(query);
         return head(src, key, valueId);
     }
 
-    private Response head(Contact src, Key key, KUID valueId) throws IOException {
+    private Response2 head(Contact src, Key key, KUID valueId) throws IOException {
         Context context = null;
         try {
             context = index.get(key, valueId);
@@ -263,14 +264,14 @@ public class IndexDatastore extends AbstractIndexDatastore implements Closeable 
         }
         
         if (context == null) {
-            return ResponseFactory.notFound();
+            return ResponseFactory2.notFound();
         }
         
-        return new Response(StatusLine.OK, context);
+        return new Response2(StatusLine.OK, context);
     }
     
     @Override
-    protected Response handleGet(Contact src, 
+    protected Response2 handleGet(Contact src, 
             Key key, boolean store) throws IOException {
         
         Map<String, String> query = key.getQueryString();
@@ -292,7 +293,7 @@ public class IndexDatastore extends AbstractIndexDatastore implements Closeable 
             return value(src, key, value.getKey(), value.getValue());
         }
         
-        return ResponseFactory.list(
+        return ResponseFactory2.list(
                 StatusLine.MULTIPLE_CHOICES, key, values);
     }
     
@@ -307,15 +308,15 @@ public class IndexDatastore extends AbstractIndexDatastore implements Closeable 
         }
     }
     
-    private Response list(Contact src, Key key, Map<String, String> query) throws IOException {
+    private Response2 list(Contact src, Key key, Map<String, String> query) throws IOException {
         Values values = listValues(src, key, query);
         if (values != null) {
-            return ResponseFactory.list(StatusLine.OK, key, values);
+            return ResponseFactory2.list(StatusLine.OK, key, values);
         }
         return null;
     }
     
-    private Response value(Contact src, Key key, Map<String, String> query) throws IOException {
+    private Response2 value(Contact src, Key key, Map<String, String> query) throws IOException {
         KUID valueId = getValueId(query);
         
         Context context = null;
@@ -332,14 +333,14 @@ public class IndexDatastore extends AbstractIndexDatastore implements Closeable 
         return null;
     }
     
-    private Response value(Contact src, Key key, KUID valueId, Context context) {
+    private Response2 value(Contact src, Key key, KUID valueId, Context context) {
         File contentFile = mkContentFile(key, valueId, false);
         if (!contentFile.exists()) {
             return null;
         }
         
-        return new Response(StatusLine.OK, context, 
-                new FileValueEntity(contentFile));
+        return new Response2(StatusLine.OK, context, 
+                new FileValue(contentFile));
     }
     
     private static void deleteAll(File... files) {

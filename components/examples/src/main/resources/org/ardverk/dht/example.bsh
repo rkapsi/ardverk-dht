@@ -44,8 +44,8 @@ createDHT(int port) {
 	DHT dht = builder.newDHT();
 	
 	MessageCodec codec = new BencodeMessageCodec();
-	dht.bind(new DatagramTransport(codec, port));
-	//dht.bind(new SocketTransport(codec, port));
+	//dht.bind(new DatagramTransport(codec, port));
+	dht.bind(new SocketTransport(codec, port));
 	//dht.bind(new HybridTransport(codec, port));
 	//dht.bind(new HttpTransport(port));
 	
