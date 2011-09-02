@@ -19,13 +19,13 @@
   	<dependency>
       <groupId>org.ardverk</groupId>
       <artifactId>ardverk-dht-core</artifactId>
-      <version>0.1-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
     
     <dependency>
       <groupId>org.ardverk</groupId>
       <artifactId>ardverk-dht-tools</artifactId>
-      <version>0.1-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
     
     <dependency>
