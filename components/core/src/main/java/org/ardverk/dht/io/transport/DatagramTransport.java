@@ -203,7 +203,8 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
             }
         };
         
-        executor.execute(task);
+        //executor.execute(task);
+        EXECUTOR.execute(task);
     }
     
     @Override
@@ -242,7 +243,8 @@ public class DatagramTransport extends AbstractTransport implements Closeable {
             }
         };
         
-        executor.execute(task);
+        //executor.execute(task);
+        EXECUTOR.execute(task);
     }
     
     protected void uncaughtException(DatagramSocket socket, Throwable t) {
