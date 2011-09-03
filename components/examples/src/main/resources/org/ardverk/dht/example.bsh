@@ -73,7 +73,7 @@ bootstrapAll() {
 	
 	for (DHT dht : dhts) {
 		if (dht != first) {
-			dht.bootstrap(contact, null).get();
+			dht.bootstrap(first.getLocalhost(), null).get();
 		}
 	}
 	
