@@ -70,20 +70,20 @@ createDHTs(int count, int port) {
 // Bootstraps a list of DHTs
 bootstrapAll() {
 	DHT first = dhts.get(0);
-	bootstrap(first, dhts);
+	
+	for (DHT dht : dhts) {
+		if (dht != first) {
+			dht.bootstrap(contact, null).get();
+		}
+	}
 	
 	first.getRouteTable().clear();
 	first.bootstrap(dhts.get(1).getLocalhost(), null).get();
 }
 
-// Bootstraps a list of DHTs
-bootstrap(DHT root, java.util.List dhts) {
-	//SocketAddress foo = new InetSocketAddress("localhost", 12000);
+bootstrapAll(String address, int port) {
 	for (DHT dht : dhts) {
-		if (dht != root) {
-			//dht.bootstrap(foo).get();
-			dht.bootstrap(root.getLocalhost(), null).get();
-		}
+		dht.bootstrap(address, port, null).get();
 	}
 }
 
@@ -194,14 +194,14 @@ quit() {
 print("\nHello, please type init(); and press Enter. For further instructions and examples see 'example.bsh' and www.beanshell.org.\n");
 
 init() {
-	init(true);
+	INITIAL_PORT = 13000;
+	init("localhost", INITIAL_PORT, true);
 }
 
-init(boolean withUI) {
+init(String host, int port, boolean withUI) {
 	INSTANCE_COUNT = 256;
 	//INSTANCE_COUNT = 30;
-	INITIAL_PORT = 13000;
-
+	
 	print("Creating DHTs...");
 	createDHTs(INSTANCE_COUNT, INITIAL_PORT);
 	
@@ -211,7 +211,11 @@ init(boolean withUI) {
 	}
 
 	print("Bootstrapping all DHTs...");
-	bootstrapAll();
+	if (host.equals("localhost")) {
+		bootstrapAll();
+	} else {
+		bootstrapAll(host, port);
+	}
 
 	quicken();
   
