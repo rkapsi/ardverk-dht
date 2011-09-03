@@ -203,7 +203,7 @@ init(String host, int port, boolean withUI) {
 	//INSTANCE_COUNT = 30;
 	
 	print("Creating DHTs...");
-	createDHTs(INSTANCE_COUNT, INITIAL_PORT);
+	createDHTs(INSTANCE_COUNT, port);
 	
 	if (withUI) {
 		print("Creating UI for the first DHT instance...");
