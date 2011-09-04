@@ -137,7 +137,7 @@ public class MessageOutputStream extends BencodingOutputStream {
     public void writeSender(Contact contact) throws IOException {
         writeKUID(contact.getId());
         writeInt(contact.getInstanceId());
-        writeBoolean(contact.isInvisible());
+        writeBoolean(contact.isHidden());
         writeSocketAddress(contact.getRemoteAddress());
     }
     

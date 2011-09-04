@@ -75,7 +75,7 @@ public class Localhost extends AbstractContact implements Bindable<Transport> {
     }
 
     @Override
-    public boolean isInvisible() {
+    public boolean isHidden() {
         return invisible;
     }
 

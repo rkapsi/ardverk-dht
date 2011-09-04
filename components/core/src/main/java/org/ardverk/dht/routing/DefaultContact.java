@@ -25,9 +25,8 @@ import org.ardverk.lang.Precoditions;
 import org.ardverk.lang.TimeStamp;
 import org.ardverk.net.NetworkUtils;
 
-
 /**
- * 
+ * A default implementation of {@link Contact}.
  */
 public class DefaultContact extends AbstractContact {
     
@@ -41,7 +40,7 @@ public class DefaultContact extends AbstractContact {
     
     private final int instanceId;
     
-    private final boolean invisible;
+    private final boolean hidden;
     
     private final SocketAddress socketAddress;
     
@@ -60,18 +59,18 @@ public class DefaultContact extends AbstractContact {
      * Creates a {@link DefaultContact}
      */
     public DefaultContact(Type type, KUID contactId, 
-            int instanceId, boolean invisible, 
+            int instanceId, boolean hidden, 
             SocketAddress address) {
-        this(type, contactId, instanceId, invisible, address, address);
+        this(type, contactId, instanceId, hidden, address, address);
     }
     
     /**
      * Creates a {@link DefaultContact}
      */
     public DefaultContact(Type type, KUID contactId, 
-            int instanceId, boolean invisible, 
+            int instanceId, boolean hidden, 
             SocketAddress socketAddress, SocketAddress contactAddress) {
-        this(type, contactId, instanceId, invisible, 
+        this(type, contactId, instanceId, hidden, 
                 socketAddress, contactAddress, -1L, TimeUnit.MILLISECONDS);
     }
     
@@ -81,7 +80,7 @@ public class DefaultContact extends AbstractContact {
     public DefaultContact(Type type, 
             KUID contactId, 
             int instanceId, 
-            boolean invisible,
+            boolean hidden,
             SocketAddress socketAddress, 
             SocketAddress contactAddress,
             long rtt, TimeUnit unit) {
@@ -96,7 +95,7 @@ public class DefaultContact extends AbstractContact {
         this.timeStamp = creationTime;
         
         this.instanceId = instanceId;
-        this.invisible = invisible;
+        this.hidden = hidden;
         this.socketAddress = Precoditions.notNull(socketAddress, "socketAddress");
         this.contactAddress = Precoditions.notNull(contactAddress, "contactAddress");
         this.remoteAddress = combine(socketAddress, contactAddress);
@@ -118,14 +117,14 @@ public class DefaultContact extends AbstractContact {
         
         if (existing.isBetter(other)) {
             this.instanceId = existing.getInstanceId();
-            this.invisible = existing.isInvisible();
+            this.hidden = existing.isHidden();
             this.socketAddress = existing.getSocketAddress();
             this.contactAddress = existing.getContactAddress();
             this.remoteAddress = existing.getRemoteAddress();
             this.type = existing.getType();
         } else {
             this.instanceId = other.getInstanceId();
-            this.invisible = other.isInvisible();
+            this.hidden = other.isHidden();
             this.socketAddress = other.getSocketAddress();
             this.contactAddress = other.getContactAddress();
             this.remoteAddress = other.getRemoteAddress();
@@ -167,8 +166,8 @@ public class DefaultContact extends AbstractContact {
     }
     
     @Override
-    public boolean isInvisible() {
-        return invisible;
+    public boolean isHidden() {
+        return hidden;
     }
     
     @Override
@@ -193,7 +192,7 @@ public class DefaultContact extends AbstractContact {
     
     @Override
     public Contact merge(Contact other) {
-        if (!equals(other) || other.isInvisible()) {
+        if (!equals(other) || other.isHidden()) {
             throw new IllegalArgumentException("other=" + other);
         }
         
@@ -222,6 +221,6 @@ public class DefaultContact extends AbstractContact {
      */
     private static long pickRTT(Contact existing, Contact other) {
         long otherRTT = other.getRoundTripTimeInMillis();
-        return otherRTT >= 0L ? otherRTT : existing.getRoundTripTimeInMillis();
+        return otherRTT > 0L ? otherRTT : existing.getRoundTripTimeInMillis();
     }
 }

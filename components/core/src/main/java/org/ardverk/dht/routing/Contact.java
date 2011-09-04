@@ -111,7 +111,7 @@ public interface Contact extends Identifier, Longevity,
      * Returns {@code true} if the {@link Contact} is considered invisible
      * and shouldn't be added to the {@link RouteTable}.
      */
-    public boolean isInvisible();
+    public boolean isHidden();
     
     /**
      * Returns the {@link Contact}'s instance ID

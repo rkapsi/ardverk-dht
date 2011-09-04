@@ -152,7 +152,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         }
         
         // Don't add invisible contacts to the RouteTable.
-        if (contact.isInvisible()) {
+        if (contact.isHidden()) {
             return;
         }
         
