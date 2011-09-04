@@ -34,22 +34,22 @@ public interface RouteTable extends Bindable<ContactPinger>, IoErrorCallback {
     /**
      * Returns the localhost {@link Localhost}.
      */
-    public Localhost getLocalhost();
+    public Contact2 getLocalhost();
     
     /**
      * Adds the given {@link Contact} to the {@link RouteTable}.
      */
-    public void add(Contact contact);
+    public void add(Contact2 contact);
     
     /**
      * Returns a {@link Contact} for the given {@link KUID}.
      */
-    public Contact get(KUID contactId);
+    public Contact2 get(KUID contactId);
     
     /**
      * See {@link #select(KUID, int)}
      */
-    public Contact[] select(KUID contactId);
+    public Contact2[] select(KUID contactId);
     
     /**
      * Returns up to <tt>count</tt> number of {@link Contact}s that are
@@ -98,6 +98,6 @@ public interface RouteTable extends Bindable<ContactPinger>, IoErrorCallback {
         /**
          * Sends a ping to the given {@link Contact}.
          */
-        public DHTFuture<PingEntity> ping(Contact contact, PingConfig config);
+        public DHTFuture<PingEntity> ping(Contact2 contact, PingConfig config);
     }
 }

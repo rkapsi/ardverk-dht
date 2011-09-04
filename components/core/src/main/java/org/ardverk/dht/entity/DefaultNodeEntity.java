@@ -19,7 +19,7 @@ package org.ardverk.dht.entity;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.dht.io.Outcome;
-import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.Contact2;
 
 /**
  * A default implementation of {@link NodeEntity}.
@@ -36,12 +36,12 @@ public class DefaultNodeEntity extends AbstractLookupEntity implements NodeEntit
     }
     
     @Override
-    public Contact[] getClosest() {
+    public Contact2[] getClosest() {
         return outcome.getClosest();
     }
     
     @Override
-    public Contact[] getContacts() {
+    public Contact2[] getContacts() {
         return outcome.getContacts();
     }
 

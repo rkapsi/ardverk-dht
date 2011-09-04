@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.dht.concurrent.ExecutorKey;
 import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.Contact2;
 
 
 public interface Config {
@@ -66,5 +67,5 @@ public interface Config {
      * Returns an <tt>adaptive</tt> timeout for the given {@link Contact}
      * which is ideally less than the given default timeout.
      */
-    public long getAdaptiveTimeout(Contact dst, long defaultTimeout, TimeUnit unit);
+    public long getAdaptiveTimeout(Contact2 dst, long defaultTimeout, TimeUnit unit);
 }

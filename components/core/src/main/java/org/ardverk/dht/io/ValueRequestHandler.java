@@ -23,7 +23,7 @@ import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.message.RequestMessage;
 import org.ardverk.dht.message.ResponseMessage;
 import org.ardverk.dht.message.ValueRequest;
-import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.Contact2;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.Value;
@@ -54,7 +54,7 @@ public class ValueRequestHandler extends AbstractRequestHandler {
     public ResponseMessage handleRequest(RequestMessage message) throws IOException {
         ValueRequest request = (ValueRequest)message;
         
-        Contact src = request.getContact();
+        Contact2 src = request.getContact();
         Key key = request.getKey();
         Value value = datastore.get(src, key);
         
@@ -64,7 +64,7 @@ public class ValueRequestHandler extends AbstractRequestHandler {
         if (value != null) {
             response = factory.createValueResponse(request, value);
         } else {
-            Contact[] contacts = routeTable.select(key.getId());
+            Contact2[] contacts = routeTable.select(key.getId());
             response = factory.createNodeResponse(request, contacts);
         }
         

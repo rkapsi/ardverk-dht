@@ -19,7 +19,7 @@ package org.ardverk.dht.message;
 import java.net.SocketAddress;
 
 import org.ardverk.dht.KUID;
-import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.Contact2;
 import org.ardverk.dht.rsrc.Key;
 
 
@@ -28,7 +28,7 @@ public class DefaultValueRequest extends AbstractLookupRequest
     
     private final Key key;
     
-    public DefaultValueRequest(MessageId messageId, Contact contact, 
+    public DefaultValueRequest(MessageId messageId, Contact2 contact, 
             SocketAddress address, Key key) {
         super(messageId, contact, address);
         this.key = key;

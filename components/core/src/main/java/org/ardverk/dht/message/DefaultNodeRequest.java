@@ -19,7 +19,7 @@ package org.ardverk.dht.message;
 import java.net.SocketAddress;
 
 import org.ardverk.dht.KUID;
-import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.Contact2;
 
 
 public class DefaultNodeRequest extends AbstractLookupRequest 
@@ -27,7 +27,7 @@ public class DefaultNodeRequest extends AbstractLookupRequest
     
     private final KUID lookupId;
     
-    public DefaultNodeRequest(MessageId messageId, Contact contact, 
+    public DefaultNodeRequest(MessageId messageId, Contact2 contact, 
             SocketAddress address, KUID lookupId) {
         super(messageId, contact, address);
         

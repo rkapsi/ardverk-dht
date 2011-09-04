@@ -32,6 +32,7 @@ import org.ardverk.dht.message.StoreResponse;
 import org.ardverk.dht.message.ValueRequest;
 import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.Contact2;
 
 
 /**
@@ -93,7 +94,7 @@ public class RequestEntity implements Identifier {
             return (response instanceof PingResponse);
         }
         
-        Contact contact = response.getContact();
+        Contact2 contact = response.getContact();
         KUID otherId = contact.getId();
         
         return contactId.equals(otherId);

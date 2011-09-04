@@ -32,7 +32,7 @@ import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.message.ResponseMessage;
 import org.ardverk.dht.message.StoreRequest;
 import org.ardverk.dht.message.StoreResponse;
-import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.Contact2;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.Value;
 import org.ardverk.lang.TimeStamp;
@@ -55,9 +55,9 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
 
     private final TimeStamp creationTime = TimeStamp.now();
     
-    private final Contact[] contacts;
+    private final Contact2[] contacts;
     
-    private final Iterator<Contact> it;
+    private final Iterator<Contact2> it;
     
     private final Key key;
     
@@ -69,7 +69,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     
     public StoreResponseHandler(
             MessageDispatcher messageDispatcher, 
-            Contact[] contacts, int k,
+            Contact2[] contacts, int k,
             Key key, Value value, 
             StoreConfig config) {
         super(messageDispatcher);
@@ -107,7 +107,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
                     break;
                 }
                 
-                Contact contact = it.next();
+                Contact2 contact = it.next();
                 store(contact);
                 
                 counter.increment();
@@ -139,7 +139,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
         }
     }
     
-    private synchronized void store(Contact dst) throws IOException {
+    private synchronized void store(Contact2 dst) throws IOException {
         MessageFactory factory = messageDispatcher.getMessageFactory();
         StoreRequest request = factory.createStoreRequest(dst, key, value);
         

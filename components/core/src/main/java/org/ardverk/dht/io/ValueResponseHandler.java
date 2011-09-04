@@ -31,7 +31,7 @@ import org.ardverk.dht.message.NodeResponse;
 import org.ardverk.dht.message.ResponseMessage;
 import org.ardverk.dht.message.ValueRequest;
 import org.ardverk.dht.message.ValueResponse;
-import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.Contact2;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.rsrc.Key;
 
@@ -47,7 +47,7 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     private final Key key;
     
     public ValueResponseHandler(MessageDispatcher messageDispatcher,
-            Contact[] contacts, RouteTable routeTable, 
+            Contact2[] contacts, RouteTable routeTable, 
             Key key, GetConfig config) {
         super(messageDispatcher, contacts, routeTable, 
                 key.getId(), config);
@@ -71,8 +71,8 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     private synchronized void processNodeResponse(NodeResponse response, 
             long time, TimeUnit unit) throws IOException {
         
-        Contact src = response.getContact();
-        Contact[] contacts = response.getContacts();
+        Contact2 src = response.getContact();
+        Contact2[] contacts = response.getContacts();
         processContacts(src, contacts, time, unit);
     }
     
@@ -89,7 +89,7 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     }
     
     @Override
-    protected void lookup(Contact dst, KUID lookupId, 
+    protected void lookup(Contact2 dst, KUID lookupId, 
             long timeout, TimeUnit unit) throws IOException {
         
         assert (lookupId.equals(key.getId()));

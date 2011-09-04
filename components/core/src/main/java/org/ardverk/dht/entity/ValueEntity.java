@@ -19,6 +19,7 @@ package org.ardverk.dht.entity;
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.Contact2;
 import org.ardverk.dht.rsrc.Value;
 
 /**
@@ -31,7 +32,7 @@ public interface ValueEntity extends LookupEntity {
      * 
      * @see #getValueResponse()
      */
-    public Contact getSender();
+    public Contact2 getSender();
     
     /**
      * Returns the first {@link Value}.

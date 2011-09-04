@@ -19,7 +19,7 @@ package org.ardverk.dht.config;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.dht.concurrent.ExecutorKey;
-import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.Contact2;
 
 
 public abstract class AbstractConfig implements Config {
@@ -54,7 +54,7 @@ public abstract class AbstractConfig implements Config {
     }
     
     @Override
-    public long getAdaptiveTimeout(Contact dst, 
+    public long getAdaptiveTimeout(Contact2 dst, 
             long defaultTimeout, TimeUnit unit) {
         double multiplier = getRoundTripTimeMultiplier();
         return ConfigUtils.getAdaptiveTimeout(dst, 

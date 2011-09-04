@@ -18,13 +18,13 @@ package org.ardverk.dht.message;
 
 import java.net.SocketAddress;
 
-import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.Contact2;
 import org.ardverk.dht.rsrc.Value;
 
 public class DefaultStoreResponse extends AbstractResponseMessage 
         implements StoreResponse {
     
-    public DefaultStoreResponse(MessageId messageId, Contact contact, 
+    public DefaultStoreResponse(MessageId messageId, Contact2 contact, 
             SocketAddress address, Value value) {
         super(messageId, contact, address, value);
     }

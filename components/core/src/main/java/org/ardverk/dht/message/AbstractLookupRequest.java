@@ -18,7 +18,7 @@ package org.ardverk.dht.message;
 
 import java.net.SocketAddress;
 
-import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.Contact2;
 
 /**
  * An abstract implementation of {@link LookupRequest}.
@@ -26,7 +26,7 @@ import org.ardverk.dht.routing.Contact;
 abstract class AbstractLookupRequest extends AbstractRequestMessage 
         implements LookupRequest {
     
-    public AbstractLookupRequest(MessageId messageId, Contact contact, 
+    public AbstractLookupRequest(MessageId messageId, Contact2 contact, 
             SocketAddress address) {
         super(messageId, contact, address);
     }

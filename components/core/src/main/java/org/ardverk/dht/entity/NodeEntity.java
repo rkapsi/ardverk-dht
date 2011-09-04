@@ -18,6 +18,7 @@ package org.ardverk.dht.entity;
 
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.Contact2;
 
 /**
  * The result of a {@link MessageType#FIND_NODE} operation.
@@ -32,10 +33,10 @@ public interface NodeEntity extends LookupEntity {
     /**
      * Returns the k-closest {@link Contact}s that were found.
      */
-    public Contact[] getClosest();
+    public Contact2[] getClosest();
     
     /**
      * Returns all {@link Contact}s that were found.
      */
-    public Contact[] getContacts();
+    public Contact2[] getContacts();
 }

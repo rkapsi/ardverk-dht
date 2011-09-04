@@ -24,7 +24,7 @@ import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.message.NodeRequest;
 import org.ardverk.dht.message.RequestMessage;
 import org.ardverk.dht.message.ResponseMessage;
-import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.Contact2;
 import org.ardverk.dht.routing.RouteTable;
 
 
@@ -78,7 +78,7 @@ public class NodeRequestHandler extends AbstractRequestHandler {
             contacts = kContacts;
         }*/
         
-        Contact[] contacts = routeTable.select(lookupId);
+        Contact2[] contacts = routeTable.select(lookupId);
         
         MessageFactory factory = messageDispatcher.getMessageFactory();
         return factory.createNodeResponse(request, contacts);

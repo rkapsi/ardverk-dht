@@ -18,14 +18,14 @@ package org.ardverk.dht.message;
 
 import java.net.SocketAddress;
 
-import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.Contact2;
 
 
 public class DefaultPingResponse extends AbstractResponseMessage 
         implements PingResponse {
 
     public DefaultPingResponse(MessageId messageId, 
-            Contact contact, SocketAddress address) {
+            Contact2 contact, SocketAddress address) {
         super(messageId, contact, address);
     }
 }

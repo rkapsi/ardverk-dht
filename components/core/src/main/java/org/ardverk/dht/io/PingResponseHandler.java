@@ -31,6 +31,7 @@ import org.ardverk.dht.message.PingRequest;
 import org.ardverk.dht.message.PingResponse;
 import org.ardverk.dht.message.ResponseMessage;
 import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.Contact2;
 
 
 /**
@@ -51,7 +52,7 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
     }
     
     public PingResponseHandler(MessageDispatcher messageDispatcher, 
-            Contact contact, PingConfig config) {
+            Contact2 contact, PingConfig config) {
         super(messageDispatcher);
         
         sender = new ContactPingSender(contact);
@@ -116,9 +117,9 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
      */
     private class ContactPingSender implements PingSender {
         
-        private final Contact contact;
+        private final Contact2 contact;
         
-        public ContactPingSender(Contact contact) {
+        public ContactPingSender(Contact2 contact) {
             this.contact = contact;
         }
         

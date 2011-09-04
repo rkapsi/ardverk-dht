@@ -19,6 +19,7 @@ package org.ardverk.dht.entity;
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.message.PingResponse;
 import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.Contact2;
 
 /**
  * The result of a {@link MessageType#PING} operation.
@@ -28,7 +29,7 @@ public interface PingEntity extends Entity {
     /**
      * Returns the remote {@link Contact}
      */
-    public Contact getContact();
+    public Contact2 getContact();
     
     /**
      * Returns the {@link PingResponse}.

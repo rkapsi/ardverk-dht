@@ -19,7 +19,7 @@ package org.ardverk.dht.entity;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.dht.message.StoreResponse;
-import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.Contact2;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.Value;
 
@@ -28,7 +28,7 @@ import org.ardverk.dht.rsrc.Value;
  */
 public class DefaultStoreEntity extends AbstractEntity implements StoreEntity {
 
-    private final Contact[] contacts;
+    private final Contact2[] contacts;
     
     private final Key key;
     
@@ -36,7 +36,7 @@ public class DefaultStoreEntity extends AbstractEntity implements StoreEntity {
     
     private final StoreResponse[] responses;
     
-    public DefaultStoreEntity(Contact[] contacts, Key key, 
+    public DefaultStoreEntity(Contact2[] contacts, Key key, 
             Value value, StoreResponse[] responses, 
             long time, TimeUnit unit) {
         super(time, unit);
@@ -48,7 +48,7 @@ public class DefaultStoreEntity extends AbstractEntity implements StoreEntity {
     }
     
     @Override
-    public Contact[] getContacts() {
+    public Contact2[] getContacts() {
         return contacts;
     }
 
@@ -63,8 +63,8 @@ public class DefaultStoreEntity extends AbstractEntity implements StoreEntity {
     }
     
     @Override
-    public Contact[] getStoreContacts() {
-        Contact[] contacts = new Contact[responses.length];
+    public Contact2[] getStoreContacts() {
+        Contact2[] contacts = new Contact2[responses.length];
         for (int i = 0; i < responses.length; i++) {
             contacts[i] = responses[i].getContact();
         }

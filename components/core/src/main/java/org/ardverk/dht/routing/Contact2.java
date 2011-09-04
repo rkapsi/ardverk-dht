@@ -10,7 +10,7 @@ import org.ardverk.dht.KUID;
 import org.ardverk.dht.lang.Identifier;
 import org.ardverk.lang.TimeStamp;
 
-public class Contact2 implements Identifier, Longevity, 
+public class Contact2 implements Identifier, Longevity, RoundTripTime,
         Comparable<Contact2>, Serializable {
     
     private static final long serialVersionUID = 3215258031597639857L;
@@ -64,7 +64,7 @@ public class Contact2 implements Identifier, Longevity,
     public static Builder localhost(KUID contactId) {
         return newContact(Type.AUTHORITATIVE, contactId);
     }
-
+    
     public static Builder newContact(Type type, KUID contactId) {
         TimeStamp now = TimeStamp.now();
         return new Builder(type, contactId, now, now);
@@ -84,9 +84,9 @@ public class Contact2 implements Identifier, Longevity,
     
     protected final SocketAddress contactAddress;
     
-    protected final Duration rtt;
-    
     protected final boolean hidden;
+    
+    protected volatile Duration rtt;
     
     public Contact2(Type type, 
             KUID contactId, 
@@ -141,14 +141,21 @@ public class Contact2 implements Identifier, Longevity,
         return timeStamp;
     }
     
+    @Override
     public long getRoundTripTime(TimeUnit unit) {
         return rtt.getTime(unit);
     }
     
+    @Override
     public long getRoundTripTimeInMillis() {
         return rtt.getTimeInMillis();
     }
     
+    @Override
+    public void setRoundTripTime(long rtt, TimeUnit unit) {
+        this.rtt = new Duration(rtt, unit);
+    }
+
     /**
      * Returns the {@link Contact2}'s address as reported by 
      * the {@link Socket}.
@@ -383,6 +390,12 @@ public class Contact2 implements Identifier, Longevity,
         
         public Builder setInstanceId(int instanceId) {
             this.instanceId = instanceId;
+            return this;
+        }
+        
+        public Builder setAddress(SocketAddress address) {
+            this.socketAddress = address;
+            this.contactAddress = address;
             return this;
         }
         

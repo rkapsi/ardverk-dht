@@ -18,7 +18,7 @@ package org.ardverk.dht.message;
 
 import java.net.SocketAddress;
 
-import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.Contact2;
 import org.ardverk.dht.rsrc.Value;
 
 /**
@@ -28,11 +28,11 @@ abstract class AbstractLookupResponse extends AbstractResponseMessage
         implements LookupResponse {
     
     public AbstractLookupResponse(MessageId messageId, 
-            Contact contact, SocketAddress address) {
+            Contact2 contact, SocketAddress address) {
         super(messageId, contact, address);
     }
 
-    public AbstractLookupResponse(MessageId messageId, Contact contact,
+    public AbstractLookupResponse(MessageId messageId, Contact2 contact,
             SocketAddress address, Value value) {
         super(messageId, contact, address, value);
     }

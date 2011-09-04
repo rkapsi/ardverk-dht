@@ -17,7 +17,7 @@
 package org.ardverk.dht.storage;
 
 import org.ardverk.dht.DHT;
-import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.Contact2;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.Value;
 import org.ardverk.lang.Bindable;
@@ -27,7 +27,7 @@ import org.ardverk.lang.Bindable;
  */
 public interface Datastore extends Bindable<DHT> {
 
-    public Value store(Contact src, Key key, Value value);
+    public Value store(Contact2 src, Key key, Value value);
     
-    public Value get(Contact src, Key key);
+    public Value get(Contact2 src, Key key);
 }

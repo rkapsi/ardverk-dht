@@ -18,6 +18,7 @@ package org.ardverk.dht.message;
 
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.Contact2;
 
 /**
  * A {@link MessageType#FIND_NODE} response.
@@ -27,5 +28,5 @@ public interface NodeResponse extends LookupResponse {
     /**
      * Returns the {@link Contact}s that were closest to a lookup {@link KUID}.
      */
-    public Contact[] getContacts();
+    public Contact2[] getContacts();
 }

@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.dht.lang.Identifier;
 import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.Contact2;
 
 
 /**
@@ -30,12 +31,12 @@ public abstract class Outcome implements Identifier {
     /**
      * Returns the k-closest {@link Contact}s that have been found.
      */
-    public abstract Contact[] getClosest();
+    public abstract Contact2[] getClosest();
     
     /**
      * Returns all {@link Contact}s that have been found.
      */
-    public abstract Contact[] getContacts();
+    public abstract Contact2[] getContacts();
     
     /**
      * Returns the number of hops the lookup has taken.

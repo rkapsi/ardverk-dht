@@ -18,23 +18,23 @@ package org.ardverk.dht.message;
 
 import java.net.SocketAddress;
 
-import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.Contact2;
 
 
 public class DefaultNodeResponse extends AbstractLookupResponse 
         implements NodeResponse {
 
-    private final Contact[] contacts;
+    private final Contact2[] contacts;
     
-    public DefaultNodeResponse(MessageId messageId, Contact contact, 
-            SocketAddress address, Contact[] contacts) {
+    public DefaultNodeResponse(MessageId messageId, Contact2 contact, 
+            SocketAddress address, Contact2[] contacts) {
         super(messageId, contact, address);
         
         this.contacts = contacts;
     }
 
     @Override
-    public Contact[] getContacts() {
+    public Contact2[] getContacts() {
         return contacts;
     }
 }

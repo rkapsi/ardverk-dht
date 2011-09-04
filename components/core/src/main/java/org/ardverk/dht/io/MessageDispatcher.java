@@ -43,6 +43,7 @@ import org.ardverk.dht.message.MessageId;
 import org.ardverk.dht.message.RequestMessage;
 import org.ardverk.dht.message.ResponseMessage;
 import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.Contact2;
 import org.ardverk.io.IoUtils;
 import org.ardverk.lang.Bindable;
 import org.ardverk.lang.BindableUtils;
@@ -569,7 +570,7 @@ public abstract class MessageDispatcher
                 return false;
             }
             
-            Contact contact = response.getContact();
+            Contact2 contact = response.getContact();
             if (!factory.isFor(messageId, contact.getRemoteAddress())) {
                 if (LOG.isErrorEnabled()) {
                     LOG.error("Wrong MessageId signature: " + response);

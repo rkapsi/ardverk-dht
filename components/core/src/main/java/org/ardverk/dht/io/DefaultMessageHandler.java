@@ -25,6 +25,8 @@ import org.ardverk.dht.message.Message;
 import org.ardverk.dht.message.RequestMessage;
 import org.ardverk.dht.message.ResponseMessage;
 import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.Contact2;
+import org.ardverk.dht.routing.Contact2.Builder;
 import org.ardverk.dht.routing.Localhost;
 import org.ardverk.dht.routing.RoundTripTime;
 import org.ardverk.dht.routing.RouteTable;
@@ -44,7 +46,7 @@ public class DefaultMessageHandler implements MessageCallback {
     }
     
     public void handleRequest(RequestMessage request) throws IOException {
-        Contact src = request.getContact();
+        Contact2 src = request.getContact();
         routeTable.add(src);
     }
     
@@ -52,7 +54,7 @@ public class DefaultMessageHandler implements MessageCallback {
     public boolean handleResponse(RequestEntity entity, 
             ResponseMessage response, long time, TimeUnit unit) throws IOException {
         
-        Contact src = response.getContact();
+        Contact2 src = response.getContact();
         
         if (src instanceof RoundTripTime) {
             ((RoundTripTime)src).setRoundTripTime(time, unit);
@@ -67,7 +69,7 @@ public class DefaultMessageHandler implements MessageCallback {
     }
     
     public void handleLateResponse(ResponseMessage response) throws IOException {
-        Contact src = response.getContact();
+        Contact2 src = response.getContact();
         routeTable.add(src);
     }
     
@@ -92,11 +94,13 @@ public class DefaultMessageHandler implements MessageCallback {
      */
     private void updateContactAddress(SocketAddress address) {
         if (address != null) {
-            Localhost localhost = routeTable.getLocalhost();
-            SocketAddress current = localhost.getContactAddress();
+            Contact2 localhost = routeTable.getLocalhost();
+            SocketAddress current = localhost.getSocketAddress();
             
             if (current == null || !current.equals(address)) {
-                localhost.setContactAddress(address);
+                Builder builder = localhost.newBuilder()
+                        .setSocketAddress(address);
+                routeTable.add(builder.build());
             }
         }
     }

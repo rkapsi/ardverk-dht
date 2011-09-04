@@ -37,7 +37,7 @@ import org.ardverk.dht.message.StoreRequest;
 import org.ardverk.dht.message.StoreResponse;
 import org.ardverk.dht.message.ValueRequest;
 import org.ardverk.dht.message.ValueResponse;
-import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.Contact2;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.NoValue;
 import org.ardverk.dht.rsrc.Value;
@@ -65,8 +65,8 @@ public class MessageOutputStream extends BencodingOutputStream {
             writeKUID((KUID)obj);
         } else if (obj instanceof MessageId) {
             writeMessageId((MessageId)obj);
-        } else if (obj instanceof Contact) {
-            writeContact((Contact)obj);
+        } else if (obj instanceof Contact2) {
+            writeContact((Contact2)obj);
         } else if (obj instanceof Message) {
             writeMessage((Message)obj);
         } else if (obj instanceof Key) {
@@ -134,19 +134,19 @@ public class MessageOutputStream extends BencodingOutputStream {
         writeBytes(messageId.getBytes());
     }
     
-    public void writeSender(Contact contact) throws IOException {
+    public void writeSender(Contact2 contact) throws IOException {
         writeKUID(contact.getId());
         writeInt(contact.getInstanceId());
-        writeBoolean(contact.isInvisible());
+        writeBoolean(contact.isHidden());
         writeSocketAddress(contact.getRemoteAddress());
     }
     
-    public void writeContact(Contact contact) throws IOException {
+    public void writeContact(Contact2 contact) throws IOException {
         writeKUID(contact.getId());
         writeSocketAddress(contact.getRemoteAddress());
     }
     
-    public void writeContacts(Contact[] contacts) throws IOException {
+    public void writeContacts(Contact2[] contacts) throws IOException {
         writeArray(contacts);
     }
     
@@ -213,10 +213,10 @@ public class MessageOutputStream extends BencodingOutputStream {
     }
     
     private void writeNodeResponse(NodeResponse message) throws IOException {
-        Contact[] contacts = message.getContacts();
+        Contact2[] contacts = message.getContacts();
         
         writeInt(contacts.length);
-        for (Contact contact : contacts) {
+        for (Contact2 contact : contacts) {
             writeContact(contact);
         }
     }

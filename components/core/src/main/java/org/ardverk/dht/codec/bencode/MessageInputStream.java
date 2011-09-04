@@ -16,6 +16,8 @@
 
 package org.ardverk.dht.codec.bencode;
 
+import static org.ardverk.dht.routing.Contact2.newContact;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -48,8 +50,7 @@ import org.ardverk.dht.message.StoreRequest;
 import org.ardverk.dht.message.StoreResponse;
 import org.ardverk.dht.message.ValueRequest;
 import org.ardverk.dht.message.ValueResponse;
-import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.routing.DefaultContact;
+import org.ardverk.dht.routing.Contact2;
 import org.ardverk.dht.rsrc.ByteArrayValue;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.KeyFactory;
@@ -155,25 +156,29 @@ public class MessageInputStream extends BencodingInputStream {
         return new Vector(timeStamp, value);
     }
     
-    public Contact readSender(Contact.Type type, SocketAddress src) throws IOException {
+    public Contact2 readSender(Contact2.Type type, SocketAddress src) throws IOException {
         KUID contactId = readKUID();
         int instanceId = readInt();
-        boolean invisible = readBoolean();
+        boolean hidden = readBoolean();
         SocketAddress address = readSocketAddress();
         
-        return new DefaultContact(type, contactId, 
-                instanceId, invisible, src, address);
+        return newContact(type, contactId)
+                    .setInstanceId(instanceId)
+                    .setHidden(hidden)
+                    .setSocketAddress(src)
+                    .setContactAddress(address).build();
     }
     
-    public Contact readContact() throws IOException {
+    public Contact2 readContact() throws IOException {
         KUID contactId = readKUID();
         SocketAddress address = readSocketAddress();
         
-        return new DefaultContact(contactId, address);
+        return newContact(Contact2.Type.UNKNOWN, contactId)
+                    .setAddress(address).build();
     }
     
-    public Contact[] readContacts() throws IOException {
-        Contact[] contacts = new Contact[readInt()];
+    public Contact2[] readContacts() throws IOException {
+        Contact2[] contacts = new Contact2[readInt()];
         for (int i = 0; i < contacts.length; i++) {
             contacts[i] = readContact();
         }
@@ -201,8 +206,8 @@ public class MessageInputStream extends BencodingInputStream {
         
         OpCode opcode = readEnum(OpCode.class);
         MessageId messageId = readMessageId();
-        Contact contact = readSender(opcode.isRequest() 
-                ? Contact.Type.UNSOLICITED : Contact.Type.SOLICITED, src);
+        Contact2 contact = readSender(opcode.isRequest() 
+                ? Contact2.Type.UNSOLICITED : Contact2.Type.SOLICITED, src);
         SocketAddress address = readSocketAddress();
         
         switch (opcode) {
@@ -228,44 +233,44 @@ public class MessageInputStream extends BencodingInputStream {
     }
     
     private PingRequest readPingRequest(MessageId messageId, 
-            Contact contact, SocketAddress address) throws IOException {
+            Contact2 contact, SocketAddress address) throws IOException {
         return new DefaultPingRequest(messageId, contact, address);
     }
     
     private PingResponse readPingResponse(MessageId messageId, 
-            Contact contact, SocketAddress address) throws IOException {
+            Contact2 contact, SocketAddress address) throws IOException {
         return new DefaultPingResponse(messageId, contact, address);
     }
     
     private NodeRequest readNodeRequest(MessageId messageId, 
-            Contact contact, SocketAddress address) throws IOException {
+            Contact2 contact, SocketAddress address) throws IOException {
         KUID lookupId = readKUID();
         return new DefaultNodeRequest(messageId, contact, address, lookupId);
     }
     
     private NodeResponse readNodeResponse(MessageId messageId, 
-            Contact contact, SocketAddress address) throws IOException {
+            Contact2 contact, SocketAddress address) throws IOException {
         
-        Contact[] contacts = readContacts();
+        Contact2[] contacts = readContacts();
         return new DefaultNodeResponse(messageId, contact, address, contacts);
     }
     
     private ValueRequest readValueRequest(MessageId messageId, 
-            Contact contact, SocketAddress address) throws IOException {
+            Contact2 contact, SocketAddress address) throws IOException {
         
         Key key = readKey();
         return new DefaultValueRequest(messageId, contact, address, key);
     }
     
     private ValueResponse readValueResponse(MessageId messageId, 
-            Contact contact, SocketAddress address) throws IOException {
+            Contact2 contact, SocketAddress address) throws IOException {
         
         Value value = readValue();
         return new DefaultValueResponse(messageId, contact, address, value);
     }
     
     private StoreRequest readStoreRequest(MessageId messageId, 
-            Contact contact, SocketAddress address) throws IOException {
+            Contact2 contact, SocketAddress address) throws IOException {
         
         Key key = readKey();
         Value value = readValue();
@@ -274,7 +279,7 @@ public class MessageInputStream extends BencodingInputStream {
     }
     
     private StoreResponse readStoreResponse(MessageId messageId, 
-            Contact contact, SocketAddress address) throws IOException {
+            Contact2 contact, SocketAddress address) throws IOException {
         Value value = readValue();
         return new DefaultStoreResponse(messageId, contact, address, value);
     }

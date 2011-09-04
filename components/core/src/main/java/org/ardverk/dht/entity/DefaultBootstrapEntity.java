@@ -18,7 +18,7 @@ package org.ardverk.dht.entity;
 
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.Contact2;
 
 /**
  * A default implementation of {@link BootstrapEntity}.
@@ -53,9 +53,9 @@ public class DefaultBootstrapEntity extends AbstractEntity
     public String toString() {
         StringBuilder buffer = new StringBuilder();
         buffer.append("PONG: ").append(pingEntity.getContact()).append("\n");
-        Contact[] contacts = nodeEntity.getContacts();
+        Contact2[] contacts = nodeEntity.getContacts();
         buffer.append("CONTACTS ").append(contacts.length).append("\n");
-        for (Contact contact : contacts) {
+        for (Contact2 contact : contacts) {
             buffer.append(" ").append(contact);
         }
         return buffer.toString();

@@ -29,6 +29,7 @@ import org.ardverk.dht.entity.Entity;
 import org.ardverk.dht.message.RequestMessage;
 import org.ardverk.dht.message.ResponseMessage;
 import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.Contact2;
 import org.ardverk.lang.Precoditions;
 import org.ardverk.lang.TimeStamp;
 
@@ -147,7 +148,7 @@ abstract class AbstractResponseHandler<V extends Entity>
     /**
      * Sends a {@link RequestMessage} to the given {@link Contact}.
      */
-    public void send(Contact dst, RequestMessage message, 
+    public void send(Contact2 dst, RequestMessage message, 
             long timeout, TimeUnit unit) throws IOException {
         
         KUID contactId = dst.getId();

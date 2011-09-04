@@ -19,7 +19,7 @@ package org.ardverk.dht.message;
 import java.net.SocketAddress;
 
 import org.ardverk.dht.KUID;
-import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.Contact2;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.Value;
 
@@ -48,7 +48,7 @@ public interface MessageFactory {
     /**
      * Creates and returns a {@link PingRequest}.
      */
-    public PingRequest createPingRequest(Contact dst);
+    public PingRequest createPingRequest(Contact2 dst);
     
     /**
      * Creates and returns a {@link PingResponse}.
@@ -58,17 +58,17 @@ public interface MessageFactory {
     /**
      * Creates and returns a {@link NodeRequest}.
      */
-    public NodeRequest createNodeRequest(Contact dst, KUID key);
+    public NodeRequest createNodeRequest(Contact2 dst, KUID key);
     
     /**
      * Creates and returns a {@link NodeResponse}.
      */
-    public NodeResponse createNodeResponse(LookupRequest request, Contact[] contacts);
+    public NodeResponse createNodeResponse(LookupRequest request, Contact2[] contacts);
     
     /**
      * Creates and returns a {@link ValueRequest}.
      */
-    public ValueRequest createValueRequest(Contact dst, Key key);
+    public ValueRequest createValueRequest(Contact2 dst, Key key);
     
     /**
      * Creates and returns a {@link ValueResponse}.
@@ -78,7 +78,7 @@ public interface MessageFactory {
     /**
      * Creates and returns a {@link StoreRequest}.
      */
-    public StoreRequest createStoreRequest(Contact dst, 
+    public StoreRequest createStoreRequest(Contact2 dst, 
             Key key, Value value);
     
     /**

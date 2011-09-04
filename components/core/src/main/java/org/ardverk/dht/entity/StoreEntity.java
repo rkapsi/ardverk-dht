@@ -19,6 +19,7 @@ package org.ardverk.dht.entity;
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.message.StoreResponse;
 import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.Contact2;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.Value;
 
@@ -30,7 +31,7 @@ public interface StoreEntity extends Entity {
     /**
      * Returns all {@link Contact}s along the store path.
      */
-    public Contact[] getContacts();
+    public Contact2[] getContacts();
     
     /**
      * Returns the {@link Key} that was stored.
@@ -58,5 +59,5 @@ public interface StoreEntity extends Entity {
      * 
      * @see #getStoreResponses()
      */
-    public Contact[] getStoreContacts();
+    public Contact2[] getStoreContacts();
 }

@@ -18,7 +18,7 @@ package org.ardverk.dht.entity;
 
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.message.StoreResponse;
-import org.ardverk.dht.routing.Contact;
+import org.ardverk.dht.routing.Contact2;
 
 /**
  * The result of a {@link MessageType#FIND_NODE} and 
@@ -47,5 +47,5 @@ public interface PutEntity extends LookupEntity {
     /**
      * @see StoreEntity#getStoreContacts()
      */
-    public Contact[] getStoreContacts();
+    public Contact2[] getStoreContacts();
 }
