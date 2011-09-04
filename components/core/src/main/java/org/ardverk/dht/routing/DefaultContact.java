@@ -96,9 +96,9 @@ public class DefaultContact extends AbstractContact {
         
         this.instanceId = instanceId;
         this.hidden = hidden;
-        this.socketAddress = Precoditions.notNull(socketAddress, "socketAddress");
-        this.contactAddress = Precoditions.notNull(contactAddress, "contactAddress");
-        this.remoteAddress = combine(socketAddress, contactAddress);
+        this.socketAddress = socketAddress;
+        this.contactAddress = contactAddress;
+        this.remoteAddress = fixAddress(socketAddress, contactAddress);
     }
     
     /**
@@ -203,17 +203,14 @@ public class DefaultContact extends AbstractContact {
      * Combines the socket addresses {@link InetAddress} and the
      * contact addresses port number.
      */
-    private static SocketAddress combine(SocketAddress socketAddress, 
+    private static SocketAddress fixAddress(SocketAddress socketAddress, 
             SocketAddress contactAddress) {
         
-        if (NetworkUtils.isAnyLocalAddress(socketAddress)) {
-            if (NetworkUtils.isAnyLocalAddress(contactAddress)) {
-                return NetworkUtils.createUnresolved("localhost", contactAddress);
-            }
-            return contactAddress;
+        if (NetworkUtils.isAnyLocalAddress(contactAddress)) {
+            return NetworkUtils.create(socketAddress, contactAddress);
         }
         
-        return NetworkUtils.create(socketAddress, contactAddress);
+        return contactAddress;
     }
     
     /**

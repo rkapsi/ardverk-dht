@@ -20,12 +20,10 @@ import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.dht.KUID;
-import org.ardverk.dht.io.transport.Transport;
-import org.ardverk.lang.Bindable;
 import org.ardverk.lang.TimeStamp;
 
 
-public class Localhost extends AbstractContact implements Bindable<Transport> {
+public class Localhost extends AbstractContact {
     
     private static final long serialVersionUID = 1919885060478043754L;
 
@@ -35,16 +33,17 @@ public class Localhost extends AbstractContact implements Bindable<Transport> {
     
     private volatile int instanceId = 0;
     
-    private volatile Transport transport;
+    private volatile SocketAddress socketAddress;
     
     private volatile SocketAddress contactAddress;
     
-    public Localhost(int keySize) {
-        this(KUID.createRandom(keySize));
+    public Localhost(int keySize, SocketAddress address) {
+        this(KUID.createRandom(keySize), address);
     }
     
-    public Localhost(KUID contactId) {
+    public Localhost(KUID contactId, SocketAddress address) {
         super(contactId);
+        this.contactAddress = address;
     }
     
     @Override
@@ -86,39 +85,22 @@ public class Localhost extends AbstractContact implements Bindable<Transport> {
     public void setHidden(boolean hidden) {
         this.hidden = hidden;
     }
-    
-    /**
-     * Binds the {@link Localhost} to the given {@link Transport}.
-     */
-    @Override
-    public synchronized void bind(Transport transport) {
-        this.transport = transport;
-        
-        SocketAddress bindaddr = transport.getSocketAddress();
-        this.contactAddress = bindaddr;
-    }
-    
-    /**
-     * Unbinds the {@link Localhost} from a {@link Transport}.
-     */
-    @Override
-    public synchronized void unbind() {
-        this.transport = null;
-        this.contactAddress = null;
-    }
 
     /**
-     * Returns true if the {@link Localhost} is bound to a {@link Transport}.
+     * Returns the {@link Localhost}'s {@link SocketAddress} as seen
+     * by other {@link Contact}s in the network.
      */
-    @Override
-    public synchronized boolean isBound() {
-        return transport != null;
-    }
-
     @Override
     public SocketAddress getSocketAddress() {
-        Transport transport = this.transport;
-        return transport != null ? transport.getSocketAddress() : null;
+        return socketAddress;
+    }
+    
+    /**
+     * Sets the {@link Localhost}'s {@link SocketAddress} as seen
+     * by other {@link Contact}s in the network.
+     */
+    public void setSocketAddress(SocketAddress socketAddress) {
+        this.socketAddress = socketAddress;
     }
     
     @Override

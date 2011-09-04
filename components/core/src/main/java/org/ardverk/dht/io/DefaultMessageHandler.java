@@ -93,10 +93,10 @@ public class DefaultMessageHandler implements MessageCallback {
     private void updateContactAddress(SocketAddress address) {
         if (address != null) {
             Localhost localhost = routeTable.getLocalhost();
-            SocketAddress current = localhost.getContactAddress();
+            SocketAddress current = localhost.getSocketAddress();
             
             if (current == null || !current.equals(address)) {
-                localhost.setContactAddress(address);
+                localhost.setSocketAddress(address);
             }
         }
     }

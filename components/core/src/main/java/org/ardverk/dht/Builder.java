@@ -2,10 +2,10 @@ package org.ardverk.dht;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 
+import org.ardverk.dht.io.transport.Transport;
 import org.ardverk.dht.message.DefaultMessageFactory;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.routing.DefaultRouteTable;
@@ -67,8 +67,9 @@ public class Builder {
         return this;
     }
     
-    public DHT newDHT() {
-        Localhost localhost = new Localhost(keySize);
+    public DHT newDHT(SocketAddress address, Transport transport) throws IOException {
+        
+        Localhost localhost = new Localhost(keySize, address);
         
         MessageFactory messageFactory 
             = new DefaultMessageFactory(localhost);
@@ -89,30 +90,8 @@ public class Builder {
         
         RouteTable routeTable = new DefaultRouteTable(localhost);
         
-        return new ArdverkDHT(messageFactory, routeTable, datastore);
-    }
-    
-    public DHT newDHT(int port) throws IOException {
-        DHT dht = newDHT();
-        dht.bind(port);
-        return dht;
-    }
-    
-    public DHT newDHT(String host, int port) throws IOException {
-        DHT dht = newDHT();
-        dht.bind(host, port);
-        return dht;
-    }
-    
-    public DHT newDHT(InetAddress addr, int port) throws IOException {
-        DHT dht = newDHT();
-        dht.bind(addr, port);
-        return dht;
-    }
-    
-    public DHT newDHT(SocketAddress bindaddr) throws IOException {
-        DHT dht = newDHT();
-        dht.bind(bindaddr);
+        ArdverkDHT dht = new ArdverkDHT(messageFactory, routeTable, datastore);
+        dht.bind(transport);
         return dht;
     }
 }

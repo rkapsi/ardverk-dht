@@ -17,7 +17,6 @@
 package org.ardverk.dht;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
@@ -37,21 +36,6 @@ import org.ardverk.dht.routing.Localhost;
 abstract class AbstractDHT implements DHT, Closeable {
 
     private final FutureManager futureManager = new FutureManager();
-    
-    @Override
-    public void bind(int port) throws IOException {
-        bind(new InetSocketAddress(port));
-    }
-
-    @Override
-    public void bind(String host, int port) throws IOException {
-        bind(new InetSocketAddress(host, port));
-    }
-
-    @Override
-    public void bind(InetAddress bindaddr, int port) throws IOException {
-        bind(new InetSocketAddress(bindaddr, port));
-    }
 
     @Override
     public void close() {

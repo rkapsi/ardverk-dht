@@ -37,13 +37,10 @@ import org.ardverk.dht.entity.QuickenEntity;
 import org.ardverk.dht.entity.ValueEntity;
 import org.ardverk.dht.io.DefaultMessageDispatcher;
 import org.ardverk.dht.io.MessageDispatcher;
-import org.ardverk.dht.io.transport.DatagramTransport;
 import org.ardverk.dht.io.transport.Transport;
 import org.ardverk.dht.message.DefaultMessageFactory;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.routing.DefaultRouteTable;
-import org.ardverk.dht.routing.Localhost;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.Value;
@@ -74,14 +71,6 @@ public class ArdverkDHT extends AbstractDHT {
     private final Datastore datastore;
     
     private final MessageDispatcher messageDispatcher;
-    
-    public ArdverkDHT(int keySize, Datastore datastore) {
-        this(new Localhost(keySize), datastore);
-    }
-    
-    public ArdverkDHT(Localhost localhost, Datastore datastore) {
-        this(new DefaultRouteTable(localhost), datastore);
-    }
     
     public ArdverkDHT(RouteTable routeTable, Datastore datastore) {
         this(new DefaultMessageFactory(
@@ -179,20 +168,13 @@ public class ArdverkDHT extends AbstractDHT {
     }
     
     @Override
-    public void bind(SocketAddress address) throws IOException {
-        bind(new DatagramTransport(address));
-    }
-    
-    @Override
     public void bind(Transport transport) throws IOException {
-        getLocalhost().bind(transport);
         messageDispatcher.bind(transport);
     }
 
     @Override
     public void unbind() {
         messageDispatcher.unbind();
-        getLocalhost().unbind();
     }
 
     @Override
