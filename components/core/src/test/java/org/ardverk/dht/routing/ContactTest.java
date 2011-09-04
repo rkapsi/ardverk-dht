@@ -46,7 +46,8 @@ public class ContactTest {
                 KUID.createRandom(20), 
                 2, false, new InetSocketAddress("www.google.com", 4000));
         
-        Contact contact4 = new Localhost(contact1.getId());
+        Contact contact4 = new Localhost(contact1.getId(), 
+                new InetSocketAddress(1000));
         
         TestCase.assertTrue(contact1.equals(contact2));
         TestCase.assertTrue(contact2.equals(contact1));

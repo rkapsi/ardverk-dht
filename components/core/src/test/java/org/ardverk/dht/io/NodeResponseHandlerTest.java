@@ -28,6 +28,7 @@ import junit.framework.TestCase;
 import org.ardverk.dht.Builder;
 import org.ardverk.dht.DHT;
 import org.ardverk.dht.KUID;
+import org.ardverk.dht.codec.bencode.BencodeMessageCodec;
 import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.concurrent.ExecutorKey;
 import org.ardverk.dht.config.BootstrapConfig;
@@ -36,6 +37,7 @@ import org.ardverk.dht.config.DefaultLookupConfig;
 import org.ardverk.dht.config.LookupConfig;
 import org.ardverk.dht.entity.BootstrapEntity;
 import org.ardverk.dht.entity.NodeEntity;
+import org.ardverk.dht.io.transport.DatagramTransport;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.DefaultRouteTable;
 import org.ardverk.dht.utils.XorComparator;
@@ -53,7 +55,12 @@ public class NodeResponseHandlerTest {
         boolean success = false;
         try {
             for (int i = 0; i < count; i++) {
-                dhts.add(builder.newDHT(port+i));
+                int prt = port+i;
+                
+                DHT dht = builder.newDHT(prt); 
+                dht.bind(new DatagramTransport(
+                        new BencodeMessageCodec(), prt));
+                dhts.add(dht);
             }
             success = true;
         } finally {

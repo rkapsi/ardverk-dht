@@ -164,7 +164,7 @@ public class RouteTableTest {
     }
     
     private static Localhost createLocalhost(int keySize) {
-        return new Localhost(keySize);
+        return new Localhost(keySize, new InetSocketAddress(DEFAULT_PORT));
     }
     
     private static Contact createContact() {
