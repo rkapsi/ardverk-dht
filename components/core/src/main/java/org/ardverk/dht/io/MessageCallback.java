@@ -41,6 +41,12 @@ public interface MessageCallback {
             long time, TimeUnit unit) throws IOException;
     
     /**
+     * 
+     */
+    public void handleIllegalResponse(RequestEntity entity, 
+            ResponseMessage response, long time, TimeUnit unit) throws IOException;
+    
+    /**
      * Called if an {@link Exception} occurred.
      */
     public void handleException(RequestEntity entity, Throwable exception);

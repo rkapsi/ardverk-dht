@@ -252,6 +252,42 @@ abstract class LookupResponseHandler<T extends LookupEntity>
         lookupManager.handleTimeout(time, unit);
     }
     
+    @Override
+    protected final void processIllegalResponse(RequestEntity entity,
+            ResponseMessage response, long time, TimeUnit unit)
+            throws IOException {
+        
+        try {
+            processIllegalResponse0(entity, response, time, unit);
+        } finally {
+            process(1);
+        }
+    }
+    
+    protected synchronized void processIllegalResponse0(RequestEntity entity,
+            ResponseMessage response, long time, TimeUnit unit)
+            throws IOException {
+        // Do nothing!
+    }
+
+    @Override
+    protected final void processException(RequestEntity entity, Throwable exception) {
+        
+        try {
+            processException0(entity, exception);
+        } finally {
+            try { 
+                process(1);
+            } catch (IOException err) {
+                setException(err);
+            }
+        }
+    }
+    
+    protected synchronized void processException0(RequestEntity entity, Throwable exception) {
+        // Do nothing!
+    }
+
     /**
      * Creates and returns the current lookup {@link Outcome}.
      */

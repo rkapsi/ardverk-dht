@@ -249,6 +249,29 @@ abstract class AbstractResponseHandler<V extends Entity>
     protected abstract void processTimeout(RequestEntity entity, 
             long time, TimeUnit unit) throws IOException;
 
+    
+    @Override
+    public void handleIllegalResponse(RequestEntity entity, 
+            ResponseMessage response, long time, TimeUnit unit) throws IOException {
+        synchronized (future) {
+            if (!isOpen()) {
+                return;
+            }
+            
+            synchronized (this) {
+                processIllegalResponse(entity, response, time, unit);
+            }
+        }
+    }
+    
+    /**
+     * @see #handleIllegalResponse(RequestEntity, ResponseMessage, long, TimeUnit)
+     */
+    protected void processIllegalResponse(RequestEntity entity, 
+            ResponseMessage response, long time, TimeUnit unit) throws IOException {
+        setException(new ResponseException(entity, response, time, unit));
+    }
+    
     @Override
     public void handleException(RequestEntity entity, Throwable exception) {
         synchronized (future) {
@@ -266,5 +289,60 @@ abstract class AbstractResponseHandler<V extends Entity>
      * @see #handleException(RequestEntity, Throwable)
      */
     protected void processException(RequestEntity entity, Throwable exception) {
+        setException(new UnhandledException(entity, exception));
+    }
+    
+    public static class ResponseException extends IOException {
+        
+        private static final long serialVersionUID = -966684138962375899L;
+        
+        private final RequestEntity entity;
+        
+        private final ResponseMessage response;
+        
+        private final long time;
+        
+        private final TimeUnit unit;
+        
+        protected ResponseException(RequestEntity entity, 
+                ResponseMessage response, long time, TimeUnit unit) {
+            
+            this.entity = entity;
+            this.response = response;
+            this.time = time;
+            this.unit = unit;
+        }
+        
+        public RequestEntity getRequestEntity() {
+            return entity;
+        }
+        
+        public ResponseMessage getResponseMessage() {
+            return response;
+        }
+        
+        public long getTime(TimeUnit unit) {
+            return unit.convert(time, this.unit);
+        }
+        
+        public long getTimeInMillis() {
+            return getTime(TimeUnit.MILLISECONDS);
+        }
+    }
+
+    public static class UnhandledException extends IOException {
+        
+        private static final long serialVersionUID = -966684138962375899L;
+        
+        private final RequestEntity entity;
+        
+        protected UnhandledException(RequestEntity entity, Throwable cause) {
+            super(cause);
+            this.entity = entity;
+        }
+        
+        public RequestEntity getRequestEntity() {
+            return entity;
+        }
     }
 }

@@ -28,6 +28,8 @@ import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.Localhost;
 import org.ardverk.dht.routing.RoundTripTime;
 import org.ardverk.dht.routing.RouteTable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -37,6 +39,9 @@ import org.ardverk.dht.routing.RouteTable;
  */
 public class DefaultMessageHandler implements MessageCallback {
 
+    private static final Logger LOG 
+        = LoggerFactory.getLogger(DefaultMessageHandler.class);
+    
     private final RouteTable routeTable;
     
     public DefaultMessageHandler(RouteTable routeTable) {
@@ -80,10 +85,26 @@ public class DefaultMessageHandler implements MessageCallback {
         
         routeTable.handleIoError(contactId, address);
     }
+    
+    @Override
+    public void handleIllegalResponse(RequestEntity entity,
+            ResponseMessage response, long time, TimeUnit unit)
+            throws IOException {
+        
+        // Do nothing!
+        
+        if (LOG.isErrorEnabled()) {
+            LOG.error("Illegal Response: " + entity + " -> " + response);
+        }
+    }
 
     @Override
     public void handleException(RequestEntity entity, Throwable exception) {
         // Do nothing!
+        
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Exception: " + entity, exception);
+        }
     }
     
     /**

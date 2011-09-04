@@ -304,10 +304,7 @@ public abstract class MessageDispatcher
     protected void handleIllegalResponse(MessageCallback callback, 
             RequestEntity entity, ResponseMessage response, 
             long time, TimeUnit unit) throws IOException {
-        
-        if (LOG.isErrorEnabled()) {
-            LOG.error("Illegal Response: " + entity + " -> " + response);
-        }
+        callback.handleIllegalResponse(entity, response, time, unit);
     }
     
     /**
@@ -507,7 +504,6 @@ public abstract class MessageDispatcher
                     success = MessageDispatcher.this.handleResponse(callback, entity, 
                             response, time, TimeUnit.MILLISECONDS);
                 } else {
-                    System.out.println("BLA!");
                     MessageDispatcher.this.handleIllegalResponse(callback, 
                             entity, response, time, TimeUnit.MILLISECONDS);
                 }

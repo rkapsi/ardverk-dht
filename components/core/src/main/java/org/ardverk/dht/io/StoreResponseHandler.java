@@ -167,4 +167,20 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
             long time, TimeUnit unit) throws IOException {
         process(1);
     }
+
+    @Override
+    protected synchronized void processIllegalResponse(RequestEntity entity,
+            ResponseMessage response, long time, TimeUnit unit)
+            throws IOException {
+        process(1);
+    }
+
+    @Override
+    protected synchronized void processException(RequestEntity entity, Throwable exception) {
+        try {
+            process(1);
+        } catch (IOException err) {
+            setException(err);
+        }
+    }
 }
