@@ -31,7 +31,7 @@ public class Localhost extends AbstractContact implements Bindable<Transport> {
 
     private final TimeStamp creationTime = TimeStamp.now();
     
-    private volatile boolean invisible = false;
+    private volatile boolean hidden = false;
     
     private volatile int instanceId = 0;
     
@@ -76,15 +76,15 @@ public class Localhost extends AbstractContact implements Bindable<Transport> {
 
     @Override
     public boolean isHidden() {
-        return invisible;
+        return hidden;
     }
 
     /**
      * Sets weather or not this instance is invisible to
      * other nodes in the network.
      */
-    public void setInvisible(boolean invisible) {
-        this.invisible = invisible;
+    public void setHidden(boolean hidden) {
+        this.hidden = hidden;
     }
     
     /**
