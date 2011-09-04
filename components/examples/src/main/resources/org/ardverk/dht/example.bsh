@@ -41,7 +41,7 @@ int current = 0;
 createDHT(int port) {
 	
 	Builder builder = Builder.sha1();
-	DHT dht = builder.newDHT();
+	DHT dht = builder.newDHT(port);
 	
 	MessageCodec codec = new BencodeMessageCodec();
 	dht.bind(new DatagramTransport(codec, port));
