@@ -1,0 +1,133 @@
+import org.ardverk.dht.*;
+import org.ardverk.dht.codec.*;
+import org.ardverk.dht.codec.bencode.*;
+import org.ardverk.dht.concurrent.*;
+import org.ardverk.dht.config.*;
+import org.ardverk.dht.entity.*;
+import org.ardverk.dht.event.*;
+import org.ardverk.dht.io.*;
+import org.ardverk.dht.io.transport.*;
+import org.ardverk.dht.lang.*;
+import org.ardverk.dht.logging.*;
+import org.ardverk.dht.message.*;
+import org.ardverk.dht.routing.*;
+import org.ardverk.dht.security.*;
+import org.ardverk.dht.storage.*;
+import org.ardverk.dht.utils.*;
+import org.ardverk.dht.ui.*;
+import org.ardverk.dht.rsrc.*;
+
+import org.ardverk.dht.http.*;
+
+import org.ardverk.coding.*;
+import org.ardverk.collection.*;
+import org.ardverk.concurrent.*;
+import org.ardverk.io.*;
+import org.ardverk.lang.*;
+import org.ardverk.net.*;
+import org.ardverk.security.*;
+import org.ardverk.utils.*;
+import java.security.*;
+
+// Make everything accessible!
+setAccessibility(true);
+
+SocketAddress bindaddr = new InetSocketAddress(13000);
+
+java.util.List dhts = new ArrayList();
+int current = 0;
+
+destroy() {
+	IoUtils.closeAll(dhts);
+	dhts.clear();
+}
+
+create() {
+	create(1);
+}
+
+create(int count) {
+	destroy();
+	for (int i = 0; i < count; i++) {
+		dhts.add(createDHT(NetworkUtils.createNext(bindaddr, i)));
+	}
+}
+
+createDHT(SocketAddress bindaddr) {
+	Builder builder = Builder.sha1();
+	DHT dht = builder.newDHT();
+	
+	MessageCodec codec = new BencodeMessageCodec();
+	dht.bind(new DatagramTransport(codec, bindaddr));
+	//dht.bind(new SocketTransport(codec, bindaddr));
+	//dht.bind(new HybridTransport(codec, bindaddr));
+	//dht.bind(new HttpTransport(bindaddr));
+	
+	return dht;
+}
+
+dht() {
+	return dhts.get(current);
+}
+
+ui() {
+	DHT dht = dht();
+	PainterFrame frame = new PainterFrame(dht);
+	
+	Contact localhost = dht.getLocalhost();
+	frame.setTitle(localhost.getId() + ":" + localhost.getSocketAddress().getPort());
+	frame.setVisible(true);
+	frame.start();
+	return frame;
+}
+
+ping(String host, int port) {
+	println(dht().ping(host, port, null).get());
+}
+
+put(String key, String value) {
+	DHTFuture future = dht().put(toKey(key), toValue(value), null);
+		
+	PutEntity entity = future.get();
+	for (StoreResponse response : entity.getStoreResponses()) {
+	  	StringValue status = ValueUtils.valueOf(StringValue.class, response.getValue());
+		print("PUT: " + response.getContact().getId() + " -> " + status);
+	}
+}
+
+get(String key) {
+	DHTFuture future = dht().get(toKey(key), null);
+	
+	ValueEntity entity = future.get();
+	StringValue value = ValueUtils.valueOf(StringValue.class, entity.getValue());
+	
+	KUID senderId = entity.getSender().getId();
+	KUID creatorId = null;
+	
+	print("GET: " + entity.getId() + " (" + key + ")" + " -> " 
+		+ value
+		+ "\n SENDER: " + senderId
+		+ "\n CREATOR: " + creatorId
+		+ "\n TIME: " + entity.getTimeInMillis() + "ms");
+		
+	return value;
+}
+
+quicken() {
+	for (DHT dht : dhts) {
+		dht.quicken(null).get();
+	}
+}
+
+toKey(String key) {
+	return KeyFactory.parseKey("ardverk:///" + key);
+}
+
+toValue(String value) {
+  	return new StringValue(value);
+}
+
+init() {
+	create(30);
+	ui();
+}
