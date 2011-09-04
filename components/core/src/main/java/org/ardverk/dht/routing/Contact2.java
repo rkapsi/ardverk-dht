@@ -1,6 +1,7 @@
 package org.ardverk.dht.routing;
 
 import java.io.Serializable;
+import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 
@@ -111,6 +112,9 @@ public class Contact2 implements Identifier, Longevity,
         this.hidden = hidden;
     }
     
+    /**
+     * Returns the {@link Type} of the {@link Contact2}
+     */
     public Type getType() {
         return type;
     }
@@ -120,6 +124,9 @@ public class Contact2 implements Identifier, Longevity,
         return contactId;
     }
     
+    /**
+     * Returns the {@link Contact2}'s instance ID
+     */
     public int getInstanceId() {
         return instanceId;
     }
@@ -141,39 +148,109 @@ public class Contact2 implements Identifier, Longevity,
     public long getRoundTripTimeInMillis() {
         return rtt.getTimeInMillis();
     }
-
-    public boolean isHidden() {
-        return hidden;
-    }
     
-    public boolean isActive() {
-        return type.isActive();
-    }
-    
+    /**
+     * Returns the {@link Contact2}'s address as reported by 
+     * the {@link Socket}.
+     */
     public SocketAddress getSocketAddress() {
         return socketAddress;
     }
 
+    /**
+     * Returns the {@link Contact2}'s address as reported by 
+     * the remote {@link Contact2} itself.
+     */
     public SocketAddress getContactAddress() {
         return contactAddress;
     }
     
+    /**
+     * Returns the {@link Contact2}'s remote address.
+     * 
+     * NOTE: This is the address we're using to send messages.
+     */
     public SocketAddress getRemoteAddress() {
         return getContactAddress();
     }
     
+    /**
+     * Returns the amount of time in the given {@link TimeUnit} that 
+     * has passed since we had contact with this {@link Contact2}.
+     */
     public long getTimeSinceLastContact(TimeUnit unit) {
         return getTimeStamp().getAge(unit);
     }
     
+    /**
+     * Returns the amount of time in milliseconds that has passed since 
+     * we had contact with this {@link Contact2}.
+     */
     public long getTimeSinceLastContactInMillis() {
         return getTimeSinceLastContact(TimeUnit.MILLISECONDS);
     }
     
+    /**
+     * Returns {@code true} if we haven't had any contact with this
+     * {@link Contact2} for the given period of time.
+     * 
+     * @see #getTimeSinceLastContact(TimeUnit)
+     * @see #getTimeSinceLastContactInMillis()
+     */
     public boolean isTimeout(long timeout, TimeUnit unit) {
         return getTimeSinceLastContact(unit) >= timeout;
     }
     
+    /**
+     * Returns {@code true} if the {@link Contact2} is considered hidden
+     * and shouldn't be added to the {@link RouteTable}.
+     */
+    public boolean isHidden() {
+        return hidden;
+    }
+    
+    /**
+     * Returns {@code true} if the {@link Contact2} is of the given {@link Type}
+     */
+    public boolean isType(Type type) {
+        return this.type == type;
+    }
+    
+    /**
+     * Returns {@code true} if this is a an authoritative {@link Contact2}.
+     */
+    public boolean isAuthoritative() {
+        return isType(Type.AUTHORITATIVE);
+    }
+    
+    /**
+     * Returns {@code true} if this {@link Contact2} was discovered 
+     * through solicited communication.
+     */
+    public boolean isSolicited() {
+        return isType(Type.SOLICITED);
+    }
+    
+    /**
+     * Returns {@code true} if this {@link Contact2} was discovered 
+     * through unsolicited communication.
+     */
+    public boolean isUnsolicited() {
+        return isType(Type.UNSOLICITED);
+    }
+    
+    /**
+     * Returns {@code true} if the {@link Contact2} is considered active.
+     * 
+     * @see Type
+     */
+    public boolean isActive() {
+        return type.isActive();
+    }
+    
+    /**
+     * Creates and returns a new {@link Builder} for this {@link Contact2}.
+     */
     public Builder newBuilder() {
         Builder builder = new Builder(type, 
                 contactId, creationTime, timeStamp);
@@ -187,22 +264,9 @@ public class Contact2 implements Identifier, Longevity,
         return builder;
     }
     
-    private TimeStamp pickCreationTime(Contact2 other) {
-        return creationTime.compareTo(other.creationTime) < 0 
-                    ? creationTime : other.creationTime;
-    }
-    
-    private TimeStamp pickTimeStamp(Contact2 other) {
-        if (other.isActive()) {
-            return other.timeStamp;
-        }
-        return timeStamp;
-    }
-    
-    private Duration pickRTT(Contact2 other) {
-        return other.rtt.getTimeInMillis() > 0L ? other.rtt : rtt;
-    }
-    
+    /**
+     * Merges this {@link Contact2} with the given {@link Contact2}.
+     */
     public Builder merge(Contact2 other) {
         if (type.equals(Type.AUTHORITATIVE) 
                 && !other.type.equals(Type.AUTHORITATIVE)) {
@@ -234,6 +298,22 @@ public class Contact2 implements Identifier, Longevity,
             .setHidden(better.hidden);
         
         return builder;
+    }
+    
+    private TimeStamp pickCreationTime(Contact2 other) {
+        return creationTime.compareTo(other.creationTime) < 0 
+                    ? creationTime : other.creationTime;
+    }
+    
+    private TimeStamp pickTimeStamp(Contact2 other) {
+        if (other.isActive()) {
+            return other.timeStamp;
+        }
+        return timeStamp;
+    }
+    
+    private Duration pickRTT(Contact2 other) {
+        return other.rtt.getTimeInMillis() > 0L ? other.rtt : rtt;
     }
     
     @Override
