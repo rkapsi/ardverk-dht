@@ -80,10 +80,11 @@ public class DefaultMessageHandler implements MessageCallback {
     public void handleTimeout(RequestEntity entity, 
             long time, TimeUnit unit) throws IOException {
         
-        KUID contactId = entity.getId();
-        SocketAddress address = entity.getAddress();
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Timeout: entity=" + entity + ", time=" + time + ", unit=" + unit);
+        }
         
-        routeTable.handleIoError(contactId, address);
+        handleIoError(entity);
     }
     
     @Override
@@ -94,8 +95,10 @@ public class DefaultMessageHandler implements MessageCallback {
         // Do nothing!
         
         if (LOG.isErrorEnabled()) {
-            LOG.error("Illegal Response: " + entity + " -> " + response);
+            LOG.error("Illegal Response: entity=" + entity + ", response=" + response);
         }
+        
+        handleIoError(entity);
     }
 
     @Override
@@ -103,8 +106,17 @@ public class DefaultMessageHandler implements MessageCallback {
         // Do nothing!
         
         if (LOG.isTraceEnabled()) {
-            LOG.trace("Exception: " + entity, exception);
+            LOG.trace("Exception: entity=" + entity, exception);
         }
+        
+        handleIoError(entity);
+    }
+    
+    private void handleIoError(RequestEntity entity) {
+        KUID contactId = entity.getId();
+        SocketAddress address = entity.getAddress();
+        
+        routeTable.handleIoError(contactId, address);
     }
     
     /**
