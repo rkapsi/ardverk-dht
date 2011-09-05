@@ -269,7 +269,7 @@ abstract class AbstractResponseHandler<V extends Entity>
      */
     protected void processIllegalResponse(RequestEntity entity, 
             ResponseMessage response, long time, TimeUnit unit) throws IOException {
-        setException(new ResponseException(entity, response, time, unit));
+        setException(new IllegalResponseException(entity, response, time, unit));
     }
     
     @Override
@@ -292,7 +292,7 @@ abstract class AbstractResponseHandler<V extends Entity>
         setException(new UnhandledException(entity, exception));
     }
     
-    public static class ResponseException extends IOException {
+    public static class IllegalResponseException extends IOException {
         
         private static final long serialVersionUID = -966684138962375899L;
         
@@ -304,7 +304,7 @@ abstract class AbstractResponseHandler<V extends Entity>
         
         private final TimeUnit unit;
         
-        protected ResponseException(RequestEntity entity, 
+        protected IllegalResponseException(RequestEntity entity, 
                 ResponseMessage response, long time, TimeUnit unit) {
             
             this.entity = entity;
