@@ -130,6 +130,22 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
         return success;
     }
 
+    
+    @Override
+    protected void handleIllegalResponse(MessageCallback callback,
+            RequestEntity entity, ResponseMessage response, long time,
+            TimeUnit unit) throws IOException {
+        super.handleIllegalResponse(callback, entity, response, time, unit);
+        defaultHandler.handleIllegalResponse(entity, response, time, unit);
+    }
+
+    @Override
+    protected void handleException(MessageCallback callback,
+            RequestEntity entity, Throwable t) {
+        super.handleException(callback, entity, t);
+        defaultHandler.handleException(entity, t);
+    }
+
     @Override
     protected void handleTimeout(MessageCallback callback,
             RequestEntity entity, long time, TimeUnit unit)
