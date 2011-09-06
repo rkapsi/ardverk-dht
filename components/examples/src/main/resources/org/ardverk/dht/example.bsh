@@ -195,22 +195,28 @@ quit() {
 
 print("\nHello, please type init(); and press Enter. For further instructions and examples see 'example.bsh' and www.beanshell.org.\n");
 
-bla() {
-	init("ec2-107-20-29-203.compute-1.amazonaws.com", 13000, false);
+boot() {
+	INSTANCE_COUNT = 256;
+	bla(INSTANCE_COUNT);
+}
+
+boot(int count) {
+	init("ec2-107-20-29-203.compute-1.amazonaws.com", 13000, count, false);
 }
 
 init() {
 	INITIAL_PORT = 13000;
-	init("localhost", INITIAL_PORT, true);
-}
-
-init(String host, int port, boolean withUI) {
+	
 	//INSTANCE_COUNT = 256;
 	//INSTANCE_COUNT = 30;
 	INSTANCE_COUNT = 1;
 	
+	init("localhost", INITIAL_PORT, INSTANCE_COUNT, true);
+}
+
+init(String host, int port, int count, boolean withUI) {
 	print("Creating DHTs...");
-	createDHTs(INSTANCE_COUNT, port);
+	createDHTs(count, port);
 	
 	if (withUI) {
 		print("Creating UI for the first DHT instance...");
@@ -239,13 +245,6 @@ store(int count) {
 	store(0, count, false);
 }
 
-ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-Runnable task = new Runnable() {
-	public void run() {
-		ThreadUtils.dumpThreads();
-	}
-};
-
 store(int offset, int count, boolean randomize) {
 	for(i = 0; i < count; i++) {
 		String key = "Key-" + (offset + i);
@@ -259,9 +258,7 @@ store(int offset, int count, boolean randomize) {
 			getIndex = (int)(dhts.size() * Math.random());
 		}
 		
-		ScheduledFuture future = executor.schedule(task, 10L, TimeUnit.SECONDS);
 		put(dhts.get(putIndex), key, value1);
-		future.cancel(true);
 		
 		Value value2 = get(dhts.get(getIndex), key);
 		if (!value1.equals(value2.toString())) {
