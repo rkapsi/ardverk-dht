@@ -189,7 +189,7 @@ abstract class LookupResponseHandler<T extends LookupEntity>
      * Called by {@link #process(int)} after it has executed its own code.
      */
     private synchronized void postProcess() {
-        int count = lookupCounter.getProcesses();
+        int count = lookupCounter.getActive();
         if (count == 0) {
             complete(createOutcome());
         }

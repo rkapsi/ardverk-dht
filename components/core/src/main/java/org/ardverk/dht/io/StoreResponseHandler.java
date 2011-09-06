@@ -107,8 +107,8 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
                     break;
                 }
                 
-                Contact contact = it.next();
-                store(contact);
+                Contact dst = it.next();
+                store(dst);
                 
                 counter.increment();
             }
@@ -125,7 +125,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     }
     
     private synchronized void postProcess() {
-        if (counter.getProcesses() == 0) {
+        if (!counter.hasActive()) {
             long time = creationTime.getAgeInMillis();
             
             StoreResponse[] values = responses.toArray(new StoreResponse[0]);

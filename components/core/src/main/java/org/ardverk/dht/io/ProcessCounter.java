@@ -22,23 +22,23 @@ package org.ardverk.dht.io;
  */
 class ProcessCounter {
     
-    private final int maxProcesses;
+    private final int maxActive;
     
-    private int processes = 0;
+    private int active = 0;
     
     private int count = 0;
     
-    public ProcessCounter(int maxProcesses) {
-        if (maxProcesses < 0) {
+    public ProcessCounter(int maxActive) {
+        if (maxActive < 0) {
             throw new IllegalArgumentException(
-                    "maxProcesses=" + maxProcesses);
+                    "maxActive=" + maxActive);
         }
         
-        this.maxProcesses = maxProcesses;
+        this.maxActive = maxActive;
     }
     
     public boolean hasNext() {
-        return processes < maxProcesses;
+        return active < maxActive;
     }
     
     public boolean increment() {
@@ -46,8 +46,8 @@ class ProcessCounter {
     }
     
     public boolean increment(boolean force) {
-        if (processes < maxProcesses || force) {
-            ++processes;
+        if (active < maxActive || force) {
+            ++active;
             ++count;
             return true;
         }
@@ -55,13 +55,17 @@ class ProcessCounter {
     }
     
     public void decrement() {
-        if (0 < processes) {
-            --processes;
+        if (0 < active) {
+            --active;
         }
     }
     
-    public int getProcesses() {
-        return processes;
+    public boolean hasActive() {
+        return 0 < active;
+    }
+    
+    public int getActive() {
+        return active;
     }
     
     public int getCount() {
