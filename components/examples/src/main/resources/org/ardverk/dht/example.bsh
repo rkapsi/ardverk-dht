@@ -197,7 +197,7 @@ print("\nHello, please type init(); and press Enter. For further instructions an
 
 boot() {
 	INSTANCE_COUNT = 256;
-	bla(INSTANCE_COUNT);
+	boot(INSTANCE_COUNT);
 }
 
 boot(int count) {
