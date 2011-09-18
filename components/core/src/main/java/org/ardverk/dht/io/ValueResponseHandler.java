@@ -19,11 +19,12 @@ package org.ardverk.dht.io;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Provider;
+
 import org.ardverk.collection.CollectionUtils;
 import org.ardverk.collection.FixedSizeArrayList;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.config.GetConfig;
-import org.ardverk.dht.entity.DefaultValueEntity;
 import org.ardverk.dht.entity.ValueEntity;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.message.MessageType;
@@ -46,7 +47,7 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     
     private final Key key;
     
-    public ValueResponseHandler(MessageDispatcher messageDispatcher,
+    public ValueResponseHandler(Provider<MessageDispatcher> messageDispatcher,
             Contact[] contacts, RouteTable routeTable, 
             Key key, GetConfig config) {
         super(messageDispatcher, contacts, routeTable, 
@@ -84,7 +85,7 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
         if (responses.isFull()) {
             Outcome outcome = createOutcome();
             ValueResponse[] values = CollectionUtils.toArray(responses, ValueResponse.class);
-            setValue(new DefaultValueEntity(outcome, values));
+            setValue(new ValueEntity(outcome, values));
         }
     }
     
@@ -94,7 +95,7 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
         
         assert (lookupId.equals(key.getId()));
         
-        MessageFactory factory = messageDispatcher.getMessageFactory();
+        MessageFactory factory = getMessageFactory();
         ValueRequest message = factory.createValueRequest(dst, key);
         
         send(dst, message, timeout, unit);
@@ -107,7 +108,7 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
             setException(new NoSuchValueException(outcome));
         } else {
             ValueResponse[] values = CollectionUtils.toArray(responses, ValueResponse.class);
-            setValue(new DefaultValueEntity(outcome, values));
+            setValue(new ValueEntity(outcome, values));
         }
     }
 }

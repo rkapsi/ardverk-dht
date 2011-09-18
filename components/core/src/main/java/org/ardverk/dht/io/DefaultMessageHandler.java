@@ -20,12 +20,15 @@ import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.message.Message;
 import org.ardverk.dht.message.RequestMessage;
 import org.ardverk.dht.message.ResponseMessage;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.routing.Localhost;
+import org.ardverk.dht.routing.Identity;
 import org.ardverk.dht.routing.RoundTripTime;
 import org.ardverk.dht.routing.RouteTable;
 import org.slf4j.Logger;
@@ -37,6 +40,7 @@ import org.slf4j.LoggerFactory;
  * we're receiving. It's purpose is to add the remote {@link Contact}
  * to the local {@link RouteTable} and maybe trigger the store-forwarding.
  */
+@Singleton
 public class DefaultMessageHandler implements MessageCallback {
 
     private static final Logger LOG 
@@ -44,6 +48,7 @@ public class DefaultMessageHandler implements MessageCallback {
     
     private final RouteTable routeTable;
     
+    @Inject
     public DefaultMessageHandler(RouteTable routeTable) {
         this.routeTable = routeTable;
     }
@@ -121,11 +126,11 @@ public class DefaultMessageHandler implements MessageCallback {
     
     /**
      * Each message contains the receiver's (our) {@link SocketAddress}.
-     * We're using it to update our {@link Localhost}'s contact address.
+     * We're using it to update our {@link Identity}'s contact address.
      */
     private void updateContactAddress(SocketAddress address) {
         if (address != null) {
-            Localhost localhost = routeTable.getLocalhost();
+            Identity localhost = routeTable.getIdentity();
             SocketAddress current = localhost.getSocketAddress();
             
             if (current == null || !current.equals(address)) {

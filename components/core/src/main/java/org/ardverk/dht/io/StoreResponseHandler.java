@@ -22,10 +22,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Provider;
+
 import org.ardverk.collection.Iterators;
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.dht.config.StoreConfig;
-import org.ardverk.dht.entity.DefaultStoreEntity;
 import org.ardverk.dht.entity.StoreEntity;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.message.MessageType;
@@ -68,7 +69,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
     private final int w;
     
     public StoreResponseHandler(
-            MessageDispatcher messageDispatcher, 
+            Provider<MessageDispatcher> messageDispatcher, 
             Contact[] contacts, int k,
             Key key, Value value, 
             StoreConfig config) {
@@ -133,14 +134,14 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
                 setException(new StoreException(key, 
                         value, time, TimeUnit.MILLISECONDS));
             } else {
-                setValue(new DefaultStoreEntity(contacts, key, value, 
+                setValue(new StoreEntity(contacts, key, value, 
                         values, time, TimeUnit.MILLISECONDS));
             }
         }
     }
     
     private synchronized void store(Contact dst) throws IOException {
-        MessageFactory factory = messageDispatcher.getMessageFactory();
+        MessageFactory factory = getMessageFactory();
         StoreRequest request = factory.createStoreRequest(dst, key, value);
         
         long defaultTimeout = config.getStoreTimeoutInMillis();

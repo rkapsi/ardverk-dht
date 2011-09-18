@@ -16,36 +16,42 @@
 
 package org.ardverk.dht.entity;
 
-import org.ardverk.dht.message.MessageType;
+import java.util.concurrent.TimeUnit;
+
 import org.ardverk.dht.message.StoreResponse;
 import org.ardverk.dht.routing.Contact;
 
 /**
- * The result of a {@link MessageType#FIND_NODE} and 
- * {@link MessageType#STORE} operation.
- * 
- * @see NodeEntity
- * @see StoreEntity
+ * A default implementation of {@link PutEntity}.
  */
-public interface PutEntity extends LookupEntity {
+public class PutEntity extends LookupEntity {
 
-    /**
-     * Returns the {@link NodeEntity}.
-     */
-    public NodeEntity getNodeEntity();
+    private final NodeEntity nodeEntity;
     
-    /**
-     * Returns the {@link StoreEntity}.
-     */
-    public StoreEntity getStoreEntity();
+    private final StoreEntity storeEntity;
     
-    /**
-     * @see StoreEntity#getStoreResponses()
-     */
-    public StoreResponse[] getStoreResponses();
+    public PutEntity(NodeEntity nodeEntity, StoreEntity storeEntity) {
+        super(nodeEntity.getId(), 
+                EntityUtils.getTimeInMillis(nodeEntity, storeEntity), 
+                TimeUnit.MILLISECONDS);
+        
+        this.nodeEntity = nodeEntity;
+        this.storeEntity = storeEntity;
+    }
+
+    public NodeEntity getNodeEntity() {
+        return nodeEntity;
+    }
     
-    /**
-     * @see StoreEntity#getStoreContacts()
-     */
-    public Contact[] getStoreContacts();
+    public StoreEntity getStoreEntity() {
+        return storeEntity;
+    }
+
+    public StoreResponse[] getStoreResponses() {
+        return storeEntity.getStoreResponses();
+    }
+    
+    public Contact[] getStoreContacts() {
+        return storeEntity.getStoreContacts();
+    }
 }

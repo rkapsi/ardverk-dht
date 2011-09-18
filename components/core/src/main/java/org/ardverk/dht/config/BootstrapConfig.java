@@ -16,13 +16,47 @@
 
 package org.ardverk.dht.config;
 
-public interface BootstrapConfig extends Config {
+import java.util.concurrent.TimeUnit;
 
-    public PingConfig getPingConfig();
+import org.ardverk.dht.concurrent.ExecutorKey;
+
+
+public class BootstrapConfig extends Config {
+
+    private volatile PingConfig pingConfig = new PingConfig();
     
-    public void setPingConfig(PingConfig pingConfig);
+    private volatile LookupConfig lookupConfig = new LookupConfig();
     
-    public LookupConfig getLookupConfig();
+    @Override
+    public void setExecutorKey(ExecutorKey executorKey) {
+        super.setExecutorKey(executorKey);
+        pingConfig.setExecutorKey(executorKey);
+        lookupConfig.setExecutorKey(executorKey);
+    }
+
+    public PingConfig getPingConfig() {
+        return pingConfig;
+    }
     
-    public void setLookupConfig(LookupConfig lookupConfig);
+    public void setPingConfig(PingConfig pingConfig) {
+        this.pingConfig = pingConfig;
+    }
+
+    public LookupConfig getLookupConfig() {
+        return lookupConfig;
+    }
+    
+    public void setLookupConfig(LookupConfig lookupConfig) {
+        this.lookupConfig = lookupConfig;
+    }
+
+    @Override
+    public void setOperationTimeout(long timeout, TimeUnit unit) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public long getOperationTimeout(TimeUnit unit) {
+        return ConfigUtils.getOperationTimeout(new Config[] { pingConfig, lookupConfig }, unit);
+    }
 }

@@ -25,30 +25,29 @@ import java.util.concurrent.TimeUnit;
 
 import junit.framework.TestCase;
 
-import org.ardverk.dht.Builder;
 import org.ardverk.dht.DHT;
+import org.ardverk.dht.Factory;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.codec.bencode.BencodeMessageCodec;
 import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.concurrent.ExecutorKey;
 import org.ardverk.dht.config.BootstrapConfig;
-import org.ardverk.dht.config.DefaultBootstrapConfig;
-import org.ardverk.dht.config.DefaultLookupConfig;
 import org.ardverk.dht.config.LookupConfig;
 import org.ardverk.dht.entity.BootstrapEntity;
 import org.ardverk.dht.entity.NodeEntity;
 import org.ardverk.dht.io.transport.DatagramTransport;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.DefaultRouteTable;
+import org.ardverk.dht.storage.TransientDatastore;
 import org.ardverk.dht.utils.XorComparator;
 import org.ardverk.io.IoUtils;
 import org.junit.Test;
 
-
 public class NodeResponseHandlerTest {
     
     private static List<DHT> createDHTs(int count, int port) throws IOException {
-        Builder builder = Builder.sha1();
+        
+        Factory factory = Factory.sha1();
         
         List<DHT> dhts = new ArrayList<DHT>(count);
         
@@ -57,7 +56,8 @@ public class NodeResponseHandlerTest {
             for (int i = 0; i < count; i++) {
                 int prt = port+i;
                 
-                DHT dht = builder.newDHT(prt); 
+                DHT dht = factory.newDHT(prt, new TransientDatastore(30L, TimeUnit.MINUTES));
+                
                 dht.bind(new DatagramTransport(
                         new BencodeMessageCodec(), prt));
                 dhts.add(dht);
@@ -80,7 +80,7 @@ public class NodeResponseHandlerTest {
         // Bootstrap everyone from the first DHT
         DHT first = dhts.get(0);
         List<DHTFuture<BootstrapEntity>> futures1 
-            = bootstrap(first.getLocalhost(), dhts, 1, dhts.size()-1);
+            = bootstrap(first.getIdentity(), dhts, 1, dhts.size()-1);
         
         // The RouteTable is all messed up! Clear it and bootstrap
         // the first DHT from the others.
@@ -88,7 +88,7 @@ public class NodeResponseHandlerTest {
         TestCase.assertEquals(1, first.getRouteTable().size());
         
         List<DHTFuture<BootstrapEntity>> futures2 
-            = bootstrap(dhts.get(1).getLocalhost(), dhts, 0, 1);
+            = bootstrap(dhts.get(1).getIdentity(), dhts, 0, 1);
         
         futures2.addAll(futures1);
         return futures2;
@@ -101,7 +101,7 @@ public class NodeResponseHandlerTest {
         List<DHTFuture<BootstrapEntity>> futures 
             = new ArrayList<DHTFuture<BootstrapEntity>>();
         
-        BootstrapConfig config = new DefaultBootstrapConfig();
+        BootstrapConfig config = new BootstrapConfig();
         config.setExecutorKey(ExecutorKey.BACKEND);
         
         for (int i = 0; i < length; i++) {
@@ -125,12 +125,12 @@ public class NodeResponseHandlerTest {
             TreeSet<KUID> expected = new TreeSet<KUID>(
                     new XorComparator(lookupId));
             for (DHT dht : dhts) {
-                expected.add(dht.getLocalhost().getId());
+                expected.add(dht.getIdentity().getId());
             }
             
             DHT first = dhts.get(0);
             
-            LookupConfig config = new DefaultLookupConfig();
+            LookupConfig config = new LookupConfig();
             config.setLookupTimeout(20L, TimeUnit.SECONDS);
             
             DHTFuture<NodeEntity> future 

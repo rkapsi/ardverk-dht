@@ -21,6 +21,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.ardverk.collection.Iterables;
 import org.ardverk.concurrent.AsyncCompletionService;
 import org.ardverk.concurrent.AsyncFuture;
@@ -28,10 +31,10 @@ import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.FutureUtils;
 import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.concurrent.DHTValueFuture;
+import org.ardverk.dht.config.ConfigProvider;
 import org.ardverk.dht.config.LookupConfig;
 import org.ardverk.dht.config.PingConfig;
 import org.ardverk.dht.config.QuickenConfig;
-import org.ardverk.dht.entity.DefaultQuickenEntity;
 import org.ardverk.dht.entity.NodeEntity;
 import org.ardverk.dht.entity.PingEntity;
 import org.ardverk.dht.entity.QuickenEntity;
@@ -46,18 +49,29 @@ import org.ardverk.lang.TimeStamp;
  * The {@link QuickenManager} provides methods to keep 
  * the {@link RouteTable} fresh.
  */
+@Singleton
 public class QuickenManager {
 
-    private final DHT dht;
+    private final ConfigProvider configProvider;
+    
+    private final PingManager pingManager;
+    
+    private final LookupManager lookupManager;
     
     private final RouteTable routeTable;
     
-    QuickenManager(DHT dht, RouteTable routeTable) {
-        this.dht = dht;
+    @Inject
+    QuickenManager(PingManager pingManager, LookupManager lookupManager,
+            RouteTable routeTable, ConfigProvider configProvider) {
+        this.pingManager = pingManager;
+        this.lookupManager = lookupManager;
         this.routeTable = routeTable;
+        this.configProvider = configProvider;
     }
     
-    public DHTFuture<QuickenEntity> quicken(QuickenConfig config) {
+    public DHTFuture<QuickenEntity> quicken(QuickenConfig... config) {
+        
+        QuickenConfig cfg = configProvider.get(config);
         
         TimeStamp creationTime = TimeStamp.now();
         
@@ -68,14 +82,14 @@ public class QuickenManager {
             = new ArrayList<DHTFuture<NodeEntity>>();
         
         synchronized (routeTable) {
-            int pingCount = (int)(routeTable.getK() * config.getPingCount());
+            int pingCount = (int)(routeTable.getK() * cfg.getPingCount());
             
-            Contact localhost = routeTable.getLocalhost();
+            Contact localhost = routeTable.getIdentity();
             KUID localhostId = localhost.getId();
 
             if (0 < pingCount) {
-                PingConfig pingConfig = config.getPingConfig();
-                long contactTimeout = config.getContactTimeoutInMillis();
+                PingConfig pingConfig = cfg.getPingConfig();
+                long contactTimeout = cfg.getContactTimeoutInMillis();
                 
                 Contact[] contacts = routeTable.select(localhostId, pingCount);
                 for (Contact contact : contacts) {
@@ -86,14 +100,14 @@ public class QuickenManager {
                     
                     if (contact.isTimeout(contactTimeout, TimeUnit.MILLISECONDS)) {
                         DHTFuture<PingEntity> future 
-                            = dht.ping(contact, pingConfig);
+                            = pingManager.ping(contact, pingConfig);
                         pingFutures.add(future);
                     }
                 }
             }
             
-            LookupConfig lookupConfig = config.getLookupConfig();
-            long bucketTimeout = config.getBucketTimeoutInMillis();
+            LookupConfig lookupConfig = cfg.getLookupConfig();
+            long bucketTimeout = cfg.getBucketTimeoutInMillis();
             
             Bucket[] buckets = routeTable.getBuckets();
             IdentifierUtils.byXor(buckets, localhostId);
@@ -113,7 +127,7 @@ public class QuickenManager {
                         bucket.getId(), bucket.getDepth());
                 
                 DHTFuture<NodeEntity> future 
-                    = dht.lookup(randomId, lookupConfig);
+                    = lookupManager.lookup(randomId, lookupConfig);
                 lookupFutures.add(future);
             }
         }
@@ -177,7 +191,7 @@ public class QuickenManager {
         
         private void complete() {
             long time = timeStamp.getAgeInMillis();
-            setValue(new DefaultQuickenEntity(pingFutures, lookupFutures, 
+            setValue(new QuickenEntity(pingFutures, lookupFutures, 
                     time, TimeUnit.MILLISECONDS));
         }
     }

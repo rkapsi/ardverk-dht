@@ -16,47 +16,58 @@
 
 package org.ardverk.dht.entity;
 
-import org.ardverk.dht.message.MessageType;
+import java.util.concurrent.TimeUnit;
+
 import org.ardverk.dht.message.StoreResponse;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.Value;
 
 /**
- * The result of a {@link MessageType#STORE} operation.
+ * A default implementation of {@link StoreEntity}.
  */
-public interface StoreEntity extends Entity {
+public class StoreEntity extends Entity {
+
+    private final Contact[] contacts;
     
-    /**
-     * Returns all {@link Contact}s along the store path.
-     */
-    public Contact[] getContacts();
+    private final Key key;
     
-    /**
-     * Returns the {@link Key} that was stored.
-     */
-    public Key getKey();
+    private final Value value;
     
-    /**
-     * Returns the {@link Value} that was stored.
-     */
-    public Value getValue();
+    private final StoreResponse[] responses;
     
-    /**
-     * Returns all {@link StoreResponse}s.
-     * 
-     * <p>NOTE: {@link MessageType#STORE} requests are sent out in the order 
-     * as defined in {@link #getContacts()} but the {@link StoreResponse}s 
-     * are sorted in the order as arrived which depends heavily on things
-     * such as network latency and system load on both ends of the system.
-     */
-    public StoreResponse[] getStoreResponses();
+    public StoreEntity(Contact[] contacts, Key key, 
+            Value value, StoreResponse[] responses, 
+            long time, TimeUnit unit) {
+        super(time, unit);
+        
+        this.contacts = contacts;
+        this.key = key;
+        this.value = value;
+        this.responses = responses;
+    }
     
-    /**
-     * Returns the {@link Contact}s where we attempted to store
-     * a value and received responses from.
-     * 
-     * @see #getStoreResponses()
-     */
-    public Contact[] getStoreContacts();
+    public Contact[] getContacts() {
+        return contacts;
+    }
+
+    public Key getKey() {
+        return key;
+    }
+
+    public Value getValue() {
+        return value;
+    }
+    
+    public Contact[] getStoreContacts() {
+        Contact[] contacts = new Contact[responses.length];
+        for (int i = 0; i < responses.length; i++) {
+            contacts[i] = responses[i].getContact();
+        }
+        return contacts;
+    }
+
+    public StoreResponse[] getStoreResponses() {
+        return responses;
+    }
 }

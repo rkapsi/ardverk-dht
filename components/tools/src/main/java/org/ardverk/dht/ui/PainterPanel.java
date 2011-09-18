@@ -72,7 +72,7 @@ public class PainterPanel extends JPanel {
     public PainterPanel(DHT dht) {
         this.dht = dht;
         
-        Contact localhost = dht.getLocalhost();
+        Contact localhost = dht.getIdentity();
         KUID localhostId = localhost.getId();
         
         painters.add(new JuicePainter(localhostId));

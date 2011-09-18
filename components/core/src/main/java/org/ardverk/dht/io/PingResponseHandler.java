@@ -20,10 +20,11 @@ import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Provider;
+
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.config.PingConfig;
-import org.ardverk.dht.entity.DefaultPingEntity;
 import org.ardverk.dht.entity.PingEntity;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.message.MessageType;
@@ -42,7 +43,7 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
     
     private final PingSender sender;
     
-    public PingResponseHandler(MessageDispatcher messageDispatcher, 
+    public PingResponseHandler(Provider<MessageDispatcher> messageDispatcher, 
             SocketAddress address, PingConfig config) {
         super(messageDispatcher);
         
@@ -50,7 +51,7 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
         this.config = config;
     }
     
-    public PingResponseHandler(MessageDispatcher messageDispatcher, 
+    public PingResponseHandler(Provider<MessageDispatcher> messageDispatcher, 
             Contact contact, PingConfig config) {
         super(messageDispatcher);
         
@@ -66,7 +67,7 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
     @Override
     protected void processResponse(RequestEntity entity, 
             ResponseMessage response, long time, TimeUnit unit) {
-        setValue(new DefaultPingEntity((PingResponse)response, time, unit));
+        setValue(new PingEntity((PingResponse)response, time, unit));
     }
     
     @Override
@@ -103,7 +104,7 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
     
         @Override
         public void ping() throws IOException {
-            MessageFactory factory = messageDispatcher.getMessageFactory();
+            MessageFactory factory = getMessageFactory();
             PingRequest request = factory.createPingRequest(address);
             
             long timeout = config.getPingTimeout(TimeUnit.MILLISECONDS);
@@ -124,7 +125,7 @@ public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
         
         @Override
         public void ping() throws IOException {
-            MessageFactory factory = messageDispatcher.getMessageFactory();
+            MessageFactory factory = getMessageFactory();
             PingRequest request = factory.createPingRequest(contact);
             
             long timeout = config.getPingTimeoutInMillis();

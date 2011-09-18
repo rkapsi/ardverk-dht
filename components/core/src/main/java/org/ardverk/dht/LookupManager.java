@@ -16,8 +16,13 @@
 
 package org.ardverk.dht;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
 import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.concurrent.DHTProcess;
+import org.ardverk.dht.config.ConfigProvider;
 import org.ardverk.dht.config.GetConfig;
 import org.ardverk.dht.config.LookupConfig;
 import org.ardverk.dht.entity.NodeEntity;
@@ -32,46 +37,58 @@ import org.ardverk.dht.rsrc.Key;
 /**
  * The {@link LookupManager} manages FIND_NODE and FIND_VALUE lookups.
  */
+@Singleton
 public class LookupManager {
 
-    private final FutureService futureService;
+    private final ConfigProvider configProvider;
     
-    private final MessageDispatcher messageDispatcher;
+    private final FutureManager futureManager;
+    
+    private final Provider<MessageDispatcher> messageDispatcher;
     
     private final RouteTable routeTable;
     
-    LookupManager(FutureService futureService, 
-            MessageDispatcher messageDispatcher, 
-            RouteTable routeTable) {
-        this.futureService = futureService;
+    @Inject
+    LookupManager(ConfigProvider configProvider,
+            RouteTable routeTable, 
+            FutureManager futureManager, 
+            Provider<MessageDispatcher> messageDispatcher) {
+        
+        this.configProvider = configProvider;
+        this.futureManager = futureManager;
         this.messageDispatcher = messageDispatcher;
         this.routeTable = routeTable;
     }
     
-    public DHTFuture<NodeEntity> lookup(KUID lookupId, LookupConfig config) {
+    public DHTFuture<NodeEntity> lookup(KUID lookupId, LookupConfig... config) {
         Contact[] contacts = routeTable.select(lookupId);
         return lookup(contacts, lookupId, config);
     }
     
     public DHTFuture<NodeEntity> lookup(Contact[] contacts, 
-            KUID lookupId, LookupConfig config) {
+            KUID lookupId, LookupConfig... config) {
+        
+        LookupConfig cfg = configProvider.get(config);
         
         DHTProcess<NodeEntity> process 
             = new NodeResponseHandler(messageDispatcher, 
-                    contacts, routeTable, lookupId, config);
-        return futureService.submit(process, config);
+                    contacts, routeTable, lookupId, cfg);
+        return futureManager.submit(process, cfg);
     }
     
-    public DHTFuture<ValueEntity> get(Key key, GetConfig config) {
+    public DHTFuture<ValueEntity> get(Key key, GetConfig... config) {
         Contact[] contacts = routeTable.select(key.getId());
         return get(contacts, key, config);
     }
     
     public DHTFuture<ValueEntity> get(Contact[] contacts, 
-            Key key, GetConfig config) {
+            Key key, GetConfig... config) {
+        
+        GetConfig cfg = configProvider.get(config);
+        
         DHTProcess<ValueEntity> process
             = new ValueResponseHandler(messageDispatcher, contacts, 
-                    routeTable, key, config);
-        return futureService.submit(process, config);
+                    routeTable, key, cfg);
+        return futureManager.submit(process, cfg);
     }
 }

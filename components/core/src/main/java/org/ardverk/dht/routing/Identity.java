@@ -23,7 +23,7 @@ import org.ardverk.dht.KUID;
 import org.ardverk.lang.TimeStamp;
 
 
-public class Localhost extends AbstractContact {
+public class Identity extends AbstractContact {
     
     private static final long serialVersionUID = 1919885060478043754L;
 
@@ -37,13 +37,13 @@ public class Localhost extends AbstractContact {
     
     private volatile SocketAddress contactAddress;
     
-    public Localhost(int keySize, SocketAddress address) {
-        this(KUID.createRandom(keySize), address);
+    public Identity(int keySize, SocketAddress contactAddress) {
+        this(KUID.createRandom(keySize), contactAddress);
     }
     
-    public Localhost(KUID contactId, SocketAddress address) {
+    public Identity(KUID contactId, SocketAddress contactAddress) {
         super(contactId);
-        this.contactAddress = address;
+        this.contactAddress = contactAddress;
     }
     
     @Override
@@ -87,7 +87,7 @@ public class Localhost extends AbstractContact {
     }
 
     /**
-     * Returns the {@link Localhost}'s {@link SocketAddress} as seen
+     * Returns the {@link Identity}'s {@link SocketAddress} as seen
      * by other {@link Contact}s in the network.
      */
     @Override
@@ -96,7 +96,7 @@ public class Localhost extends AbstractContact {
     }
     
     /**
-     * Sets the {@link Localhost}'s {@link SocketAddress} as seen
+     * Sets the {@link Identity}'s {@link SocketAddress} as seen
      * by other {@link Contact}s in the network.
      */
     public void setSocketAddress(SocketAddress socketAddress) {

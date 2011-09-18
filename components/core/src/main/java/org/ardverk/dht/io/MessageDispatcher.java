@@ -51,11 +51,14 @@ import org.ardverk.lang.TimeStamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.inject.ImplementedBy;
+
 
 /**
  * The {@link MessageDispatcher} is responsible for sending messages over
  * a given {@link Transport} and keeping track of the messages.
  */
+@ImplementedBy(DefaultMessageDispatcher.class)
 public abstract class MessageDispatcher 
         implements Bindable<Transport>, Closeable {
     

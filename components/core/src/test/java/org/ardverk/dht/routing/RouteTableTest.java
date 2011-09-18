@@ -37,14 +37,14 @@ public class RouteTableTest {
     
     @Test
     public void initialState() {
-        Localhost localhost = createLocalhost();
+        Identity localhost = createLocalhost();
         DefaultRouteTable routeTable = createRouteTable(localhost);
         
         TestCase.assertEquals(1, routeTable.size());
         TestCase.assertEquals(1, routeTable.getBuckets().length);
         
-        TestCase.assertEquals(localhost, routeTable.getLocalhost());
-        TestCase.assertSame(localhost, routeTable.getLocalhost());
+        TestCase.assertEquals(localhost, routeTable.getIdentity());
+        TestCase.assertSame(localhost, routeTable.getIdentity());
         
         TestCase.assertEquals(localhost, routeTable.get(localhost.getId()));
         TestCase.assertSame(localhost, routeTable.get(localhost.getId()));
@@ -61,7 +61,7 @@ public class RouteTableTest {
     
     @Test
     public void addLocalhost() {
-        Localhost localhost = createLocalhost();
+        Identity localhost = createLocalhost();
         DefaultRouteTable routeTable = createRouteTable(localhost);
         
         routeTable.addRouteTableListener(new RouteTableAdapter() {
@@ -136,7 +136,7 @@ public class RouteTableTest {
     
     @Test
     public void select() {
-        Localhost localhost = createLocalhost();
+        Identity localhost = createLocalhost();
         DefaultRouteTable routeTable = createRouteTable(localhost);
         
         while (routeTable.size() < routeTable.getK()) {
@@ -151,20 +151,20 @@ public class RouteTableTest {
     }
     
     private static DefaultRouteTable createRouteTable() {
-        Localhost localhost = createLocalhost();
+        Identity localhost = createLocalhost();
         return createRouteTable(localhost);
     }
     
-    private static DefaultRouteTable createRouteTable(Localhost localhost) {
-        return new DefaultRouteTable(K, localhost);
+    private static DefaultRouteTable createRouteTable(Identity localhost) {
+        return new DefaultRouteTable(new RouteTableConfig(K), localhost);
     }
     
-    private static Localhost createLocalhost() {
+    private static Identity createLocalhost() {
         return createLocalhost(ID_SIZE);
     }
     
-    private static Localhost createLocalhost(int keySize) {
-        return new Localhost(keySize, new InetSocketAddress(DEFAULT_PORT));
+    private static Identity createLocalhost(int keySize) {
+        return new Identity(keySize, new InetSocketAddress(DEFAULT_PORT));
     }
     
     private static Contact createContact() {

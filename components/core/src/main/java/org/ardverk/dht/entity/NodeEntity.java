@@ -16,26 +16,38 @@
 
 package org.ardverk.dht.entity;
 
-import org.ardverk.dht.message.MessageType;
+import java.util.concurrent.TimeUnit;
+
+import org.ardverk.dht.io.Outcome;
 import org.ardverk.dht.routing.Contact;
 
 /**
- * The result of a {@link MessageType#FIND_NODE} operation.
+ * A default implementation of {@link NodeEntity}.
  */
-public interface NodeEntity extends LookupEntity {
+public class NodeEntity extends LookupEntity {
     
-    /**
-     * Returns number of hops it took to find the k-closest {@link Contact}s.
-     */
-    public int getHop();
+    private final Outcome outcome;
     
-    /**
-     * Returns the k-closest {@link Contact}s that were found.
-     */
-    public Contact[] getClosest();
+    public NodeEntity(Outcome outcome) {
+        super(outcome.getId(), outcome.getTimeInMillis(), 
+                TimeUnit.MILLISECONDS);
+        
+        this.outcome = outcome;
+    }
     
-    /**
-     * Returns all {@link Contact}s that were found.
-     */
-    public Contact[] getContacts();
+    public Contact[] getClosest() {
+        return outcome.getClosest();
+    }
+    
+    public Contact[] getContacts() {
+        return outcome.getContacts();
+    }
+
+    public int getHop() {
+        return outcome.getHop();
+    }
+    
+    public Outcome getOutcome() {
+        return outcome;
+    }
 }

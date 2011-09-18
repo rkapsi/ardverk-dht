@@ -18,6 +18,10 @@ package org.ardverk.dht.io;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.message.RequestMessage;
@@ -33,12 +37,14 @@ import org.ardverk.dht.storage.Datastore;
  * The {@link StoreRequestHandler} is called for all {@link StoreRequest} 
  * ({@link MessageType#STORE}) messages.
  */
+@Singleton
 public class StoreRequestHandler extends AbstractRequestHandler {
     
     private final Datastore datastore;
     
+    @Inject
     public StoreRequestHandler(
-            MessageDispatcher messageDispatcher,
+            Provider<MessageDispatcher> messageDispatcher,
             Datastore datastore) {
         super(messageDispatcher);
         
@@ -57,7 +63,7 @@ public class StoreRequestHandler extends AbstractRequestHandler {
         StoreRequest request = (StoreRequest)message;
         Value value = store(request);
         
-        MessageFactory factory = messageDispatcher.getMessageFactory();
+        MessageFactory factory = getMessageFactory();
         return factory.createStoreResponse(request, value);
     }
 }

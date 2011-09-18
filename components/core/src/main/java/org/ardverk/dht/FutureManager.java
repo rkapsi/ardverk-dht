@@ -20,6 +20,8 @@ import java.io.Closeable;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Singleton;
+
 import org.ardverk.collection.IdentityHashSet;
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncProcess;
@@ -29,11 +31,13 @@ import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.concurrent.DHTFutureTask;
 import org.ardverk.dht.concurrent.DHTProcess;
 import org.ardverk.dht.concurrent.ExecutorKey;
+import org.ardverk.dht.config.Config;
 
 
 /**
  * The {@link FutureManager} manages {@link DHTFuture}s.
  */
+@Singleton
 public class FutureManager implements Closeable {
     
     private final Set<AsyncFuture<?>> futures 
@@ -51,6 +55,12 @@ public class FutureManager implements Closeable {
         
         FutureUtils.cancelAll(futures, true);
         futures.clear();
+    }
+    
+    public <V> DHTFuture<V> submit(DHTProcess<V> process, Config config) {
+        ExecutorKey executorKey = config.getExecutorKey();
+        long timeout = config.getOperationTimeoutInMillis();
+        return submit(executorKey, process, timeout, TimeUnit.MILLISECONDS);
     }
     
     /**

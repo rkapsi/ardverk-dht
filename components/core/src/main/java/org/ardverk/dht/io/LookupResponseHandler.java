@@ -28,6 +28,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Provider;
+
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.ExecutorUtils;
 import org.ardverk.concurrent.FutureUtils;
@@ -39,7 +41,6 @@ import org.ardverk.dht.message.ResponseMessage;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.utils.XorComparator;
-import org.ardverk.lang.Precoditions;
 import org.ardverk.lang.TimeStamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,12 +69,12 @@ abstract class LookupResponseHandler<T extends LookupEntity>
     
     private ScheduledFuture<?> boostFuture;
     
-    public LookupResponseHandler(MessageDispatcher messageDispatcher, 
+    public LookupResponseHandler(Provider<MessageDispatcher> messageDispatcher, 
             Contact[] contacts, RouteTable routeTable, KUID lookupId, 
             LookupConfig config) {
         super(messageDispatcher);
         
-        this.config = Precoditions.notNull(config, "config");
+        this.config = config;
         lookupManager = new LookupManager(contacts, routeTable, lookupId);
         lookupCounter = new ProcessCounter(config.getAlpha());
     }
@@ -372,10 +373,10 @@ abstract class LookupResponseHandler<T extends LookupEntity>
         private int timeouts = 0;
         
         public LookupManager(Contact[] contacts, RouteTable routeTable, KUID lookupId) {
-            this.routeTable = Precoditions.notNull(routeTable, "routeTable");
-            this.lookupId = Precoditions.notNull(lookupId, "lookupId");
+            this.routeTable = routeTable;
+            this.lookupId = lookupId;
             
-            Contact localhost = routeTable.getLocalhost();
+            Contact localhost = routeTable.getIdentity();
             KUID contactId = localhost.getId();
             
             XorComparator comparator = new XorComparator(lookupId);

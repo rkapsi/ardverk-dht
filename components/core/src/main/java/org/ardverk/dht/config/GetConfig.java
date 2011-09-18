@@ -16,22 +16,25 @@
 
 package org.ardverk.dht.config;
 
-import org.ardverk.dht.message.MessageType;
+import java.util.concurrent.TimeUnit;
 
-/**
- * The {@link GetConfig} is providing configuration date for the
- * {@link MessageType#FIND_VALUE} process.
- */
-public interface GetConfig extends LookupConfig {
+public class GetConfig extends LookupConfig {
     
-    /**
-     * Returns the retrieval count. The default value is 1.
-     */
-    public int getR();
+    private volatile int r = 1;
+    
+    public GetConfig() {
+        super();
+    }
 
-    /**
-     * Sets the retrieval count. The default value is 1 and the
-     * maximum is K.
-     */
-    public void setR(int r);
+    public GetConfig(long timeout, TimeUnit unit) {
+        super(timeout, unit);
+    }
+    
+    public int getR() {
+        return r;
+    }
+
+    public void setR(int r) {
+        this.r = r;
+    }
 }

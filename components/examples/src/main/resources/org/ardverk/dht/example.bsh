@@ -42,8 +42,8 @@ int current = 0;
 // Creates a DHT that is bound to the given port
 createDHT(int port) {
 	
-	Builder builder = Builder.sha1();
-	DHT dht = builder.newDHT(port);
+	Factory factory = Factory.sha1();
+	DHT dht = factory.newDHT(port);
 	
 	MessageCodec codec = new BencodeMessageCodec();
 	dht.bind(new DatagramTransport(codec, port));
@@ -75,12 +75,12 @@ bootstrapAll() {
 	
 	for (DHT dht : dhts) {
 		if (dht != first) {
-			dht.bootstrap(first.getLocalhost(), null).get();
+			dht.bootstrap(first.getIdentity(), null).get();
 		}
 	}
 	
 	first.getRouteTable().clear();
-	first.bootstrap(dhts.get(1).getLocalhost(), null).get();
+	first.bootstrap(dhts.get(1).getIdentity(), null).get();
 }
 
 bootstrapAll(String address, int port) {
@@ -107,8 +107,8 @@ sync() {
 ui(DHT dht) {
 	PainterFrame frame = new PainterFrame(dht);
 	
-	Contact localhost = dht.getLocalhost();
-	frame.setTitle(localhost.getId() + ":" + localhost.getSocketAddress().getPort());
+	Contact localhost = dht.getIdentity();
+	frame.setTitle(localhost.getId() + ":" + localhost.getContactAddress().getPort());
 	frame.setVisible(true);
 	frame.start();
 	return frame;
@@ -172,7 +172,7 @@ toValue(String value) {
   	//byte[] raw = StringUtils.getBytes(value);
   	//byte[] data = new byte[1024 * 1024];
   	//System.arraycopy(raw, 0, data, 0, raw.length);
-	//return new org.ardverk.dht.storage.message.DefaultRequest(dhts.get(current).getLocalhost(), new ByteArrayValueEntity(StringUtils.getBytes(value)));
+	//return new org.ardverk.dht.storage.message.DefaultRequest(dhts.get(current).getIdentity(), new ByteArrayValueEntity(StringUtils.getBytes(value)));
 	return new org.ardverk.dht.rsrc.StringValue(value);
 }
 
@@ -208,8 +208,8 @@ init() {
 	INITIAL_PORT = 13000;
 	
 	//INSTANCE_COUNT = 256;
-	//INSTANCE_COUNT = 30;
-	INSTANCE_COUNT = 1;
+	INSTANCE_COUNT = 30;
+	//INSTANCE_COUNT = 1;
 	
 	init("localhost", INITIAL_PORT, INSTANCE_COUNT, true);
 }

@@ -17,22 +17,25 @@
 package org.ardverk.dht;
 
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.routing.Localhost;
+import org.ardverk.dht.routing.Identity;
 import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.storage.Datastore;
+
+import com.google.inject.ImplementedBy;
 
 /**
  * The default interface for a DHT.
  */
+@ImplementedBy(ArdverkDHT.class)
 public interface DHT extends DHTService, BootstrapService, 
         QuickenService, FutureService, TransportService {
     
     /**
      * Returns the localhost {@link Contact}.
      * 
-     * @see RouteTable#getLocalhost()
+     * @see RouteTable#getIdentity()
      */
-    public Localhost getLocalhost();
+    public Identity getIdentity();
     
     /**
      * Returns the {@link DHT}'s {@link RouteTable}.

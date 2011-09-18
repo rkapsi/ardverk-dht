@@ -16,31 +16,48 @@
 
 package org.ardverk.dht.entity;
 
-import org.ardverk.dht.message.MessageType;
+import java.util.concurrent.TimeUnit;
+
+import org.ardverk.collection.CollectionUtils;
+import org.ardverk.dht.io.Outcome;
 import org.ardverk.dht.message.ValueResponse;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.rsrc.Value;
 
 /**
- * The result of a {@link MessageType#FIND_VALUE} operation.
+ * A default implementation of {@link ValueEntity}.
  */
-public interface ValueEntity extends LookupEntity {
+public class ValueEntity extends LookupEntity {
     
-    /**
-     * Returns the first {@link Contact}.
-     * 
-     * @see #getValueResponse()
-     */
-    public Contact getSender();
+    private final Outcome outcome;
     
-    /**
-     * Returns the first {@link Value}.
-     * 
-     * @see #getValueResponse()
-     */
-    public Value getValue();
+    private final ValueResponse[] responses;
     
-    public ValueResponse getValueResponse();
+    public ValueEntity(Outcome outcome, ValueResponse[] responses) {
+        super(outcome.getId(), outcome.getTimeInMillis(), 
+                TimeUnit.MILLISECONDS);
+        
+        this.outcome = outcome;
+        this.responses = responses;
+    }
     
-    public ValueResponse[] ValueResponses();
+    public ValueResponse getValueResponse() {
+        return CollectionUtils.first(responses);
+    }
+    
+    public ValueResponse[] ValueResponses() {
+        return responses;
+    }
+    
+    public Contact getSender() {
+        return getValueResponse().getContact();
+    }
+    
+    public Value getValue() {
+        return getValueResponse().getValue();
+    }
+    
+    public Outcome getOutcome() {
+        return outcome;
+    }
 }

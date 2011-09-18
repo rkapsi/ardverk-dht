@@ -18,6 +18,10 @@ package org.ardverk.dht.io;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.message.MessageType;
@@ -32,12 +36,14 @@ import org.ardverk.dht.routing.RouteTable;
  * The {@link NodeRequestHandler} handles {@link NodeRequest} 
  * ({@link MessageType#FIND_NODE}) messages. 
  */
+@Singleton
 public class NodeRequestHandler extends AbstractRequestHandler {
     
     private final RouteTable routeTable;
     
+    @Inject
     public NodeRequestHandler(
-            MessageDispatcher messageDispatcher, 
+            Provider<MessageDispatcher> messageDispatcher, 
             RouteTable routeTable) {
         super(messageDispatcher);
         
@@ -80,7 +86,7 @@ public class NodeRequestHandler extends AbstractRequestHandler {
         
         Contact[] contacts = routeTable.select(lookupId);
         
-        MessageFactory factory = messageDispatcher.getMessageFactory();
+        MessageFactory factory = getMessageFactory();
         return factory.createNodeResponse(request, contacts);
     }
 }

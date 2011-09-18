@@ -25,6 +25,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.ardverk.collection.Cursor;
 import org.ardverk.collection.Cursor.Decision;
 import org.ardverk.collection.FixedSizeHashMap;
@@ -40,12 +43,11 @@ import org.ardverk.dht.entity.PingEntity;
 import org.ardverk.dht.lang.Identifier;
 import org.ardverk.dht.routing.ContactEntry.Update;
 import org.ardverk.dht.utils.ContactKey;
-import org.ardverk.lang.Precoditions;
 import org.ardverk.net.NetworkCounter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+@Singleton
 public class DefaultRouteTable extends AbstractRouteTable {
     
     private static final Logger LOG 
@@ -56,23 +58,16 @@ public class DefaultRouteTable extends AbstractRouteTable {
     
     private final RouteTableConfig config;
     
-    private final Localhost localhost;
+    private final Identity localhost;
     
     private final Trie<KUID, DefaultBucket> buckets;
     
     private int consecutiveErrors = 0;
     
-    public DefaultRouteTable(Localhost localhost) {
-        this(new RouteTableConfig(), localhost);
-    }
-    
-    public DefaultRouteTable(int k, Localhost localhost) {
-        this(new RouteTableConfig(k), localhost);
-    }
-    
-    public DefaultRouteTable(RouteTableConfig config, Localhost localhost) {
-        this.config = Precoditions.notNull(config, "config");
-        this.localhost = Precoditions.notNull(localhost, "localhost");
+    @Inject
+    public DefaultRouteTable(RouteTableConfig config, Identity localhost) {
+        this.config = config;
+        this.localhost = localhost;
         
         this.buckets = new PatriciaTrie<KUID, DefaultBucket>();
         
@@ -102,7 +97,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
     }
     
     @Override
-    public Localhost getLocalhost() {
+    public Identity getIdentity() {
         return localhost;
     }
     
@@ -147,7 +142,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
         
         // Nobody and nothing can add a Contact that is 
         // an instance of Localhost.
-        if (contact instanceof Localhost) {
+        if (contact instanceof Identity) {
             throw new IllegalArgumentException("contact=" + contact);
         }
         
