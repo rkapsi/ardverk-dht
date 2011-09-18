@@ -27,7 +27,10 @@ import org.ardverk.dht.concurrent.ExecutorKey;
 import org.ardverk.dht.config.Config;
 import org.ardverk.dht.config.PingConfig;
 import org.ardverk.dht.entity.PingEntity;
-import org.ardverk.dht.routing.Localhost;
+import org.ardverk.dht.routing.Identity;
+import org.ardverk.dht.routing.RouteTable;
+import org.ardverk.dht.storage.Datastore;
+import org.ardverk.io.IoUtils;
 
 
 /**
@@ -35,35 +38,53 @@ import org.ardverk.dht.routing.Localhost;
  */
 abstract class AbstractDHT implements DHT, Closeable {
 
-    private final FutureManager futureManager = new FutureManager();
+    protected final RouteTable routeTable;
 
-    @Override
-    public void close() {
-        futureManager.close();
+    protected final Datastore datastore;
+    
+    protected final FutureManager futureManager;
+    
+    public AbstractDHT(RouteTable routeTable, Datastore datastore, FutureManager futureManager) {
+        this.routeTable = routeTable;
+        this.datastore = datastore;
+        this.futureManager = futureManager;
     }
     
     @Override
-    public Localhost getLocalhost() {
-        return getRouteTable().getLocalhost();
+    public RouteTable getRouteTable() {
+        return routeTable;
+    }
+    
+    @Override
+    public Datastore getDatabase() {
+        return datastore;
+    }
+    
+    @Override
+    public void close() {
+        IoUtils.close(futureManager);
+    }
+    
+    @Override
+    public Identity getIdentity() {
+        return routeTable.getIdentity();
     }
     
     @Override
     public DHTFuture<PingEntity> ping(InetAddress address, 
-            int port, PingConfig config) {
+            int port, PingConfig... config) {
         return ping(new InetSocketAddress(address, port), config);
     }
     
     @Override
     public DHTFuture<PingEntity> ping(String address, 
-            int port, PingConfig config) {
+            int port, PingConfig... config) {
         return ping(new InetSocketAddress(address, port), config);
     }
     
     @Override
     public <V> DHTFuture<V> submit(DHTProcess<V> process, Config config) {
-        ExecutorKey executorKey = config.getExecutorKey();
-        long timeout = config.getOperationTimeoutInMillis();
-        return submit(executorKey, process, timeout, TimeUnit.MILLISECONDS);
+        return futureManager.submit(process, config);
     }
 
     @Override
@@ -74,6 +95,6 @@ abstract class AbstractDHT implements DHT, Closeable {
     
     @Override
     public String toString() {
-        return getLocalhost().toString();
+        return getIdentity().toString();
     }
 }

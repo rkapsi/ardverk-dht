@@ -16,8 +16,9 @@
 
 package org.ardverk.dht.io;
 
+import javax.inject.Provider;
+
 import org.ardverk.dht.message.MessageFactory;
-import org.ardverk.lang.Precoditions;
 
 
 /**
@@ -25,17 +26,17 @@ import org.ardverk.lang.Precoditions;
  */
 abstract class AbstractMessageHandler {
 
-    protected final MessageDispatcher messageDispatcher;
+    protected final Provider<MessageDispatcher> messageDispatcher;
     
-    public AbstractMessageHandler(MessageDispatcher messageDispatcher) {
-        this.messageDispatcher = Precoditions.notNull(messageDispatcher, "messageDispatcher");
+    public AbstractMessageHandler(Provider<MessageDispatcher> messageDispatcher) {
+        this.messageDispatcher = messageDispatcher;
     }
     
     public MessageDispatcher getMessageDispatcher() {
-        return messageDispatcher;
+        return messageDispatcher.get();
     }
     
     public MessageFactory getMessageFactory() {
-        return messageDispatcher.getMessageFactory();
+        return getMessageDispatcher().getMessageFactory();
     }
 }

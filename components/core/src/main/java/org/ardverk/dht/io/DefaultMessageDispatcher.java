@@ -19,6 +19,9 @@ package org.ardverk.dht.io;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.ardverk.dht.message.Message;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.message.NodeRequest;
@@ -27,8 +30,6 @@ import org.ardverk.dht.message.RequestMessage;
 import org.ardverk.dht.message.ResponseMessage;
 import org.ardverk.dht.message.StoreRequest;
 import org.ardverk.dht.message.ValueRequest;
-import org.ardverk.dht.routing.RouteTable;
-import org.ardverk.dht.storage.Datastore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +37,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A default implementation of {@link MessageDispatcher}.
  */
+@Singleton
 public class DefaultMessageDispatcher extends MessageDispatcher {
 
     private static final Logger LOG 
@@ -51,17 +53,20 @@ public class DefaultMessageDispatcher extends MessageDispatcher {
     
     private final StoreRequestHandler store;
     
-    public DefaultMessageDispatcher(MessageFactory factory, 
-            RouteTable routeTable, Datastore datastore) {
+    @Inject
+    public DefaultMessageDispatcher(MessageFactory factory,
+            DefaultMessageHandler defaultHandler, PingRequestHandler ping,
+            NodeRequestHandler node, ValueRequestHandler value,
+            StoreRequestHandler store) {
         super(factory);
         
-        defaultHandler = new DefaultMessageHandler(routeTable);
-        ping = new PingRequestHandler(this);
-        node = new NodeRequestHandler(this, routeTable);
-        value = new ValueRequestHandler(this, routeTable, datastore);
-        store = new StoreRequestHandler(this, datastore);
+        this.defaultHandler = defaultHandler;
+        this.ping = ping;
+        this.node = node;
+        this.value = value;
+        this.store = store;
     }
-    
+
     /**
      * Returns the {@link DefaultMessageHandler} which is called for 
      * every incoming {@link Message}.

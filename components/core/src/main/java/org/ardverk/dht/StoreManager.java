@@ -16,6 +16,10 @@
 
 package org.ardverk.dht;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.FutureUtils;
@@ -23,9 +27,9 @@ import org.ardverk.concurrent.ValueReference;
 import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.concurrent.DHTProcess;
 import org.ardverk.dht.concurrent.NopProcess;
+import org.ardverk.dht.config.ConfigProvider;
 import org.ardverk.dht.config.PutConfig;
 import org.ardverk.dht.config.StoreConfig;
-import org.ardverk.dht.entity.DefaultPutEntity;
 import org.ardverk.dht.entity.NodeEntity;
 import org.ardverk.dht.entity.PutEntity;
 import org.ardverk.dht.entity.StoreEntity;
@@ -40,25 +44,39 @@ import org.ardverk.dht.rsrc.Value;
 /**
  * The {@link StoreManager} manages STORE operations.
  */
+@Singleton
 public class StoreManager {
     
-    private final ArdverkDHT dht;
+    private final ConfigProvider configProvider;
+    
+    private final FutureManager futureManager;
+    
+    private final LookupManager lookupManager;
     
     private final RouteTable routeTable;
     
-    private final MessageDispatcher messageDispatcher;
+    private final Provider<MessageDispatcher> messageDispatcher;
     
-    StoreManager(ArdverkDHT dht, RouteTable routeTable, 
-            MessageDispatcher messageDispatcher) {
-        this.dht = dht;
+    @Inject
+    StoreManager(ConfigProvider configProvider, 
+            RouteTable routeTable, 
+            FutureManager futureManager, 
+            LookupManager lookupManager,
+            Provider<MessageDispatcher> messageDispatcher) {
+        
+        this.futureManager = futureManager;
+        this.lookupManager = lookupManager;
         this.routeTable = routeTable;
         this.messageDispatcher = messageDispatcher;
+        this.configProvider = configProvider;
     }
     
     public DHTFuture<PutEntity> put(final Key key, 
-            final Value value, final PutConfig config) {
+            final Value value, PutConfig... config) {
         
-        int w = config.getStoreConfig().getW();
+        final PutConfig cfg = configProvider.get(config);
+        
+        int w = cfg.getStoreConfig().getW();
         if (w < 1) {
             throw new IllegalArgumentException("w=" + w);
         }
@@ -75,7 +93,7 @@ public class StoreManager {
             // of this method (in most cases the user).
             DHTProcess<PutEntity> process = NopProcess.create();
             final DHTFuture<PutEntity> userFuture 
-                = dht.submit(process, config);
+                = futureManager.submit(process, cfg);
             
             // This will get initialized once we've found the k-closest
             // Contacts to the given KUID
@@ -89,8 +107,8 @@ public class StoreManager {
             
             // Start the lookup for the given KUID
             final DHTFuture<NodeEntity> lookupFuture 
-                = dht.lookup(key.getId(), 
-                        config.getLookupConfig());
+                = lookupManager.lookup(key.getId(), 
+                        cfg.getLookupConfig());
             
             // Let's wait for the result of the FIND_NODE operation. On success we're 
             // going to initialize the storeFutureRef and do the actual STOREing.
@@ -114,7 +132,7 @@ public class StoreManager {
                     Contact[] contacts = nodeEntity.getContacts();
                     DHTFuture<StoreEntity> storeFuture 
                         = storeFutureRef.make(store(contacts, 
-                                key, value, config.getStoreConfig()));
+                                key, value, cfg.getStoreConfig()));
                     
                     storeFuture.addAsyncFutureListener(new AsyncFutureListener<StoreEntity>() {
                         @Override
@@ -133,7 +151,7 @@ public class StoreManager {
                         }
                         
                         private void handleStoreEntity(StoreEntity storeEntity) {
-                            userFuture.setValue(new DefaultPutEntity(
+                            userFuture.setValue(new PutEntity(
                                     nodeEntity, storeEntity));
                         }
                     });
@@ -177,6 +195,6 @@ public class StoreManager {
             = new StoreResponseHandler(messageDispatcher, 
                 dst, k, key, value, config);
         
-        return dht.submit(process, config);
+        return futureManager.submit(process, config);
     }
 }

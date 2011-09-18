@@ -16,22 +16,34 @@
 
 package org.ardverk.dht.entity;
 
-import org.ardverk.dht.message.MessageType;
+import java.util.concurrent.TimeUnit;
+
 import org.ardverk.dht.message.PingResponse;
 import org.ardverk.dht.routing.Contact;
 
 /**
- * The result of a {@link MessageType#PING} operation.
+ * A default implementation of {@link PingEntity}.
  */
-public interface PingEntity extends Entity {
+public class PingEntity extends Entity {
     
-    /**
-     * Returns the remote {@link Contact}
-     */
-    public Contact getContact();
+    private final PingResponse response;
     
-    /**
-     * Returns the {@link PingResponse}.
-     */
-    public PingResponse getPingResponse();
+    public PingEntity(PingResponse response, 
+            long time, TimeUnit unit) {
+        super(time, unit);
+        this.response = response;
+    }
+    
+    public Contact getContact() {
+        return response.getContact();
+    }
+    
+    public PingResponse getPingResponse() {
+        return response;
+    }
+    
+    @Override
+    public String toString() {
+        return getContact() + ", " + time + ", " + unit;
+    }
 }

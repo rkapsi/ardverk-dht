@@ -18,6 +18,10 @@ package org.ardverk.dht.io;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.message.RequestMessage;
@@ -34,14 +38,16 @@ import org.ardverk.dht.storage.Datastore;
  * The {@link ValueRequestHandler} handles {@link ValueRequest} 
  * ({@link MessageType#FIND_VALUE}) messages. 
  */
+@Singleton
 public class ValueRequestHandler extends AbstractRequestHandler {
 
     private final RouteTable routeTable;
     
     private final Datastore datastore;
     
+    @Inject
     public ValueRequestHandler(
-            MessageDispatcher messageDispatcher, 
+            Provider<MessageDispatcher> messageDispatcher, 
             RouteTable routeTable, 
             Datastore datastore) {
         super(messageDispatcher);
@@ -58,7 +64,7 @@ public class ValueRequestHandler extends AbstractRequestHandler {
         Key key = request.getKey();
         Value value = datastore.get(src, key);
         
-        MessageFactory factory = messageDispatcher.getMessageFactory();
+        MessageFactory factory = getMessageFactory();
         ResponseMessage response = null;
         
         if (value != null) {

@@ -1,5 +1,8 @@
 package org.ardverk.dht.config;
 
+import com.google.inject.ImplementedBy;
+
+@ImplementedBy(DefaultConfigFactory.class)
 public interface ConfigFactory {
 
     public PingConfig newPingConfig();

@@ -29,7 +29,7 @@ public class DatastoreUtils {
     public static boolean isInBucket(Key key, RouteTable routeTable) {
         KUID bucketId = key.getId();
         Contact[] contacts = routeTable.select(bucketId);
-        Contact localhost = routeTable.getLocalhost();
+        Contact localhost = routeTable.getIdentity();
         
         if (!ArrayUtils.contains(localhost, contacts)) {
             return false;

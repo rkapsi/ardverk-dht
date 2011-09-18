@@ -16,6 +16,8 @@
 
 package org.ardverk.dht.io;
 
+import javax.inject.Provider;
+
 
 /**
  * An abstract base class for {@link RequestHandler}s.
@@ -23,7 +25,7 @@ package org.ardverk.dht.io;
 abstract class AbstractRequestHandler 
         extends AbstractMessageHandler implements RequestHandler {
 
-    public AbstractRequestHandler(MessageDispatcher messageDispatcher) {
+    public AbstractRequestHandler(Provider<MessageDispatcher> messageDispatcher) {
         super(messageDispatcher);
     }
 }

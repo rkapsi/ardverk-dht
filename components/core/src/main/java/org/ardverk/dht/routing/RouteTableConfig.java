@@ -19,7 +19,6 @@ package org.ardverk.dht.routing;
 import java.util.concurrent.TimeUnit;
 
 import org.ardverk.dht.concurrent.ExecutorKey;
-import org.ardverk.dht.config.DefaultPingConfig;
 import org.ardverk.dht.config.PingConfig;
 import org.ardverk.net.NetworkMask;
 import org.ardverk.utils.TimeUtils;
@@ -31,7 +30,7 @@ public class RouteTableConfig {
     
     private final int k;
     
-    private volatile PingConfig pingConfig = new DefaultPingConfig();
+    private volatile PingConfig pingConfig = new PingConfig();
     
     private volatile int maxDepth = Integer.MAX_VALUE;
     

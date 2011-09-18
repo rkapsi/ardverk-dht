@@ -18,84 +18,86 @@ package org.ardverk.dht.config;
 
 import java.util.concurrent.TimeUnit;
 
-import org.ardverk.dht.routing.Bucket;
-import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.routing.RouteTable;
+import org.ardverk.dht.concurrent.ExecutorKey;
+import org.ardverk.utils.TimeUtils;
 
 
-/**
- * The {@link QuickenConfig} provides configuration data for the
- * quicken operation.
- */
-public interface QuickenConfig extends Config {
+public class QuickenConfig extends Config {
 
-    /**
-     * Returns the {@link PingConfig} that's used for refreshing.
-     */
-    public PingConfig getPingConfig();
+    private volatile PingConfig pingConfig = new PingConfig();
+
+    private volatile LookupConfig lookupConfig = new LookupConfig();
+
+    private volatile float pingCount = 1.0f;
     
-    /**
-     * Sets the {@link PingConfig} that's used for refreshing.
-     */
-    public void setPingConfig(PingConfig pingConfig);
+    private volatile long contactTimeoutInMillis 
+        = TimeUtils.convert(5L*60L, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
     
-    /**
-     * Returns the {@link LookupConfig} that's used for refreshing.
-     */
-    public LookupConfig getLookupConfig();
+    private volatile long bucketTimeoutInMillis 
+        = TimeUtils.convert(5L*60L, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
     
-    /**
-     * Returns the {@link LookupConfig} that's used for refreshing.
-     */
-    public void setLookupConfig(LookupConfig lookupConfig);
+    @Override
+    public void setExecutorKey(ExecutorKey executorKey) {
+        super.setExecutorKey(executorKey);
+        pingConfig.setExecutorKey(executorKey);
+        lookupConfig.setExecutorKey(executorKey);
+    }
     
-    /**
-     * The ping count is used to determinate how many {@link Contact}s 
-     * should be selected from the {@link RouteTable}.
-     * 
-     * selectCount = ping count * K
-     */
-    public float getPingCount();
+    public PingConfig getPingConfig() {
+        return pingConfig;
+    }
     
-    /**
-     * Sets how many {@link Contact}s should be selected from 
-     * the {@link RouteTable}.
-     */
-    public void setPingCount(float pingCount);
+    public void setPingConfig(PingConfig pingConfig) {
+        this.pingConfig = pingConfig;
+    }
     
-    /**
-     * The {@link Contact} timeout is used to determinate if it's necessary
-     * to send a PING to a {@link Contact}.
-     */
-    public long getContactTimeout(TimeUnit unit);
+    public float getPingCount() {
+        return pingCount;
+    }
     
-    /**
-     * The {@link Contact} timeout is used to determinate if it's necessary
-     * to send a PING to a {@link Contact}.
-     */
-    public long getContactTimeoutInMillis();
+    public void setPingCount(float pingCount) {
+        this.pingCount = pingCount;
+    }
+
+    public long getContactTimeout(TimeUnit unit) {
+        return unit.convert(contactTimeoutInMillis, TimeUnit.MILLISECONDS);
+    }
+
+    public long getContactTimeoutInMillis() {
+        return getContactTimeout(TimeUnit.MILLISECONDS);
+    }
     
-    /**
-     * The {@link Contact} timeout is used to determinate if it's necessary
-     * to send a PING to a {@link Contact}.
-     */
-    public void setContactTimeout(long timeout, TimeUnit unit);
+    public void setContactTimeout(long timeout, TimeUnit unit) {
+        this.contactTimeoutInMillis = unit.toMillis(timeout);
+    }
+
+    public LookupConfig getLookupConfig() {
+        return lookupConfig;
+    }
     
-    /**
-     * The {@link Bucket} timeout is used to determinate if it's necessary
-     * to refresh a {@link Bucket}.
-     */
-    public long getBucketTimeout(TimeUnit unit);
+    public void setLookupConfig(LookupConfig lookupConfig) {
+        this.lookupConfig = lookupConfig;
+    }
+
+    public long getBucketTimeout(TimeUnit unit) {
+        return unit.convert(bucketTimeoutInMillis, TimeUnit.MILLISECONDS);
+    }
+
+    public long getBucketTimeoutInMillis() {
+        return getBucketTimeout(TimeUnit.MILLISECONDS);
+    }
     
-    /**
-     * The {@link Bucket} timeout is used to determinate if it's necessary
-     * to refresh a {@link Bucket}.
-     */
-    public long getBucketTimeoutInMillis();
-    
-    /**
-     * The {@link Bucket} timeout is used to determinate if it's necessary
-     * to refresh a {@link Bucket}.
-     */
-    public void setBucketTimeout(long timeout, TimeUnit unit);
+    public void setBucketTimeout(long timeout, TimeUnit unit) {
+        this.bucketTimeoutInMillis = unit.toMillis(timeout);
+    }
+
+    @Override
+    public void setOperationTimeout(long timeout, TimeUnit unit) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public long getOperationTimeout(TimeUnit unit) {
+        throw new UnsupportedOperationException();
+    }
 }

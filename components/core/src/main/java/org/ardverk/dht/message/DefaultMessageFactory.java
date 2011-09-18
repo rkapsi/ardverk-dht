@@ -18,25 +18,28 @@ package org.ardverk.dht.message;
 
 import java.net.SocketAddress;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.routing.Contact;
-import org.ardverk.dht.routing.Localhost;
+import org.ardverk.dht.routing.Identity;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.Value;
-import org.ardverk.lang.Precoditions;
 
-
+@Singleton
 public class DefaultMessageFactory extends AbstractMessageFactory {
 
-    private final Localhost localhost;
+    private final Identity localhost;
     
-    public DefaultMessageFactory(Localhost localhost) {
+    @Inject
+    public DefaultMessageFactory(Identity localhost) {
         this(localhost.getId().length(), localhost);
     }
     
-    public DefaultMessageFactory(int length, Localhost localhost) {
+    public DefaultMessageFactory(int length, Identity localhost) {
         super(length);
-        this.localhost = Precoditions.notNull(localhost, "localhost");
+        this.localhost = localhost;
     }
     
     @Override

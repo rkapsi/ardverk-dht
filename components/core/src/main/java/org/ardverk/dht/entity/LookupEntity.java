@@ -16,12 +16,23 @@
 
 package org.ardverk.dht.entity;
 
-import org.ardverk.dht.lang.Identifier;
-import org.ardverk.dht.message.MessageType;
+import java.util.concurrent.TimeUnit;
+
+import org.ardverk.dht.KUID;
 
 /**
- * The result of a {@link MessageType#FIND_NODE} 
- * or {@link MessageType#FIND_VALUE} operation.
+ * An abstract implementation of {@link LookupEntity}.
  */
-public interface LookupEntity extends Entity, Identifier {
+public abstract class LookupEntity extends Entity {
+
+    private final KUID lookupId;
+    
+    public LookupEntity(KUID lookupId, long time, TimeUnit unit) {
+        super(time, unit);
+        this.lookupId = lookupId;
+    }
+
+    public KUID getId() {
+        return lookupId;
+    }
 }

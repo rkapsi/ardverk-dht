@@ -18,18 +18,29 @@ package org.ardverk.dht.entity;
 
 import java.util.concurrent.TimeUnit;
 
-/**
- * An {@link Entity} is the result of a DHT operation.
- */
-public interface Entity {
+import org.ardverk.lang.Precoditions;
 
-    /**
-     * Returns the Round Trip Time (RTT) in the given {@link TimeUnit}
-     */
-    public long getTime(TimeUnit unit);
+public abstract class Entity {
+
+    protected final long time;
     
-    /**
-     * Returns the Round Trip Time (RTT) in milliseconds
-     */
-    public long getTimeInMillis();
+    protected final TimeUnit unit;
+    
+    public Entity(long time, TimeUnit unit) {
+        this.time = time;
+        this.unit = Precoditions.notNull(unit, "unit");
+    }
+    
+    public long getTime(TimeUnit unit) {
+        return unit.convert(time, this.unit);
+    }
+    
+    public long getTimeInMillis() {
+        return getTime(TimeUnit.MILLISECONDS);
+    }
+    
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + " (" + time + ", " + unit + ")";
+    }
 }

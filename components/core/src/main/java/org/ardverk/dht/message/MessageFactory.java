@@ -23,10 +23,13 @@ import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.Value;
 
+import com.google.inject.ImplementedBy;
+
 /**
  * A factory interface to create various {@link Message}es such as
  * {@link PingRequest} etc.
  */
+@ImplementedBy(DefaultMessageFactory.class)
 public interface MessageFactory {
     
     /**

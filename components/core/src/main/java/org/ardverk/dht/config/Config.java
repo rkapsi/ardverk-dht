@@ -22,49 +22,53 @@ import org.ardverk.dht.concurrent.ExecutorKey;
 import org.ardverk.dht.routing.Contact;
 
 
-public interface Config {
+public abstract class Config {
+
+    private volatile double adaptiveTimeoutMultiplier = -1;
     
-    /**
-     * Returns the {@link ExecutorKey}.
-     */
-    public ExecutorKey getExecutorKey();
+    private volatile ExecutorKey executorKey = ExecutorKey.DEFAULT;
     
-    /**
-     * Sets the {@link ExecutorKey}.
-     */
-    public void setExecutorKey(ExecutorKey executorKey);
+    private volatile long operationTimeoutInMillis;
     
-    /**
-     * Sets the timeout for the operation
-     */
-    public void setOperationTimeout(long timeout, TimeUnit unit);
+    public Config() {
+    }
     
-    /**
-     * Returns the operation timeout in the given {@link TimeUnit}.
-     */
-    public long getOperationTimeout(TimeUnit unit);
+    public Config(long timeout, TimeUnit unit) {
+        setOperationTimeout(timeout, unit);
+    }
     
-    /**
-     * Returns the operation timeout in milliseconds.
-     */
-    public long getOperationTimeoutInMillis();
+    public void setOperationTimeout(long timeout, TimeUnit unit) {
+        this.operationTimeoutInMillis = unit.toMillis(timeout);
+    }
     
-    /**
-     * The RTT multiplier is used multiply a {@link Contact}'s RTT
-     * by some number.
-     * 
-     * @see #getAdaptiveTimeout(Contact, long, TimeUnit)
-     */
-    public void setRountTripTimeMultiplier(double multiplier);
+    public long getOperationTimeout(TimeUnit unit) {
+        return unit.convert(operationTimeoutInMillis, TimeUnit.MILLISECONDS);
+    }
     
-    /**
-     * @see #getAdaptiveTimeout(Contact, long, TimeUnit)
-     */
-    public double getRoundTripTimeMultiplier();
+    public ExecutorKey getExecutorKey() {
+        return executorKey;
+    }
+
+    public void setExecutorKey(ExecutorKey executorKey) {
+        this.executorKey = executorKey;
+    }
+
+    public final long getOperationTimeoutInMillis() {
+        return getOperationTimeout(TimeUnit.MILLISECONDS);
+    }
     
-    /**
-     * Returns an <tt>adaptive</tt> timeout for the given {@link Contact}
-     * which is ideally less than the given default timeout.
-     */
-    public long getAdaptiveTimeout(Contact dst, long defaultTimeout, TimeUnit unit);
+    public double getRoundTripTimeMultiplier() {
+        return adaptiveTimeoutMultiplier;
+    }
+
+    public void setRountTripTimeMultiplier(double adaptiveTimeoutMultiplier) {
+        this.adaptiveTimeoutMultiplier = adaptiveTimeoutMultiplier;
+    }
+    
+    public long getAdaptiveTimeout(Contact dst, 
+            long defaultTimeout, TimeUnit unit) {
+        double multiplier = getRoundTripTimeMultiplier();
+        return ConfigUtils.getAdaptiveTimeout(dst, 
+                multiplier, defaultTimeout, unit);
+    }
 }

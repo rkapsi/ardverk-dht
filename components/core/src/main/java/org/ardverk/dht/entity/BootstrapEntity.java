@@ -16,21 +16,45 @@
 
 package org.ardverk.dht.entity;
 
-/**
- * The result of a bootstrap operation.
- * 
- * @see PingEntity
- * @see NodeEntity
- */
-public interface BootstrapEntity extends Entity {
+import java.util.concurrent.TimeUnit;
 
-    /**
-     * Returns the {@link PingEntity}.
-     */
-    public PingEntity getPingEntity();
+import org.ardverk.dht.routing.Contact;
+
+/**
+ * A default implementation of {@link BootstrapEntity}.
+ */
+public class BootstrapEntity extends Entity {
+
+    private final PingEntity pingEntity;
     
-    /**
-     * Returns the {@link NodeEntity}.
-     */
-    public NodeEntity getNodeEntity();
+    private final NodeEntity nodeEntity;
+    
+    public BootstrapEntity(PingEntity pingEntity, 
+            NodeEntity nodeEntity) {
+        super(EntityUtils.getTimeInMillis(pingEntity, nodeEntity), 
+                TimeUnit.MILLISECONDS);
+        
+        this.pingEntity = pingEntity;
+        this.nodeEntity = nodeEntity;
+    }
+
+    public PingEntity getPingEntity() {
+        return pingEntity;
+    }
+
+    public NodeEntity getNodeEntity() {
+        return nodeEntity;
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder buffer = new StringBuilder();
+        buffer.append("PONG: ").append(pingEntity.getContact()).append("\n");
+        Contact[] contacts = nodeEntity.getContacts();
+        buffer.append("CONTACTS ").append(contacts.length).append("\n");
+        for (Contact contact : contacts) {
+            buffer.append(" ").append(contact);
+        }
+        return buffer.toString();
+    }
 }

@@ -19,9 +19,10 @@ package org.ardverk.dht.io;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Provider;
+
 import org.ardverk.dht.KUID;
 import org.ardverk.dht.config.LookupConfig;
-import org.ardverk.dht.entity.DefaultNodeEntity;
 import org.ardverk.dht.entity.NodeEntity;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.message.MessageType;
@@ -38,7 +39,7 @@ import org.ardverk.dht.routing.RouteTable;
  */
 public class NodeResponseHandler extends LookupResponseHandler<NodeEntity> {
     
-    public NodeResponseHandler(MessageDispatcher messageDispatcher,
+    public NodeResponseHandler(Provider<MessageDispatcher> messageDispatcher,
             Contact[] contacts, RouteTable routeTable, KUID lookupId, LookupConfig config) {
         super(messageDispatcher, contacts, routeTable, lookupId, config);
     }
@@ -47,7 +48,7 @@ public class NodeResponseHandler extends LookupResponseHandler<NodeEntity> {
     protected void lookup(Contact dst, KUID lookupId, 
             long timeout, TimeUnit unit) throws IOException {
         
-        MessageFactory factory = messageDispatcher.getMessageFactory();
+        MessageFactory factory = getMessageFactory();
         NodeRequest message = factory.createNodeRequest(dst, lookupId);
         send(dst, message, timeout, unit);
     }
@@ -59,7 +60,7 @@ public class NodeResponseHandler extends LookupResponseHandler<NodeEntity> {
         if (contacts.length == 0) {
             setException(new NoSuchNodeException(outcome));                
         } else {
-            setValue(new DefaultNodeEntity(outcome));
+            setValue(new NodeEntity(outcome));
         }
     }
     

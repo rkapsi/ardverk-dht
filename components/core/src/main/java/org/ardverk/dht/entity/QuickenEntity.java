@@ -16,25 +16,32 @@
 
 package org.ardverk.dht.entity;
 
+import java.util.concurrent.TimeUnit;
+
 import org.ardverk.dht.concurrent.DHTFuture;
-import org.ardverk.dht.message.MessageType;
 
 /**
- * The result of a quicken operation. It's a combination of multiple
- * operations.
- * 
- * @see PingEntity
- * @see NodeEntity
+ * A default implementation of {@link QuickenEntity}.
  */
-public interface QuickenEntity extends Entity {
+public class QuickenEntity extends Entity {
 
-    /**
-     * Returns all {@link MessageType#PING} {@link DHTFuture}s.
-     */
-    public DHTFuture<PingEntity>[] getPingFutures();
+    private final DHTFuture<PingEntity>[] pingFutures;
     
-    /**
-     * Returns all {@link MessageType#FIND_NODE} {@link DHTFuture}s.
-     */
-    public DHTFuture<NodeEntity>[] getLookupFutures();
+    private final DHTFuture<NodeEntity>[] lookupFutures;
+    
+    public QuickenEntity(DHTFuture<PingEntity>[] pingFutures, 
+            DHTFuture<NodeEntity>[] lookupFutures, long time, TimeUnit unit) {
+        super(time, unit);
+        
+        this.pingFutures = pingFutures;
+        this.lookupFutures = lookupFutures;
+    }
+
+    public DHTFuture<PingEntity>[] getPingFutures() {
+        return pingFutures;
+    }
+
+    public DHTFuture<NodeEntity>[] getLookupFutures() {
+        return lookupFutures;
+    }
 }

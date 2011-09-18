@@ -23,6 +23,9 @@ import org.ardverk.dht.entity.PingEntity;
 import org.ardverk.dht.routing.RouteTable.ContactPinger;
 import org.ardverk.lang.Bindable;
 
+import com.google.inject.ImplementedBy;
+
+@ImplementedBy(DefaultRouteTable.class)
 public interface RouteTable extends Bindable<ContactPinger>, IoErrorCallback {
     
     /**
@@ -32,9 +35,9 @@ public interface RouteTable extends Bindable<ContactPinger>, IoErrorCallback {
     public int getK();
     
     /**
-     * Returns the localhost {@link Localhost}.
+     * Returns the localhost {@link Identity}.
      */
-    public Localhost getLocalhost();
+    public Identity getIdentity();
     
     /**
      * Adds the given {@link Contact} to the {@link RouteTable}.

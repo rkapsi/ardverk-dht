@@ -21,6 +21,8 @@ import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.inject.Provider;
+
 import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.AsyncFutureListener;
 import org.ardverk.concurrent.AsyncProcessFuture;
@@ -47,7 +49,7 @@ abstract class AbstractResponseHandler<V extends Entity>
     
     private volatile TimeStamp lastResponseTime = null;
     
-    public AbstractResponseHandler(MessageDispatcher messageDispatcher) {
+    public AbstractResponseHandler(Provider<MessageDispatcher> messageDispatcher) {
         super(messageDispatcher);
     }
     
@@ -164,7 +166,7 @@ abstract class AbstractResponseHandler<V extends Entity>
             long timeout, TimeUnit unit) throws IOException {
         
         if (isOpen()) {
-            messageDispatcher.send(this, contactId, 
+            getMessageDispatcher().send(this, contactId, 
                     message, timeout, unit);
             lastSendTime = TimeStamp.now();
         }

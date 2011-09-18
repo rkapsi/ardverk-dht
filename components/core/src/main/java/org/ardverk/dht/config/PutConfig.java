@@ -16,41 +16,57 @@
 
 package org.ardverk.dht.config;
 
-import org.ardverk.dht.message.MessageType;
+import java.util.concurrent.TimeUnit;
 
-/**
- * The {@link PutConfig} provides configuration data for the {@link MessageType#FIND_NODE}
- * and {@link MessageType#STORE} operations.
- */
-public interface PutConfig extends Config {
+import org.ardverk.dht.concurrent.ExecutorKey;
 
-    /**
-     * Returns the {@link LookupConfig}.
-     */
-    public LookupConfig getLookupConfig();
+
+public class PutConfig extends Config {
+
+    private volatile LookupConfig lookupConfig = new LookupConfig();
     
-    /**
-     * Sets the {@link LookupConfig}.
-     */
-    public void setLookupConfig(LookupConfig lookupConfig);
+    private volatile StoreConfig storeConfig = new StoreConfig();
     
-    /**
-     * Returns the {@link LookupConfig}.
-     */
-    public GetConfig getGetConfig();
+    private volatile GetConfig getConfig = new GetConfig();
     
-    /**
-     * Sets the {@link LookupConfig}.
-     */
-    public void setGetConfig(GetConfig getConfig);
+    @Override
+    public void setExecutorKey(ExecutorKey executorKey) {
+        super.setExecutorKey(executorKey);
+        lookupConfig.setExecutorKey(executorKey);
+        storeConfig.setExecutorKey(executorKey);
+        getConfig.setExecutorKey(executorKey);
+    }
     
-    /**
-     * Returns the {@link StoreConfig}.
-     */
-    public StoreConfig getStoreConfig();
+    public LookupConfig getLookupConfig() {
+        return lookupConfig;
+    }
     
-    /**
-     * Sets the {@link StoreConfig}.
-     */
-    public void setStoreConfig(StoreConfig storeConfig);
+    public void setLookupConfig(LookupConfig lookupConfig) {
+        this.lookupConfig = lookupConfig;
+    }
+    
+    public StoreConfig getStoreConfig() {
+        return storeConfig;
+    }
+    
+    public void setStoreConfig(StoreConfig storeConfig) {
+        this.storeConfig = storeConfig;
+    }
+    
+    public GetConfig getGetConfig() {
+        return getConfig;
+    }
+
+    public void setGetConfig(GetConfig getConfig) {
+        this.getConfig = getConfig;
+    }
+
+    public void setOperationTimeout(long timeout, TimeUnit unit) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public long getOperationTimeout(TimeUnit unit) {
+        return ConfigUtils.getOperationTimeout(new Config[] { lookupConfig, storeConfig }, unit);
+    }
 }

@@ -18,8 +18,13 @@ package org.ardverk.dht;
 
 import java.net.SocketAddress;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
 import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.concurrent.DHTProcess;
+import org.ardverk.dht.config.ConfigProvider;
 import org.ardverk.dht.config.PingConfig;
 import org.ardverk.dht.entity.PingEntity;
 import org.ardverk.dht.io.MessageDispatcher;
@@ -30,28 +35,41 @@ import org.ardverk.dht.routing.Contact;
 /**
  * The {@link PingManager} manages PINGs.
  */
+@Singleton
 public class PingManager {
 
-    private final FutureService futureService;
+    private final ConfigProvider configProvider;
     
-    private final MessageDispatcher messageDispatcher;
+    private final FutureManager futureManager;
     
-    PingManager(FutureService futureService, 
-            MessageDispatcher messageDispatcher) {
-        this.futureService = futureService;
+    private final Provider<MessageDispatcher> messageDispatcher;
+    
+    @Inject
+    PingManager(ConfigProvider configProvider,
+            FutureManager futureManager, 
+            Provider<MessageDispatcher> messageDispatcher) {
+        
+        this.configProvider = configProvider;
+        this.futureManager = futureManager;
         this.messageDispatcher = messageDispatcher;
     }
     
-    public DHTFuture<PingEntity> ping(Contact contact, PingConfig config) {
+    public DHTFuture<PingEntity> ping(Contact contact, PingConfig... config) {
+        
+        PingConfig cfg = configProvider.get(config);
+        
         DHTProcess<PingEntity> process 
-            = new PingResponseHandler(messageDispatcher, contact, config);
-        return futureService.submit(process, config);
+            = new PingResponseHandler(messageDispatcher, contact, cfg);
+        return futureManager.submit(process, cfg);
     }
     
     public DHTFuture<PingEntity> ping(
-            SocketAddress dst, PingConfig config) {
+            SocketAddress dst, PingConfig... config) {
+        
+        PingConfig cfg = configProvider.get(config);
+        
         DHTProcess<PingEntity> process 
-            = new PingResponseHandler(messageDispatcher, dst, config);
-        return futureService.submit(process, config);
+            = new PingResponseHandler(messageDispatcher, dst, cfg);
+        return futureManager.submit(process, cfg);
     }
 }
