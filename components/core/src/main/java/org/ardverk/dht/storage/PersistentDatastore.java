@@ -49,7 +49,7 @@ public class PersistentDatastore extends SimpleDatastore {
         final long now = System.currentTimeMillis();
         final long timeoutInMillis = unit.toMillis(timeout);
         
-        store.listFiles(new FileFilter() {
+        FileFilter filter = new FileFilter() {
             @Override
             public boolean accept(File file) {
                 if (file.isFile()) {
@@ -62,19 +62,10 @@ public class PersistentDatastore extends SimpleDatastore {
                 }
                 return false;
             }
-        });
+        };
         
-        tmp.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                if (file.isFile()) {
-                    if ((now - file.lastModified()) >= timeoutInMillis) {
-                        file.delete();
-                    }
-                }
-                return false;
-            }
-        });
+        store.listFiles(filter);
+        tmp.listFiles(filter);
     }
     
     @Override
