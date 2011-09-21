@@ -201,7 +201,7 @@ boot() {
 }
 
 boot(int count) {
-	init("ec2-107-20-29-203.compute-1.amazonaws.com", 13000, count, false);
+	init("ec2-107-20-116-179.compute-1.amazonaws.com", 13000, count, false);
 }
 
 init() {
