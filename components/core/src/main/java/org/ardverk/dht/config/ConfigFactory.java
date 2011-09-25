@@ -7,11 +7,11 @@ public interface ConfigFactory {
 
     public PingConfig newPingConfig();
     
-    public GetConfig newGetConfig();
+    public ValueConfig newGetConfig();
     
     public PutConfig newPutConfig();
     
-    public LookupConfig newLookupConfig();
+    public NodeConfig newLookupConfig();
     
     public BootstrapConfig newBootstrapConfig();
     

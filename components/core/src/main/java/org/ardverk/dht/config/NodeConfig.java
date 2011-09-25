@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.ardverk.utils.TimeUtils;
 
-public class LookupConfig extends Config {
+public class NodeConfig extends Config {
     
     private static final long DEFAULT_OPERATION_TIMEOUT 
         = TimeUtils.convert(60L, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
@@ -40,11 +40,11 @@ public class LookupConfig extends Config {
     private volatile long lookupTimeoutInMillis 
         = TimeUtils.convert(10L, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
     
-    public LookupConfig() {
+    public NodeConfig() {
         this(DEFAULT_OPERATION_TIMEOUT, TimeUnit.MILLISECONDS);
     }
     
-    public LookupConfig(long timeout, TimeUnit unit) {
+    public NodeConfig(long timeout, TimeUnit unit) {
         super(timeout, unit);
     }
     

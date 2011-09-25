@@ -26,7 +26,7 @@ public class ConfigProvider {
         return isNull(config) ? cf.newPingConfig() : config[0];
     }
     
-    public GetConfig get(GetConfig... config) {
+    public ValueConfig get(ValueConfig... config) {
         return isNull(config) ? cf.newGetConfig() : config[0];
     }
     
@@ -38,7 +38,7 @@ public class ConfigProvider {
         return isNull(config) ? cf.newQuickenConfig() : config[0];
     }
     
-    public LookupConfig get(LookupConfig... config) {
+    public NodeConfig get(NodeConfig... config) {
         return isNull(config) ? cf.newLookupConfig() : config[0];
     }
 }

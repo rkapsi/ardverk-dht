@@ -34,7 +34,7 @@ import org.ardverk.concurrent.AsyncFuture;
 import org.ardverk.concurrent.ExecutorUtils;
 import org.ardverk.concurrent.FutureUtils;
 import org.ardverk.dht.KUID;
-import org.ardverk.dht.config.LookupConfig;
+import org.ardverk.dht.config.NodeConfig;
 import org.ardverk.dht.entity.LookupEntity;
 import org.ardverk.dht.message.MessageType;
 import org.ardverk.dht.message.ResponseMessage;
@@ -61,7 +61,7 @@ abstract class LookupResponseHandler<T extends LookupEntity>
     
     private final TimeStamp creationTime = TimeStamp.now();
     
-    protected final LookupConfig config;
+    protected final NodeConfig config;
     
     private final LookupManager lookupManager;
     
@@ -71,7 +71,7 @@ abstract class LookupResponseHandler<T extends LookupEntity>
     
     public LookupResponseHandler(Provider<MessageDispatcher> messageDispatcher, 
             Contact[] contacts, RouteTable routeTable, KUID lookupId, 
-            LookupConfig config) {
+            NodeConfig config) {
         super(messageDispatcher);
         
         this.config = config;

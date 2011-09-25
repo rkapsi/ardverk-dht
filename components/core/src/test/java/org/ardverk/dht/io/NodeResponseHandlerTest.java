@@ -32,7 +32,7 @@ import org.ardverk.dht.codec.bencode.BencodeMessageCodec;
 import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.concurrent.ExecutorKey;
 import org.ardverk.dht.config.BootstrapConfig;
-import org.ardverk.dht.config.LookupConfig;
+import org.ardverk.dht.config.NodeConfig;
 import org.ardverk.dht.entity.BootstrapEntity;
 import org.ardverk.dht.entity.NodeEntity;
 import org.ardverk.dht.io.transport.DatagramTransport;
@@ -130,7 +130,7 @@ public class NodeResponseHandlerTest {
             
             DHT first = dhts.get(0);
             
-            LookupConfig config = new LookupConfig();
+            NodeConfig config = new NodeConfig();
             config.setLookupTimeout(20L, TimeUnit.SECONDS);
             
             DHTFuture<NodeEntity> future 

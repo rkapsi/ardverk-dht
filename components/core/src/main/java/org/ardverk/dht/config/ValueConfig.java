@@ -18,15 +18,15 @@ package org.ardverk.dht.config;
 
 import java.util.concurrent.TimeUnit;
 
-public class GetConfig extends LookupConfig {
+public class ValueConfig extends NodeConfig {
     
     private volatile int r = 1;
     
-    public GetConfig() {
+    public ValueConfig() {
         super();
     }
 
-    public GetConfig(long timeout, TimeUnit unit) {
+    public ValueConfig(long timeout, TimeUnit unit) {
         super(timeout, unit);
     }
     

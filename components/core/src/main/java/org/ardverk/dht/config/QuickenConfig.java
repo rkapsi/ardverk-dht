@@ -26,7 +26,7 @@ public class QuickenConfig extends Config {
 
     private volatile PingConfig pingConfig = new PingConfig();
 
-    private volatile LookupConfig lookupConfig = new LookupConfig();
+    private volatile NodeConfig lookupConfig = new NodeConfig();
 
     private volatile float pingCount = 1.0f;
     
@@ -71,11 +71,11 @@ public class QuickenConfig extends Config {
         this.contactTimeoutInMillis = unit.toMillis(timeout);
     }
 
-    public LookupConfig getLookupConfig() {
+    public NodeConfig getLookupConfig() {
         return lookupConfig;
     }
     
-    public void setLookupConfig(LookupConfig lookupConfig) {
+    public void setLookupConfig(NodeConfig lookupConfig) {
         this.lookupConfig = lookupConfig;
     }
 

@@ -24,7 +24,7 @@ import javax.inject.Provider;
 import org.ardverk.collection.CollectionUtils;
 import org.ardverk.collection.FixedSizeArrayList;
 import org.ardverk.dht.KUID;
-import org.ardverk.dht.config.GetConfig;
+import org.ardverk.dht.config.ValueConfig;
 import org.ardverk.dht.entity.ValueEntity;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.message.MessageType;
@@ -49,7 +49,7 @@ public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
     
     public ValueResponseHandler(Provider<MessageDispatcher> messageDispatcher,
             Contact[] contacts, RouteTable routeTable, 
-            Key key, GetConfig config) {
+            Key key, ValueConfig config) {
         super(messageDispatcher, contacts, routeTable, 
                 key.getId(), config);
         

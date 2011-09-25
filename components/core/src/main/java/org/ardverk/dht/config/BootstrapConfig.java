@@ -25,7 +25,7 @@ public class BootstrapConfig extends Config {
 
     private volatile PingConfig pingConfig = new PingConfig();
     
-    private volatile LookupConfig lookupConfig = new LookupConfig();
+    private volatile NodeConfig lookupConfig = new NodeConfig();
     
     @Override
     public void setExecutorKey(ExecutorKey executorKey) {
@@ -42,11 +42,11 @@ public class BootstrapConfig extends Config {
         this.pingConfig = pingConfig;
     }
 
-    public LookupConfig getLookupConfig() {
+    public NodeConfig getLookupConfig() {
         return lookupConfig;
     }
     
-    public void setLookupConfig(LookupConfig lookupConfig) {
+    public void setLookupConfig(NodeConfig lookupConfig) {
         this.lookupConfig = lookupConfig;
     }
 

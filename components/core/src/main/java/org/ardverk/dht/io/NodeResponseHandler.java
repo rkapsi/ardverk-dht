@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Provider;
 
 import org.ardverk.dht.KUID;
-import org.ardverk.dht.config.LookupConfig;
+import org.ardverk.dht.config.NodeConfig;
 import org.ardverk.dht.entity.NodeEntity;
 import org.ardverk.dht.message.MessageFactory;
 import org.ardverk.dht.message.MessageType;
@@ -40,7 +40,7 @@ import org.ardverk.dht.routing.RouteTable;
 public class NodeResponseHandler extends LookupResponseHandler<NodeEntity> {
     
     public NodeResponseHandler(Provider<MessageDispatcher> messageDispatcher,
-            Contact[] contacts, RouteTable routeTable, KUID lookupId, LookupConfig config) {
+            Contact[] contacts, RouteTable routeTable, KUID lookupId, NodeConfig config) {
         super(messageDispatcher, contacts, routeTable, lookupId, config);
     }
     

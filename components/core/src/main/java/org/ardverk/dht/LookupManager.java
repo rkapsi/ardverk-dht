@@ -23,8 +23,8 @@ import javax.inject.Singleton;
 import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.concurrent.DHTProcess;
 import org.ardverk.dht.config.ConfigProvider;
-import org.ardverk.dht.config.GetConfig;
-import org.ardverk.dht.config.LookupConfig;
+import org.ardverk.dht.config.ValueConfig;
+import org.ardverk.dht.config.NodeConfig;
 import org.ardverk.dht.entity.NodeEntity;
 import org.ardverk.dht.entity.ValueEntity;
 import org.ardverk.dht.io.MessageDispatcher;
@@ -60,15 +60,15 @@ public class LookupManager {
         this.routeTable = routeTable;
     }
     
-    public DHTFuture<NodeEntity> lookup(KUID lookupId, LookupConfig... config) {
+    public DHTFuture<NodeEntity> lookup(KUID lookupId, NodeConfig... config) {
         Contact[] contacts = routeTable.select(lookupId);
         return lookup(contacts, lookupId, config);
     }
     
     public DHTFuture<NodeEntity> lookup(Contact[] contacts, 
-            KUID lookupId, LookupConfig... config) {
+            KUID lookupId, NodeConfig... config) {
         
-        LookupConfig cfg = configProvider.get(config);
+        NodeConfig cfg = configProvider.get(config);
         
         DHTProcess<NodeEntity> process 
             = new NodeResponseHandler(messageDispatcher, 
@@ -76,15 +76,15 @@ public class LookupManager {
         return futureManager.submit(process, cfg);
     }
     
-    public DHTFuture<ValueEntity> get(Key key, GetConfig... config) {
+    public DHTFuture<ValueEntity> get(Key key, ValueConfig... config) {
         Contact[] contacts = routeTable.select(key.getId());
         return get(contacts, key, config);
     }
     
     public DHTFuture<ValueEntity> get(Contact[] contacts, 
-            Key key, GetConfig... config) {
+            Key key, ValueConfig... config) {
         
-        GetConfig cfg = configProvider.get(config);
+        ValueConfig cfg = configProvider.get(config);
         
         DHTProcess<ValueEntity> process
             = new ValueResponseHandler(messageDispatcher, contacts, 

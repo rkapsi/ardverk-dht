@@ -32,7 +32,7 @@ import org.ardverk.concurrent.FutureUtils;
 import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.concurrent.DHTValueFuture;
 import org.ardverk.dht.config.ConfigProvider;
-import org.ardverk.dht.config.LookupConfig;
+import org.ardverk.dht.config.NodeConfig;
 import org.ardverk.dht.config.PingConfig;
 import org.ardverk.dht.config.QuickenConfig;
 import org.ardverk.dht.entity.NodeEntity;
@@ -106,7 +106,7 @@ public class QuickenManager {
                 }
             }
             
-            LookupConfig lookupConfig = cfg.getLookupConfig();
+            NodeConfig lookupConfig = cfg.getLookupConfig();
             long bucketTimeout = cfg.getBucketTimeoutInMillis();
             
             Bucket[] buckets = routeTable.getBuckets();

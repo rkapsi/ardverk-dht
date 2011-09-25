@@ -20,8 +20,8 @@ import java.net.InetAddress;
 import java.net.SocketAddress;
 
 import org.ardverk.dht.concurrent.DHTFuture;
-import org.ardverk.dht.config.GetConfig;
-import org.ardverk.dht.config.LookupConfig;
+import org.ardverk.dht.config.ValueConfig;
+import org.ardverk.dht.config.NodeConfig;
 import org.ardverk.dht.config.PingConfig;
 import org.ardverk.dht.config.PutConfig;
 import org.ardverk.dht.entity.NodeEntity;
@@ -67,13 +67,13 @@ interface DHTService {
      * Performs a {@link MessageType#FIND_NODE} lookup in the DHT.
      */
     public DHTFuture<NodeEntity> lookup(
-            KUID lookupId, LookupConfig... config);
+            KUID lookupId, NodeConfig... config);
     
     /**
      * Performs a {@link MessageType#FIND_VALUE} lookup in the DHT.
      */
     public DHTFuture<ValueEntity> get(
-            Key key, GetConfig... config);
+            Key key, ValueConfig... config);
     
     /**
      * Performs a {@link MessageType#FIND_NODE} lookup followed by 

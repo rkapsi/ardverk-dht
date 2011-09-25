@@ -23,11 +23,11 @@ import org.ardverk.dht.concurrent.ExecutorKey;
 
 public class PutConfig extends Config {
 
-    private volatile LookupConfig lookupConfig = new LookupConfig();
+    private volatile NodeConfig lookupConfig = new NodeConfig();
     
     private volatile StoreConfig storeConfig = new StoreConfig();
     
-    private volatile GetConfig getConfig = new GetConfig();
+    private volatile ValueConfig getConfig = new ValueConfig();
     
     @Override
     public void setExecutorKey(ExecutorKey executorKey) {
@@ -37,11 +37,11 @@ public class PutConfig extends Config {
         getConfig.setExecutorKey(executorKey);
     }
     
-    public LookupConfig getLookupConfig() {
+    public NodeConfig getLookupConfig() {
         return lookupConfig;
     }
     
-    public void setLookupConfig(LookupConfig lookupConfig) {
+    public void setLookupConfig(NodeConfig lookupConfig) {
         this.lookupConfig = lookupConfig;
     }
     
@@ -53,11 +53,11 @@ public class PutConfig extends Config {
         this.storeConfig = storeConfig;
     }
     
-    public GetConfig getGetConfig() {
+    public ValueConfig getGetConfig() {
         return getConfig;
     }
 
-    public void setGetConfig(GetConfig getConfig) {
+    public void setGetConfig(ValueConfig getConfig) {
         this.getConfig = getConfig;
     }
 

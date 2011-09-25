@@ -39,8 +39,8 @@ public class DefaultConfigFactory implements ConfigFactory {
     }
 
     @Override
-    public GetConfig newGetConfig() {
-        return newConfig(GetConfig.class);
+    public ValueConfig newGetConfig() {
+        return newConfig(ValueConfig.class);
     }
     
     @Override
@@ -49,8 +49,8 @@ public class DefaultConfigFactory implements ConfigFactory {
     }
 
     @Override
-    public LookupConfig newLookupConfig() {
-        return newConfig(LookupConfig.class);
+    public NodeConfig newLookupConfig() {
+        return newConfig(NodeConfig.class);
     }
 
     @Override

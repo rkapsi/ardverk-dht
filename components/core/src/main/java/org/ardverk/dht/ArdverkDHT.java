@@ -25,8 +25,8 @@ import javax.inject.Singleton;
 
 import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.config.BootstrapConfig;
-import org.ardverk.dht.config.GetConfig;
-import org.ardverk.dht.config.LookupConfig;
+import org.ardverk.dht.config.ValueConfig;
+import org.ardverk.dht.config.NodeConfig;
 import org.ardverk.dht.config.PingConfig;
 import org.ardverk.dht.config.PutConfig;
 import org.ardverk.dht.config.QuickenConfig;
@@ -196,12 +196,12 @@ public class ArdverkDHT extends AbstractDHT {
     }
 
     @Override
-    public DHTFuture<NodeEntity> lookup(KUID lookupId, LookupConfig... config) {
+    public DHTFuture<NodeEntity> lookup(KUID lookupId, NodeConfig... config) {
         return lookupManager.lookup(lookupId, config);
     }
     
     @Override
-    public DHTFuture<ValueEntity> get(Key key, GetConfig... config) {
+    public DHTFuture<ValueEntity> get(Key key, ValueConfig... config) {
         return lookupManager.get(key, config);
     }
 
