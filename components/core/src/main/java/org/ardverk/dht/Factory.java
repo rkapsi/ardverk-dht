@@ -43,10 +43,10 @@ public class Factory {
     }
     
     public DHT newDHT(SocketAddress address, Datastore datastore) {
-        return getInjector(address, datastore).getInstance(DHT.class);
+        return createInjector(address, datastore).getInstance(DHT.class);
     }
     
-    public Injector getInjector(final SocketAddress address, final Datastore datastore) {
+    public Injector createInjector(final SocketAddress address, final Datastore datastore) {
         Module module = new AbstractModule() {
             @Override
             protected void configure() {
