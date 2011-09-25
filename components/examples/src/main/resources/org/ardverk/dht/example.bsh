@@ -40,10 +40,10 @@ java.util.List dhts = new ArrayList();
 int current = 0;
 
 // Creates a DHT that is bound to the given port
-createDHT(int port) {
+createDHT(String host, int port) {
 	
 	Factory factory = Factory.sha1();
-	DHT dht = factory.newDHT(port);
+	DHT dht = factory.newDHT(InetSocketAddress.createUnresolved(host, port));
 	
 	MessageCodec codec = new BencodeMessageCodec();
 	dht.bind(new DatagramTransport(codec, port));
@@ -55,11 +55,11 @@ createDHT(int port) {
 }
 
 // Creates a list of DHTs
-createDHTs(int count, int port) {
+createDHTs(int count, String host, int port) {
 	java.util.List list = new ArrayList();
 	for (i = 0; i < count; i++) {
 		try {
-			list.add(createDHT(port+i));
+			list.add(createDHT(host, port+i));
 		} catch (IOException err) {
 			err.printStackTrace();
 		}
@@ -70,7 +70,7 @@ createDHTs(int count, int port) {
 }
 
 // Bootstraps a list of DHTs
-bootstrapAll() {
+bootstrap() {
 	DHT first = dhts.get(0);
 	
 	for (DHT dht : dhts) {
@@ -83,7 +83,7 @@ bootstrapAll() {
 	first.bootstrap(dhts.get(1).getIdentity(), null).get();
 }
 
-bootstrapAll(String address, int port) {
+bootstrap(String address, int port) {
 	for (DHT dht : dhts) {
 		dht.bootstrap(address, port, null).get();
 	}
@@ -216,29 +216,27 @@ init() {
 
 init(String host, int port, int count, boolean withUI) {
 	print("Creating DHTs...");
-	createDHTs(count, port);
+	createDHTs(count, host, port);
 	
 	if (withUI) {
 		print("Creating UI for the first DHT instance...");
 		ui(dhts.get(current));
 	}
-
-	print("Bootstrapping all DHTs...");
-	if (host.equals("localhost")) {
-		bootstrapAll();
-	} else {
-		bootstrapAll(host, port);
-	}
-
-	quicken();
-  
-	print("\nStoring a Key-Value...");
-	put("Hello", "World");
-
-	print("\nGetting a Key-Value...");
-	get("Hello");
 	
-	print("\nTry also store(count);...");
+	if (1 < count) {
+		print("Bootstrapping all DHTs...");
+		bootstrap(host, port);
+
+		quicken();
+  
+		print("\nStoring a Key-Value...");
+		put("Hello", "World");
+
+		print("\nGetting a Key-Value...");
+		get("Hello");
+	
+		print("\nTry also store(count);...");
+	}
 }
 
 store(int count) {
