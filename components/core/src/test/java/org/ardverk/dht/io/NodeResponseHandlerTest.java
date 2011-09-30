@@ -38,7 +38,6 @@ import org.ardverk.dht.entity.NodeEntity;
 import org.ardverk.dht.io.transport.DatagramTransport;
 import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.routing.DefaultRouteTable;
-import org.ardverk.dht.storage.TransientDatastore;
 import org.ardverk.dht.utils.XorComparator;
 import org.ardverk.io.IoUtils;
 import org.junit.Test;
@@ -56,7 +55,7 @@ public class NodeResponseHandlerTest {
             for (int i = 0; i < count; i++) {
                 int prt = port+i;
                 
-                DHT dht = factory.newDHT(prt, new TransientDatastore(30L, TimeUnit.MINUTES));
+                DHT dht = factory.newDHT(prt);
                 
                 dht.bind(new DatagramTransport(
                         new BencodeMessageCodec(), prt));

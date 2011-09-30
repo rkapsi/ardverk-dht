@@ -2,19 +2,13 @@ package org.ardverk.dht;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-import javax.inject.Singleton;
-
-import org.ardverk.dht.routing.Identity;
-import org.ardverk.dht.storage.Datastore;
-import org.ardverk.dht.storage.TransientDatastore;
-
-import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
-import com.google.inject.Provides;
 
 public class Factory {
     
@@ -30,35 +24,23 @@ public class Factory {
         this.keySize = keySize;
     }
     
-    public DHT newDHT(int port) {
-        return newDHT(new InetSocketAddress(port));
+    public DHT newDHT(int port, Module... modules) {
+        return newDHT(new InetSocketAddress(port), modules);
     }
     
-    public DHT newDHT(int port, Datastore datastore) {
-        return newDHT(new InetSocketAddress(port), datastore);
+    public DHT newDHT(String host, int port, Module... modules) {
+        return newDHT(InetSocketAddress.createUnresolved(host, port), modules);
     }
     
-    public DHT newDHT(SocketAddress address) {
-        return newDHT(address, new TransientDatastore(30L, TimeUnit.MINUTES));
+    public DHT newDHT(SocketAddress address, Module... modules) {
+        return createInjector(address, modules).getInstance(DHT.class);
     }
     
-    public DHT newDHT(SocketAddress address, Datastore datastore) {
-        return createInjector(address, datastore).getInstance(DHT.class);
-    }
-    
-    public Injector createInjector(final SocketAddress address, final Datastore datastore) {
-        Module module = new AbstractModule() {
-            @Override
-            protected void configure() {
-                bind(Datastore.class).toInstance(datastore);
-            }
-            
-            @Provides @Singleton
-            Identity getIdentity() {
-                return new Identity(keySize, address);
-            }
-        };
+    public Injector createInjector(SocketAddress address, Module... modules) {
+        List<Module> m = new ArrayList<Module>();
+        m.add(new ArdverkModule(keySize, address));
+        m.addAll(Arrays.asList(modules));
         
-        return Guice.createInjector(module);
+        return Guice.createInjector(m);
     }
 }
