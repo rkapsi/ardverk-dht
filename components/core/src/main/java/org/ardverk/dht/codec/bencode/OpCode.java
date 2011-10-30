@@ -27,12 +27,14 @@ import org.ardverk.dht.message.StoreRequest;
 import org.ardverk.dht.message.StoreResponse;
 import org.ardverk.dht.message.ValueRequest;
 import org.ardverk.dht.message.ValueResponse;
+import org.ardverk.enums.PrimitiveEnum;
+import org.ardverk.enums.PrimitiveEnums;
 
 /**
  * The {@link OpCode} is the type of a {@link Message} as 
  * it's written over the wire.
  */
-enum OpCode implements IntegerValue {
+enum OpCode implements PrimitiveEnum.Int, IntegerValue {
     
     PING_REQUEST(0x00, MessageType.PING),
     PING_RESPONSE(0x01, MessageType.PING),
@@ -60,6 +62,11 @@ enum OpCode implements IntegerValue {
         return value;
     }
     
+    @Override
+    public int convert() {
+        return value;
+    }
+
     /**
      * Returns the {@link MessageType}.
      */
@@ -87,34 +94,11 @@ enum OpCode implements IntegerValue {
         return name() + " (" + value + ", " + messageType + ")";
     }
     
-    private static final OpCode[] VALUES;
-    
-    static {
-        OpCode[] values = values();
-        VALUES = new OpCode[values.length];
-        
-        for (OpCode o : values) {
-            int index = o.value % VALUES.length;
-            if (VALUES[index] != null) {
-                throw new IllegalStateException();
-            }
-            VALUES[index] = o;
-        }
-    }
-    
     /**
-     * Returns an {@link OpCode} for the given int value.
-     * 
-     * @see #intValue()
+     * Returns an {@link OpCode} for the given {@code int} value.
      */
     public static OpCode valueOf(int value) {
-        int index = (value & Integer.MAX_VALUE) % VALUES.length;
-        OpCode opcode = VALUES[index];
-        if (opcode != null && opcode.value == value) {
-            return opcode;
-        }
-        
-        throw new IllegalArgumentException("value=" + value);
+        return PrimitiveEnums.Int.valueOf(OpCode.class, value);
     }
     
     /**
