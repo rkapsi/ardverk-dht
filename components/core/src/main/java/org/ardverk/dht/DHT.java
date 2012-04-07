@@ -45,5 +45,5 @@ public interface DHT extends DHTService, BootstrapService,
   /**
    * Returns the {@link DHT}'s {@link Datastore}.
    */
-  public Datastore getDatabase();
+  public Datastore getDatastore();
 }

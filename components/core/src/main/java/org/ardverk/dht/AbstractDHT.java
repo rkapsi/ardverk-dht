@@ -56,7 +56,7 @@ abstract class AbstractDHT implements DHT, Closeable {
   }
   
   @Override
-  public Datastore getDatabase() {
+  public Datastore getDatastore() {
     return datastore;
   }
   
