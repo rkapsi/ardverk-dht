@@ -20,14 +20,14 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.ardverk.dht.message.Message;
-import org.ardverk.io.Writable;
+import org.ardverk.io.Streamable;
 
 /**
  * The {@link Message}'s value.
  * 
  * @see Message#getValue()
  */
-public interface Value extends Writable {
+public interface Value extends Streamable {
     
     /**
      * Returns the length of the value in {@code byte}s.

@@ -11,10 +11,10 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPut;
 import org.ardverk.dht.lang.StringValue;
-import org.ardverk.io.Writable;
+import org.ardverk.io.Streamable;
 import org.ardverk.utils.StringUtils;
 
-public enum Method implements Writable, StringValue {
+public enum Method implements Streamable, StringValue {
     
     GET(HttpGet.METHOD_NAME),
     PUT(HttpPut.METHOD_NAME),

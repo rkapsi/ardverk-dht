@@ -6,10 +6,10 @@ import java.io.OutputStream;
 
 import org.apache.http.HttpStatus;
 import org.ardverk.io.DataUtils;
-import org.ardverk.io.Writable;
+import org.ardverk.io.Streamable;
 import org.ardverk.utils.StringUtils;
 
-public class StatusLine implements Writable {
+public class StatusLine implements Streamable {
 
     public static final StatusLine OK = new StatusLine(
             HttpStatus.SC_OK, "OK");

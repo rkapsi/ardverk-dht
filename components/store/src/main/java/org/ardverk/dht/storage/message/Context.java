@@ -18,10 +18,10 @@ import org.apache.http.protocol.HTTP;
 import org.ardverk.dht.storage.Constants;
 import org.ardverk.io.DataUtils;
 import org.ardverk.io.IoUtils;
-import org.ardverk.io.Writable;
+import org.ardverk.io.Streamable;
 import org.ardverk.utils.StringUtils;
 
-public final class Context implements Properties, Writable, Cloneable {
+public final class Context implements Properties, Streamable, Cloneable {
     
     protected final HeaderGroup group;
     

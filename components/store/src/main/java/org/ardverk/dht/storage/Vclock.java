@@ -21,7 +21,7 @@ import org.ardverk.dht.rsrc.Key;
 import org.ardverk.io.DataUtils;
 import org.ardverk.io.IoUtils;
 import org.ardverk.io.NopOutputStream;
-import org.ardverk.io.Writable;
+import org.ardverk.io.Streamable;
 import org.ardverk.security.MessageDigestUtils;
 import org.ardverk.utils.StringUtils;
 import org.ardverk.version.Occured;
@@ -29,7 +29,7 @@ import org.ardverk.version.Vector;
 import org.ardverk.version.VectorClock;
 import org.ardverk.version.Version;
 
-public class Vclock implements Version<Vclock>, Writable {
+public class Vclock implements Version<Vclock>, Streamable {
     
     public static Vclock create(Key key) {
         return new Vclock(key, VectorClock.<String>create());
