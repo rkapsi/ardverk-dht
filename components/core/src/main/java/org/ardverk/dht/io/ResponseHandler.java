@@ -24,10 +24,10 @@ import org.ardverk.dht.message.ResponseMessage;
  * Classes that process {@link ResponseMessage}s may implement this interface.
  */
 public interface ResponseHandler<V extends Entity> 
-        extends MessageCallback, DHTProcess<V> {
+    extends MessageCallback, DHTProcess<V> {
 
-    /**
-     * Returns {@code true} if the {@link ResponseHandler} is open.
-     */
-    public boolean isOpen();
+  /**
+   * Returns {@code true} if the {@link ResponseHandler} is open.
+   */
+  public boolean isOpen();
 }

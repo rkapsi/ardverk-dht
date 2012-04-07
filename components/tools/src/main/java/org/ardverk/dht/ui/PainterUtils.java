@@ -35,82 +35,82 @@ import org.ardverk.dht.message.ValueResponse;
 
 class PainterUtils {
 
-    private static int MAX_SIZE = 2048;
-    
-    public static final int SCALE = 10;
+  private static int MAX_SIZE = 2048;
+  
+  public static final int SCALE = 10;
 
-    public static final Stroke DEFAULT_STROKE = new BasicStroke(1.0f);
+  public static final Stroke DEFAULT_STROKE = new BasicStroke(1.0f);
 
-    public static final Stroke TWO_PIXEL_STROKE = new BasicStroke(2.0f);
-    
-    public static final long ATTACK = 250L;
-    
-    public static final long RELEASE = 2750L;
-    
-    public static final long DURATION = ATTACK + RELEASE;
-    
-    public static final float DOT_SIZE = 6f;
-    
-    private static final Color PING_REQUEST = Color.RED;
-    
-    private static final Color PING_RESPONSE = PING_REQUEST.darker();
-    
-    private static final Color NODE_REQUEST = Color.GREEN;
-    
-    private static final Color NODE_RESPONSE = NODE_REQUEST.darker();
-    
-    private static final Color VALUE_REQUEST = Color.BLUE;
-    
-    private static final Color VALUE_RESPONSE = VALUE_REQUEST.darker();
-    
-    private static final Color STORE_REQUEST = Color.CYAN;
-    
-    private static final Color STORE_RESPONSE = STORE_REQUEST.darker();
+  public static final Stroke TWO_PIXEL_STROKE = new BasicStroke(2.0f);
+  
+  public static final long ATTACK = 250L;
+  
+  public static final long RELEASE = 2750L;
+  
+  public static final long DURATION = ATTACK + RELEASE;
+  
+  public static final float DOT_SIZE = 6f;
+  
+  private static final Color PING_REQUEST = Color.RED;
+  
+  private static final Color PING_RESPONSE = PING_REQUEST.darker();
+  
+  private static final Color NODE_REQUEST = Color.GREEN;
+  
+  private static final Color NODE_RESPONSE = NODE_REQUEST.darker();
+  
+  private static final Color VALUE_REQUEST = Color.BLUE;
+  
+  private static final Color VALUE_RESPONSE = VALUE_REQUEST.darker();
+  
+  private static final Color STORE_REQUEST = Color.CYAN;
+  
+  private static final Color STORE_RESPONSE = STORE_REQUEST.darker();
 
-    private PainterUtils() {}
+  private PainterUtils() {}
 
-    public static Color alpha(Color color, int alpha) {
-        int rgb = (color.getRGB() & 0x00FFFFFF) | ((alpha & 0xFF) << 24);
-        return new Color(rgb, true);
+  public static Color alpha(Color color, int alpha) {
+    int rgb = (color.getRGB() & 0x00FFFFFF) | ((alpha & 0xFF) << 24);
+    return new Color(rgb, true);
+  }
+  
+  public static Color getColorForMessage(Message message) {
+    if (message instanceof PingRequest) {
+      return PING_REQUEST;
+    } else if (message instanceof PingResponse) {
+      return PING_RESPONSE;
+    } else if (message instanceof NodeRequest) {
+      return NODE_REQUEST;
+    } else if (message instanceof NodeResponse) {
+      return NODE_RESPONSE;
+    } else if (message instanceof ValueRequest) {
+      return VALUE_REQUEST;
+    } else if (message instanceof ValueResponse) {
+      return VALUE_RESPONSE;
+    } else if (message instanceof StoreRequest) {
+      return STORE_REQUEST;
+    } else if (message instanceof StoreResponse) {
+      return STORE_RESPONSE;
     }
     
-    public static Color getColorForMessage(Message message) {
-        if (message instanceof PingRequest) {
-            return PING_REQUEST;
-        } else if (message instanceof PingResponse) {
-            return PING_RESPONSE;
-        } else if (message instanceof NodeRequest) {
-            return NODE_REQUEST;
-        } else if (message instanceof NodeResponse) {
-            return NODE_RESPONSE;
-        } else if (message instanceof ValueRequest) {
-            return VALUE_REQUEST;
-        } else if (message instanceof ValueResponse) {
-            return VALUE_RESPONSE;
-        } else if (message instanceof StoreRequest) {
-            return STORE_REQUEST;
-        } else if (message instanceof StoreResponse) {
-            return STORE_RESPONSE;
-        }
-        
-        return Color.WHITE;
-    }
+    return Color.WHITE;
+  }
+  
+  public static Stroke getStrokeForMessage(Message message) {
+    float dash_phase = (float)Math.random() * 10f;
     
-    public static Stroke getStrokeForMessage(Message message) {
-        float dash_phase = (float)Math.random() * 10f;
-        
-        if (message instanceof RequestMessage) {
-            return PainterUtils.DEFAULT_STROKE;
-        } else {
-            return new BasicStroke(1.0f, BasicStroke.CAP_ROUND, 
-                BasicStroke.JOIN_ROUND, 10.0f, 
-                new float[]{ 2f, 4f }, dash_phase);
-        }
+    if (message instanceof RequestMessage) {
+      return PainterUtils.DEFAULT_STROKE;
+    } else {
+      return new BasicStroke(1.0f, BasicStroke.CAP_ROUND, 
+        BasicStroke.JOIN_ROUND, 10.0f, 
+        new float[]{ 2f, 4f }, dash_phase);
     }
-    
-    public static void adjustSize(List<?> nodes) {
-        while (!nodes.isEmpty() && nodes.size() >= MAX_SIZE) {
-            nodes.remove(0);
-        }
+  }
+  
+  public static void adjustSize(List<?> nodes) {
+    while (!nodes.isEmpty() && nodes.size() >= MAX_SIZE) {
+      nodes.remove(0);
     }
+  }
 }

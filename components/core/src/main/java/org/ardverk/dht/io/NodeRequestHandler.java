@@ -38,55 +38,55 @@ import org.ardverk.dht.routing.RouteTable;
  */
 @Singleton
 public class NodeRequestHandler extends AbstractRequestHandler {
+  
+  private final RouteTable routeTable;
+  
+  @Inject
+  public NodeRequestHandler(
+      Provider<MessageDispatcher> messageDispatcher, 
+      RouteTable routeTable) {
+    super(messageDispatcher);
     
-    private final RouteTable routeTable;
+    this.routeTable = routeTable;
+  }
+  
+  @Override
+  public ResponseMessage handleRequest(RequestMessage message) throws IOException {
+    NodeRequest request = (NodeRequest)message;
     
-    @Inject
-    public NodeRequestHandler(
-            Provider<MessageDispatcher> messageDispatcher, 
-            RouteTable routeTable) {
-        super(messageDispatcher);
-        
-        this.routeTable = routeTable;
-    }
+    KUID lookupId = request.getId();
     
-    @Override
-    public ResponseMessage handleRequest(RequestMessage message) throws IOException {
-        NodeRequest request = (NodeRequest)message;
+    // This is an idea where I'm not sure if it's improving anything 
+    // or not. In short we're excluding the localhost from the result 
+    // set. The other guy knows us already and our information is in 
+    // the message header anyways. There is therefore no reason to
+    // send it again and the remote host can determinate computationally 
+    // if we were supposed to be in the result set or not. 
+    //
+    // Instead we could send back some other contact. It's maybe not
+    // useful in the context of this lookup but maybe helps the remote
+    // host to keep its RouteTable "more" fresh.
+    
+    /*Contact localhost = routeTable.getLocalhost();
+    int k = routeTable.getK();
+    
+    Contact[] contacts = routeTable.select(lookupId, k+1);
+    if (k < contacts.length) {
+      Contact[] kContacts = new Contact[k];
+      for (int i = 0, j = 0; i < contacts.length 
+          && j < kContacts.length; i++) {
         
-        KUID lookupId = request.getId();
-        
-        // This is an idea where I'm not sure if it's improving anything 
-        // or not. In short we're excluding the localhost from the result 
-        // set. The other guy knows us already and our information is in 
-        // the message header anyways. There is therefore no reason to
-        // send it again and the remote host can determinate computationally 
-        // if we were supposed to be in the result set or not. 
-        //
-        // Instead we could send back some other contact. It's maybe not
-        // useful in the context of this lookup but maybe helps the remote
-        // host to keep its RouteTable "more" fresh.
-        
-        /*Contact localhost = routeTable.getLocalhost();
-        int k = routeTable.getK();
-        
-        Contact[] contacts = routeTable.select(lookupId, k+1);
-        if (k < contacts.length) {
-            Contact[] kContacts = new Contact[k];
-            for (int i = 0, j = 0; i < contacts.length 
-                    && j < kContacts.length; i++) {
-                
-                Contact contact = contacts[i];
-                if (!contact.equals(localhost)) {
-                    kContacts[j++] = contact;
-                }
-            }
-            contacts = kContacts;
-        }*/
-        
-        Contact[] contacts = routeTable.select(lookupId);
-        
-        MessageFactory factory = getMessageFactory();
-        return factory.createNodeResponse(request, contacts);
-    }
+        Contact contact = contacts[i];
+        if (!contact.equals(localhost)) {
+          kContacts[j++] = contact;
+        }
+      }
+      contacts = kContacts;
+    }*/
+    
+    Contact[] contacts = routeTable.select(lookupId);
+    
+    MessageFactory factory = getMessageFactory();
+    return factory.createNodeResponse(request, contacts);
+  }
 }

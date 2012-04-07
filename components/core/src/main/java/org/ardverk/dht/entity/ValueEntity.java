@@ -28,36 +28,36 @@ import org.ardverk.dht.rsrc.Value;
  * A default implementation of {@link ValueEntity}.
  */
 public class ValueEntity extends LookupEntity {
+  
+  private final Outcome outcome;
+  
+  private final ValueResponse[] responses;
+  
+  public ValueEntity(Outcome outcome, ValueResponse[] responses) {
+    super(outcome.getId(), outcome.getTimeInMillis(), 
+        TimeUnit.MILLISECONDS);
     
-    private final Outcome outcome;
-    
-    private final ValueResponse[] responses;
-    
-    public ValueEntity(Outcome outcome, ValueResponse[] responses) {
-        super(outcome.getId(), outcome.getTimeInMillis(), 
-                TimeUnit.MILLISECONDS);
-        
-        this.outcome = outcome;
-        this.responses = responses;
-    }
-    
-    public ValueResponse getValueResponse() {
-        return CollectionUtils.first(responses);
-    }
-    
-    public ValueResponse[] ValueResponses() {
-        return responses;
-    }
-    
-    public Contact getSender() {
-        return getValueResponse().getContact();
-    }
-    
-    public Value getValue() {
-        return getValueResponse().getValue();
-    }
-    
-    public Outcome getOutcome() {
-        return outcome;
-    }
+    this.outcome = outcome;
+    this.responses = responses;
+  }
+  
+  public ValueResponse getValueResponse() {
+    return CollectionUtils.first(responses);
+  }
+  
+  public ValueResponse[] ValueResponses() {
+    return responses;
+  }
+  
+  public Contact getSender() {
+    return getValueResponse().getContact();
+  }
+  
+  public Value getValue() {
+    return getValueResponse().getValue();
+  }
+  
+  public Outcome getOutcome() {
+    return outcome;
+  }
 }

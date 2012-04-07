@@ -50,224 +50,224 @@ import org.slf4j.LoggerFactory;
  */
 public class DatagramTransport extends AbstractTransport implements Closeable {
 
-    private static final Logger LOG 
-        = LoggerFactory.getLogger(DatagramTransport.class);
-    
-    private static final ExecutorService EXECUTOR 
-        = ExecutorUtils.newCachedThreadPool("DatagramTransportThread");
-    
-    private final int MAX_SIZE = 8 * 1024;
-    
-    private final ExecutorQueue<Runnable> executor 
-        = new DefaultExecutorQueue(EXECUTOR);
-    
-    private final MessageCodec codec;
-    
-    private final SocketAddress bindaddr;
-    
-    private volatile DatagramSocket socket = null;
-    
-    private Future<?> future = null;
-    
-    private boolean open = true;
-    
-    public DatagramTransport(MessageCodec codec, int port) {
-        this(codec, new InetSocketAddress(port));
-    }
-    
-    public DatagramTransport(MessageCodec codec, 
-            String bindaddr, int port) {
-        this(codec, new InetSocketAddress(bindaddr, port));
-    }
-    
-    public DatagramTransport(MessageCodec codec, 
-            InetAddress bindaddr, int port) {
-        this(codec, new InetSocketAddress(bindaddr, port));
-    }
-    
-    public DatagramTransport(SocketAddress bindaddr) {
-        this(new BencodeMessageCodec(), bindaddr);
-    }
-    
-    public DatagramTransport(MessageCodec codec, 
-            SocketAddress bindaddr) {
-        this.codec = codec;
-        this.bindaddr = bindaddr;
-    }
-    
-    @Override
-    public SocketAddress getSocketAddress() {
-        return bindaddr;
-    }
+  private static final Logger LOG 
+    = LoggerFactory.getLogger(DatagramTransport.class);
+  
+  private static final ExecutorService EXECUTOR 
+    = ExecutorUtils.newCachedThreadPool("DatagramTransportThread");
+  
+  private final int MAX_SIZE = 8 * 1024;
+  
+  private final ExecutorQueue<Runnable> executor 
+    = new DefaultExecutorQueue(EXECUTOR);
+  
+  private final MessageCodec codec;
+  
+  private final SocketAddress bindaddr;
+  
+  private volatile DatagramSocket socket = null;
+  
+  private Future<?> future = null;
+  
+  private boolean open = true;
+  
+  public DatagramTransport(MessageCodec codec, int port) {
+    this(codec, new InetSocketAddress(port));
+  }
+  
+  public DatagramTransport(MessageCodec codec, 
+      String bindaddr, int port) {
+    this(codec, new InetSocketAddress(bindaddr, port));
+  }
+  
+  public DatagramTransport(MessageCodec codec, 
+      InetAddress bindaddr, int port) {
+    this(codec, new InetSocketAddress(bindaddr, port));
+  }
+  
+  public DatagramTransport(SocketAddress bindaddr) {
+    this(new BencodeMessageCodec(), bindaddr);
+  }
+  
+  public DatagramTransport(MessageCodec codec, 
+      SocketAddress bindaddr) {
+    this.codec = codec;
+    this.bindaddr = bindaddr;
+  }
+  
+  @Override
+  public SocketAddress getSocketAddress() {
+    return bindaddr;
+  }
 
-    @Override
-    public synchronized void bind(TransportCallback callback) throws IOException {
-        if (!open) {
-            throw new IOException();
-        }
-        
-        super.bind(callback);
+  @Override
+  public synchronized void bind(TransportCallback callback) throws IOException {
+    if (!open) {
+      throw new IOException();
+    }
+    
+    super.bind(callback);
 
-        socket = new DatagramSocket(bindaddr);
+    socket = new DatagramSocket(bindaddr);
 
-        Runnable task = new Runnable() {
-            @Override
-            public void run() {
-                doServe();
-            }
-        };
-        
-        future = EXECUTOR.submit(task);
-    }
+    Runnable task = new Runnable() {
+      @Override
+      public void run() {
+        doServe();
+      }
+    };
+    
+    future = EXECUTOR.submit(task);
+  }
 
-    @Override
-    public synchronized void unbind() {
-        super.unbind();
-        
-        IoUtils.close(socket);
-        
-        if (future != null) {
-            future.cancel(true);
-        }
-        
-        synchronized (executor) {
-            executor.getQueue().clear();
-        }
+  @Override
+  public synchronized void unbind() {
+    super.unbind();
+    
+    IoUtils.close(socket);
+    
+    if (future != null) {
+      future.cancel(true);
     }
+    
+    synchronized (executor) {
+      executor.getQueue().clear();
+    }
+  }
 
-    @Override
-    public synchronized void close() {
-        open = false;
-        executor.shutdownNow();
-        unbind();
-    }
+  @Override
+  public synchronized void close() {
+    open = false;
+    executor.shutdownNow();
+    unbind();
+  }
+  
+  private void doServe() {
     
-    private void doServe() {
+    byte[] buffer = new byte[MAX_SIZE];
+    DatagramPacket packet 
+      = new DatagramPacket(buffer, buffer.length);
+    
+    DatagramSocket socket = null;
+    while ((socket = this.socket) != null 
+        && !socket.isClosed()) {
+      
+      try {
+        packet.setData(buffer);
+        socket.receive(packet);
         
-        byte[] buffer = new byte[MAX_SIZE];
-        DatagramPacket packet 
-            = new DatagramPacket(buffer, buffer.length);
-        
-        DatagramSocket socket = null;
-        while ((socket = this.socket) != null 
-                && !socket.isClosed()) {
-            
-            try {
-                packet.setData(buffer);
-                socket.receive(packet);
-                
-                process(packet);
-            } catch (IOException err) {
-                uncaughtException(socket, err);
-            }
+        process(packet);
+      } catch (IOException err) {
+        uncaughtException(socket, err);
+      }
+    }
+  }
+  
+  private void process(DatagramPacket packet) {
+    
+    final SocketAddress src = packet.getSocketAddress();
+    final byte[] data = extract(packet);
+    
+    Runnable task = new Runnable() {
+      @Override
+      public void run() {
+        Decoder decoder = null;
+        try {
+          decoder = codec.createDecoder(src, 
+              new ByteArrayInputStream(data));
+          Message message = decoder.read();
+          
+          if (message instanceof RequestMessage) {
+            handleRequest((RequestMessage)message);
+          } else {
+            handleResponse((ResponseMessage)message);
+          }
+          
+        } catch (IOException err) {
+          uncaughtException(socket, err);
+        } finally {
+          IoUtils.close(decoder);
         }
-    }
-    
-    private void process(DatagramPacket packet) {
-        
-        final SocketAddress src = packet.getSocketAddress();
-        final byte[] data = extract(packet);
-        
-        Runnable task = new Runnable() {
-            @Override
-            public void run() {
-                Decoder decoder = null;
-                try {
-                    decoder = codec.createDecoder(src, 
-                            new ByteArrayInputStream(data));
-                    Message message = decoder.read();
-                    
-                    if (message instanceof RequestMessage) {
-                        handleRequest((RequestMessage)message);
-                    } else {
-                        handleResponse((ResponseMessage)message);
-                    }
-                    
-                } catch (IOException err) {
-                    uncaughtException(socket, err);
-                } finally {
-                    IoUtils.close(decoder);
-                }
-            }
-            
-            private void handleRequest(RequestMessage request) throws IOException {
-                ResponseMessage response = DatagramTransport.this.handleRequest(request);
-                if (response != null) {
-                    KUID contactId = request.getContact().getId();
-                    send(contactId, response, -1L, TimeUnit.MILLISECONDS);
-                }
-            }
-            
-            private boolean handleResponse(ResponseMessage response) throws IOException {
-                return DatagramTransport.this.handleResponse(response);
-            }
-        };
-        
-        executor.execute(task);
-        //EXECUTOR.execute(task);
-    }
-    
-    @Override
-    public void send(final KUID contactId, final Message message,
-            long timeout, TimeUnit unit) throws IOException {
-        
-        final DatagramSocket socket = this.socket;
-        if (socket == null || socket.isClosed()) {
-            throw new IOException();
+      }
+      
+      private void handleRequest(RequestMessage request) throws IOException {
+        ResponseMessage response = DatagramTransport.this.handleRequest(request);
+        if (response != null) {
+          KUID contactId = request.getContact().getId();
+          send(contactId, response, -1L, TimeUnit.MILLISECONDS);
         }
-        
-        Runnable task = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    
-                    SocketAddress addr = message.getAddress();
-                    SocketAddress endpoint = NetworkUtils.getResolved(addr);
-                    
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    Encoder encoder = codec.createEncoder(baos);
-                    encoder.write(message);
-                    encoder.close();
-                    
-                    byte[] encoded = baos.toByteArray();
-                    DatagramPacket packet = new DatagramPacket(
-                            encoded, 0, encoded.length, endpoint);
-                    
-                    socket.send(packet);
-                    messageSent(contactId, message);
-                    
-                } catch (IOException err) {
-                    uncaughtException(socket, err);
-                    handleException(message, err);
-                }
-            }
-        };
-        
-        executor.execute(task);
-        //EXECUTOR.execute(task);
+      }
+      
+      private boolean handleResponse(ResponseMessage response) throws IOException {
+        return DatagramTransport.this.handleResponse(response);
+      }
+    };
+    
+    executor.execute(task);
+    //EXECUTOR.execute(task);
+  }
+  
+  @Override
+  public void send(final KUID contactId, final Message message,
+      long timeout, TimeUnit unit) throws IOException {
+    
+    final DatagramSocket socket = this.socket;
+    if (socket == null || socket.isClosed()) {
+      throw new IOException();
     }
     
-    protected void uncaughtException(DatagramSocket socket, Throwable t) {
-        if (socket.isClosed()) {
-            LOG.debug("Exception", t);
-        } else {
-            LOG.error("Exception", t);
+    Runnable task = new Runnable() {
+      @Override
+      public void run() {
+        try {
+          
+          SocketAddress addr = message.getAddress();
+          SocketAddress endpoint = NetworkUtils.getResolved(addr);
+          
+          ByteArrayOutputStream baos = new ByteArrayOutputStream();
+          Encoder encoder = codec.createEncoder(baos);
+          encoder.write(message);
+          encoder.close();
+          
+          byte[] encoded = baos.toByteArray();
+          DatagramPacket packet = new DatagramPacket(
+              encoded, 0, encoded.length, endpoint);
+          
+          socket.send(packet);
+          messageSent(contactId, message);
+          
+        } catch (IOException err) {
+          uncaughtException(socket, err);
+          handleException(message, err);
         }
-    }
+      }
+    };
     
-    /**
-     * Extracts and returns a copy of the {@link DatagramPacket}'s {@code byte[]}.
-     * 
-     * @see DatagramPacket#getData()
-     */
-    private static byte[] extract(DatagramPacket packet) {
-        byte[] data = packet.getData();
-        int offset = packet.getOffset();
-        int length = packet.getLength();
-        
-        byte[] copy = new byte[length];
-        System.arraycopy(data, offset, copy, 0, copy.length);
-        
-        return copy;
+    executor.execute(task);
+    //EXECUTOR.execute(task);
+  }
+  
+  protected void uncaughtException(DatagramSocket socket, Throwable t) {
+    if (socket.isClosed()) {
+      LOG.debug("Exception", t);
+    } else {
+      LOG.error("Exception", t);
     }
+  }
+  
+  /**
+   * Extracts and returns a copy of the {@link DatagramPacket}'s {@code byte[]}.
+   * 
+   * @see DatagramPacket#getData()
+   */
+  private static byte[] extract(DatagramPacket packet) {
+    byte[] data = packet.getData();
+    int offset = packet.getOffset();
+    int length = packet.getLength();
+    
+    byte[] copy = new byte[length];
+    System.arraycopy(data, offset, copy, 0, copy.length);
+    
+    return copy;
+  }
 }

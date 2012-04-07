@@ -27,24 +27,24 @@ import org.ardverk.dht.message.ResponseMessage;
  * The {@link TransportCallback} is called by {@link Transport}.
  */
 public interface TransportCallback {
-    
-    /**
-     * 
-     */
-    public ResponseMessage handleRequest(RequestMessage request) throws IOException;
-    
-    /**
-     * 
-     */
-    public boolean handleResponse(ResponseMessage response) throws IOException;
-    
-    /**
-     * Called by {@link Transport} for every {@link Message} that has been sent.
-     */
-    public void messageSent(KUID contactId, Message message);
-    
-    /**
-     * Called by {@link Transport} for every {@link Message} that failed to be sent.
-     */
-    public void handleException(Endpoint endpoint, Message message, Throwable t);
+  
+  /**
+   * 
+   */
+  public ResponseMessage handleRequest(RequestMessage request) throws IOException;
+  
+  /**
+   * 
+   */
+  public boolean handleResponse(ResponseMessage response) throws IOException;
+  
+  /**
+   * Called by {@link Transport} for every {@link Message} that has been sent.
+   */
+  public void messageSent(KUID contactId, Message message);
+  
+  /**
+   * Called by {@link Transport} for every {@link Message} that failed to be sent.
+   */
+  public void handleException(Endpoint endpoint, Message message, Throwable t);
 }

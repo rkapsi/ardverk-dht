@@ -28,27 +28,27 @@ import org.ardverk.io.Streamable;
  * @see Message#getValue()
  */
 public interface Value extends Streamable {
-    
-    /**
-     * Returns the length of the value in {@code byte}s.
-     */
-    public long getContentLength();
-    
-    /**
-     * Returns the {@link Value}'s data as an {@link InputStream}.
-     * 
-     * NOTE: The caller (you) is responsible for closing the {@link InputStream}.
-     */
-    public InputStream getContent() throws IOException;
-    
-    /**
-     * Returns {@code true} if the {@link Value} capable of producing 
-     * its data more than once.
-     */
-    public boolean isRepeatable();
-    
-    /**
-     * Returns {@code true} if the {@link Value} is streaming.
-     */
-    public boolean isStreaming();
+  
+  /**
+   * Returns the length of the value in {@code byte}s.
+   */
+  public long getContentLength();
+  
+  /**
+   * Returns the {@link Value}'s data as an {@link InputStream}.
+   * 
+   * NOTE: The caller (you) is responsible for closing the {@link InputStream}.
+   */
+  public InputStream getContent() throws IOException;
+  
+  /**
+   * Returns {@code true} if the {@link Value} capable of producing 
+   * its data more than once.
+   */
+  public boolean isRepeatable();
+  
+  /**
+   * Returns {@code true} if the {@link Value} is streaming.
+   */
+  public boolean isStreaming();
 }

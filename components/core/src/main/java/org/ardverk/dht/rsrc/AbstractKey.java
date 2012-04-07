@@ -23,39 +23,39 @@ import java.util.Map;
  */
 public abstract class AbstractKey implements Key {
 
-    @Override
-    public String getPath() {
-        return getURI().getPath();
-    }
-    
-    @Override
-    public Map<String, String> getQueryString() {
-        return KeyUtils.getQueryString(getURI());
-    }
-    
-    @Override
-    public int compareTo(Key o) {
-        return getPath().compareTo(o.getPath());
-    }
+  @Override
+  public String getPath() {
+    return getURI().getPath();
+  }
+  
+  @Override
+  public Map<String, String> getQueryString() {
+    return KeyUtils.getQueryString(getURI());
+  }
+  
+  @Override
+  public int compareTo(Key o) {
+    return getPath().compareTo(o.getPath());
+  }
 
-    @Override
-    public int hashCode() {
-        return getPath().hashCode();
+  @Override
+  public int hashCode() {
+    return getPath().hashCode();
+  }
+  
+  @Override
+  public boolean equals(Object o) {
+    if (o == this) {
+      return true;
+    } else if (!(o instanceof Key)) {
+      return false;
     }
     
-    @Override
-    public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        } else if (!(o instanceof Key)) {
-            return false;
-        }
-        
-        return compareTo((Key)o) == 0;
-    }
-    
-    @Override
-    public String toString() {
-        return getURI().toString();
-    }
+    return compareTo((Key)o) == 0;
+  }
+  
+  @Override
+  public String toString() {
+    return getURI().toString();
+  }
 }

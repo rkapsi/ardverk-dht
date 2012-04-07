@@ -27,7 +27,7 @@ import org.ardverk.lang.Bindable;
  */
 public interface Datastore extends Bindable<DHT> {
 
-    public Value store(Contact src, Key key, Value value);
-    
-    public Value get(Contact src, Key key);
+  public Value store(Contact src, Key key, Value value);
+  
+  public Value get(Contact src, Key key);
 }

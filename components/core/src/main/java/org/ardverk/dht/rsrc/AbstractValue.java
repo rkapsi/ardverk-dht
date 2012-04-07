@@ -25,24 +25,24 @@ import org.ardverk.io.StreamUtils;
 
 public abstract class AbstractValue implements Value {
 
-    @Override
-    public void writeTo(OutputStream out) throws IOException {
-        long length = getContentLength();
-        InputStream in = getContent();
-        try {
-            StreamUtils.copy(in, out, length);
-        } finally {
-            IoUtils.close(in);
-        }
+  @Override
+  public void writeTo(OutputStream out) throws IOException {
+    long length = getContentLength();
+    InputStream in = getContent();
+    try {
+      StreamUtils.copy(in, out, length);
+    } finally {
+      IoUtils.close(in);
     }
+  }
 
-    @Override
-    public boolean isRepeatable() {
-        return false;
-    }
+  @Override
+  public boolean isRepeatable() {
+    return false;
+  }
 
-    @Override
-    public boolean isStreaming() {
-        return false;
-    }
+  @Override
+  public boolean isStreaming() {
+    return false;
+  }
 }

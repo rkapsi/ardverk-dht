@@ -22,41 +22,41 @@ import org.ardverk.dht.routing.Contact;
 
 class ConfigUtils {
 
-    public ConfigUtils() {}
+  public ConfigUtils() {}
+  
+  /**
+   * Returns the sum of the {@link Config}'s operation 
+   * timeouts in milliseconds.
+   */
+  public static long getOperationTimeoutInMillis(Config... configs) {
+    return getOperationTimeout(configs, TimeUnit.MILLISECONDS);
+  }
+  
+  /**
+   * Returns the sum of the {@link Config}'s operation timeouts 
+   * in the given {@link TimeUnit}.
+   */
+  public static long getOperationTimeout(Config[] configs, TimeUnit unit) {
+    long time = 0;
     
-    /**
-     * Returns the sum of the {@link Config}'s operation 
-     * timeouts in milliseconds.
-     */
-    public static long getOperationTimeoutInMillis(Config... configs) {
-        return getOperationTimeout(configs, TimeUnit.MILLISECONDS);
+    for (Config config : configs) {
+      time += config.getOperationTimeout(unit);
     }
     
-    /**
-     * Returns the sum of the {@link Config}'s operation timeouts 
-     * in the given {@link TimeUnit}.
-     */
-    public static long getOperationTimeout(Config[] configs, TimeUnit unit) {
-        long time = 0;
-        
-        for (Config config : configs) {
-            time += config.getOperationTimeout(unit);
-        }
-        
-        return time;
+    return time;
+  }
+  
+  public static long getAdaptiveTimeout(Contact dst, 
+      double multiplier, long defaultTimeout, TimeUnit unit) {
+    
+    long rttInMillis = dst.getRoundTripTimeInMillis();
+    if (0L < rttInMillis && 0d < multiplier) {
+      long timeout = (long)(rttInMillis * multiplier);
+      long adaptive = Math.min(timeout, 
+          unit.toMillis(defaultTimeout));
+      return unit.convert(adaptive, TimeUnit.MILLISECONDS);
     }
     
-    public static long getAdaptiveTimeout(Contact dst, 
-            double multiplier, long defaultTimeout, TimeUnit unit) {
-        
-        long rttInMillis = dst.getRoundTripTimeInMillis();
-        if (0L < rttInMillis && 0d < multiplier) {
-            long timeout = (long)(rttInMillis * multiplier);
-            long adaptive = Math.min(timeout, 
-                    unit.toMillis(defaultTimeout));
-            return unit.convert(adaptive, TimeUnit.MILLISECONDS);
-        }
-        
-        return defaultTimeout;
-    }
+    return defaultTimeout;
+  }
 }

@@ -26,32 +26,32 @@ import org.ardverk.dht.routing.Contact;
  */
 public class PutEntity extends LookupEntity {
 
-    private final NodeEntity nodeEntity;
+  private final NodeEntity nodeEntity;
+  
+  private final StoreEntity storeEntity;
+  
+  public PutEntity(NodeEntity nodeEntity, StoreEntity storeEntity) {
+    super(nodeEntity.getId(), 
+        EntityUtils.getTimeInMillis(nodeEntity, storeEntity), 
+        TimeUnit.MILLISECONDS);
     
-    private final StoreEntity storeEntity;
-    
-    public PutEntity(NodeEntity nodeEntity, StoreEntity storeEntity) {
-        super(nodeEntity.getId(), 
-                EntityUtils.getTimeInMillis(nodeEntity, storeEntity), 
-                TimeUnit.MILLISECONDS);
-        
-        this.nodeEntity = nodeEntity;
-        this.storeEntity = storeEntity;
-    }
+    this.nodeEntity = nodeEntity;
+    this.storeEntity = storeEntity;
+  }
 
-    public NodeEntity getNodeEntity() {
-        return nodeEntity;
-    }
-    
-    public StoreEntity getStoreEntity() {
-        return storeEntity;
-    }
+  public NodeEntity getNodeEntity() {
+    return nodeEntity;
+  }
+  
+  public StoreEntity getStoreEntity() {
+    return storeEntity;
+  }
 
-    public StoreResponse[] getStoreResponses() {
-        return storeEntity.getStoreResponses();
-    }
-    
-    public Contact[] getStoreContacts() {
-        return storeEntity.getStoreContacts();
-    }
+  public StoreResponse[] getStoreResponses() {
+    return storeEntity.getStoreResponses();
+  }
+  
+  public Contact[] getStoreContacts() {
+    return storeEntity.getStoreContacts();
+  }
 }

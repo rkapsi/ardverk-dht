@@ -25,15 +25,15 @@ import org.ardverk.dht.rsrc.Value;
  * An abstract implementation of {@link ResponseMessage}.
  */
 public class AbstractResponseMessage extends AbstractMessage 
-        implements ResponseMessage {
+    implements ResponseMessage {
 
-    public AbstractResponseMessage( MessageId messageId, 
-            Contact contact, SocketAddress address) {
-        super(messageId, contact, address);
-    }
+  public AbstractResponseMessage( MessageId messageId, 
+      Contact contact, SocketAddress address) {
+    super(messageId, contact, address);
+  }
 
-    public AbstractResponseMessage(MessageId messageId, Contact contact,
-            SocketAddress address, Value value) {
-        super(messageId, contact, address, value);
-    }
+  public AbstractResponseMessage(MessageId messageId, Contact contact,
+      SocketAddress address, Value value) {
+    super(messageId, contact, address, value);
+  }
 }

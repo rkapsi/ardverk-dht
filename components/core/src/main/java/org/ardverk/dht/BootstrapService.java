@@ -30,27 +30,27 @@ import org.ardverk.dht.routing.Contact;
  */
 interface BootstrapService {
 
-    /**
-     * Bootstraps the DHT from the given hostname and port.
-     */
-    public DHTFuture<BootstrapEntity> bootstrap(
-            String host, int port, BootstrapConfig... config);
-    
-    /**
-     * Bootstraps the DHT from the given {@link InetAddress} and port.
-     */
-    public DHTFuture<BootstrapEntity> bootstrap(
-            InetAddress address, int port, BootstrapConfig... config);
-    
-    /**
-     * Bootstraps the DHT from the given {@link SocketAddress}.
-     */
-    public DHTFuture<BootstrapEntity> bootstrap(
-            SocketAddress address, BootstrapConfig... config);
-    
-    /**
-     * Bootstraps the DHT from the given {@link Contact}.
-     */
-    public DHTFuture<BootstrapEntity> bootstrap(
-            Contact contact, BootstrapConfig... config);
+  /**
+   * Bootstraps the DHT from the given hostname and port.
+   */
+  public DHTFuture<BootstrapEntity> bootstrap(
+      String host, int port, BootstrapConfig... config);
+  
+  /**
+   * Bootstraps the DHT from the given {@link InetAddress} and port.
+   */
+  public DHTFuture<BootstrapEntity> bootstrap(
+      InetAddress address, int port, BootstrapConfig... config);
+  
+  /**
+   * Bootstraps the DHT from the given {@link SocketAddress}.
+   */
+  public DHTFuture<BootstrapEntity> bootstrap(
+      SocketAddress address, BootstrapConfig... config);
+  
+  /**
+   * Bootstraps the DHT from the given {@link Contact}.
+   */
+  public DHTFuture<BootstrapEntity> bootstrap(
+      Contact contact, BootstrapConfig... config);
 }

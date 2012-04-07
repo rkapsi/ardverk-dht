@@ -25,12 +25,12 @@ import org.ardverk.dht.message.Message;
 
 interface Painter {
 
-    public static enum EventType {
-        MESSAGE_SENT,
-        MESSAGE_RECEIVED;
-    }
-    
-    public void paint(Component c, Graphics g);
-    
-    public void handleEvent(EventType type, KUID contactId, Message message);
+  public static enum EventType {
+    MESSAGE_SENT,
+    MESSAGE_RECEIVED;
+  }
+  
+  public void paint(Component c, Graphics g);
+  
+  public void handleEvent(EventType type, KUID contactId, Message message);
 }

@@ -23,5 +23,5 @@ import org.ardverk.lang.BindableObject;
  * An abstract implementation of {@link Datastore}.
  */
 public abstract class AbstractDatastore extends BindableObject<DHT> implements Datastore {
-    
+  
 }

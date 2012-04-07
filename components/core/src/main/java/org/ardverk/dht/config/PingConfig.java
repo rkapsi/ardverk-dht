@@ -21,27 +21,27 @@ import java.util.concurrent.TimeUnit;
 import org.ardverk.utils.TimeUtils;
 
 public class PingConfig extends Config {
-    
-    private static final long DEFAULT_PING_TIMEOUT 
-        = TimeUtils.convert(10L, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
-    
-    public PingConfig() {
-        super(DEFAULT_PING_TIMEOUT, TimeUnit.MILLISECONDS);
-    }
-    
-    public PingConfig(long pingTimeout, TimeUnit unit) {
-        super(pingTimeout, unit);
-    }
+  
+  private static final long DEFAULT_PING_TIMEOUT 
+    = TimeUtils.convert(10L, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
+  
+  public PingConfig() {
+    super(DEFAULT_PING_TIMEOUT, TimeUnit.MILLISECONDS);
+  }
+  
+  public PingConfig(long pingTimeout, TimeUnit unit) {
+    super(pingTimeout, unit);
+  }
 
-    public void setPingTimeout(long timeout, TimeUnit unit) {
-        setOperationTimeout(timeout, unit);
-    }
+  public void setPingTimeout(long timeout, TimeUnit unit) {
+    setOperationTimeout(timeout, unit);
+  }
 
-    public long getPingTimeout(TimeUnit unit) {
-        return getOperationTimeout(unit);
-    }
+  public long getPingTimeout(TimeUnit unit) {
+    return getOperationTimeout(unit);
+  }
 
-    public long getPingTimeoutInMillis() {
-        return getOperationTimeoutInMillis();
-    }
+  public long getPingTimeoutInMillis() {
+    return getOperationTimeoutInMillis();
+  }
 }

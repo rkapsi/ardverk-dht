@@ -21,54 +21,54 @@ package org.ardverk.dht.io;
  * limiting the number of concurrently active processes.
  */
 class ProcessCounter {
-    
-    private final int maxActive;
-    
-    private int active = 0;
-    
-    private int count = 0;
-    
-    public ProcessCounter(int maxActive) {
-        if (maxActive < 0) {
-            throw new IllegalArgumentException(
-                    "maxActive=" + maxActive);
-        }
-        
-        this.maxActive = maxActive;
+  
+  private final int maxActive;
+  
+  private int active = 0;
+  
+  private int count = 0;
+  
+  public ProcessCounter(int maxActive) {
+    if (maxActive < 0) {
+      throw new IllegalArgumentException(
+          "maxActive=" + maxActive);
     }
     
-    public boolean hasNext() {
-        return active < maxActive;
+    this.maxActive = maxActive;
+  }
+  
+  public boolean hasNext() {
+    return active < maxActive;
+  }
+  
+  public boolean increment() {
+    return increment(false);
+  }
+  
+  public boolean increment(boolean force) {
+    if (active < maxActive || force) {
+      ++active;
+      ++count;
+      return true;
     }
-    
-    public boolean increment() {
-        return increment(false);
+    return false;
+  }
+  
+  public void decrement() {
+    if (0 < active) {
+      --active;
     }
-    
-    public boolean increment(boolean force) {
-        if (active < maxActive || force) {
-            ++active;
-            ++count;
-            return true;
-        }
-        return false;
-    }
-    
-    public void decrement() {
-        if (0 < active) {
-            --active;
-        }
-    }
-    
-    public boolean hasActive() {
-        return 0 < active;
-    }
-    
-    public int getActive() {
-        return active;
-    }
-    
-    public int getCount() {
-        return count;
-    }
+  }
+  
+  public boolean hasActive() {
+    return 0 < active;
+  }
+  
+  public int getActive() {
+    return active;
+  }
+  
+  public int getCount() {
+    return count;
+  }
 }

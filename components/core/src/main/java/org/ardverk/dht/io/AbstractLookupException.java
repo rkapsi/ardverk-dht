@@ -24,26 +24,26 @@ import org.ardverk.dht.lang.Identifier;
 
 
 abstract class AbstractLookupException extends DHTException implements Identifier {
-    
-    private static final long serialVersionUID = -2767832375265292182L;
+  
+  private static final long serialVersionUID = -2767832375265292182L;
 
-    private final Outcome outcome;
-    
-    public AbstractLookupException(Outcome outcome) {
-        super(outcome.getTimeInMillis(), TimeUnit.MILLISECONDS);
-        this.outcome = outcome;
-    }
+  private final Outcome outcome;
+  
+  public AbstractLookupException(Outcome outcome) {
+    super(outcome.getTimeInMillis(), TimeUnit.MILLISECONDS);
+    this.outcome = outcome;
+  }
 
-    /**
-     * Returns the {@link Outcome} as it was at the point of time when
-     * the {@link AbstractLookupException} occurred.
-     */
-    public Outcome getOutcome() {
-        return outcome;
-    }
+  /**
+   * Returns the {@link Outcome} as it was at the point of time when
+   * the {@link AbstractLookupException} occurred.
+   */
+  public Outcome getOutcome() {
+    return outcome;
+  }
 
-    @Override
-    public KUID getId() {
-        return outcome.getId();
-    }
+  @Override
+  public KUID getId() {
+    return outcome.getId();
+  }
 }

@@ -28,58 +28,58 @@ import org.ardverk.lang.Epoch;
  */
 public abstract class AbstractMessage implements Message, Epoch {
 
-    private final long creationTime = System.currentTimeMillis();
+  private final long creationTime = System.currentTimeMillis();
+  
+  private final MessageId messageId;
+  
+  private final Contact contact;
+  
+  private final SocketAddress address;
+  
+  private final Value value;
+  
+  public AbstractMessage(MessageId messageId, Contact contact, 
+      SocketAddress address) {
+    this(messageId, contact, address, NoValue.EMPTY);
+  }
+  
+  public AbstractMessage(MessageId messageId, Contact contact, 
+      SocketAddress address, Value value) {
     
-    private final MessageId messageId;
-    
-    private final Contact contact;
-    
-    private final SocketAddress address;
-    
-    private final Value value;
-    
-    public AbstractMessage(MessageId messageId, Contact contact, 
-            SocketAddress address) {
-        this(messageId, contact, address, NoValue.EMPTY);
-    }
-    
-    public AbstractMessage(MessageId messageId, Contact contact, 
-            SocketAddress address, Value value) {
-        
-        this.messageId = messageId;
-        this.contact = contact;
-        this.address = address;
-        this.value = value;
-    }
-    
-    @Override
-    public long getCreationTime() {
-        return creationTime;
-    }
-    
-    @Override
-    public MessageId getMessageId() {
-        return messageId;
-    }
+    this.messageId = messageId;
+    this.contact = contact;
+    this.address = address;
+    this.value = value;
+  }
+  
+  @Override
+  public long getCreationTime() {
+    return creationTime;
+  }
+  
+  @Override
+  public MessageId getMessageId() {
+    return messageId;
+  }
 
-    @Override
-    public Contact getContact() {
-        return contact;
-    }
-    
-    @Override
-    public SocketAddress getAddress() {
-        return address;
-    }
-    
-    @Override
-    public Value getValue() {
-        return value;
-    }
+  @Override
+  public Contact getContact() {
+    return contact;
+  }
+  
+  @Override
+  public SocketAddress getAddress() {
+    return address;
+  }
+  
+  @Override
+  public Value getValue() {
+    return value;
+  }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() 
-            + "(" + messageId + ", " + contact + ", " + address + ")";
-    }
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() 
+      + "(" + messageId + ", " + contact + ", " + address + ")";
+  }
 }

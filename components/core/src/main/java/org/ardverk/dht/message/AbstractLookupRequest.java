@@ -24,10 +24,10 @@ import org.ardverk.dht.routing.Contact;
  * An abstract implementation of {@link LookupRequest}.
  */
 abstract class AbstractLookupRequest extends AbstractRequestMessage 
-        implements LookupRequest {
-    
-    public AbstractLookupRequest(MessageId messageId, Contact contact, 
-            SocketAddress address) {
-        super(messageId, contact, address);
-    }
+    implements LookupRequest {
+  
+  public AbstractLookupRequest(MessageId messageId, Contact contact, 
+      SocketAddress address) {
+    super(messageId, contact, address);
+  }
 }

@@ -23,19 +23,19 @@ import org.ardverk.dht.rsrc.Key;
 import org.ardverk.dht.rsrc.Value;
 
 public class DefaultStoreRequest extends AbstractRequestMessage 
-        implements StoreRequest {
+    implements StoreRequest {
 
-    private final Key key;
+  private final Key key;
+  
+  public DefaultStoreRequest(MessageId messageId, Contact contact, 
+      SocketAddress address, Key key, Value value) {
+    super(messageId, contact, address, value);
     
-    public DefaultStoreRequest(MessageId messageId, Contact contact, 
-            SocketAddress address, Key key, Value value) {
-        super(messageId, contact, address, value);
-        
-        this.key = key;
-    }
-    
-    @Override
-    public Key getKey() {
-        return key;
-    }
+    this.key = key;
+  }
+  
+  @Override
+  public Key getKey() {
+    return key;
+  }
 }

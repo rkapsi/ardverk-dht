@@ -23,8 +23,8 @@ package org.ardverk.dht.lang;
 
 public interface Negation<T> {
 
-    /**
-     * Returns the bitwise negation of this value
-     */
-    public T negate();
+  /**
+   * Returns the bitwise negation of this value
+   */
+  public T negate();
 }

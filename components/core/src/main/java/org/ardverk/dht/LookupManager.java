@@ -40,55 +40,55 @@ import org.ardverk.dht.rsrc.Key;
 @Singleton
 public class LookupManager {
 
-    private final ConfigProvider configProvider;
+  private final ConfigProvider configProvider;
+  
+  private final FutureManager futureManager;
+  
+  private final Provider<MessageDispatcher> messageDispatcher;
+  
+  private final RouteTable routeTable;
+  
+  @Inject
+  LookupManager(ConfigProvider configProvider,
+      RouteTable routeTable, 
+      FutureManager futureManager, 
+      Provider<MessageDispatcher> messageDispatcher) {
     
-    private final FutureManager futureManager;
+    this.configProvider = configProvider;
+    this.futureManager = futureManager;
+    this.messageDispatcher = messageDispatcher;
+    this.routeTable = routeTable;
+  }
+  
+  public DHTFuture<NodeEntity> lookup(KUID lookupId, NodeConfig... config) {
+    Contact[] contacts = routeTable.select(lookupId);
+    return lookup(contacts, lookupId, config);
+  }
+  
+  public DHTFuture<NodeEntity> lookup(Contact[] contacts, 
+      KUID lookupId, NodeConfig... config) {
     
-    private final Provider<MessageDispatcher> messageDispatcher;
+    NodeConfig cfg = configProvider.get(config);
     
-    private final RouteTable routeTable;
+    DHTProcess<NodeEntity> process 
+      = new NodeResponseHandler(messageDispatcher, 
+          contacts, routeTable, lookupId, cfg);
+    return futureManager.submit(process, cfg);
+  }
+  
+  public DHTFuture<ValueEntity> get(Key key, ValueConfig... config) {
+    Contact[] contacts = routeTable.select(key.getId());
+    return get(contacts, key, config);
+  }
+  
+  public DHTFuture<ValueEntity> get(Contact[] contacts, 
+      Key key, ValueConfig... config) {
     
-    @Inject
-    LookupManager(ConfigProvider configProvider,
-            RouteTable routeTable, 
-            FutureManager futureManager, 
-            Provider<MessageDispatcher> messageDispatcher) {
-        
-        this.configProvider = configProvider;
-        this.futureManager = futureManager;
-        this.messageDispatcher = messageDispatcher;
-        this.routeTable = routeTable;
-    }
+    ValueConfig cfg = configProvider.get(config);
     
-    public DHTFuture<NodeEntity> lookup(KUID lookupId, NodeConfig... config) {
-        Contact[] contacts = routeTable.select(lookupId);
-        return lookup(contacts, lookupId, config);
-    }
-    
-    public DHTFuture<NodeEntity> lookup(Contact[] contacts, 
-            KUID lookupId, NodeConfig... config) {
-        
-        NodeConfig cfg = configProvider.get(config);
-        
-        DHTProcess<NodeEntity> process 
-            = new NodeResponseHandler(messageDispatcher, 
-                    contacts, routeTable, lookupId, cfg);
-        return futureManager.submit(process, cfg);
-    }
-    
-    public DHTFuture<ValueEntity> get(Key key, ValueConfig... config) {
-        Contact[] contacts = routeTable.select(key.getId());
-        return get(contacts, key, config);
-    }
-    
-    public DHTFuture<ValueEntity> get(Contact[] contacts, 
-            Key key, ValueConfig... config) {
-        
-        ValueConfig cfg = configProvider.get(config);
-        
-        DHTProcess<ValueEntity> process
-            = new ValueResponseHandler(messageDispatcher, contacts, 
-                    routeTable, key, cfg);
-        return futureManager.submit(process, cfg);
-    }
+    DHTProcess<ValueEntity> process
+      = new ValueResponseHandler(messageDispatcher, contacts, 
+          routeTable, key, cfg);
+    return futureManager.submit(process, cfg);
+  }
 }

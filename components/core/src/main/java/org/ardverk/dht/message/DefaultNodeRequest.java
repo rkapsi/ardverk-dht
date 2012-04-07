@@ -23,19 +23,19 @@ import org.ardverk.dht.routing.Contact;
 
 
 public class DefaultNodeRequest extends AbstractLookupRequest 
-        implements NodeRequest {
+    implements NodeRequest {
+  
+  private final KUID lookupId;
+  
+  public DefaultNodeRequest(MessageId messageId, Contact contact, 
+      SocketAddress address, KUID lookupId) {
+    super(messageId, contact, address);
     
-    private final KUID lookupId;
-    
-    public DefaultNodeRequest(MessageId messageId, Contact contact, 
-            SocketAddress address, KUID lookupId) {
-        super(messageId, contact, address);
-        
-        this.lookupId = lookupId;
-    }
+    this.lookupId = lookupId;
+  }
 
-    @Override
-    public KUID getId() {
-        return lookupId;
-    }
+  @Override
+  public KUID getId() {
+    return lookupId;
+  }
 }

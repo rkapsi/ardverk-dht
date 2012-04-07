@@ -25,14 +25,14 @@ import org.ardverk.dht.KUID;
  */
 public abstract class LookupEntity extends Entity {
 
-    private final KUID lookupId;
-    
-    public LookupEntity(KUID lookupId, long time, TimeUnit unit) {
-        super(time, unit);
-        this.lookupId = lookupId;
-    }
+  private final KUID lookupId;
+  
+  public LookupEntity(KUID lookupId, long time, TimeUnit unit) {
+    super(time, unit);
+    this.lookupId = lookupId;
+  }
 
-    public KUID getId() {
-        return lookupId;
-    }
+  public KUID getId() {
+    return lookupId;
+  }
 }

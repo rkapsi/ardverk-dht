@@ -21,90 +21,90 @@ import java.util.concurrent.TimeUnit;
 import org.ardverk.utils.TimeUtils;
 
 public class NodeConfig extends Config {
-    
-    private static final long DEFAULT_OPERATION_TIMEOUT 
-        = TimeUtils.convert(60L, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
-    
-    private volatile boolean exhaustive = false;
-    
-    private volatile boolean randomize = false;
-    
-    private volatile int alpha = 4;
+  
+  private static final long DEFAULT_OPERATION_TIMEOUT 
+    = TimeUtils.convert(60L, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
+  
+  private volatile boolean exhaustive = false;
+  
+  private volatile boolean randomize = false;
+  
+  private volatile int alpha = 4;
 
-    private volatile long boostFrequency 
-        = TimeUtils.convert(5L, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
-    
-    private volatile long boostTimeout 
-        = TimeUtils.convert(3L, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
-    
-    private volatile long lookupTimeoutInMillis 
-        = TimeUtils.convert(10L, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
-    
-    public NodeConfig() {
-        this(DEFAULT_OPERATION_TIMEOUT, TimeUnit.MILLISECONDS);
-    }
-    
-    public NodeConfig(long timeout, TimeUnit unit) {
-        super(timeout, unit);
-    }
-    
-    public boolean isExhaustive() {
-        return exhaustive;
-    }
+  private volatile long boostFrequency 
+    = TimeUtils.convert(5L, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
+  
+  private volatile long boostTimeout 
+    = TimeUtils.convert(3L, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
+  
+  private volatile long lookupTimeoutInMillis 
+    = TimeUtils.convert(10L, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
+  
+  public NodeConfig() {
+    this(DEFAULT_OPERATION_TIMEOUT, TimeUnit.MILLISECONDS);
+  }
+  
+  public NodeConfig(long timeout, TimeUnit unit) {
+    super(timeout, unit);
+  }
+  
+  public boolean isExhaustive() {
+    return exhaustive;
+  }
 
-    public void setExhaustive(boolean exhaustive) {
-        this.exhaustive = exhaustive;
-    }
+  public void setExhaustive(boolean exhaustive) {
+    this.exhaustive = exhaustive;
+  }
 
-    public boolean isRandomize() {
-        return randomize;
-    }
+  public boolean isRandomize() {
+    return randomize;
+  }
 
-    public void setRandomize(boolean randomize) {
-        this.randomize = randomize;
-    }
+  public void setRandomize(boolean randomize) {
+    this.randomize = randomize;
+  }
 
-    public int getAlpha() {
-        return alpha;
-    }
+  public int getAlpha() {
+    return alpha;
+  }
 
-    public void setAlpha(int alpha) {
-        this.alpha = alpha;
-    }
-    
-    public long getBoostFrequency(TimeUnit unit) {
-        return unit.convert(boostFrequency, TimeUnit.MILLISECONDS);
-    }
-    
-    public long getBoostFrequencyInMillis() {
-        return getBoostFrequency(TimeUnit.MILLISECONDS);
-    }
-    
-    public void setBoostFrequency(long boostFrequency, TimeUnit unit) {
-        this.boostFrequency = unit.toMillis(boostTimeout);
-    }
-    
-    public long getBoostTimeout(TimeUnit unit) {
-        return unit.convert(boostTimeout, TimeUnit.MILLISECONDS);
-    }
-    
-    public long getBoostTimeoutInMillis() {
-        return getBoostTimeout(TimeUnit.MILLISECONDS);
-    }
-    
-    public void setBoostTimeout(long boostTimeout, TimeUnit unit) {
-        this.boostTimeout = unit.toMillis(boostTimeout);
-    }
+  public void setAlpha(int alpha) {
+    this.alpha = alpha;
+  }
+  
+  public long getBoostFrequency(TimeUnit unit) {
+    return unit.convert(boostFrequency, TimeUnit.MILLISECONDS);
+  }
+  
+  public long getBoostFrequencyInMillis() {
+    return getBoostFrequency(TimeUnit.MILLISECONDS);
+  }
+  
+  public void setBoostFrequency(long boostFrequency, TimeUnit unit) {
+    this.boostFrequency = unit.toMillis(boostTimeout);
+  }
+  
+  public long getBoostTimeout(TimeUnit unit) {
+    return unit.convert(boostTimeout, TimeUnit.MILLISECONDS);
+  }
+  
+  public long getBoostTimeoutInMillis() {
+    return getBoostTimeout(TimeUnit.MILLISECONDS);
+  }
+  
+  public void setBoostTimeout(long boostTimeout, TimeUnit unit) {
+    this.boostTimeout = unit.toMillis(boostTimeout);
+  }
 
-    public long getLookupTimeout(TimeUnit unit) {
-        return unit.convert(lookupTimeoutInMillis, TimeUnit.MILLISECONDS);
-    }
+  public long getLookupTimeout(TimeUnit unit) {
+    return unit.convert(lookupTimeoutInMillis, TimeUnit.MILLISECONDS);
+  }
 
-    public long getLookupTimeoutInMillis() {
-        return getLookupTimeout(TimeUnit.MILLISECONDS);
-    }
+  public long getLookupTimeoutInMillis() {
+    return getLookupTimeout(TimeUnit.MILLISECONDS);
+  }
 
-    public void setLookupTimeout(long timeout, TimeUnit unit) {
-        this.lookupTimeoutInMillis = unit.toMillis(timeout);
-    }
+  public void setLookupTimeout(long timeout, TimeUnit unit) {
+    this.lookupTimeoutInMillis = unit.toMillis(timeout);
+  }
 }

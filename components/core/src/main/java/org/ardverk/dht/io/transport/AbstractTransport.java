@@ -28,87 +28,87 @@ import org.ardverk.dht.message.ResponseMessage;
  * An abstract implementation of {@link Transport}.
  */
 public abstract class AbstractTransport implements Transport {
-    
-    private final AtomicReference<TransportCallback> callbackRef 
-        = new AtomicReference<TransportCallback>();
-    
-    @Override
-    public void bind(TransportCallback callback) throws IOException {
-        if (callback == null) {
-            throw new NullPointerException("callback");
-        }
-        
-        if (!callbackRef.compareAndSet(null, callback)) {
-            throw new IOException();
-        }
+  
+  private final AtomicReference<TransportCallback> callbackRef 
+    = new AtomicReference<TransportCallback>();
+  
+  @Override
+  public void bind(TransportCallback callback) throws IOException {
+    if (callback == null) {
+      throw new NullPointerException("callback");
     }
     
-    @Override
-    public void unbind() {
-        callbackRef.set(null);
+    if (!callbackRef.compareAndSet(null, callback)) {
+      throw new IOException();
     }
+  }
+  
+  @Override
+  public void unbind() {
+    callbackRef.set(null);
+  }
 
-    @Override
-    public boolean isBound() {
-        return callbackRef.get() != null;
+  @Override
+  public boolean isBound() {
+    return callbackRef.get() != null;
+  }
+  
+  /**
+   * A helper method to notify the {@link TransportCallback.Inbound} callback.
+   */
+  protected boolean handleResponse(ResponseMessage response) throws IOException {
+    TransportCallback callback = callbackRef.get();
+    if (callback != null) {
+      return callback.handleResponse(response);
+    }
+    return false;
+  }
+  
+  /**
+   * A helper method to notify the {@link TransportCallback.Inbound} callback.
+   */
+  protected ResponseMessage handleRequest(RequestMessage request) throws IOException {
+    TransportCallback callback = callbackRef.get();
+    if (callback != null) {
+      return callback.handleRequest(request);
     }
     
-    /**
-     * A helper method to notify the {@link TransportCallback.Inbound} callback.
-     */
-    protected boolean handleResponse(ResponseMessage response) throws IOException {
-        TransportCallback callback = callbackRef.get();
-        if (callback != null) {
-            return callback.handleResponse(response);
-        }
-        return false;
+    throw new IOException();
+  }
+  
+  protected boolean messageSent(RequestMessage request, 
+      ResponseMessage response) {
+    KUID contactId = request.getContact().getId();
+    return messageSent(contactId, response);
+  }
+  
+  /**
+   * A helper method to notify the {@link TransportCallback.Outbound} callback.
+   */
+  protected boolean messageSent(KUID contactId, Message message) {
+    TransportCallback callback = callbackRef.get();
+    if (callback != null) {
+      callback.messageSent(contactId, message);
+      return true;
     }
+    return false;
+  }
+  
+  protected boolean handleException(Message message, Throwable t) {
+    return handleException(this, message, t);
+  }
+  
+  /**
+   * A helper method to notify the {@link TransportCallback.Outbound} callback.
+   */
+  protected boolean handleException(Endpoint endpoint, 
+      Message message, Throwable t) {
     
-    /**
-     * A helper method to notify the {@link TransportCallback.Inbound} callback.
-     */
-    protected ResponseMessage handleRequest(RequestMessage request) throws IOException {
-        TransportCallback callback = callbackRef.get();
-        if (callback != null) {
-            return callback.handleRequest(request);
-        }
-        
-        throw new IOException();
+    TransportCallback callback = callbackRef.get();
+    if (callback != null) {
+      callback.handleException(endpoint, message, t);
+      return true;
     }
-    
-    protected boolean messageSent(RequestMessage request, 
-            ResponseMessage response) {
-        KUID contactId = request.getContact().getId();
-        return messageSent(contactId, response);
-    }
-    
-    /**
-     * A helper method to notify the {@link TransportCallback.Outbound} callback.
-     */
-    protected boolean messageSent(KUID contactId, Message message) {
-        TransportCallback callback = callbackRef.get();
-        if (callback != null) {
-            callback.messageSent(contactId, message);
-            return true;
-        }
-        return false;
-    }
-    
-    protected boolean handleException(Message message, Throwable t) {
-        return handleException(this, message, t);
-    }
-    
-    /**
-     * A helper method to notify the {@link TransportCallback.Outbound} callback.
-     */
-    protected boolean handleException(Endpoint endpoint, 
-            Message message, Throwable t) {
-        
-        TransportCallback callback = callbackRef.get();
-        if (callback != null) {
-            callback.handleException(endpoint, message, t);
-            return true;
-        }
-        return false;
-    }
+    return false;
+  }
 }

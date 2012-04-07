@@ -24,19 +24,19 @@ import java.util.Random;
  */
 public class SecurityUtils {
 
-    private SecurityUtils() {}
-    
-    /**
-     * Creates and returns a {@link Random}.
-     */
-    public static Random createRandom() {
-        return new Random();
-    }
-    
-    /**
-     * Creates and returns {@link SecureRandom}.
-     */
-    public static SecureRandom createSecureRandom() {
-        return org.ardverk.security.SecurityUtils.createSecureRandom();
-    }
+  private SecurityUtils() {}
+  
+  /**
+   * Creates and returns a {@link Random}.
+   */
+  public static Random createRandom() {
+    return new Random();
+  }
+  
+  /**
+   * Creates and returns {@link SecureRandom}.
+   */
+  public static SecureRandom createSecureRandom() {
+    return org.ardverk.security.SecurityUtils.createSecureRandom();
+  }
 }

@@ -23,54 +23,54 @@ import java.util.concurrent.TimeUnit;
  * An exception that is thrown by the DHT.
  */
 public class DHTException extends IOException {
+  
+  private static final long serialVersionUID = 5855991566361343341L;
+
+  private final long timeInMillis;
+
+  public DHTException(long time, TimeUnit unit) {
+    super(message(null, time, unit));
+    this.timeInMillis = unit.toMillis(time);
+  }
+
+  public DHTException(String message, Throwable cause, 
+      long time, TimeUnit unit) {
+    super(message(message, time, unit), cause);
+    this.timeInMillis = unit.toMillis(time);
+  }
+
+  public DHTException(String message, long time, TimeUnit unit) {
+    super(message(message, time, unit));
+    this.timeInMillis = unit.toMillis(time);
+  }
+
+  public DHTException(Throwable cause, long time, TimeUnit unit) {
+    super(message(null, time, unit), cause);
+    this.timeInMillis = unit.toMillis(time);
+  }
+  
+  /**
+   * Returns the amount of time that passed in the given {@link TimeUnit}.
+   */
+  public long getTime(TimeUnit unit) {
+    return unit.convert(timeInMillis, TimeUnit.MILLISECONDS);
+  }
+  
+  /**
+   * Returns the amount of time that passed in milliseconds.
+   */
+  public long getTimeInMillis() {
+    return getTime(TimeUnit.MILLISECONDS);
+  }
+  
+  /**
+   * Creates and returns an exception message from the given arguments.
+   */
+  private static String message(String message, long time, TimeUnit unit) {
+    if (message == null || message.isEmpty()) {
+      return time + " " + unit;
+    }
     
-    private static final long serialVersionUID = 5855991566361343341L;
-
-    private final long timeInMillis;
-
-    public DHTException(long time, TimeUnit unit) {
-        super(message(null, time, unit));
-        this.timeInMillis = unit.toMillis(time);
-    }
-
-    public DHTException(String message, Throwable cause, 
-            long time, TimeUnit unit) {
-        super(message(message, time, unit), cause);
-        this.timeInMillis = unit.toMillis(time);
-    }
-
-    public DHTException(String message, long time, TimeUnit unit) {
-        super(message(message, time, unit));
-        this.timeInMillis = unit.toMillis(time);
-    }
-
-    public DHTException(Throwable cause, long time, TimeUnit unit) {
-        super(message(null, time, unit), cause);
-        this.timeInMillis = unit.toMillis(time);
-    }
-    
-    /**
-     * Returns the amount of time that passed in the given {@link TimeUnit}.
-     */
-    public long getTime(TimeUnit unit) {
-        return unit.convert(timeInMillis, TimeUnit.MILLISECONDS);
-    }
-    
-    /**
-     * Returns the amount of time that passed in milliseconds.
-     */
-    public long getTimeInMillis() {
-        return getTime(TimeUnit.MILLISECONDS);
-    }
-    
-    /**
-     * Creates and returns an exception message from the given arguments.
-     */
-    private static String message(String message, long time, TimeUnit unit) {
-        if (message == null || message.isEmpty()) {
-            return time + " " + unit;
-        }
-        
-        return message + ": " + time + " " + unit;
-    }
+    return message + ": " + time + " " + unit;
+  }
 }

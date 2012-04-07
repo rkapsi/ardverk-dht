@@ -22,47 +22,47 @@ import org.ardverk.dht.routing.RouteTableConfig;
 import org.ardverk.utils.TimeUtils;
 
 public class StoreConfig extends Config {
-    
-    private static final long DEFAULT_STORE_TIMEOUT
-        = TimeUtils.convert(15L, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
-    
-    private volatile int s = 5;
-    
-    private volatile int w = RouteTableConfig.DEFAULT_K;
-    
-    public StoreConfig() {
-        super(DEFAULT_STORE_TIMEOUT, TimeUnit.MILLISECONDS);
-    }
-    
-    public StoreConfig(long storeTimeout, TimeUnit unit) {
-        super(storeTimeout, unit);
-    }
+  
+  private static final long DEFAULT_STORE_TIMEOUT
+    = TimeUtils.convert(15L, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
+  
+  private volatile int s = 5;
+  
+  private volatile int w = RouteTableConfig.DEFAULT_K;
+  
+  public StoreConfig() {
+    super(DEFAULT_STORE_TIMEOUT, TimeUnit.MILLISECONDS);
+  }
+  
+  public StoreConfig(long storeTimeout, TimeUnit unit) {
+    super(storeTimeout, unit);
+  }
 
-    public long getStoreTimeout(TimeUnit unit) {
-        return getOperationTimeout(unit);
-    }
+  public long getStoreTimeout(TimeUnit unit) {
+    return getOperationTimeout(unit);
+  }
 
-    public long getStoreTimeoutInMillis() {
-        return getOperationTimeoutInMillis();
-    }
+  public long getStoreTimeoutInMillis() {
+    return getOperationTimeoutInMillis();
+  }
 
-    public void setStoreTimeout(long timeout, TimeUnit unit) {
-        setOperationTimeout(timeout, unit);
-    }
+  public void setStoreTimeout(long timeout, TimeUnit unit) {
+    setOperationTimeout(timeout, unit);
+  }
 
-    public int getS() {
-        return s;
-    }
+  public int getS() {
+    return s;
+  }
 
-    public void setS(int s) {
-        this.s = s;
-    }
+  public void setS(int s) {
+    this.s = s;
+  }
 
-    public int getW() {
-        return w;
-    }
+  public int getW() {
+    return w;
+  }
 
-    public void setW(int w) {
-        this.w = w;
-    }
+  public void setW(int w) {
+    this.w = w;
+  }
 }

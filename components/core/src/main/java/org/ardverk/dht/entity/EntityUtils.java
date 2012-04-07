@@ -21,17 +21,17 @@ package org.ardverk.dht.entity;
  */
 class EntityUtils {
 
-    private EntityUtils() {}
+  private EntityUtils() {}
 
-    /**
-     * Returns the sum of {@link Entity#getTimeInMillis()} for the 
-     * given {@link Entity}ies.
-     */
-    public static long getTimeInMillis(Entity... entities) {
-        long time = 0L;
-        for (Entity entity : entities) {
-            time += entity.getTimeInMillis();
-        }
-        return time;
+  /**
+   * Returns the sum of {@link Entity#getTimeInMillis()} for the 
+   * given {@link Entity}ies.
+   */
+  public static long getTimeInMillis(Entity... entities) {
+    long time = 0L;
+    for (Entity entity : entities) {
+      time += entity.getTimeInMillis();
     }
+    return time;
+  }
 }

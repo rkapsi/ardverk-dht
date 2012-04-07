@@ -22,9 +22,9 @@ import org.ardverk.dht.message.Message;
  * Just a few constants.
  */
 interface Constants {
-    
-    /**
-     * The current {@link Message} Version.
-     */
-    public static final int VERSION = 0;
+  
+  /**
+   * The current {@link Message} Version.
+   */
+  public static final int VERSION = 0;
 }

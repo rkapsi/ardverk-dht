@@ -26,36 +26,36 @@ import org.ardverk.dht.routing.Contact;
  * The {@link Outcome} is a snapshot of the current lookup process.
  */
 public abstract class Outcome implements Identifier {
-    
-    /**
-     * Returns the k-closest {@link Contact}s that have been found.
-     */
-    public abstract Contact[] getClosest();
-    
-    /**
-     * Returns all {@link Contact}s that have been found.
-     */
-    public abstract Contact[] getContacts();
-    
-    /**
-     * Returns the number of hops the lookup has taken.
-     */
-    public abstract int getHop();
-    
-    /**
-     * Returns the number of errors that have been occurred.
-     */
-    public abstract int getErrorCount();
-    
-    /**
-     * Returns the lookup time in the given {@link TimeUnit}.
-     */
-    public abstract long getTime(TimeUnit unit);
-    
-    /**
-     * Returns the lookup time in milliseconds.
-     */
-    public long getTimeInMillis() {
-        return getTime(TimeUnit.MILLISECONDS);
-    }
+  
+  /**
+   * Returns the k-closest {@link Contact}s that have been found.
+   */
+  public abstract Contact[] getClosest();
+  
+  /**
+   * Returns all {@link Contact}s that have been found.
+   */
+  public abstract Contact[] getContacts();
+  
+  /**
+   * Returns the number of hops the lookup has taken.
+   */
+  public abstract int getHop();
+  
+  /**
+   * Returns the number of errors that have been occurred.
+   */
+  public abstract int getErrorCount();
+  
+  /**
+   * Returns the lookup time in the given {@link TimeUnit}.
+   */
+  public abstract long getTime(TimeUnit unit);
+  
+  /**
+   * Returns the lookup time in milliseconds.
+   */
+  public long getTimeInMillis() {
+    return getTime(TimeUnit.MILLISECONDS);
+  }
 }

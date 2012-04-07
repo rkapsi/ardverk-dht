@@ -22,10 +22,10 @@ import org.ardverk.dht.routing.Contact;
 
 
 public class DefaultPingResponse extends AbstractResponseMessage 
-        implements PingResponse {
+    implements PingResponse {
 
-    public DefaultPingResponse(MessageId messageId, 
-            Contact contact, SocketAddress address) {
-        super(messageId, contact, address);
-    }
+  public DefaultPingResponse(MessageId messageId, 
+      Contact contact, SocketAddress address) {
+    super(messageId, contact, address);
+  }
 }

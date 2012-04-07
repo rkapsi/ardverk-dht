@@ -25,25 +25,25 @@ import org.ardverk.dht.routing.Contact;
  * A default implementation of {@link PingEntity}.
  */
 public class PingEntity extends Entity {
-    
-    private final PingResponse response;
-    
-    public PingEntity(PingResponse response, 
-            long time, TimeUnit unit) {
-        super(time, unit);
-        this.response = response;
-    }
-    
-    public Contact getContact() {
-        return response.getContact();
-    }
-    
-    public PingResponse getPingResponse() {
-        return response;
-    }
-    
-    @Override
-    public String toString() {
-        return getContact() + ", " + time + ", " + unit;
-    }
+  
+  private final PingResponse response;
+  
+  public PingEntity(PingResponse response, 
+      long time, TimeUnit unit) {
+    super(time, unit);
+    this.response = response;
+  }
+  
+  public Contact getContact() {
+    return response.getContact();
+  }
+  
+  public PingResponse getPingResponse() {
+    return response;
+  }
+  
+  @Override
+  public String toString() {
+    return getContact() + ", " + time + ", " + unit;
+  }
 }

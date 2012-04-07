@@ -24,23 +24,23 @@ import org.ardverk.dht.rsrc.Key;
 
 
 public class DefaultValueRequest extends AbstractLookupRequest 
-        implements ValueRequest {
-    
-    private final Key key;
-    
-    public DefaultValueRequest(MessageId messageId, Contact contact, 
-            SocketAddress address, Key key) {
-        super(messageId, contact, address);
-        this.key = key;
-    }
-    
-    @Override
-    public KUID getId() {
-        return key.getId();
-    }
+    implements ValueRequest {
+  
+  private final Key key;
+  
+  public DefaultValueRequest(MessageId messageId, Contact contact, 
+      SocketAddress address, Key key) {
+    super(messageId, contact, address);
+    this.key = key;
+  }
+  
+  @Override
+  public KUID getId() {
+    return key.getId();
+  }
 
-    @Override
-    public Key getKey() {
-        return key;
-    }
+  @Override
+  public Key getKey() {
+    return key;
+  }
 }

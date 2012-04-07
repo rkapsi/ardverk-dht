@@ -29,53 +29,53 @@ import org.ardverk.concurrent.EventUtils;
  * on a {@link Thread}.
  */
 public class DHTFutureTask<V> extends AsyncProcessFutureTask<V> 
-        implements DHTRunnableFuture<V> {
+    implements DHTRunnableFuture<V> {
 
-    private volatile Object attachment;
+  private volatile Object attachment;
+  
+  public DHTFutureTask() {
+    super();
+  }
+
+  public DHTFutureTask(AsyncProcess<V> process, long timeout,
+      TimeUnit unit) {
+    super(process, timeout, unit);
+  }
+
+  public DHTFutureTask(AsyncProcess<V> process) {
+    super(process);
+  }
+  
+  @Override
+  public void setAttachment(Object attachment) {
+    this.attachment = attachment;
+  }
+
+  @Override
+  public Object getAttachment() {
+    return attachment;
+  }
+
+  @Override
+  protected boolean isEventThread() {
+    return EventUtils.isEventThread();
+  }
+  
+  @Override
+  protected void fireOperationComplete(final AsyncFutureListener<V> first,
+      final AsyncFutureListener<V>... others) {
     
-    public DHTFutureTask() {
-        super();
-    }
-
-    public DHTFutureTask(AsyncProcess<V> process, long timeout,
-            TimeUnit unit) {
-        super(process, timeout, unit);
-    }
-
-    public DHTFutureTask(AsyncProcess<V> process) {
-        super(process);
+    if (first == null) {
+      return;
     }
     
-    @Override
-    public void setAttachment(Object attachment) {
-        this.attachment = attachment;
-    }
-
-    @Override
-    public Object getAttachment() {
-        return attachment;
-    }
-
-    @Override
-    protected boolean isEventThread() {
-        return EventUtils.isEventThread();
-    }
+    Runnable event = new Runnable() {
+      @Override
+      public void run() {
+        DHTFutureTask.super.fireOperationComplete(first, others);
+      }
+    };
     
-    @Override
-    protected void fireOperationComplete(final AsyncFutureListener<V> first,
-            final AsyncFutureListener<V>... others) {
-        
-        if (first == null) {
-            return;
-        }
-        
-        Runnable event = new Runnable() {
-            @Override
-            public void run() {
-                DHTFutureTask.super.fireOperationComplete(first, others);
-            }
-        };
-        
-        EventUtils.fireEvent(event);
-    }
+    EventUtils.fireEvent(event);
+  }
 }

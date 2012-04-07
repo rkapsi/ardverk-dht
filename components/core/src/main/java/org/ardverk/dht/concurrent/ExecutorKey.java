@@ -21,28 +21,28 @@ package org.ardverk.dht.concurrent;
  * be executed.
  */
 public enum ExecutorKey {
-    
-    /**
-     * The {@link #SERIAL} {@link ExecutorKey} executions enqueued operations
-     * in a serial fashion.
-     */
-    SERIAL,
-    
-    /**
-     * The {@link #PARALLEL} {@link ExecutorKey} executions enqueued operations
-     * in a parallel fashion.
-     */
-    PARALLEL;
-    
-    /**
-     * The default {@link ExecutorKey} that should be used unless there
-     * is a reason not to use this {@link ExecutorKey}.
-     */
-    public static final ExecutorKey DEFAULT = ExecutorKey.PARALLEL;
-    
-    /**
-     * The {@link ExecutorKey} that should be used for backend and possibly 
-     * for other low priority operations.
-     */
-    public static final ExecutorKey BACKEND = ExecutorKey.SERIAL;
+  
+  /**
+   * The {@link #SERIAL} {@link ExecutorKey} executions enqueued operations
+   * in a serial fashion.
+   */
+  SERIAL,
+  
+  /**
+   * The {@link #PARALLEL} {@link ExecutorKey} executions enqueued operations
+   * in a parallel fashion.
+   */
+  PARALLEL;
+  
+  /**
+   * The default {@link ExecutorKey} that should be used unless there
+   * is a reason not to use this {@link ExecutorKey}.
+   */
+  public static final ExecutorKey DEFAULT = ExecutorKey.PARALLEL;
+  
+  /**
+   * The {@link ExecutorKey} that should be used for backend and possibly 
+   * for other low priority operations.
+   */
+  public static final ExecutorKey BACKEND = ExecutorKey.SERIAL;
 }

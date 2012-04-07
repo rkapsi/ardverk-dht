@@ -22,40 +22,40 @@ import java.util.concurrent.TimeUnit;
 import org.ardverk.io.ProgressInputStream.ProgressCallback;
 
 public class Idle implements ProgressCallback {
-    
-    private boolean done = false;
-    
-    private long timeStamp = System.currentTimeMillis();
-    
-    @Override
-    public synchronized void in(InputStream in, int count) {
-        timeStamp = System.currentTimeMillis();
-    }
+  
+  private boolean done = false;
+  
+  private long timeStamp = System.currentTimeMillis();
+  
+  @Override
+  public synchronized void in(InputStream in, int count) {
+    timeStamp = System.currentTimeMillis();
+  }
 
-    @Override
-    public synchronized void eof(InputStream in) {
+  @Override
+  public synchronized void eof(InputStream in) {
+    done = true;
+    notifyAll();
+  }
+
+  @Override
+  public synchronized void closed(InputStream in) {
+    done = true;
+    notifyAll();
+  }
+
+  public synchronized void await(long timeout, TimeUnit unit) 
+      throws InterruptedException {
+    long timeoutInMillis = unit.toMillis(timeout);
+    
+    while (!done) {
+      long time = System.currentTimeMillis() - timeStamp;
+      if (time >= timeoutInMillis) {
         done = true;
-        notifyAll();
+        break;
+      }
+      
+      wait(timeoutInMillis);
     }
-
-    @Override
-    public synchronized void closed(InputStream in) {
-        done = true;
-        notifyAll();
-    }
-
-    public synchronized void await(long timeout, TimeUnit unit) 
-            throws InterruptedException {
-        long timeoutInMillis = unit.toMillis(timeout);
-        
-        while (!done) {
-            long time = System.currentTimeMillis() - timeStamp;
-            if (time >= timeoutInMillis) {
-                done = true;
-                break;
-            }
-            
-            wait(timeoutInMillis);
-        }
-    }
+  }
 }

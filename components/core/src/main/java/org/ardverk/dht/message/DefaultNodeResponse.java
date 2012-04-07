@@ -22,19 +22,19 @@ import org.ardverk.dht.routing.Contact;
 
 
 public class DefaultNodeResponse extends AbstractLookupResponse 
-        implements NodeResponse {
+    implements NodeResponse {
 
-    private final Contact[] contacts;
+  private final Contact[] contacts;
+  
+  public DefaultNodeResponse(MessageId messageId, Contact contact, 
+      SocketAddress address, Contact[] contacts) {
+    super(messageId, contact, address);
     
-    public DefaultNodeResponse(MessageId messageId, Contact contact, 
-            SocketAddress address, Contact[] contacts) {
-        super(messageId, contact, address);
-        
-        this.contacts = contacts;
-    }
+    this.contacts = contacts;
+  }
 
-    @Override
-    public Contact[] getContacts() {
-        return contacts;
-    }
+  @Override
+  public Contact[] getContacts() {
+    return contacts;
+  }
 }

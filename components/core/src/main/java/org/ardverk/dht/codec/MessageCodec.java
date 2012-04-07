@@ -30,34 +30,34 @@ import org.ardverk.dht.message.Message;
  * A {@link MessageCodec} encodes and decodes {@link Message}s.
  */
 public interface MessageCodec {
-    
+  
+  /**
+   * Creates and returns a {@link Decoder}.
+   */
+  public Decoder createDecoder(SocketAddress src, InputStream in) throws IOException;
+  
+  /**
+   * Creates and retruns an {@link Encoder}.
+   */
+  public Encoder createEncoder(OutputStream out) throws IOException;
+  
+  /**
+   * A {@link Decoder} decodes {@link Message}s.
+   */
+  public static interface Decoder extends Closeable {
     /**
-     * Creates and returns a {@link Decoder}.
+     * Reads and returns a {@link Message}.
      */
-    public Decoder createDecoder(SocketAddress src, InputStream in) throws IOException;
-    
+    public Message read() throws IOException;
+  }
+  
+  /**
+   * A {@link Encoder} encodes {@link Message}s.
+   */
+  public static interface Encoder extends Flushable, Closeable {
     /**
-     * Creates and retruns an {@link Encoder}.
+     * Writes the given {@link Message}.
      */
-    public Encoder createEncoder(OutputStream out) throws IOException;
-    
-    /**
-     * A {@link Decoder} decodes {@link Message}s.
-     */
-    public static interface Decoder extends Closeable {
-        /**
-         * Reads and returns a {@link Message}.
-         */
-        public Message read() throws IOException;
-    }
-    
-    /**
-     * A {@link Encoder} encodes {@link Message}s.
-     */
-    public static interface Encoder extends Flushable, Closeable {
-        /**
-         * Writes the given {@link Message}.
-         */
-        public void write(Message message) throws IOException;
-    }
+    public void write(Message message) throws IOException;
+  }
 }

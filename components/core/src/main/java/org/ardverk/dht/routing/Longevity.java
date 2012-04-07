@@ -24,13 +24,13 @@ import org.ardverk.lang.TimeStamp;
  */
 public interface Longevity {
 
-    /**
-     * Returns the object's creation time.
-     */
-    public TimeStamp getCreationTime();
-    
-    /**
-     * Returns the time when this object was modified.
-     */
-    public TimeStamp getTimeStamp();
+  /**
+   * Returns the object's creation time.
+   */
+  public TimeStamp getCreationTime();
+  
+  /**
+   * Returns the time when this object was modified.
+   */
+  public TimeStamp getTimeStamp();
 }

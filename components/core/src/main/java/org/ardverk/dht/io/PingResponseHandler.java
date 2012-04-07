@@ -38,100 +38,100 @@ import org.ardverk.dht.routing.Contact;
  * The {@link PingResponseHandler} manages the {@link MessageType#PING} process.
  */
 public class PingResponseHandler extends AbstractResponseHandler<PingEntity> {
+  
+  private final PingConfig config;
+  
+  private final PingSender sender;
+  
+  public PingResponseHandler(Provider<MessageDispatcher> messageDispatcher, 
+      SocketAddress address, PingConfig config) {
+    super(messageDispatcher);
     
-    private final PingConfig config;
+    sender = new SocketAddressPingSender(address);
+    this.config = config;
+  }
+  
+  public PingResponseHandler(Provider<MessageDispatcher> messageDispatcher, 
+      Contact contact, PingConfig config) {
+    super(messageDispatcher);
     
-    private final PingSender sender;
+    sender = new ContactPingSender(contact);
+    this.config = config;
+  }
+  
+  @Override
+  protected void go(AsyncFuture<PingEntity> future) throws IOException {
+    sender.ping();
+  }
+  
+  @Override
+  protected void processResponse(RequestEntity entity, 
+      ResponseMessage response, long time, TimeUnit unit) {
+    setValue(new PingEntity((PingResponse)response, time, unit));
+  }
+  
+  @Override
+  protected void processTimeout(RequestEntity entity, 
+      long time, TimeUnit unit) throws IOException {
+    setException(new PingTimeoutException(entity, time, unit));
+  }
+  
+  /**
+   * An interface that hides the complexity of sending a PING.
+   */
+  private interface PingSender {
+    public void ping() throws IOException;
+  }
+  
+  /**
+   * The {@link SocketAddressPingSender} sends a PING to a {@link SocketAddress}.
+   */
+  private class SocketAddressPingSender implements PingSender {
     
-    public PingResponseHandler(Provider<MessageDispatcher> messageDispatcher, 
-            SocketAddress address, PingConfig config) {
-        super(messageDispatcher);
-        
-        sender = new SocketAddressPingSender(address);
-        this.config = config;
+    private final KUID contactId;
+    
+    private final SocketAddress address;
+    
+    public SocketAddressPingSender(SocketAddress address) {
+      this(null, address);
     }
     
-    public PingResponseHandler(Provider<MessageDispatcher> messageDispatcher, 
-            Contact contact, PingConfig config) {
-        super(messageDispatcher);
-        
-        sender = new ContactPingSender(contact);
-        this.config = config;
+    public SocketAddressPingSender(KUID contactId, 
+        SocketAddress address) {
+      this.contactId = contactId;
+      this.address = address;
+    }
+  
+    @Override
+    public void ping() throws IOException {
+      MessageFactory factory = getMessageFactory();
+      PingRequest request = factory.createPingRequest(address);
+      
+      long timeout = config.getPingTimeout(TimeUnit.MILLISECONDS);
+      send(contactId, request, timeout, TimeUnit.MILLISECONDS);
+    }
+  }
+  
+  /**
+   * The {@link ContactPingSender} sends a PING to a {@link Contact}.
+   */
+  private class ContactPingSender implements PingSender {
+    
+    private final Contact contact;
+    
+    public ContactPingSender(Contact contact) {
+      this.contact = contact;
     }
     
     @Override
-    protected void go(AsyncFuture<PingEntity> future) throws IOException {
-        sender.ping();
+    public void ping() throws IOException {
+      MessageFactory factory = getMessageFactory();
+      PingRequest request = factory.createPingRequest(contact);
+      
+      long timeout = config.getPingTimeoutInMillis();
+      long adaptiveTimeout = config.getAdaptiveTimeout(
+          contact, timeout, TimeUnit.MILLISECONDS);
+      send(contact, request, adaptiveTimeout, TimeUnit.MILLISECONDS);
     }
-    
-    @Override
-    protected void processResponse(RequestEntity entity, 
-            ResponseMessage response, long time, TimeUnit unit) {
-        setValue(new PingEntity((PingResponse)response, time, unit));
-    }
-    
-    @Override
-    protected void processTimeout(RequestEntity entity, 
-            long time, TimeUnit unit) throws IOException {
-        setException(new PingTimeoutException(entity, time, unit));
-    }
-    
-    /**
-     * An interface that hides the complexity of sending a PING.
-     */
-    private interface PingSender {
-        public void ping() throws IOException;
-    }
-    
-    /**
-     * The {@link SocketAddressPingSender} sends a PING to a {@link SocketAddress}.
-     */
-    private class SocketAddressPingSender implements PingSender {
-        
-        private final KUID contactId;
-        
-        private final SocketAddress address;
-        
-        public SocketAddressPingSender(SocketAddress address) {
-            this(null, address);
-        }
-        
-        public SocketAddressPingSender(KUID contactId, 
-                SocketAddress address) {
-            this.contactId = contactId;
-            this.address = address;
-        }
-    
-        @Override
-        public void ping() throws IOException {
-            MessageFactory factory = getMessageFactory();
-            PingRequest request = factory.createPingRequest(address);
-            
-            long timeout = config.getPingTimeout(TimeUnit.MILLISECONDS);
-            send(contactId, request, timeout, TimeUnit.MILLISECONDS);
-        }
-    }
-    
-    /**
-     * The {@link ContactPingSender} sends a PING to a {@link Contact}.
-     */
-    private class ContactPingSender implements PingSender {
-        
-        private final Contact contact;
-        
-        public ContactPingSender(Contact contact) {
-            this.contact = contact;
-        }
-        
-        @Override
-        public void ping() throws IOException {
-            MessageFactory factory = getMessageFactory();
-            PingRequest request = factory.createPingRequest(contact);
-            
-            long timeout = config.getPingTimeoutInMillis();
-            long adaptiveTimeout = config.getAdaptiveTimeout(
-                    contact, timeout, TimeUnit.MILLISECONDS);
-            send(contact, request, adaptiveTimeout, TimeUnit.MILLISECONDS);
-        }
-    }
+  }
 }

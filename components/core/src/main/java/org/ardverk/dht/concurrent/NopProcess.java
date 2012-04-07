@@ -23,17 +23,17 @@ import org.ardverk.concurrent.AsyncProcessFuture;
  */
 public class NopProcess<V> implements DHTProcess<V> {
 
-    private static final DHTProcess<Object> NOP 
-        = new NopProcess<Object>();
-    
-    @SuppressWarnings("unchecked")
-    public static <V> DHTProcess<V> create() {
-        return (DHTProcess<V>)NOP;
-    }
-    
-    private NopProcess() {}
-    
-    @Override
-    public void start(AsyncProcessFuture<V> future) {
-    }
+  private static final DHTProcess<Object> NOP 
+    = new NopProcess<Object>();
+  
+  @SuppressWarnings("unchecked")
+  public static <V> DHTProcess<V> create() {
+    return (DHTProcess<V>)NOP;
+  }
+  
+  private NopProcess() {}
+  
+  @Override
+  public void start(AsyncProcessFuture<V> future) {
+  }
 }

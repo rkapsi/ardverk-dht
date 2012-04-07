@@ -38,39 +38,39 @@ import org.ardverk.dht.routing.RouteTable;
  * lookup process.
  */
 public class NodeResponseHandler extends LookupResponseHandler<NodeEntity> {
+  
+  public NodeResponseHandler(Provider<MessageDispatcher> messageDispatcher,
+      Contact[] contacts, RouteTable routeTable, KUID lookupId, NodeConfig config) {
+    super(messageDispatcher, contacts, routeTable, lookupId, config);
+  }
+  
+  @Override
+  protected void lookup(Contact dst, KUID lookupId, 
+      long timeout, TimeUnit unit) throws IOException {
     
-    public NodeResponseHandler(Provider<MessageDispatcher> messageDispatcher,
-            Contact[] contacts, RouteTable routeTable, KUID lookupId, NodeConfig config) {
-        super(messageDispatcher, contacts, routeTable, lookupId, config);
-    }
-    
-    @Override
-    protected void lookup(Contact dst, KUID lookupId, 
-            long timeout, TimeUnit unit) throws IOException {
-        
-        MessageFactory factory = getMessageFactory();
-        NodeRequest message = factory.createNodeRequest(dst, lookupId);
-        send(dst, message, timeout, unit);
-    }
+    MessageFactory factory = getMessageFactory();
+    NodeRequest message = factory.createNodeRequest(dst, lookupId);
+    send(dst, message, timeout, unit);
+  }
 
-    @Override
-    protected void complete(Outcome outcome) {
-        Contact[] contacts = outcome.getContacts();
-        
-        if (contacts.length == 0) {
-            setException(new NoSuchNodeException(outcome));                
-        } else {
-            setValue(new NodeEntity(outcome));
-        }
-    }
+  @Override
+  protected void complete(Outcome outcome) {
+    Contact[] contacts = outcome.getContacts();
     
-    @Override
-    protected synchronized void processResponse0(RequestEntity entity,
-            ResponseMessage response, long time, TimeUnit unit)
-            throws IOException {
-        
-        Contact src = response.getContact();
-        Contact[] contacts = ((NodeResponse)response).getContacts();
-        processContacts(src, contacts, time, unit);
+    if (contacts.length == 0) {
+      setException(new NoSuchNodeException(outcome));        
+    } else {
+      setValue(new NodeEntity(outcome));
     }
+  }
+  
+  @Override
+  protected synchronized void processResponse0(RequestEntity entity,
+      ResponseMessage response, long time, TimeUnit unit)
+      throws IOException {
+    
+    Contact src = response.getContact();
+    Contact[] contacts = ((NodeResponse)response).getContacts();
+    processContacts(src, contacts, time, unit);
+  }
 }

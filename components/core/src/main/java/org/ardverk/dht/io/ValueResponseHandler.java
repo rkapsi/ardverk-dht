@@ -42,73 +42,73 @@ import org.ardverk.dht.rsrc.Key;
  * lookup process.
  */
 public class ValueResponseHandler extends LookupResponseHandler<ValueEntity> {
+  
+  private final FixedSizeArrayList<ValueResponse> responses;
+  
+  private final Key key;
+  
+  public ValueResponseHandler(Provider<MessageDispatcher> messageDispatcher,
+      Contact[] contacts, RouteTable routeTable, 
+      Key key, ValueConfig config) {
+    super(messageDispatcher, contacts, routeTable, 
+        key.getId(), config);
     
-    private final FixedSizeArrayList<ValueResponse> responses;
-    
-    private final Key key;
-    
-    public ValueResponseHandler(Provider<MessageDispatcher> messageDispatcher,
-            Contact[] contacts, RouteTable routeTable, 
-            Key key, ValueConfig config) {
-        super(messageDispatcher, contacts, routeTable, 
-                key.getId(), config);
-        
-        responses = new FixedSizeArrayList<ValueResponse>(config.getR());
-        this.key = key;
-    }
+    responses = new FixedSizeArrayList<ValueResponse>(config.getR());
+    this.key = key;
+  }
 
-    @Override
-    protected synchronized void processResponse0(RequestEntity request,
-            ResponseMessage response, long time, TimeUnit unit)
-            throws IOException {
-        
-        if (response instanceof NodeResponse) {
-            processNodeResponse((NodeResponse)response, time, unit);
-        } else {
-            processValueResponse((ValueResponse)response, time, unit);
-        }
-    }
+  @Override
+  protected synchronized void processResponse0(RequestEntity request,
+      ResponseMessage response, long time, TimeUnit unit)
+      throws IOException {
     
-    private synchronized void processNodeResponse(NodeResponse response, 
-            long time, TimeUnit unit) throws IOException {
-        
-        Contact src = response.getContact();
-        Contact[] contacts = response.getContacts();
-        processContacts(src, contacts, time, unit);
+    if (response instanceof NodeResponse) {
+      processNodeResponse((NodeResponse)response, time, unit);
+    } else {
+      processValueResponse((ValueResponse)response, time, unit);
     }
+  }
+  
+  private synchronized void processNodeResponse(NodeResponse response, 
+      long time, TimeUnit unit) throws IOException {
     
-    private synchronized void processValueResponse(ValueResponse response, 
-            long time, TimeUnit unit) throws IOException {
-        
-        responses.add(response);
-        
-        if (responses.isFull()) {
-            Outcome outcome = createOutcome();
-            ValueResponse[] values = CollectionUtils.toArray(responses, ValueResponse.class);
-            setValue(new ValueEntity(outcome, values));
-        }
-    }
+    Contact src = response.getContact();
+    Contact[] contacts = response.getContacts();
+    processContacts(src, contacts, time, unit);
+  }
+  
+  private synchronized void processValueResponse(ValueResponse response, 
+      long time, TimeUnit unit) throws IOException {
     
-    @Override
-    protected void lookup(Contact dst, KUID lookupId, 
-            long timeout, TimeUnit unit) throws IOException {
-        
-        assert (lookupId.equals(key.getId()));
-        
-        MessageFactory factory = getMessageFactory();
-        ValueRequest message = factory.createValueRequest(dst, key);
-        
-        send(dst, message, timeout, unit);
-    }
+    responses.add(response);
     
-    @Override
-    protected void complete(Outcome outcome) {
-        
-        if (responses.isEmpty()) {
-            setException(new NoSuchValueException(outcome));
-        } else {
-            ValueResponse[] values = CollectionUtils.toArray(responses, ValueResponse.class);
-            setValue(new ValueEntity(outcome, values));
-        }
+    if (responses.isFull()) {
+      Outcome outcome = createOutcome();
+      ValueResponse[] values = CollectionUtils.toArray(responses, ValueResponse.class);
+      setValue(new ValueEntity(outcome, values));
     }
+  }
+  
+  @Override
+  protected void lookup(Contact dst, KUID lookupId, 
+      long timeout, TimeUnit unit) throws IOException {
+    
+    assert (lookupId.equals(key.getId()));
+    
+    MessageFactory factory = getMessageFactory();
+    ValueRequest message = factory.createValueRequest(dst, key);
+    
+    send(dst, message, timeout, unit);
+  }
+  
+  @Override
+  protected void complete(Outcome outcome) {
+    
+    if (responses.isEmpty()) {
+      setException(new NoSuchValueException(outcome));
+    } else {
+      ValueResponse[] values = CollectionUtils.toArray(responses, ValueResponse.class);
+      setValue(new ValueEntity(outcome, values));
+    }
+  }
 }

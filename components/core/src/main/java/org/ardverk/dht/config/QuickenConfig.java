@@ -24,80 +24,80 @@ import org.ardverk.utils.TimeUtils;
 
 public class QuickenConfig extends Config {
 
-    private volatile PingConfig pingConfig = new PingConfig();
+  private volatile PingConfig pingConfig = new PingConfig();
 
-    private volatile NodeConfig lookupConfig = new NodeConfig();
+  private volatile NodeConfig lookupConfig = new NodeConfig();
 
-    private volatile float pingCount = 1.0f;
-    
-    private volatile long contactTimeoutInMillis 
-        = TimeUtils.convert(5L*60L, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
-    
-    private volatile long bucketTimeoutInMillis 
-        = TimeUtils.convert(5L*60L, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
-    
-    @Override
-    public void setExecutorKey(ExecutorKey executorKey) {
-        super.setExecutorKey(executorKey);
-        pingConfig.setExecutorKey(executorKey);
-        lookupConfig.setExecutorKey(executorKey);
-    }
-    
-    public PingConfig getPingConfig() {
-        return pingConfig;
-    }
-    
-    public void setPingConfig(PingConfig pingConfig) {
-        this.pingConfig = pingConfig;
-    }
-    
-    public float getPingCount() {
-        return pingCount;
-    }
-    
-    public void setPingCount(float pingCount) {
-        this.pingCount = pingCount;
-    }
+  private volatile float pingCount = 1.0f;
+  
+  private volatile long contactTimeoutInMillis 
+    = TimeUtils.convert(5L*60L, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
+  
+  private volatile long bucketTimeoutInMillis 
+    = TimeUtils.convert(5L*60L, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
+  
+  @Override
+  public void setExecutorKey(ExecutorKey executorKey) {
+    super.setExecutorKey(executorKey);
+    pingConfig.setExecutorKey(executorKey);
+    lookupConfig.setExecutorKey(executorKey);
+  }
+  
+  public PingConfig getPingConfig() {
+    return pingConfig;
+  }
+  
+  public void setPingConfig(PingConfig pingConfig) {
+    this.pingConfig = pingConfig;
+  }
+  
+  public float getPingCount() {
+    return pingCount;
+  }
+  
+  public void setPingCount(float pingCount) {
+    this.pingCount = pingCount;
+  }
 
-    public long getContactTimeout(TimeUnit unit) {
-        return unit.convert(contactTimeoutInMillis, TimeUnit.MILLISECONDS);
-    }
+  public long getContactTimeout(TimeUnit unit) {
+    return unit.convert(contactTimeoutInMillis, TimeUnit.MILLISECONDS);
+  }
 
-    public long getContactTimeoutInMillis() {
-        return getContactTimeout(TimeUnit.MILLISECONDS);
-    }
-    
-    public void setContactTimeout(long timeout, TimeUnit unit) {
-        this.contactTimeoutInMillis = unit.toMillis(timeout);
-    }
+  public long getContactTimeoutInMillis() {
+    return getContactTimeout(TimeUnit.MILLISECONDS);
+  }
+  
+  public void setContactTimeout(long timeout, TimeUnit unit) {
+    this.contactTimeoutInMillis = unit.toMillis(timeout);
+  }
 
-    public NodeConfig getLookupConfig() {
-        return lookupConfig;
-    }
-    
-    public void setLookupConfig(NodeConfig lookupConfig) {
-        this.lookupConfig = lookupConfig;
-    }
+  public NodeConfig getLookupConfig() {
+    return lookupConfig;
+  }
+  
+  public void setLookupConfig(NodeConfig lookupConfig) {
+    this.lookupConfig = lookupConfig;
+  }
 
-    public long getBucketTimeout(TimeUnit unit) {
-        return unit.convert(bucketTimeoutInMillis, TimeUnit.MILLISECONDS);
-    }
+  public long getBucketTimeout(TimeUnit unit) {
+    return unit.convert(bucketTimeoutInMillis, TimeUnit.MILLISECONDS);
+  }
 
-    public long getBucketTimeoutInMillis() {
-        return getBucketTimeout(TimeUnit.MILLISECONDS);
-    }
-    
-    public void setBucketTimeout(long timeout, TimeUnit unit) {
-        this.bucketTimeoutInMillis = unit.toMillis(timeout);
-    }
+  public long getBucketTimeoutInMillis() {
+    return getBucketTimeout(TimeUnit.MILLISECONDS);
+  }
+  
+  public void setBucketTimeout(long timeout, TimeUnit unit) {
+    this.bucketTimeoutInMillis = unit.toMillis(timeout);
+  }
 
-    @Override
-    public void setOperationTimeout(long timeout, TimeUnit unit) {
-        throw new UnsupportedOperationException();
-    }
+  @Override
+  public void setOperationTimeout(long timeout, TimeUnit unit) {
+    throw new UnsupportedOperationException();
+  }
 
-    @Override
-    public long getOperationTimeout(TimeUnit unit) {
-        throw new UnsupportedOperationException();
-    }
+  @Override
+  public long getOperationTimeout(TimeUnit unit) {
+    throw new UnsupportedOperationException();
+  }
 }

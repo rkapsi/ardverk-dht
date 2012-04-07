@@ -26,9 +26,9 @@ import org.ardverk.dht.message.ResponseMessage;
  * Classes that process {@link RequestMessage}s may implement this interface.
  */
 public interface RequestHandler {
-    
-    /**
-     * Called for every {@link RequestMessage} we're receiving.
-     */
-    public ResponseMessage handleRequest(RequestMessage request) throws IOException;
+  
+  /**
+   * Called for every {@link RequestMessage} we're receiving.
+   */
+  public ResponseMessage handleRequest(RequestMessage request) throws IOException;
 }

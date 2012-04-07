@@ -28,25 +28,25 @@ import org.ardverk.lang.Precoditions;
  */
 public class XorComparator implements Comparator<Identifier> {
 
-    private final Identifier identifier;
-    
-    public XorComparator(Identifier identifier) {
-        this.identifier = Precoditions.notNull(identifier, "identifier");
-    }
-    
-    /**
-     * Returns the {@link Identifier}.
-     */
-    public Identifier getIdentifier() {
-        return identifier;
-    }
-    
-    private KUID xor(Identifier id) {
-        return identifier.getId().xor(id.getId());
-    }
-    
-    @Override
-    public int compare(Identifier o1, Identifier o2) {
-        return xor(o1).compareTo(xor(o2));
-    }
+  private final Identifier identifier;
+  
+  public XorComparator(Identifier identifier) {
+    this.identifier = Precoditions.notNull(identifier, "identifier");
+  }
+  
+  /**
+   * Returns the {@link Identifier}.
+   */
+  public Identifier getIdentifier() {
+    return identifier;
+  }
+  
+  private KUID xor(Identifier id) {
+    return identifier.getId().xor(id.getId());
+  }
+  
+  @Override
+  public int compare(Identifier o1, Identifier o2) {
+    return xor(o1).compareTo(xor(o2));
+  }
 }

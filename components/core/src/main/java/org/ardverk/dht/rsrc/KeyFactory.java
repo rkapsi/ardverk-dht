@@ -22,51 +22,51 @@ import java.util.Map;
 import java.util.ServiceLoader;
 
 public abstract class KeyFactory {
+  
+  private static final Map<String, KeyFactory> FACTORIES = createKeyFactoryMap();
+  
+  public static Key parseKey(String uri) {
+    return parseKey(URI.create(uri));
+  }
+  
+  public static Key parseKey(URI uri) {
     
-    private static final Map<String, KeyFactory> FACTORIES = createKeyFactoryMap();
-    
-    public static Key parseKey(String uri) {
-        return parseKey(URI.create(uri));
+    String scheme = uri.getScheme();
+    KeyFactory factory = FACTORIES.get(scheme);
+    if (factory != null) {
+      return factory.valueOf(uri);
     }
     
-    public static Key parseKey(URI uri) {
-        
-        String scheme = uri.getScheme();
-        KeyFactory factory = FACTORIES.get(scheme);
-        if (factory != null) {
-            return factory.valueOf(uri);
-        }
-        
-        throw new IllegalArgumentException(uri.toString());
-    }
+    throw new IllegalArgumentException(uri.toString());
+  }
 
-    /**
-     * 
-     */
-    public abstract String getScheme();
+  /**
+   * 
+   */
+  public abstract String getScheme();
+  
+  /**
+   * 
+   */
+  public abstract Key valueOf(URI uri);
+  
+  @Override
+  public String toString() {
+    return getScheme();
+  }
+  
+  private static Map<String, KeyFactory> createKeyFactoryMap() {
+    Map<String, KeyFactory> map 
+      = new HashMap<String, KeyFactory>();
     
-    /**
-     * 
-     */
-    public abstract Key valueOf(URI uri);
+    ServiceLoader<KeyFactory> factories 
+      = ServiceLoader.load(KeyFactory.class);
     
-    @Override
-    public String toString() {
-        return getScheme();
+    for (KeyFactory factory : factories) {
+      String scheme = factory.getScheme();
+      map.put(scheme, factory);
     }
     
-    private static Map<String, KeyFactory> createKeyFactoryMap() {
-        Map<String, KeyFactory> map 
-            = new HashMap<String, KeyFactory>();
-        
-        ServiceLoader<KeyFactory> factories 
-            = ServiceLoader.load(KeyFactory.class);
-        
-        for (KeyFactory factory : factories) {
-            String scheme = factory.getScheme();
-            map.put(scheme, factory);
-        }
-        
-        return map;
-    }
+    return map;
+  }
 }

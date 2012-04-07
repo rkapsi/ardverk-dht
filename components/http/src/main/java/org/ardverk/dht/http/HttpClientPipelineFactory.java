@@ -24,18 +24,18 @@ import org.jboss.netty.handler.codec.http.HttpClientCodec;
 
 class HttpClientPipelineFactory implements ChannelPipelineFactory {
 
-    private final SimpleChannelHandler channelHandler;
-    
-    public HttpClientPipelineFactory(SimpleChannelHandler channelHandler) {
-        this.channelHandler = channelHandler;
-    }
-    
-    @Override
-    public ChannelPipeline getPipeline() throws Exception {
-        ChannelPipeline pipeline = Channels.pipeline();
-        pipeline.addLast("codec", new HttpClientCodec());
-        pipeline.addLast("idle", IdleUtils.DEFAULT);
-        pipeline.addLast("handler", channelHandler);
-        return pipeline;
-    }
+  private final SimpleChannelHandler channelHandler;
+  
+  public HttpClientPipelineFactory(SimpleChannelHandler channelHandler) {
+    this.channelHandler = channelHandler;
+  }
+  
+  @Override
+  public ChannelPipeline getPipeline() throws Exception {
+    ChannelPipeline pipeline = Channels.pipeline();
+    pipeline.addLast("codec", new HttpClientCodec());
+    pipeline.addLast("idle", IdleUtils.DEFAULT);
+    pipeline.addLast("handler", channelHandler);
+    return pipeline;
+  }
 }

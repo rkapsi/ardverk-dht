@@ -27,70 +27,70 @@ import org.ardverk.lang.ByteArray;
  */
 public final class MessageId extends ByteArray<MessageId> implements Cloneable {
 
-    private static final long serialVersionUID = 6653397095695641792L;
-    
-    private static final Random GENERATOR = SecurityUtils.createRandom();
-    
-    /**
-     * Creates and returns a random {@link MessageId} of the given length.
-     */
-    public static MessageId createRandom(int length) {
-        byte[] messageId = new byte[length];
-        GENERATOR.nextBytes(messageId);
-        return new MessageId(messageId);
-    }
-    
-    /**
-     * Creates and returns a random {@link MessageId} of the same length 
-     * as the given {@link MessageId}.
-     */
-    public static MessageId createRandom(MessageId otherId) {
-        return createRandom(otherId.length());
-    }
-    
-    /**
-     * Creates and returns a {@link MessageId} from the given {@code byte[]}.
-     */
-    public static MessageId create(byte[] messageId) {
-        return new MessageId(messageId);
-    }
-    
-    /**
-     * Creates and returns a {@link MessageId} from the given {@code byte[]}.
-     */
-    public static MessageId create(byte[] messageId, int offset, int length) {
-        byte[] copy = new byte[length];
-        System.arraycopy(messageId, 0, copy, 0, copy.length);
-        return new MessageId(copy);
-    }
-    
-    /**
-     * Creates and returns a {@link MessageId} from the Base-16 (hex)
-     * encoded {@link String}.
-     */
-    public static MessageId create(String messageId) {
-        return create(CodingUtils.decodeBase16(messageId));
-    }
-    
-    private MessageId(byte[] messageId) {
-        super(messageId);
-    }
-    
-    /**
-     * Returns {@code true} if the given {@link MessageId} is 
-     * compatible with this {@link MessageId}.
-     */
-    public boolean isCompatible(MessageId otherId) {
-        return otherId != null && length() == otherId.length();
-    }
-    
-    @Override
-    public MessageId clone() {
-        return this;
-    }
-    
-    @Override
-    public String toString() {
-        return toHexString();
-    }
+  private static final long serialVersionUID = 6653397095695641792L;
+  
+  private static final Random GENERATOR = SecurityUtils.createRandom();
+  
+  /**
+   * Creates and returns a random {@link MessageId} of the given length.
+   */
+  public static MessageId createRandom(int length) {
+    byte[] messageId = new byte[length];
+    GENERATOR.nextBytes(messageId);
+    return new MessageId(messageId);
+  }
+  
+  /**
+   * Creates and returns a random {@link MessageId} of the same length 
+   * as the given {@link MessageId}.
+   */
+  public static MessageId createRandom(MessageId otherId) {
+    return createRandom(otherId.length());
+  }
+  
+  /**
+   * Creates and returns a {@link MessageId} from the given {@code byte[]}.
+   */
+  public static MessageId create(byte[] messageId) {
+    return new MessageId(messageId);
+  }
+  
+  /**
+   * Creates and returns a {@link MessageId} from the given {@code byte[]}.
+   */
+  public static MessageId create(byte[] messageId, int offset, int length) {
+    byte[] copy = new byte[length];
+    System.arraycopy(messageId, 0, copy, 0, copy.length);
+    return new MessageId(copy);
+  }
+  
+  /**
+   * Creates and returns a {@link MessageId} from the Base-16 (hex)
+   * encoded {@link String}.
+   */
+  public static MessageId create(String messageId) {
+    return create(CodingUtils.decodeBase16(messageId));
+  }
+  
+  private MessageId(byte[] messageId) {
+    super(messageId);
+  }
+  
+  /**
+   * Returns {@code true} if the given {@link MessageId} is 
+   * compatible with this {@link MessageId}.
+   */
+  public boolean isCompatible(MessageId otherId) {
+    return otherId != null && length() == otherId.length();
+  }
+  
+  @Override
+  public MessageId clone() {
+    return this;
+  }
+  
+  @Override
+  public String toString() {
+    return toHexString();
+  }
 }

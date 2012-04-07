@@ -5,24 +5,24 @@ import java.io.InputStream;
 
 public class NoValue extends AbstractValue {
 
-    public static final Value EMPTY = new NoValue();
-    
-    private final InputStream in = new InputStream() {
-        @Override
-        public int read() throws IOException {
-            return -1;
-        }
-    };
-    
-    private NoValue() {}
-    
+  public static final Value EMPTY = new NoValue();
+  
+  private final InputStream in = new InputStream() {
     @Override
-    public long getContentLength() {
-        return 0L;
+    public int read() throws IOException {
+      return -1;
     }
+  };
+  
+  private NoValue() {}
+  
+  @Override
+  public long getContentLength() {
+    return 0L;
+  }
 
-    @Override
-    public InputStream getContent() {
-        return in;
-    }
+  @Override
+  public InputStream getContent() {
+    return in;
+  }
 }

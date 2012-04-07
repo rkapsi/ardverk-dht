@@ -25,23 +25,23 @@ import org.ardverk.dht.concurrent.DHTFuture;
  */
 public class QuickenEntity extends Entity {
 
-    private final DHTFuture<PingEntity>[] pingFutures;
+  private final DHTFuture<PingEntity>[] pingFutures;
+  
+  private final DHTFuture<NodeEntity>[] lookupFutures;
+  
+  public QuickenEntity(DHTFuture<PingEntity>[] pingFutures, 
+      DHTFuture<NodeEntity>[] lookupFutures, long time, TimeUnit unit) {
+    super(time, unit);
     
-    private final DHTFuture<NodeEntity>[] lookupFutures;
-    
-    public QuickenEntity(DHTFuture<PingEntity>[] pingFutures, 
-            DHTFuture<NodeEntity>[] lookupFutures, long time, TimeUnit unit) {
-        super(time, unit);
-        
-        this.pingFutures = pingFutures;
-        this.lookupFutures = lookupFutures;
-    }
+    this.pingFutures = pingFutures;
+    this.lookupFutures = lookupFutures;
+  }
 
-    public DHTFuture<PingEntity>[] getPingFutures() {
-        return pingFutures;
-    }
+  public DHTFuture<PingEntity>[] getPingFutures() {
+    return pingFutures;
+  }
 
-    public DHTFuture<NodeEntity>[] getLookupFutures() {
-        return lookupFutures;
-    }
+  public DHTFuture<NodeEntity>[] getLookupFutures() {
+    return lookupFutures;
+  }
 }

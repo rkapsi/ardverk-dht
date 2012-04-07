@@ -23,29 +23,29 @@ import org.ardverk.concurrent.AsyncFutureListener;
  * value and doesn't keep track of its {@link AsyncFutureListener}s.
  */
 public class NopFuture<T> extends DHTValueFuture<T> {
-    
-    public static <T> NopFuture<T> withValue(T value) {
-        return new NopFuture<T>(value);
-    }
-    
-    public static <T> NopFuture<T> withExcepton(Throwable t) {
-        return new NopFuture<T>(t);
-    }
-    
-    private NopFuture(T value) {
-        super(value);
-    }
+  
+  public static <T> NopFuture<T> withValue(T value) {
+    return new NopFuture<T>(value);
+  }
+  
+  public static <T> NopFuture<T> withExcepton(Throwable t) {
+    return new NopFuture<T>(t);
+  }
+  
+  private NopFuture(T value) {
+    super(value);
+  }
 
-    private NopFuture(Throwable t) {
-        super(t);
-    }
+  private NopFuture(Throwable t) {
+    super(t);
+  }
 
-    /**
-     * Overwritten to notify the {@link AsyncFutureListener} right away. It
-     * won't be added to the internal list of {@link AsyncFutureListener}s!
-     */
-    @Override
-    public void addAsyncFutureListener(AsyncFutureListener<T> l) {
-        fireOperationComplete(l);
-    }
+  /**
+   * Overwritten to notify the {@link AsyncFutureListener} right away. It
+   * won't be added to the internal list of {@link AsyncFutureListener}s!
+   */
+  @Override
+  public void addAsyncFutureListener(AsyncFutureListener<T> l) {
+    fireOperationComplete(l);
+  }
 }

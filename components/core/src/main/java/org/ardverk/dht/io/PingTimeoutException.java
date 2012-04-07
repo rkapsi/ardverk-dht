@@ -29,37 +29,37 @@ import org.ardverk.dht.routing.Contact;
  * The {@link PingTimeoutException} is thrown if a timeout occurs.
  */
 public class PingTimeoutException extends DHTException {
-    
-    private static final long serialVersionUID = -7330783412590437071L;
+  
+  private static final long serialVersionUID = -7330783412590437071L;
 
-    private final RequestEntity entity;
-    
-    public PingTimeoutException(RequestEntity entity, 
-            long time, TimeUnit unit) {
-        super (time, unit);
-        this.entity = entity;
-    }
-    
-    /**
-     * Returns the {@link RequestEntity}.
-     */
-    public RequestEntity getRequestEntity() {
-        return entity;
-    }
-    
-    /**
-     * Returns the remote {@link Contact}'s {@link KUID} or {@code null}
-     * if the {@link MessageType#PING} was sent to an IP-address and no
-     * {@link KUID} was provided.
-     */
-    public KUID getContactId() {
-        return entity.getId();
-    }
-    
-    /**
-     * Returns the remote {@link Contact}'s IP-address.
-     */
-    public SocketAddress getAddress() {
-        return entity.getAddress();
-    }
+  private final RequestEntity entity;
+  
+  public PingTimeoutException(RequestEntity entity, 
+      long time, TimeUnit unit) {
+    super (time, unit);
+    this.entity = entity;
+  }
+  
+  /**
+   * Returns the {@link RequestEntity}.
+   */
+  public RequestEntity getRequestEntity() {
+    return entity;
+  }
+  
+  /**
+   * Returns the remote {@link Contact}'s {@link KUID} or {@code null}
+   * if the {@link MessageType#PING} was sent to an IP-address and no
+   * {@link KUID} was provided.
+   */
+  public KUID getContactId() {
+    return entity.getId();
+  }
+  
+  /**
+   * Returns the remote {@link Contact}'s IP-address.
+   */
+  public SocketAddress getAddress() {
+    return entity.getAddress();
+  }
 }

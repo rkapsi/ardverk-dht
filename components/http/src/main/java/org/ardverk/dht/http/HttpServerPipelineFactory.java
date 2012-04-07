@@ -25,21 +25,21 @@ import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
 
 class HttpServerPipelineFactory implements ChannelPipelineFactory {
 
-    private final SimpleChannelHandler channelHandler;
+  private final SimpleChannelHandler channelHandler;
+  
+  public HttpServerPipelineFactory(SimpleChannelHandler channelHandler) {
+    this.channelHandler = channelHandler;
+  }
+  
+  @Override
+  public ChannelPipeline getPipeline() {
+    ChannelPipeline pipeline = Channels.pipeline();
+    pipeline.addLast("decoder", new HttpRequestDecoder());
+    pipeline.addLast("encoder", new HttpResponseEncoder());
     
-    public HttpServerPipelineFactory(SimpleChannelHandler channelHandler) {
-        this.channelHandler = channelHandler;
-    }
+    pipeline.addLast("idle", IdleUtils.DEFAULT);
+    pipeline.addLast("handler", channelHandler);
     
-    @Override
-    public ChannelPipeline getPipeline() {
-        ChannelPipeline pipeline = Channels.pipeline();
-        pipeline.addLast("decoder", new HttpRequestDecoder());
-        pipeline.addLast("encoder", new HttpResponseEncoder());
-        
-        pipeline.addLast("idle", IdleUtils.DEFAULT);
-        pipeline.addLast("handler", channelHandler);
-        
-        return pipeline;
-    }
+    return pipeline;
+  }
 }

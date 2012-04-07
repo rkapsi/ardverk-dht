@@ -25,29 +25,29 @@ import org.ardverk.dht.routing.Contact;
  * A default implementation of {@link NodeEntity}.
  */
 public class NodeEntity extends LookupEntity {
+  
+  private final Outcome outcome;
+  
+  public NodeEntity(Outcome outcome) {
+    super(outcome.getId(), outcome.getTimeInMillis(), 
+        TimeUnit.MILLISECONDS);
     
-    private final Outcome outcome;
-    
-    public NodeEntity(Outcome outcome) {
-        super(outcome.getId(), outcome.getTimeInMillis(), 
-                TimeUnit.MILLISECONDS);
-        
-        this.outcome = outcome;
-    }
-    
-    public Contact[] getClosest() {
-        return outcome.getClosest();
-    }
-    
-    public Contact[] getContacts() {
-        return outcome.getContacts();
-    }
+    this.outcome = outcome;
+  }
+  
+  public Contact[] getClosest() {
+    return outcome.getClosest();
+  }
+  
+  public Contact[] getContacts() {
+    return outcome.getContacts();
+  }
 
-    public int getHop() {
-        return outcome.getHop();
-    }
-    
-    public Outcome getOutcome() {
-        return outcome;
-    }
+  public int getHop() {
+    return outcome.getHop();
+  }
+  
+  public Outcome getOutcome() {
+    return outcome;
+  }
 }

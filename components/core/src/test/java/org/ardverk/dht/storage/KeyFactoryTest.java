@@ -24,14 +24,14 @@ import org.junit.Test;
 
 public class KeyFactoryTest {
 
-    @Test
-    public void equals() {
-        Key key1 = KeyFactory.parseKey("ardverk:///key1");
-        Key key2 = KeyFactory.parseKey("ardverk:///key1");
-        
-        Key key3 = KeyFactory.parseKey("ardverk:///key2");
-        
-        TestCase.assertEquals(key1, key2);
-        TestCase.assertFalse(key1.equals(key3));
-    }
+  @Test
+  public void equals() {
+    Key key1 = KeyFactory.parseKey("ardverk:///key1");
+    Key key2 = KeyFactory.parseKey("ardverk:///key1");
+    
+    Key key3 = KeyFactory.parseKey("ardverk:///key2");
+    
+    TestCase.assertEquals(key1, key2);
+    TestCase.assertFalse(key1.equals(key3));
+  }
 }

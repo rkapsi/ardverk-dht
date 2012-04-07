@@ -20,24 +20,24 @@ package org.ardverk.dht.message;
  * This class describes the basic Kademlia IPC operations.
  */
 public enum MessageType {
-    
-    /**
-     * See Kademlia Specification(s) for PING.
-     */
-    PING,
-    
-    /**
-     * See Kademlia Specification(s) for FIND_NODE.
-     */
-    FIND_NODE,
-    
-    /**
-     * See Kademlia Specification(s) for FIND_VALUE.
-     */
-    FIND_VALUE,
-    
-    /**
-     * See Kademlia Specification(s) for STORE.
-     */
-    STORE
+  
+  /**
+   * See Kademlia Specification(s) for PING.
+   */
+  PING,
+  
+  /**
+   * See Kademlia Specification(s) for FIND_NODE.
+   */
+  FIND_NODE,
+  
+  /**
+   * See Kademlia Specification(s) for FIND_VALUE.
+   */
+  FIND_VALUE,
+  
+  /**
+   * See Kademlia Specification(s) for STORE.
+   */
+  STORE
 }

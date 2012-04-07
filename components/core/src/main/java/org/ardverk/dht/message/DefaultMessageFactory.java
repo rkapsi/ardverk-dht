@@ -30,82 +30,82 @@ import org.ardverk.dht.rsrc.Value;
 @Singleton
 public class DefaultMessageFactory extends AbstractMessageFactory {
 
-    private final Identity localhost;
+  private final Identity localhost;
+  
+  @Inject
+  public DefaultMessageFactory(Identity localhost) {
+    this(localhost.getId().length(), localhost);
+  }
+  
+  public DefaultMessageFactory(int length, Identity localhost) {
+    super(length);
+    this.localhost = localhost;
+  }
+  
+  @Override
+  public PingRequest createPingRequest(Contact dst) {
+    return createPingRequest(dst.getRemoteAddress());
+  }
+
+  @Override
+  public PingRequest createPingRequest(SocketAddress dst) {
+    MessageId messageId = createMessageId(dst);
+    return new DefaultPingRequest(messageId, localhost, dst);
+  }
+
+  @Override
+  public PingResponse createPingResponse(PingRequest request) {
+    Contact dst = request.getContact();
+    SocketAddress address = dst.getRemoteAddress();
+    MessageId messageId = request.getMessageId();
+    return new DefaultPingResponse(messageId, localhost, address);
+  }
+
+  @Override
+  public NodeRequest createNodeRequest(Contact dst, KUID key) {
+    SocketAddress address = dst.getRemoteAddress();
+    MessageId messageId = createMessageId(address);
+    return new DefaultNodeRequest(messageId, localhost, address, key);
+  }
+
+  @Override
+  public NodeResponse createNodeResponse(LookupRequest request, Contact[] contacts) {
+    Contact dst = request.getContact();
+    SocketAddress address = dst.getRemoteAddress();
+    MessageId messageId = request.getMessageId();
+    return new DefaultNodeResponse(messageId, localhost, address, contacts);
+  }
+
+  @Override
+  public ValueRequest createValueRequest(Contact dst, Key key) {
+    SocketAddress address = dst.getRemoteAddress();
+    MessageId messageId = createMessageId(address);
+    return new DefaultValueRequest(messageId, localhost, address, key);
+  }
+
+  @Override
+  public ValueResponse createValueResponse(LookupRequest request, Value value) {
+    Contact dst = request.getContact();
+    SocketAddress address = dst.getRemoteAddress();
+    MessageId messageId = request.getMessageId();
+    return new DefaultValueResponse(messageId, localhost, address, value);
+  }
+
+  @Override
+  public StoreRequest createStoreRequest(Contact dst, Key key, 
+      Value value) {
+    SocketAddress address = dst.getRemoteAddress();
+    MessageId messageId = createMessageId(address);
     
-    @Inject
-    public DefaultMessageFactory(Identity localhost) {
-        this(localhost.getId().length(), localhost);
-    }
-    
-    public DefaultMessageFactory(int length, Identity localhost) {
-        super(length);
-        this.localhost = localhost;
-    }
-    
-    @Override
-    public PingRequest createPingRequest(Contact dst) {
-        return createPingRequest(dst.getRemoteAddress());
-    }
+    return new DefaultStoreRequest(messageId, localhost, 
+        address, key, value);
+  }
 
-    @Override
-    public PingRequest createPingRequest(SocketAddress dst) {
-        MessageId messageId = createMessageId(dst);
-        return new DefaultPingRequest(messageId, localhost, dst);
-    }
-
-    @Override
-    public PingResponse createPingResponse(PingRequest request) {
-        Contact dst = request.getContact();
-        SocketAddress address = dst.getRemoteAddress();
-        MessageId messageId = request.getMessageId();
-        return new DefaultPingResponse(messageId, localhost, address);
-    }
-
-    @Override
-    public NodeRequest createNodeRequest(Contact dst, KUID key) {
-        SocketAddress address = dst.getRemoteAddress();
-        MessageId messageId = createMessageId(address);
-        return new DefaultNodeRequest(messageId, localhost, address, key);
-    }
-
-    @Override
-    public NodeResponse createNodeResponse(LookupRequest request, Contact[] contacts) {
-        Contact dst = request.getContact();
-        SocketAddress address = dst.getRemoteAddress();
-        MessageId messageId = request.getMessageId();
-        return new DefaultNodeResponse(messageId, localhost, address, contacts);
-    }
-
-    @Override
-    public ValueRequest createValueRequest(Contact dst, Key key) {
-        SocketAddress address = dst.getRemoteAddress();
-        MessageId messageId = createMessageId(address);
-        return new DefaultValueRequest(messageId, localhost, address, key);
-    }
-
-    @Override
-    public ValueResponse createValueResponse(LookupRequest request, Value value) {
-        Contact dst = request.getContact();
-        SocketAddress address = dst.getRemoteAddress();
-        MessageId messageId = request.getMessageId();
-        return new DefaultValueResponse(messageId, localhost, address, value);
-    }
-
-    @Override
-    public StoreRequest createStoreRequest(Contact dst, Key key, 
-            Value value) {
-        SocketAddress address = dst.getRemoteAddress();
-        MessageId messageId = createMessageId(address);
-        
-        return new DefaultStoreRequest(messageId, localhost, 
-                address, key, value);
-    }
-
-    @Override
-    public StoreResponse createStoreResponse(StoreRequest request, Value value) {
-        Contact dst = request.getContact();
-        SocketAddress address = dst.getRemoteAddress();
-        MessageId messageId = request.getMessageId();
-        return new DefaultStoreResponse(messageId, localhost, address, value);
-    }
+  @Override
+  public StoreResponse createStoreResponse(StoreRequest request, Value value) {
+    Contact dst = request.getContact();
+    SocketAddress address = dst.getRemoteAddress();
+    MessageId messageId = request.getMessageId();
+    return new DefaultStoreResponse(messageId, localhost, address, value);
+  }
 }

@@ -24,8 +24,8 @@ import org.ardverk.dht.routing.Contact;
  */
 public interface NodeResponse extends LookupResponse {
 
-    /**
-     * Returns the {@link Contact}s that were closest to a lookup {@link KUID}.
-     */
-    public Contact[] getContacts();
+  /**
+   * Returns the {@link Contact}s that were closest to a lookup {@link KUID}.
+   */
+  public Contact[] getContacts();
 }

@@ -41,84 +41,84 @@ import org.ardverk.dht.routing.Contact;
  */
 public class RequestEntity implements Identifier {
 
-    private final KUID contactId;
-    
-    private final RequestMessage request;
-    
-    public RequestEntity(KUID contactId, RequestMessage request) {
-        this.contactId = contactId;
-        this.request = request;
-    }
+  private final KUID contactId;
+  
+  private final RequestMessage request;
+  
+  public RequestEntity(KUID contactId, RequestMessage request) {
+    this.contactId = contactId;
+    this.request = request;
+  }
 
-    @Override
-    public KUID getId() {
-        return contactId;
-    }
-    
-    /**
-     * Returns the remove host's {@link SocketAddress}.
-     */
-    public SocketAddress getAddress() {
-        return request.getAddress();
-    }
+  @Override
+  public KUID getId() {
+    return contactId;
+  }
+  
+  /**
+   * Returns the remove host's {@link SocketAddress}.
+   */
+  public SocketAddress getAddress() {
+    return request.getAddress();
+  }
 
-    /**
-     * Returns the {@link RequestMessage} we sent to the remote host.
-     */
-    public RequestMessage getRequest() {
-        return request;
+  /**
+   * Returns the {@link RequestMessage} we sent to the remote host.
+   */
+  public RequestMessage getRequest() {
+    return request;
+  }
+  
+  /**
+   * Returns the {@link RequestMessage}'s {@link MessageId}.
+   * 
+   * @see RequestMessage#getMessageId()
+   */
+  MessageId getMessageId() {
+    return request.getMessageId();
+  }
+  
+  /**
+   * Checks if the {@link ResponseMessage} of the expected type.
+   */
+  boolean check(ResponseMessage response) {
+    return checkType(response) && checkContactId(response);
+  }
+  
+  /**
+   * Checks the {@link Contact}'s {@link KUID}
+   */
+  private boolean checkContactId(ResponseMessage response) {
+    if (contactId == null) {
+      return (response instanceof PingResponse);
     }
     
-    /**
-     * Returns the {@link RequestMessage}'s {@link MessageId}.
-     * 
-     * @see RequestMessage#getMessageId()
-     */
-    MessageId getMessageId() {
-        return request.getMessageId();
+    Contact contact = response.getContact();
+    KUID otherId = contact.getId();
+    
+    return contactId.equals(otherId);
+  }
+  
+  /**
+   * Checks the type of the {@link ResponseMessage}.
+   */
+  private boolean checkType(ResponseMessage response) {
+    if (request instanceof PingRequest) {
+      return response instanceof PingResponse;
+    } else if (request instanceof NodeRequest) {
+      return response instanceof NodeResponse;
+    } else if (request instanceof ValueRequest) {
+      return response instanceof ValueResponse 
+        || response instanceof NodeResponse;
+    } else if (request instanceof StoreRequest) {
+      return response instanceof StoreResponse;
     }
     
-    /**
-     * Checks if the {@link ResponseMessage} of the expected type.
-     */
-    boolean check(ResponseMessage response) {
-        return checkType(response) && checkContactId(response);
-    }
-    
-    /**
-     * Checks the {@link Contact}'s {@link KUID}
-     */
-    private boolean checkContactId(ResponseMessage response) {
-        if (contactId == null) {
-            return (response instanceof PingResponse);
-        }
-        
-        Contact contact = response.getContact();
-        KUID otherId = contact.getId();
-        
-        return contactId.equals(otherId);
-    }
-    
-    /**
-     * Checks the type of the {@link ResponseMessage}.
-     */
-    private boolean checkType(ResponseMessage response) {
-        if (request instanceof PingRequest) {
-            return response instanceof PingResponse;
-        } else if (request instanceof NodeRequest) {
-            return response instanceof NodeResponse;
-        } else if (request instanceof ValueRequest) {
-            return response instanceof ValueResponse 
-                || response instanceof NodeResponse;
-        } else if (request instanceof StoreRequest) {
-            return response instanceof StoreResponse;
-        }
-        
-        return false;
-    }
-    
-    @Override
-    public String toString() {
-        return "RequestEntity: contactId=" + contactId + ", request=" + request;
-    }
+    return false;
+  }
+  
+  @Override
+  public String toString() {
+    return "RequestEntity: contactId=" + contactId + ", request=" + request;
+  }
 }

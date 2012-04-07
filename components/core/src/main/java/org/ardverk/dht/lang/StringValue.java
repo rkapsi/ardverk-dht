@@ -21,8 +21,8 @@ package org.ardverk.dht.lang;
  */
 public interface StringValue {
 
-    /**
-     * Returns a {@link String} value of this object.
-     */
-    public String stringValue();
+  /**
+   * Returns a {@link String} value of this object.
+   */
+  public String stringValue();
 }

@@ -22,10 +22,10 @@ import org.ardverk.dht.routing.Contact;
 
 
 public class DefaultPingRequest extends AbstractRequestMessage 
-        implements PingRequest {
+    implements PingRequest {
 
-    public DefaultPingRequest(MessageId messageId, 
-            Contact contact, SocketAddress address) {
-        super(messageId, contact, address);
-    }
+  public DefaultPingRequest(MessageId messageId, 
+      Contact contact, SocketAddress address) {
+    super(messageId, contact, address);
+  }
 }

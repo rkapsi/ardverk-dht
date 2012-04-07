@@ -64,242 +64,242 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class HttpTransport extends AbstractTransport {
+  
+  private static final Logger LOG 
+    = LoggerFactory.getLogger(HttpTransport.class);
+  
+  private static final ThreadPoolExecutor EXECUTOR 
+    = ExecutorUtils.newCachedThreadPool("HttpTransportThread");
+  
+  static {
+    EXECUTOR.setKeepAliveTime(10L, TimeUnit.SECONDS);
+  }
+  
+  private final MessageCodec codec = new BencodeMessageCodec();
+  
+  private final SimpleChannelHandler requestHandler 
+    = new DefaultHttpRequestHandler();
+  
+  private final SimpleChannelHandler responseHandler 
+    = new DefaultHttpResponseHandler();
+  
+  private final HttpClientPipelineFactory pipelineFactory 
+    = new HttpClientPipelineFactory(responseHandler);
+  
+  private final SocketAddress bindaddr;
+  
+  private final ServerBootstrap server;
+  
+  private final NioClientSocketChannelFactory channelFactory;
+  
+  private Channel acceptor;
+  
+  public HttpTransport(int port) {
+    this(new InetSocketAddress(port));
+  }
+  
+  public HttpTransport(String host, int port) {
+    this(new InetSocketAddress(host, port));
+  }
+  
+  public HttpTransport(InetAddress address, int port) {
+    this(new InetSocketAddress(address, port));
+  }
+  
+  public HttpTransport(SocketAddress bindaddr) {
+    this.bindaddr = bindaddr;
     
-    private static final Logger LOG 
-        = LoggerFactory.getLogger(HttpTransport.class);
+    server = new ServerBootstrap(
+        new NioServerSocketChannelFactory(
+          EXECUTOR, EXECUTOR));
+    server.setPipelineFactory(
+        new HttpServerPipelineFactory(requestHandler));
     
-    private static final ThreadPoolExecutor EXECUTOR 
-        = ExecutorUtils.newCachedThreadPool("HttpTransportThread");
-    
-    static {
-        EXECUTOR.setKeepAliveTime(10L, TimeUnit.SECONDS);
+    channelFactory = new NioClientSocketChannelFactory(
+        EXECUTOR, EXECUTOR);
+  }
+  
+  @Override
+  public SocketAddress getSocketAddress() {
+    return bindaddr;
+  }
+
+  @Override
+  public void bind(TransportCallback callback) throws IOException {
+    super.bind(callback);
+    acceptor = server.bind(bindaddr);
+  }
+
+  @Override
+  public void unbind() {
+    if (acceptor != null) {
+      acceptor.close();
     }
     
-    private final MessageCodec codec = new BencodeMessageCodec();
+    super.unbind();
+  }
+  
+  private ChannelFuture connect(SocketAddress addr, long timeout, TimeUnit unit) {
+    ClientBootstrap client 
+      = new ClientBootstrap(channelFactory);
+    client.setOption("connectTimeoutMillis", 
+        Integer.valueOf((int)unit.toMillis(timeout)));
+    client.setPipelineFactory(pipelineFactory);
+    return client.connect(addr);
+  }
+  
+  @Override
+  public void send(final KUID contactId, final Message message, 
+      long timeout, TimeUnit unit) throws IOException {
     
-    private final SimpleChannelHandler requestHandler 
-        = new DefaultHttpRequestHandler();
+    SocketAddress addr = message.getAddress();
+    SocketAddress endpoint = NetworkUtils.getResolved(addr);
     
-    private final SimpleChannelHandler responseHandler 
-        = new DefaultHttpResponseHandler();
-    
-    private final HttpClientPipelineFactory pipelineFactory 
-        = new HttpClientPipelineFactory(responseHandler);
-    
-    private final SocketAddress bindaddr;
-    
-    private final ServerBootstrap server;
-    
-    private final NioClientSocketChannelFactory channelFactory;
-    
-    private Channel acceptor;
-    
-    public HttpTransport(int port) {
-        this(new InetSocketAddress(port));
+    ChannelFuture future = null;
+    try {
+      future = connect(endpoint, timeout, unit);
+    } catch (Exception err) {
+      LOG.error("Exception", err);
+      handleException(message, err);
+      return;
     }
     
-    public HttpTransport(String host, int port) {
-        this(new InetSocketAddress(host, port));
-    }
-    
-    public HttpTransport(InetAddress address, int port) {
-        this(new InetSocketAddress(address, port));
-    }
-    
-    public HttpTransport(SocketAddress bindaddr) {
-        this.bindaddr = bindaddr;
+    future.addListener(new ChannelFutureListener() {
+      @Override
+      public void operationComplete(ChannelFuture connectFuture) throws IOException {
+        if (!connectFuture.isSuccess()) {
+          handleException(message, connectFuture.getCause());
+          return;
+        }
         
-        server = new ServerBootstrap(
-                new NioServerSocketChannelFactory(
-                    EXECUTOR, EXECUTOR));
-        server.setPipelineFactory(
-                new HttpServerPipelineFactory(requestHandler));
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Encoder encoder = codec.createEncoder(baos);
+        encoder.write(message);
+        encoder.close();
         
-        channelFactory = new NioClientSocketChannelFactory(
-                EXECUTOR, EXECUTOR);
-    }
-    
-    @Override
-    public SocketAddress getSocketAddress() {
-        return bindaddr;
-    }
+        byte[] encoded = baos.toByteArray();
+        
+        HttpRequest httpRequest = new DefaultHttpRequest(
+            HttpVersion.HTTP_1_1, 
+            HttpMethod.POST, "/ardverk");
+        httpRequest.setContent(ChannelBuffers.copiedBuffer(encoded));
+        httpRequest.setHeader(HttpHeaders.Names.CONTENT_LENGTH, encoded.length);
+        httpRequest.setHeader(HttpHeaders.Names.CONNECTION, 
+            HttpHeaders.Values.CLOSE);
+        
+        Channel channel = connectFuture.getChannel();
+        ChannelFuture future = channel.write(httpRequest);
+        
+        future.addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
+        future.addListener(new MessageListener(contactId, message));
+      }
+    });
+  }
+  
+  private static class HttpHandler extends IdleStateAwareChannelHandler {
 
     @Override
-    public void bind(TransportCallback callback) throws IOException {
-        super.bind(callback);
-        acceptor = server.bind(bindaddr);
+    public void channelIdle(ChannelHandlerContext ctx, IdleStateEvent e) {
+      HttpUtils.close(e);
     }
 
     @Override
-    public void unbind() {
-        if (acceptor != null) {
-            acceptor.close();
-        }
-        
-        super.unbind();
+    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
+      
+      if (LOG.isErrorEnabled()) {
+        LOG.error("Exception", e.getCause());
+      }
+      
+      HttpUtils.close(e);
     }
-    
-    private ChannelFuture connect(SocketAddress addr, long timeout, TimeUnit unit) {
-        ClientBootstrap client 
-            = new ClientBootstrap(channelFactory);
-        client.setOption("connectTimeoutMillis", 
-                Integer.valueOf((int)unit.toMillis(timeout)));
-        client.setPipelineFactory(pipelineFactory);
-        return client.connect(addr);
-    }
+  }
+  
+  private class DefaultHttpRequestHandler extends HttpHandler {
     
     @Override
-    public void send(final KUID contactId, final Message message, 
-            long timeout, TimeUnit unit) throws IOException {
+    public void messageReceived(ChannelHandlerContext ctx, final MessageEvent e)
+        throws IOException {
+      HttpRequest httpRequest = (HttpRequest)e.getMessage();
+      
+      SocketAddress src = e.getRemoteAddress();
+      ChannelBuffer content = httpRequest.getContent();
+      
+      ByteArrayInputStream bais = new ByteArrayInputStream(content.array());
+      Decoder decoder = codec.createDecoder(src, bais);
+      RequestMessage request = (RequestMessage)decoder.read();
+      decoder.close();
+      
+      ResponseMessage response = HttpTransport.this.handleRequest(request);
+      
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      Encoder encoder = codec.createEncoder(baos);
+      encoder.write(response);
+      encoder.close();
+      
+      byte[] encoded = baos.toByteArray();
+      
+      HttpResponse httpResponse = new DefaultHttpResponse(
+          HttpVersion.HTTP_1_1, 
+          HttpResponseStatus.OK);
+      httpResponse.setContent(ChannelBuffers.copiedBuffer(encoded));
+      httpResponse.setHeader(HttpHeaders.Names.CONTENT_LENGTH, encoded.length);
+      httpResponse.setHeader(HttpHeaders.Names.CONNECTION, 
+          HttpHeaders.Values.CLOSE);
+      
+      Channel channel = e.getChannel();
+      ChannelFuture future = channel.write(httpResponse);
+      future.addListener(ChannelFutureListener.CLOSE);
+      future.addListener(new MessageListener(request, response));
+    }
+  }
+  
+  private class DefaultHttpResponseHandler extends HttpHandler {
+    
+    @Override
+    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) 
+        throws IOException {
+      
+      try {
+        HttpResponse httpResponse = (HttpResponse)e.getMessage();
         
-        SocketAddress addr = message.getAddress();
-        SocketAddress endpoint = NetworkUtils.getResolved(addr);
+        SocketAddress src = e.getRemoteAddress();
         
-        ChannelFuture future = null;
-        try {
-            future = connect(endpoint, timeout, unit);
-        } catch (Exception err) {
-            LOG.error("Exception", err);
-            handleException(message, err);
-            return;
-        }
+        ChannelBuffer content = httpResponse.getContent();
         
-        future.addListener(new ChannelFutureListener() {
-            @Override
-            public void operationComplete(ChannelFuture connectFuture) throws IOException {
-                if (!connectFuture.isSuccess()) {
-                    handleException(message, connectFuture.getCause());
-                    return;
-                }
-                
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                Encoder encoder = codec.createEncoder(baos);
-                encoder.write(message);
-                encoder.close();
-                
-                byte[] encoded = baos.toByteArray();
-                
-                HttpRequest httpRequest = new DefaultHttpRequest(
-                        HttpVersion.HTTP_1_1, 
-                        HttpMethod.POST, "/ardverk");
-                httpRequest.setContent(ChannelBuffers.copiedBuffer(encoded));
-                httpRequest.setHeader(HttpHeaders.Names.CONTENT_LENGTH, encoded.length);
-                httpRequest.setHeader(HttpHeaders.Names.CONNECTION, 
-                        HttpHeaders.Values.CLOSE);
-                
-                Channel channel = connectFuture.getChannel();
-                ChannelFuture future = channel.write(httpRequest);
-                
-                future.addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
-                future.addListener(new MessageListener(contactId, message));
-            }
-        });
+        ByteArrayInputStream bais = new ByteArrayInputStream(content.array());
+        Decoder decoder = codec.createDecoder(src, bais);
+        ResponseMessage response = (ResponseMessage)decoder.read();
+        decoder.close();
+        
+        HttpTransport.this.handleResponse(response);
+      } finally {
+        HttpUtils.close(e);
+      }
+    }
+  }
+  
+  private class MessageListener implements ChannelFutureListener {
+    
+    private final KUID contactId;
+    
+    private final Message message;
+    
+    public MessageListener(RequestMessage request, ResponseMessage response) {
+      this(request.getContact().getId(), response);
     }
     
-    private static class HttpHandler extends IdleStateAwareChannelHandler {
+    public MessageListener(KUID contactId, Message message) {
+      this.contactId = contactId;
+      this.message = message;
+    }
 
-        @Override
-        public void channelIdle(ChannelHandlerContext ctx, IdleStateEvent e) {
-            HttpUtils.close(e);
-        }
-
-        @Override
-        public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
-            
-            if (LOG.isErrorEnabled()) {
-                LOG.error("Exception", e.getCause());
-            }
-            
-            HttpUtils.close(e);
-        }
+    @Override
+    public void operationComplete(ChannelFuture future) {
+      if (future.isSuccess()) {
+        HttpTransport.this.messageSent(contactId, message);
+      } else {
+        HttpTransport.this.handleException(message, future.getCause());
+      }
     }
-    
-    private class DefaultHttpRequestHandler extends HttpHandler {
-        
-        @Override
-        public void messageReceived(ChannelHandlerContext ctx, final MessageEvent e)
-                throws IOException {
-            HttpRequest httpRequest = (HttpRequest)e.getMessage();
-            
-            SocketAddress src = e.getRemoteAddress();
-            ChannelBuffer content = httpRequest.getContent();
-            
-            ByteArrayInputStream bais = new ByteArrayInputStream(content.array());
-            Decoder decoder = codec.createDecoder(src, bais);
-            RequestMessage request = (RequestMessage)decoder.read();
-            decoder.close();
-            
-            ResponseMessage response = HttpTransport.this.handleRequest(request);
-            
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            Encoder encoder = codec.createEncoder(baos);
-            encoder.write(response);
-            encoder.close();
-            
-            byte[] encoded = baos.toByteArray();
-            
-            HttpResponse httpResponse = new DefaultHttpResponse(
-                    HttpVersion.HTTP_1_1, 
-                    HttpResponseStatus.OK);
-            httpResponse.setContent(ChannelBuffers.copiedBuffer(encoded));
-            httpResponse.setHeader(HttpHeaders.Names.CONTENT_LENGTH, encoded.length);
-            httpResponse.setHeader(HttpHeaders.Names.CONNECTION, 
-                    HttpHeaders.Values.CLOSE);
-            
-            Channel channel = e.getChannel();
-            ChannelFuture future = channel.write(httpResponse);
-            future.addListener(ChannelFutureListener.CLOSE);
-            future.addListener(new MessageListener(request, response));
-        }
-    }
-    
-    private class DefaultHttpResponseHandler extends HttpHandler {
-        
-        @Override
-        public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) 
-                throws IOException {
-            
-            try {
-                HttpResponse httpResponse = (HttpResponse)e.getMessage();
-                
-                SocketAddress src = e.getRemoteAddress();
-                
-                ChannelBuffer content = httpResponse.getContent();
-                
-                ByteArrayInputStream bais = new ByteArrayInputStream(content.array());
-                Decoder decoder = codec.createDecoder(src, bais);
-                ResponseMessage response = (ResponseMessage)decoder.read();
-                decoder.close();
-                
-                HttpTransport.this.handleResponse(response);
-            } finally {
-                HttpUtils.close(e);
-            }
-        }
-    }
-    
-    private class MessageListener implements ChannelFutureListener {
-        
-        private final KUID contactId;
-        
-        private final Message message;
-        
-        public MessageListener(RequestMessage request, ResponseMessage response) {
-            this(request.getContact().getId(), response);
-        }
-        
-        public MessageListener(KUID contactId, Message message) {
-            this.contactId = contactId;
-            this.message = message;
-        }
-
-        @Override
-        public void operationComplete(ChannelFuture future) {
-            if (future.isSuccess()) {
-                HttpTransport.this.messageSent(contactId, message);
-            } else {
-                HttpTransport.this.handleException(message, future.getCause());
-            }
-        }
-    }
+  }
 }

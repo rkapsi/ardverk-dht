@@ -20,99 +20,99 @@ import org.slf4j.LoggerFactory;
  */
 public class TransientDatastore extends SimpleDatastore {
 
-    private static final Logger LOG 
-        = LoggerFactory.getLogger(TransientDatastore.class);
+  private static final Logger LOG 
+    = LoggerFactory.getLogger(TransientDatastore.class);
+  
+  private final Map<Key, Handle> map = new ConcurrentHashMap<Key, Handle>();
+  
+  public TransientDatastore(long frequency, TimeUnit unit) {
+    super(frequency, frequency, unit);
+  }
+  
+  public TransientDatastore(long frequency, long timeout, final TimeUnit unit) {
+    super(frequency, timeout, unit);
+  }
+  
+  @Override
+  protected void evict(long timeout, TimeUnit unit) {
+    long now = System.currentTimeMillis();
+    long timeoutInMillis = unit.toMillis(timeout);
     
-    private final Map<Key, Handle> map = new ConcurrentHashMap<Key, Handle>();
-    
-    public TransientDatastore(long frequency, TimeUnit unit) {
-        super(frequency, frequency, unit);
+    for (Handle handle : map.values()) {
+      if ((now - handle.creationTime) >= timeoutInMillis) {
+        map.remove(handle.key);
+      }
     }
-    
-    public TransientDatastore(long frequency, long timeout, final TimeUnit unit) {
-        super(frequency, timeout, unit);
-    }
-    
-    @Override
-    protected void evict(long timeout, TimeUnit unit) {
-        long now = System.currentTimeMillis();
-        long timeoutInMillis = unit.toMillis(timeout);
-        
-        for (Handle handle : map.values()) {
-            if ((now - handle.creationTime) >= timeoutInMillis) {
-                map.remove(handle.key);
-            }
+  }
+  
+  @Override
+  public Value store(Contact src, Key key, Value value) {
+    Value response = OK;
+    try {
+      Handle handle = Handle.valueOf(key, value);
+      
+      if (handle.isEmpty()) {
+        if (map.remove(key) != null) {
+          response = NOT_FOUND;
         }
+      } else {
+        map.put(key, handle);
+      }
+    } catch (IOException err) {
+      LOG.error("IOException", err);
+      response = INTERNAL_ERROR;
     }
     
-    @Override
-    public Value store(Contact src, Key key, Value value) {
-        Value response = OK;
-        try {
-            Handle handle = Handle.valueOf(key, value);
-            
-            if (handle.isEmpty()) {
-                if (map.remove(key) != null) {
-                    response = NOT_FOUND;
-                }
-            } else {
-                map.put(key, handle);
-            }
-        } catch (IOException err) {
-            LOG.error("IOException", err);
-            response = INTERNAL_ERROR;
-        }
-        
-        return response;
-    }
+    return response;
+  }
 
-    @Override
-    public Value get(Contact src, Key key) {
-        Handle handle = map.get(key);
-        return handle != null ? handle.value : null;
+  @Override
+  public Value get(Contact src, Key key) {
+    Handle handle = map.get(key);
+    return handle != null ? handle.value : null;
+  }
+  
+  @Override
+  public String toString() {
+    return map.values().toString();
+  }
+  
+  private static class Handle {
+    
+    public static Handle valueOf(Key key, Value value) throws IOException {
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      InputStream in = value.getContent();
+      try {
+        byte[] buffer = new byte[4*1024];
+        int len = -1;
+        while ((len = in.read(buffer)) != -1) {
+          baos.write(buffer, 0, len);
+        }
+        
+        return new Handle(key, new ByteArrayValue(baos.toByteArray()));
+      } finally {
+        IoUtils.close(in);
+      }
+    }
+    
+    private final long creationTime = System.currentTimeMillis();
+    
+    private final Key key;
+    
+    private final ByteArrayValue value;
+    
+    private Handle(Key key, ByteArrayValue value) {
+      this.key = key;
+      this.value = value;
+    }
+    
+    public boolean isEmpty() {
+      return value.isEmpty();
     }
     
     @Override
     public String toString() {
-        return map.values().toString();
+      return key + "=" + value;
     }
-    
-    private static class Handle {
-        
-        public static Handle valueOf(Key key, Value value) throws IOException {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            InputStream in = value.getContent();
-            try {
-                byte[] buffer = new byte[4*1024];
-                int len = -1;
-                while ((len = in.read(buffer)) != -1) {
-                    baos.write(buffer, 0, len);
-                }
-                
-                return new Handle(key, new ByteArrayValue(baos.toByteArray()));
-            } finally {
-                IoUtils.close(in);
-            }
-        }
-        
-        private final long creationTime = System.currentTimeMillis();
-        
-        private final Key key;
-        
-        private final ByteArrayValue value;
-        
-        private Handle(Key key, ByteArrayValue value) {
-            this.key = key;
-            this.value = value;
-        }
-        
-        public boolean isEmpty() {
-            return value.isEmpty();
-        }
-        
-        @Override
-        public String toString() {
-            return key + "=" + value;
-        }
-    }
+  }
 }

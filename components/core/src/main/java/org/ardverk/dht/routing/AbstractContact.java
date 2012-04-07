@@ -23,114 +23,114 @@ import org.ardverk.dht.lang.Identifier;
 
 
 abstract class AbstractContact implements Contact {
-    
-    private static final long serialVersionUID = 9018341814707545676L;
-    
-    protected final KUID contactId;
-    
-    private volatile long rtt = -1L;
-    
-    public AbstractContact(Identifier identifier) {
-        this(identifier, -1L, TimeUnit.MILLISECONDS);
+  
+  private static final long serialVersionUID = 9018341814707545676L;
+  
+  protected final KUID contactId;
+  
+  private volatile long rtt = -1L;
+  
+  public AbstractContact(Identifier identifier) {
+    this(identifier, -1L, TimeUnit.MILLISECONDS);
+  }
+  
+  public AbstractContact(Identifier identifier, long rtt, TimeUnit unit) {
+    this.contactId = identifier.getId();
+    this.rtt = unit.toMillis(rtt);
+  }
+  
+  @Override
+  public KUID getId() {
+    return contactId;
+  }
+  
+  @Override
+  public boolean isType(Type type) {
+    return type == getType();
+  }
+  
+  @Override
+  public boolean isAuthoritative() {
+    return isType(Type.AUTHORITATIVE);
+  }
+  
+  @Override
+  public boolean isSolicited() {
+    return isType(Type.SOLICITED);
+  }
+  
+  @Override
+  public boolean isUnsolicited() {
+    return isType(Type.UNSOLICITED);
+  }
+  
+  @Override
+  public boolean isActive() {
+    return getType().isActive();
+  }
+  
+  @Override
+  public long getRoundTripTime(TimeUnit unit) {
+    return unit.convert(rtt, TimeUnit.MILLISECONDS);
+  }
+  
+  @Override
+  public long getRoundTripTimeInMillis() {
+    return getRoundTripTime(TimeUnit.MILLISECONDS);
+  }
+  
+  @Override
+  public void setRoundTripTime(long rtt, TimeUnit unit) {
+    this.rtt = unit.toMillis(rtt);
+  }
+  
+  @Override
+  public long getTimeSinceLastContact(TimeUnit unit) {
+    return getTimeStamp().getAge(unit);
+  }
+  
+  @Override
+  public long getTimeSinceLastContactInMillis() {
+    return getTimeSinceLastContact(TimeUnit.MILLISECONDS);
+  }
+  
+  @Override
+  public boolean isTimeout(long timeout, TimeUnit unit) {
+    return getTimeSinceLastContact(unit) >= timeout;
+  }
+  
+  @Override
+  public int hashCode() {
+    return contactId.hashCode();
+  }
+  
+  @Override
+  public boolean equals(Object o) {
+    if (o == this) {
+      return true;
+    } else if (!(o instanceof Contact)) {
+      return false;
     }
     
-    public AbstractContact(Identifier identifier, long rtt, TimeUnit unit) {
-        this.contactId = identifier.getId();
-        this.rtt = unit.toMillis(rtt);
-    }
+    Contact other = (Contact)o;
+    return contactId.equals(other.getId());
+  }
+  
+  @Override
+  public int compareTo(Contact o) {
+    return contactId.compareTo(o.getId());
+  }
+  
+  @Override
+  public String toString() {
+    StringBuilder buffer = new StringBuilder();
     
-    @Override
-    public KUID getId() {
-        return contactId;
-    }
-    
-    @Override
-    public boolean isType(Type type) {
-        return type == getType();
-    }
-    
-    @Override
-    public boolean isAuthoritative() {
-        return isType(Type.AUTHORITATIVE);
-    }
-    
-    @Override
-    public boolean isSolicited() {
-        return isType(Type.SOLICITED);
-    }
-    
-    @Override
-    public boolean isUnsolicited() {
-        return isType(Type.UNSOLICITED);
-    }
-    
-    @Override
-    public boolean isActive() {
-        return getType().isActive();
-    }
-    
-    @Override
-    public long getRoundTripTime(TimeUnit unit) {
-        return unit.convert(rtt, TimeUnit.MILLISECONDS);
-    }
-    
-    @Override
-    public long getRoundTripTimeInMillis() {
-        return getRoundTripTime(TimeUnit.MILLISECONDS);
-    }
-    
-    @Override
-    public void setRoundTripTime(long rtt, TimeUnit unit) {
-        this.rtt = unit.toMillis(rtt);
-    }
-    
-    @Override
-    public long getTimeSinceLastContact(TimeUnit unit) {
-        return getTimeStamp().getAge(unit);
-    }
-    
-    @Override
-    public long getTimeSinceLastContactInMillis() {
-        return getTimeSinceLastContact(TimeUnit.MILLISECONDS);
-    }
-    
-    @Override
-    public boolean isTimeout(long timeout, TimeUnit unit) {
-        return getTimeSinceLastContact(unit) >= timeout;
-    }
-    
-    @Override
-    public int hashCode() {
-        return contactId.hashCode();
-    }
-    
-    @Override
-    public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        } else if (!(o instanceof Contact)) {
-            return false;
-        }
-        
-        Contact other = (Contact)o;
-        return contactId.equals(other.getId());
-    }
-    
-    @Override
-    public int compareTo(Contact o) {
-        return contactId.compareTo(o.getId());
-    }
-    
-    @Override
-    public String toString() {
-        StringBuilder buffer = new StringBuilder();
-        
-        buffer.append("Type=").append(getType())
-            .append(", contactId=").append(getId())
-            .append(", instanceId=").append(getInstanceId())
-            .append(", socketAddress=").append(getSocketAddress())
-            .append(", contactAddress=").append(getContactAddress())
-            .append(", rtt=").append(getRoundTripTimeInMillis());
-        return buffer.toString();
-    }
+    buffer.append("Type=").append(getType())
+      .append(", contactId=").append(getId())
+      .append(", instanceId=").append(getInstanceId())
+      .append(", socketAddress=").append(getSocketAddress())
+      .append(", contactAddress=").append(getContactAddress())
+      .append(", rtt=").append(getRoundTripTimeInMillis());
+    return buffer.toString();
+  }
 }

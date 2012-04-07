@@ -30,48 +30,48 @@ import org.ardverk.dht.message.Message;
  * from Bencode.
  */
 public class BencodeMessageCodec extends AbstractMessageCodec {
-    
-    @Override
-    public Decoder createDecoder(final SocketAddress src, final InputStream in) {
-        Decoder decoder = new Decoder() {
-            
-            private final MessageInputStream mis 
-                = new MessageInputStream(in);
-            
-            @Override
-            public Message read() throws IOException {
-                return mis.readMessage(src);
-            }
-            
-            @Override
-            public void close() throws IOException {
-                mis.close();
-            }
-        };
-        return decoder;
-    }
+  
+  @Override
+  public Decoder createDecoder(final SocketAddress src, final InputStream in) {
+    Decoder decoder = new Decoder() {
+      
+      private final MessageInputStream mis 
+        = new MessageInputStream(in);
+      
+      @Override
+      public Message read() throws IOException {
+        return mis.readMessage(src);
+      }
+      
+      @Override
+      public void close() throws IOException {
+        mis.close();
+      }
+    };
+    return decoder;
+  }
 
-    @Override
-    public Encoder createEncoder(final OutputStream out) {
-        Encoder encoder = new Encoder() {
-            
-            private final MessageOutputStream mos = new MessageOutputStream(out);
-            
-            @Override
-            public void write(Message message) throws IOException {
-                mos.writeMessage(message);
-            }
-            
-            @Override
-            public void flush() throws IOException {
-                mos.flush();
-            }
-            
-            @Override
-            public void close() throws IOException {
-                mos.close();
-            }
-        };
-        return encoder;
-    }
+  @Override
+  public Encoder createEncoder(final OutputStream out) {
+    Encoder encoder = new Encoder() {
+      
+      private final MessageOutputStream mos = new MessageOutputStream(out);
+      
+      @Override
+      public void write(Message message) throws IOException {
+        mos.writeMessage(message);
+      }
+      
+      @Override
+      public void flush() throws IOException {
+        mos.flush();
+      }
+      
+      @Override
+      public void close() throws IOException {
+        mos.close();
+      }
+    };
+    return encoder;
+  }
 }

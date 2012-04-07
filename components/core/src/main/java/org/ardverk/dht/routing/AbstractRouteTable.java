@@ -30,179 +30,179 @@ import org.ardverk.lang.Precoditions;
 
 
 public abstract class AbstractRouteTable implements RouteTable {
-    
-    private final AtomicReference<ContactPinger> pingerRef 
-        = new AtomicReference<ContactPinger>();
-    
-    private final List<RouteTableListener> listeners 
-        = new CopyOnWriteArrayList<RouteTableListener>();
-    
-    @Override
-    public void bind(ContactPinger pinger) {
-        if (!pingerRef.compareAndSet(null, pinger)) {
-            throw new IllegalStateException();
-        }
+  
+  private final AtomicReference<ContactPinger> pingerRef 
+    = new AtomicReference<ContactPinger>();
+  
+  private final List<RouteTableListener> listeners 
+    = new CopyOnWriteArrayList<RouteTableListener>();
+  
+  @Override
+  public void bind(ContactPinger pinger) {
+    if (!pingerRef.compareAndSet(null, pinger)) {
+      throw new IllegalStateException();
     }
-    
-    @Override
-    public void unbind() {
-        pingerRef.set(null);
-    }
-    
-    @Override
-    public boolean isBound() {
-        return pingerRef.get() != null;
-    }
+  }
+  
+  @Override
+  public void unbind() {
+    pingerRef.set(null);
+  }
+  
+  @Override
+  public boolean isBound() {
+    return pingerRef.get() != null;
+  }
 
-    protected DHTFuture<PingEntity> ping(Contact contact, 
-            PingConfig config) {
-        ContactPinger pinger = pingerRef.get();
-        
-        DHTFuture<PingEntity> future = null;
-        if (pinger != null) {
-            future = pinger.ping(contact, config);
-        }
-        
-        if (future != null) {
-            return future;
-        }
-        
-        IllegalStateException exception 
-            = new IllegalStateException();
-        
-        return new DHTValueFuture<PingEntity>(exception);
+  protected DHTFuture<PingEntity> ping(Contact contact, 
+      PingConfig config) {
+    ContactPinger pinger = pingerRef.get();
+    
+    DHTFuture<PingEntity> future = null;
+    if (pinger != null) {
+      future = pinger.ping(contact, config);
     }
     
-    @Override
-    public Contact[] select(KUID contactId) {
-        return select(contactId, getK());
+    if (future != null) {
+      return future;
     }
     
-    @Override
-    public void addRouteTableListener(RouteTableListener l) {
-        listeners.add(Precoditions.notNull(l, "l"));
-    }
+    IllegalStateException exception 
+      = new IllegalStateException();
+    
+    return new DHTValueFuture<PingEntity>(exception);
+  }
+  
+  @Override
+  public Contact[] select(KUID contactId) {
+    return select(contactId, getK());
+  }
+  
+  @Override
+  public void addRouteTableListener(RouteTableListener l) {
+    listeners.add(Precoditions.notNull(l, "l"));
+  }
 
-    @Override
-    public void removeRouteTableListener(RouteTableListener l) {
-        listeners.remove(Precoditions.notNull(l, "l"));
-    }
-    
-    @Override
-    public RouteTableListener[] getRouteTableListeners() {
-        return listeners.toArray(new RouteTableListener[0]);
-    }
+  @Override
+  public void removeRouteTableListener(RouteTableListener l) {
+    listeners.remove(Precoditions.notNull(l, "l"));
+  }
+  
+  @Override
+  public RouteTableListener[] getRouteTableListeners() {
+    return listeners.toArray(new RouteTableListener[0]);
+  }
 
-    protected void fireContact(final Bucket bucket, 
-            final Contact existing, final Contact contact) {
-        
-        if (!listeners.isEmpty()) {
-            Runnable event = new Runnable() {
-                @Override
-                public void run() {
-                    for (RouteTableListener l : listeners) {
-                        l.handleContact(bucket, existing, contact);
-                    }
-                }
-            };
-            
-            EventUtils.fireEvent(event);
-        }
-    }
+  protected void fireContact(final Bucket bucket, 
+      final Contact existing, final Contact contact) {
     
-    protected void fireBucketSplit(final Bucket bucket, 
-            final Bucket left, final Bucket right) {
-        
-        if (!listeners.isEmpty()) {
-            Runnable event = new Runnable() {
-                @Override
-                public void run() {
-                    for (RouteTableListener l : listeners) {
-                        l.handleBucketSplit(bucket, left, right);
-                    }
-                }
-            };
-            
-            EventUtils.fireEvent(event);
+    if (!listeners.isEmpty()) {
+      Runnable event = new Runnable() {
+        @Override
+        public void run() {
+          for (RouteTableListener l : listeners) {
+            l.handleContact(bucket, existing, contact);
+          }
         }
+      };
+      
+      EventUtils.fireEvent(event);
     }
+  }
+  
+  protected void fireBucketSplit(final Bucket bucket, 
+      final Bucket left, final Bucket right) {
     
-    protected void fireContactAdded(final Bucket bucket, final Contact contact) {
-        if (!listeners.isEmpty()) {
-            Runnable event = new Runnable() {
-                @Override
-                public void run() {
-                    for (RouteTableListener l : listeners) {
-                        l.handleContactAdded(bucket, contact);
-                    }
-                }
-            };
-            
-            EventUtils.fireEvent(event);
+    if (!listeners.isEmpty()) {
+      Runnable event = new Runnable() {
+        @Override
+        public void run() {
+          for (RouteTableListener l : listeners) {
+            l.handleBucketSplit(bucket, left, right);
+          }
         }
+      };
+      
+      EventUtils.fireEvent(event);
     }
+  }
+  
+  protected void fireContactAdded(final Bucket bucket, final Contact contact) {
+    if (!listeners.isEmpty()) {
+      Runnable event = new Runnable() {
+        @Override
+        public void run() {
+          for (RouteTableListener l : listeners) {
+            l.handleContactAdded(bucket, contact);
+          }
+        }
+      };
+      
+      EventUtils.fireEvent(event);
+    }
+  }
+  
+  protected void fireContactReplaced(final Bucket bucket, 
+      final Contact existing, final Contact contact) {
     
-    protected void fireContactReplaced(final Bucket bucket, 
-            final Contact existing, final Contact contact) {
-        
-        if (!listeners.isEmpty()) {
-            Runnable event = new Runnable() {
-                @Override
-                public void run() {
-                    for (RouteTableListener l : listeners) {
-                        l.handleContactReplaced(bucket, existing, contact);
-                    }
-                }
-            };
-            
-            EventUtils.fireEvent(event);
+    if (!listeners.isEmpty()) {
+      Runnable event = new Runnable() {
+        @Override
+        public void run() {
+          for (RouteTableListener l : listeners) {
+            l.handleContactReplaced(bucket, existing, contact);
+          }
         }
+      };
+      
+      EventUtils.fireEvent(event);
     }
+  }
+  
+  protected void fireContactChanged(final Bucket bucket, 
+      final Contact existing, final Contact contact) {
     
-    protected void fireContactChanged(final Bucket bucket, 
-            final Contact existing, final Contact contact) {
-        
-        if (!listeners.isEmpty()) {
-            Runnable event = new Runnable() {
-                @Override
-                public void run() {
-                    for (RouteTableListener l : listeners) {
-                        l.handleContactChanged(bucket, existing, contact);
-                    }
-                }
-            };
-            
-            EventUtils.fireEvent(event);
+    if (!listeners.isEmpty()) {
+      Runnable event = new Runnable() {
+        @Override
+        public void run() {
+          for (RouteTableListener l : listeners) {
+            l.handleContactChanged(bucket, existing, contact);
+          }
         }
+      };
+      
+      EventUtils.fireEvent(event);
     }
-    
-    protected void fireContactCollision(final Contact existing, final Contact contact) {
-        if (!listeners.isEmpty()) {
-            Runnable event = new Runnable() {
-                @Override
-                public void run() {
-                    for (RouteTableListener l : listeners) {
-                        l.handleContactCollision(existing, contact);
-                    }
-                }
-            };
-            
-            EventUtils.fireEvent(event);
+  }
+  
+  protected void fireContactCollision(final Contact existing, final Contact contact) {
+    if (!listeners.isEmpty()) {
+      Runnable event = new Runnable() {
+        @Override
+        public void run() {
+          for (RouteTableListener l : listeners) {
+            l.handleContactCollision(existing, contact);
+          }
         }
+      };
+      
+      EventUtils.fireEvent(event);
     }
-    
-    protected void fireContactRemoved(final Bucket bucket, final Contact contact) {
-        if (!listeners.isEmpty()) {
-            Runnable event = new Runnable() {
-                @Override
-                public void run() {
-                    for (RouteTableListener l : listeners) {
-                        l.handleContactRemoved(bucket, contact);
-                    }
-                }
-            };
-            
-            EventUtils.fireEvent(event);
+  }
+  
+  protected void fireContactRemoved(final Bucket bucket, final Contact contact) {
+    if (!listeners.isEmpty()) {
+      Runnable event = new Runnable() {
+        @Override
+        public void run() {
+          for (RouteTableListener l : listeners) {
+            l.handleContactRemoved(bucket, contact);
+          }
         }
+      };
+      
+      EventUtils.fireEvent(event);
     }
+  }
 }

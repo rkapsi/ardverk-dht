@@ -23,9 +23,9 @@ import javax.inject.Provider;
  * An abstract base class for {@link RequestHandler}s.
  */
 abstract class AbstractRequestHandler 
-        extends AbstractMessageHandler implements RequestHandler {
+    extends AbstractMessageHandler implements RequestHandler {
 
-    public AbstractRequestHandler(Provider<MessageDispatcher> messageDispatcher) {
-        super(messageDispatcher);
-    }
+  public AbstractRequestHandler(Provider<MessageDispatcher> messageDispatcher) {
+    super(messageDispatcher);
+  }
 }

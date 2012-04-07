@@ -23,8 +23,8 @@ import org.ardverk.dht.KUID;
  */
 public interface Identifier {
 
-    /**
-     * Returns the {@link KUID}
-     */
-    public KUID getId();
+  /**
+   * Returns the {@link KUID}
+   */
+  public KUID getId();
 }

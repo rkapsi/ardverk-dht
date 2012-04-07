@@ -23,50 +23,50 @@ import org.ardverk.dht.concurrent.ExecutorKey;
 
 public class PutConfig extends Config {
 
-    private volatile NodeConfig lookupConfig = new NodeConfig();
-    
-    private volatile StoreConfig storeConfig = new StoreConfig();
-    
-    private volatile ValueConfig getConfig = new ValueConfig();
-    
-    @Override
-    public void setExecutorKey(ExecutorKey executorKey) {
-        super.setExecutorKey(executorKey);
-        lookupConfig.setExecutorKey(executorKey);
-        storeConfig.setExecutorKey(executorKey);
-        getConfig.setExecutorKey(executorKey);
-    }
-    
-    public NodeConfig getLookupConfig() {
-        return lookupConfig;
-    }
-    
-    public void setLookupConfig(NodeConfig lookupConfig) {
-        this.lookupConfig = lookupConfig;
-    }
-    
-    public StoreConfig getStoreConfig() {
-        return storeConfig;
-    }
-    
-    public void setStoreConfig(StoreConfig storeConfig) {
-        this.storeConfig = storeConfig;
-    }
-    
-    public ValueConfig getGetConfig() {
-        return getConfig;
-    }
+  private volatile NodeConfig lookupConfig = new NodeConfig();
+  
+  private volatile StoreConfig storeConfig = new StoreConfig();
+  
+  private volatile ValueConfig getConfig = new ValueConfig();
+  
+  @Override
+  public void setExecutorKey(ExecutorKey executorKey) {
+    super.setExecutorKey(executorKey);
+    lookupConfig.setExecutorKey(executorKey);
+    storeConfig.setExecutorKey(executorKey);
+    getConfig.setExecutorKey(executorKey);
+  }
+  
+  public NodeConfig getLookupConfig() {
+    return lookupConfig;
+  }
+  
+  public void setLookupConfig(NodeConfig lookupConfig) {
+    this.lookupConfig = lookupConfig;
+  }
+  
+  public StoreConfig getStoreConfig() {
+    return storeConfig;
+  }
+  
+  public void setStoreConfig(StoreConfig storeConfig) {
+    this.storeConfig = storeConfig;
+  }
+  
+  public ValueConfig getGetConfig() {
+    return getConfig;
+  }
 
-    public void setGetConfig(ValueConfig getConfig) {
-        this.getConfig = getConfig;
-    }
+  public void setGetConfig(ValueConfig getConfig) {
+    this.getConfig = getConfig;
+  }
 
-    public void setOperationTimeout(long timeout, TimeUnit unit) {
-        throw new UnsupportedOperationException();
-    }
+  public void setOperationTimeout(long timeout, TimeUnit unit) {
+    throw new UnsupportedOperationException();
+  }
 
-    @Override
-    public long getOperationTimeout(TimeUnit unit) {
-        return ConfigUtils.getOperationTimeout(new Config[] { lookupConfig, storeConfig }, unit);
-    }
+  @Override
+  public long getOperationTimeout(TimeUnit unit) {
+    return ConfigUtils.getOperationTimeout(new Config[] { lookupConfig, storeConfig }, unit);
+  }
 }

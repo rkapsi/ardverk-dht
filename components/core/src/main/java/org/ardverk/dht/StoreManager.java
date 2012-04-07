@@ -46,155 +46,155 @@ import org.ardverk.dht.rsrc.Value;
  */
 @Singleton
 public class StoreManager {
+  
+  private final ConfigProvider configProvider;
+  
+  private final FutureManager futureManager;
+  
+  private final LookupManager lookupManager;
+  
+  private final RouteTable routeTable;
+  
+  private final Provider<MessageDispatcher> messageDispatcher;
+  
+  @Inject
+  StoreManager(ConfigProvider configProvider, 
+      RouteTable routeTable, 
+      FutureManager futureManager, 
+      LookupManager lookupManager,
+      Provider<MessageDispatcher> messageDispatcher) {
     
-    private final ConfigProvider configProvider;
+    this.futureManager = futureManager;
+    this.lookupManager = lookupManager;
+    this.routeTable = routeTable;
+    this.messageDispatcher = messageDispatcher;
+    this.configProvider = configProvider;
+  }
+  
+  public DHTFuture<PutEntity> put(final Key key, 
+      final Value value, PutConfig... config) {
     
-    private final FutureManager futureManager;
+    final PutConfig cfg = configProvider.get(config);
     
-    private final LookupManager lookupManager;
-    
-    private final RouteTable routeTable;
-    
-    private final Provider<MessageDispatcher> messageDispatcher;
-    
-    @Inject
-    StoreManager(ConfigProvider configProvider, 
-            RouteTable routeTable, 
-            FutureManager futureManager, 
-            LookupManager lookupManager,
-            Provider<MessageDispatcher> messageDispatcher) {
-        
-        this.futureManager = futureManager;
-        this.lookupManager = lookupManager;
-        this.routeTable = routeTable;
-        this.messageDispatcher = messageDispatcher;
-        this.configProvider = configProvider;
+    int w = cfg.getStoreConfig().getW();
+    if (w < 1) {
+      throw new IllegalArgumentException("w=" + w);
     }
     
-    public DHTFuture<PutEntity> put(final Key key, 
-            final Value value, PutConfig... config) {
-        
-        final PutConfig cfg = configProvider.get(config);
-        
-        int w = cfg.getStoreConfig().getW();
-        if (w < 1) {
-            throw new IllegalArgumentException("w=" + w);
-        }
-        
-        if (w >= 2 && !value.isRepeatable()) {
-            throw new IllegalArgumentException(
-                    "The value is not repeatable: w=" + w);
-        }
-        
-        final Object lock = new Object();
-        synchronized (lock) {
-            
-            // This is the DHTFuture we're going to return to the caller
-            // of this method (in most cases the user).
-            DHTProcess<PutEntity> process = NopProcess.create();
-            final DHTFuture<PutEntity> userFuture 
-                = futureManager.submit(process, cfg);
-            
-            // This will get initialized once we've found the k-closest
-            // Contacts to the given KUID
-            final ValueReference<DHTFuture<StoreEntity>> storeFutureRef 
-                = new ValueReference<DHTFuture<StoreEntity>>();
-            
-            // This will get initialized once we've found the k-closest
-            // Contacts to the given KUID
-            final ValueReference<DHTFuture<ValueEntity>> clockFutureRef 
-                = new ValueReference<DHTFuture<ValueEntity>>();
-            
-            // Start the lookup for the given KUID
-            final DHTFuture<NodeEntity> lookupFuture 
-                = lookupManager.lookup(key.getId(), 
-                        cfg.getLookupConfig());
-            
-            // Let's wait for the result of the FIND_NODE operation. On success we're 
-            // going to initialize the storeFutureRef and do the actual STOREing.
-            lookupFuture.addAsyncFutureListener(new AsyncFutureListener<NodeEntity>() {
-                @Override
-                public void operationComplete(AsyncFuture<NodeEntity> future) {
-                    synchronized (lock) {
-                        try {
-                            if (!future.isCancelled()) {
-                                handleNodeEntity(future.get());
-                            } else {
-                                handleCancelled();
-                            }
-                        } catch (Throwable t) {
-                            handleException(t);
-                        }
-                    }
-                }
-                
-                private void handleNodeEntity(final NodeEntity nodeEntity) {
-                    Contact[] contacts = nodeEntity.getContacts();
-                    DHTFuture<StoreEntity> storeFuture 
-                        = storeFutureRef.make(store(contacts, 
-                                key, value, cfg.getStoreConfig()));
-                    
-                    storeFuture.addAsyncFutureListener(new AsyncFutureListener<StoreEntity>() {
-                        @Override
-                        public void operationComplete(AsyncFuture<StoreEntity> future) {
-                            synchronized (lock) {
-                                try {
-                                    if (!future.isCancelled()) {
-                                        handleStoreEntity(future.get());
-                                    } else {
-                                        handleCancelled();
-                                    }
-                                } catch (Throwable t) {
-                                    handleException(t);
-                                }
-                            }
-                        }
-                        
-                        private void handleStoreEntity(StoreEntity storeEntity) {
-                            userFuture.setValue(new PutEntity(
-                                    nodeEntity, storeEntity));
-                        }
-                    });
-                }
-                
-                private void handleCancelled() {
-                    userFuture.cancel(true);
-                }
-                
-                private void handleException(Throwable t) {
-                    userFuture.setException(t);
-                }
-            });
-            
-            userFuture.addAsyncFutureListener(new AsyncFutureListener<PutEntity>() {
-                @Override
-                public void operationComplete(AsyncFuture<PutEntity> future) {
-                    synchronized (lock) {
-                        FutureUtils.cancel(lookupFuture, true);
-                        FutureUtils.cancel(storeFutureRef, true);
-                        FutureUtils.cancel(clockFutureRef, true);
-                    }
-                }
-            });
-            
-            return userFuture;
-        }
+    if (w >= 2 && !value.isRepeatable()) {
+      throw new IllegalArgumentException(
+          "The value is not repeatable: w=" + w);
     }
     
-    /**
-     * Sends a STORE request to the given list of {@link Contact}s.
-     * 
-     * NOTE: It's being assumed the {@link Contact}s are already sorted by
-     * their XOR distance to the given {@link KUID}.
-     */
-    public DHTFuture<StoreEntity> store(Contact[] dst, Key key, 
-            Value value, StoreConfig config) {
+    final Object lock = new Object();
+    synchronized (lock) {
+      
+      // This is the DHTFuture we're going to return to the caller
+      // of this method (in most cases the user).
+      DHTProcess<PutEntity> process = NopProcess.create();
+      final DHTFuture<PutEntity> userFuture 
+        = futureManager.submit(process, cfg);
+      
+      // This will get initialized once we've found the k-closest
+      // Contacts to the given KUID
+      final ValueReference<DHTFuture<StoreEntity>> storeFutureRef 
+        = new ValueReference<DHTFuture<StoreEntity>>();
+      
+      // This will get initialized once we've found the k-closest
+      // Contacts to the given KUID
+      final ValueReference<DHTFuture<ValueEntity>> clockFutureRef 
+        = new ValueReference<DHTFuture<ValueEntity>>();
+      
+      // Start the lookup for the given KUID
+      final DHTFuture<NodeEntity> lookupFuture 
+        = lookupManager.lookup(key.getId(), 
+            cfg.getLookupConfig());
+      
+      // Let's wait for the result of the FIND_NODE operation. On success we're 
+      // going to initialize the storeFutureRef and do the actual STOREing.
+      lookupFuture.addAsyncFutureListener(new AsyncFutureListener<NodeEntity>() {
+        @Override
+        public void operationComplete(AsyncFuture<NodeEntity> future) {
+          synchronized (lock) {
+            try {
+              if (!future.isCancelled()) {
+                handleNodeEntity(future.get());
+              } else {
+                handleCancelled();
+              }
+            } catch (Throwable t) {
+              handleException(t);
+            }
+          }
+        }
         
-        int k = routeTable.getK();
-        DHTProcess<StoreEntity> process 
-            = new StoreResponseHandler(messageDispatcher, 
-                dst, k, key, value, config);
+        private void handleNodeEntity(final NodeEntity nodeEntity) {
+          Contact[] contacts = nodeEntity.getContacts();
+          DHTFuture<StoreEntity> storeFuture 
+            = storeFutureRef.make(store(contacts, 
+                key, value, cfg.getStoreConfig()));
+          
+          storeFuture.addAsyncFutureListener(new AsyncFutureListener<StoreEntity>() {
+            @Override
+            public void operationComplete(AsyncFuture<StoreEntity> future) {
+              synchronized (lock) {
+                try {
+                  if (!future.isCancelled()) {
+                    handleStoreEntity(future.get());
+                  } else {
+                    handleCancelled();
+                  }
+                } catch (Throwable t) {
+                  handleException(t);
+                }
+              }
+            }
+            
+            private void handleStoreEntity(StoreEntity storeEntity) {
+              userFuture.setValue(new PutEntity(
+                  nodeEntity, storeEntity));
+            }
+          });
+        }
         
-        return futureManager.submit(process, config);
+        private void handleCancelled() {
+          userFuture.cancel(true);
+        }
+        
+        private void handleException(Throwable t) {
+          userFuture.setException(t);
+        }
+      });
+      
+      userFuture.addAsyncFutureListener(new AsyncFutureListener<PutEntity>() {
+        @Override
+        public void operationComplete(AsyncFuture<PutEntity> future) {
+          synchronized (lock) {
+            FutureUtils.cancel(lookupFuture, true);
+            FutureUtils.cancel(storeFutureRef, true);
+            FutureUtils.cancel(clockFutureRef, true);
+          }
+        }
+      });
+      
+      return userFuture;
     }
+  }
+  
+  /**
+   * Sends a STORE request to the given list of {@link Contact}s.
+   * 
+   * NOTE: It's being assumed the {@link Contact}s are already sorted by
+   * their XOR distance to the given {@link KUID}.
+   */
+  public DHTFuture<StoreEntity> store(Contact[] dst, Key key, 
+      Value value, StoreConfig config) {
+    
+    int k = routeTable.getK();
+    DHTProcess<StoreEntity> process 
+      = new StoreResponseHandler(messageDispatcher, 
+        dst, k, key, value, config);
+    
+    return futureManager.submit(process, config);
+  }
 }

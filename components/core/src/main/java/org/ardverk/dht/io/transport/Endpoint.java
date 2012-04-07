@@ -23,10 +23,10 @@ import org.ardverk.dht.KUID;
 import org.ardverk.dht.message.Message;
 
 public interface Endpoint {
-    
-    /**
-     * Sends the given {@link Message}.
-     */
-    public void send(KUID contactId, Message message, 
-            long timeout, TimeUnit unit) throws IOException;
+  
+  /**
+   * Sends the given {@link Message}.
+   */
+  public void send(KUID contactId, Message message, 
+      long timeout, TimeUnit unit) throws IOException;
 }

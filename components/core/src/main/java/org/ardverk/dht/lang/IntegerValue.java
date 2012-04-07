@@ -21,8 +21,8 @@ package org.ardverk.dht.lang;
  */
 public interface IntegerValue {
 
-    /**
-     * Returns an Integer value of this object.
-     */
-    public int intValue();
+  /**
+   * Returns an Integer value of this object.
+   */
+  public int intValue();
 }

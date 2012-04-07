@@ -39,312 +39,312 @@ import org.ardverk.lang.TimeStamp;
  * An abstract base class for {@link ResponseHandler}s.
  */
 abstract class AbstractResponseHandler<V extends Entity> 
-        extends AbstractMessageHandler implements ResponseHandler<V> {
-    
-    protected volatile AsyncProcessFuture<V> future = null;
-    
-    private final AtomicBoolean done = new AtomicBoolean(false);
-    
-    private volatile TimeStamp lastSendTime = null;
-    
-    private volatile TimeStamp lastResponseTime = null;
-    
-    public AbstractResponseHandler(Provider<MessageDispatcher> messageDispatcher) {
-        super(messageDispatcher);
-    }
-    
-    /**
-     * Returns the mount of time that has passed since the last message
-     * has been sent or -1 if no messages have been sent yet.
-     */
-    public long getLastSendTime(TimeUnit unit) {
-        TimeStamp lastSendTime = this.lastSendTime;
-        return lastSendTime != null ? lastSendTime.getAge(unit) : -1L;
-    }
-    
-    /**
-     * Returns the amount of time that has passed in milliseconds
-     * since the last message has been sent or -1 if no messages
-     * have been sent yet.
-     */
-    public long getLastSendTimeInMillis() {
-        return getLastSendTime(TimeUnit.MILLISECONDS);
-    }
-    
-    /**
-     * Returns the mount of time that has passed since the last message
-     * has been received or -1 if no messages have been received yet.
-     */
-    public long getLastResponseTime(TimeUnit unit) {
-        TimeStamp lastResponseTime = this.lastResponseTime;
-        return lastResponseTime != null ? lastResponseTime.getAge(unit) : -1L;
-    }
-    
-    /**
-     * Returns the amount of time that has passed in milliseconds
-     * since the last message has been received or -1 if no messages
-     * have been received yet.
-     */
-    public long getLastResponseTimeInMillis() {
-        return getLastResponseTime(TimeUnit.MILLISECONDS);
-    }
-    
-    @Override
-    public boolean isOpen() {
-        AsyncFuture<V> future = this.future;
-        return future != null && !future.isDone();
-    }
+    extends AbstractMessageHandler implements ResponseHandler<V> {
+  
+  protected volatile AsyncProcessFuture<V> future = null;
+  
+  private final AtomicBoolean done = new AtomicBoolean(false);
+  
+  private volatile TimeStamp lastSendTime = null;
+  
+  private volatile TimeStamp lastResponseTime = null;
+  
+  public AbstractResponseHandler(Provider<MessageDispatcher> messageDispatcher) {
+    super(messageDispatcher);
+  }
+  
+  /**
+   * Returns the mount of time that has passed since the last message
+   * has been sent or -1 if no messages have been sent yet.
+   */
+  public long getLastSendTime(TimeUnit unit) {
+    TimeStamp lastSendTime = this.lastSendTime;
+    return lastSendTime != null ? lastSendTime.getAge(unit) : -1L;
+  }
+  
+  /**
+   * Returns the amount of time that has passed in milliseconds
+   * since the last message has been sent or -1 if no messages
+   * have been sent yet.
+   */
+  public long getLastSendTimeInMillis() {
+    return getLastSendTime(TimeUnit.MILLISECONDS);
+  }
+  
+  /**
+   * Returns the mount of time that has passed since the last message
+   * has been received or -1 if no messages have been received yet.
+   */
+  public long getLastResponseTime(TimeUnit unit) {
+    TimeStamp lastResponseTime = this.lastResponseTime;
+    return lastResponseTime != null ? lastResponseTime.getAge(unit) : -1L;
+  }
+  
+  /**
+   * Returns the amount of time that has passed in milliseconds
+   * since the last message has been received or -1 if no messages
+   * have been received yet.
+   */
+  public long getLastResponseTimeInMillis() {
+    return getLastResponseTime(TimeUnit.MILLISECONDS);
+  }
+  
+  @Override
+  public boolean isOpen() {
+    AsyncFuture<V> future = this.future;
+    return future != null && !future.isDone();
+  }
 
-    /**
-     * Returns {@code true} if the underlying {@link AsyncFuture} is
-     * done.
-     * 
-     * NOTE: This method is throwing an {@link IllegalStateException}
-     * if the {@link AbstractRequestHandler} isn't initialized yet.
-     */
-    protected boolean isDone() {
-        AsyncFuture<V> future = this.future;
-        if (future != null) {
-            return future.isDone();
-        }
-        throw new IllegalStateException();
+  /**
+   * Returns {@code true} if the underlying {@link AsyncFuture} is
+   * done.
+   * 
+   * NOTE: This method is throwing an {@link IllegalStateException}
+   * if the {@link AbstractRequestHandler} isn't initialized yet.
+   */
+  protected boolean isDone() {
+    AsyncFuture<V> future = this.future;
+    if (future != null) {
+      return future.isDone();
     }
+    throw new IllegalStateException();
+  }
 
-    /**
-     * Sets the value of the underlying {@link AsyncFuture}.
-     * 
-     * NOTE: This method is throwing an {@link IllegalStateException}
-     * if the {@link AbstractRequestHandler} isn't initialized yet.
-     */
-    protected void setValue(V value) {
-        AsyncFuture<V> future = this.future;
-        if (future != null) {
-            future.setValue(value);
-            if (!done.getAndSet(true)) {
-                done();
-            }
-            return;
+  /**
+   * Sets the value of the underlying {@link AsyncFuture}.
+   * 
+   * NOTE: This method is throwing an {@link IllegalStateException}
+   * if the {@link AbstractRequestHandler} isn't initialized yet.
+   */
+  protected void setValue(V value) {
+    AsyncFuture<V> future = this.future;
+    if (future != null) {
+      future.setValue(value);
+      if (!done.getAndSet(true)) {
+        done();
+      }
+      return;
+    }
+    throw new IllegalStateException();
+  }
+  
+  /**
+   * Sets the exception of the underlying {@link AsyncFuture}.
+   * 
+   * NOTE: This method is throwing an {@link IllegalStateException}
+   * if the {@link AbstractRequestHandler} isn't initialized yet.
+   */
+  protected void setException(Throwable t) {
+    AsyncFuture<V> future = this.future;
+    if (future != null) {
+      future.setException(t);
+      if (!done.getAndSet(true)) {
+        done();
+      }
+      return;
+    }
+    throw new IllegalStateException();
+  }
+  
+  /**
+   * Sends a {@link RequestMessage} to the given {@link Contact}.
+   */
+  public void send(Contact dst, RequestMessage message, 
+      long timeout, TimeUnit unit) throws IOException {
+    
+    KUID contactId = dst.getId();
+    send(contactId, message, timeout, unit);
+  }
+  
+  /**
+   * Sends a {@link RequestMessage} to the given {@link KUID}.
+   * 
+   * NOTE: The receiver's {@link SocketAddress} is encoded in 
+   * the {@link RequestMessage}.
+   */
+  public void send(KUID contactId, RequestMessage message, 
+      long timeout, TimeUnit unit) throws IOException {
+    
+    if (isOpen()) {
+      getMessageDispatcher().send(this, contactId, 
+          message, timeout, unit);
+      lastSendTime = TimeStamp.now();
+    }
+  }
+  
+  @Override
+  public final void start(AsyncProcessFuture<V> future) throws Exception {
+    this.future = Precoditions.notNull(future, "future");
+    
+    future.addAsyncFutureListener(new AsyncFutureListener<V>() {
+      @Override
+      public void operationComplete(AsyncFuture<V> future) {
+        if (!done.getAndSet(true)) {
+          done();
         }
-        throw new IllegalStateException();
-    }
+      }
+    });
     
-    /**
-     * Sets the exception of the underlying {@link AsyncFuture}.
-     * 
-     * NOTE: This method is throwing an {@link IllegalStateException}
-     * if the {@link AbstractRequestHandler} isn't initialized yet.
-     */
-    protected void setException(Throwable t) {
-        AsyncFuture<V> future = this.future;
-        if (future != null) {
-            future.setException(t);
-            if (!done.getAndSet(true)) {
-                done();
-            }
-            return;
+    synchronized (future) {
+      if (!future.isDone()) {
+        go(future);
+      }
+    }
+  }
+  
+  /**
+   * Called by {@link #start(AsyncProcessFuture)}.
+   * 
+   * NOTE: A lock on the given {@link AsyncFuture} is being held.
+   */
+  protected abstract void go(AsyncFuture<V> future) throws Exception;
+  
+  /**
+   * Called when the underlying {@link AsyncFuture} is done.
+   */
+  protected void done() {
+  }
+  
+  @Override
+  public boolean handleResponse(RequestEntity entity,
+      ResponseMessage response, long time, TimeUnit unit)
+      throws IOException {
+    
+    boolean success = false;
+    synchronized (future) {
+      if (isOpen()) {
+        synchronized (this) {
+          lastResponseTime = TimeStamp.now();
+          processResponse(entity, response, time, unit);
+          success = true;
         }
-        throw new IllegalStateException();
+      }
     }
-    
-    /**
-     * Sends a {@link RequestMessage} to the given {@link Contact}.
-     */
-    public void send(Contact dst, RequestMessage message, 
-            long timeout, TimeUnit unit) throws IOException {
-        
-        KUID contactId = dst.getId();
-        send(contactId, message, timeout, unit);
-    }
-    
-    /**
-     * Sends a {@link RequestMessage} to the given {@link KUID}.
-     * 
-     * NOTE: The receiver's {@link SocketAddress} is encoded in 
-     * the {@link RequestMessage}.
-     */
-    public void send(KUID contactId, RequestMessage message, 
-            long timeout, TimeUnit unit) throws IOException {
-        
-        if (isOpen()) {
-            getMessageDispatcher().send(this, contactId, 
-                    message, timeout, unit);
-            lastSendTime = TimeStamp.now();
-        }
-    }
-    
-    @Override
-    public final void start(AsyncProcessFuture<V> future) throws Exception {
-        this.future = Precoditions.notNull(future, "future");
-        
-        future.addAsyncFutureListener(new AsyncFutureListener<V>() {
-            @Override
-            public void operationComplete(AsyncFuture<V> future) {
-                if (!done.getAndSet(true)) {
-                    done();
-                }
-            }
-        });
-        
-        synchronized (future) {
-            if (!future.isDone()) {
-                go(future);
-            }
-        }
-    }
-    
-    /**
-     * Called by {@link #start(AsyncProcessFuture)}.
-     * 
-     * NOTE: A lock on the given {@link AsyncFuture} is being held.
-     */
-    protected abstract void go(AsyncFuture<V> future) throws Exception;
-    
-    /**
-     * Called when the underlying {@link AsyncFuture} is done.
-     */
-    protected void done() {
-    }
-    
-    @Override
-    public boolean handleResponse(RequestEntity entity,
-            ResponseMessage response, long time, TimeUnit unit)
-            throws IOException {
-        
-        boolean success = false;
-        synchronized (future) {
-            if (isOpen()) {
-                synchronized (this) {
-                    lastResponseTime = TimeStamp.now();
-                    processResponse(entity, response, time, unit);
-                    success = true;
-                }
-            }
-        }
-        return success;
-    }
-    
-    /**
-     * @see #handleResponse(RequestEntity, ResponseMessage, long, TimeUnit).
-     */
-    protected abstract void processResponse(RequestEntity entity,
-            ResponseMessage response, long time, TimeUnit unit)
-            throws IOException;
+    return success;
+  }
+  
+  /**
+   * @see #handleResponse(RequestEntity, ResponseMessage, long, TimeUnit).
+   */
+  protected abstract void processResponse(RequestEntity entity,
+      ResponseMessage response, long time, TimeUnit unit)
+      throws IOException;
 
-    @Override
-    public void handleTimeout(RequestEntity entity, 
-            long time, TimeUnit unit) throws IOException {
-        
-        synchronized (future) {
-            if (!isOpen()) {
-                return;
-            }
-            
-            synchronized (this) {
-                processTimeout(entity, time, unit);                
-            }
-        }
-    }
+  @Override
+  public void handleTimeout(RequestEntity entity, 
+      long time, TimeUnit unit) throws IOException {
     
-    /**
-     * @see #handleTimeout(RequestEntity, long, TimeUnit)
-     */
-    protected abstract void processTimeout(RequestEntity entity, 
-            long time, TimeUnit unit) throws IOException;
+    synchronized (future) {
+      if (!isOpen()) {
+        return;
+      }
+      
+      synchronized (this) {
+        processTimeout(entity, time, unit);        
+      }
+    }
+  }
+  
+  /**
+   * @see #handleTimeout(RequestEntity, long, TimeUnit)
+   */
+  protected abstract void processTimeout(RequestEntity entity, 
+      long time, TimeUnit unit) throws IOException;
 
+  
+  @Override
+  public void handleIllegalResponse(RequestEntity entity, 
+      ResponseMessage response, long time, TimeUnit unit) throws IOException {
+    synchronized (future) {
+      if (!isOpen()) {
+        return;
+      }
+      
+      synchronized (this) {
+        processIllegalResponse(entity, response, time, unit);
+      }
+    }
+  }
+  
+  /**
+   * @see #handleIllegalResponse(RequestEntity, ResponseMessage, long, TimeUnit)
+   */
+  protected void processIllegalResponse(RequestEntity entity, 
+      ResponseMessage response, long time, TimeUnit unit) throws IOException {
+    setException(new IllegalResponseException(entity, response, time, unit));
+  }
+  
+  @Override
+  public void handleException(RequestEntity entity, Throwable exception) {
+    synchronized (future) {
+      if (!isOpen()) {
+        return;
+      }
+      
+      synchronized (this) {
+        processException(entity, exception);        
+      }
+    }
+  }
+  
+  /**
+   * @see #handleException(RequestEntity, Throwable)
+   */
+  protected void processException(RequestEntity entity, Throwable exception) {
+    setException(new UnhandledException(entity, exception));
+  }
+  
+  public static class IllegalResponseException extends IOException {
     
-    @Override
-    public void handleIllegalResponse(RequestEntity entity, 
-            ResponseMessage response, long time, TimeUnit unit) throws IOException {
-        synchronized (future) {
-            if (!isOpen()) {
-                return;
-            }
-            
-            synchronized (this) {
-                processIllegalResponse(entity, response, time, unit);
-            }
-        }
+    private static final long serialVersionUID = -966684138962375899L;
+    
+    private final RequestEntity entity;
+    
+    private final ResponseMessage response;
+    
+    private final long time;
+    
+    private final TimeUnit unit;
+    
+    protected IllegalResponseException(RequestEntity entity, 
+        ResponseMessage response, long time, TimeUnit unit) {
+      
+      this.entity = entity;
+      this.response = response;
+      this.time = time;
+      this.unit = unit;
     }
     
-    /**
-     * @see #handleIllegalResponse(RequestEntity, ResponseMessage, long, TimeUnit)
-     */
-    protected void processIllegalResponse(RequestEntity entity, 
-            ResponseMessage response, long time, TimeUnit unit) throws IOException {
-        setException(new IllegalResponseException(entity, response, time, unit));
+    public RequestEntity getRequestEntity() {
+      return entity;
     }
     
-    @Override
-    public void handleException(RequestEntity entity, Throwable exception) {
-        synchronized (future) {
-            if (!isOpen()) {
-                return;
-            }
-            
-            synchronized (this) {
-                processException(entity, exception);                
-            }
-        }
+    public ResponseMessage getResponseMessage() {
+      return response;
     }
     
-    /**
-     * @see #handleException(RequestEntity, Throwable)
-     */
-    protected void processException(RequestEntity entity, Throwable exception) {
-        setException(new UnhandledException(entity, exception));
+    public long getTime(TimeUnit unit) {
+      return unit.convert(time, this.unit);
     }
     
-    public static class IllegalResponseException extends IOException {
-        
-        private static final long serialVersionUID = -966684138962375899L;
-        
-        private final RequestEntity entity;
-        
-        private final ResponseMessage response;
-        
-        private final long time;
-        
-        private final TimeUnit unit;
-        
-        protected IllegalResponseException(RequestEntity entity, 
-                ResponseMessage response, long time, TimeUnit unit) {
-            
-            this.entity = entity;
-            this.response = response;
-            this.time = time;
-            this.unit = unit;
-        }
-        
-        public RequestEntity getRequestEntity() {
-            return entity;
-        }
-        
-        public ResponseMessage getResponseMessage() {
-            return response;
-        }
-        
-        public long getTime(TimeUnit unit) {
-            return unit.convert(time, this.unit);
-        }
-        
-        public long getTimeInMillis() {
-            return getTime(TimeUnit.MILLISECONDS);
-        }
+    public long getTimeInMillis() {
+      return getTime(TimeUnit.MILLISECONDS);
     }
+  }
 
-    public static class UnhandledException extends IOException {
-        
-        private static final long serialVersionUID = -966684138962375899L;
-        
-        private final RequestEntity entity;
-        
-        protected UnhandledException(RequestEntity entity, Throwable cause) {
-            super(cause);
-            this.entity = entity;
-        }
-        
-        public RequestEntity getRequestEntity() {
-            return entity;
-        }
+  public static class UnhandledException extends IOException {
+    
+    private static final long serialVersionUID = -966684138962375899L;
+    
+    private final RequestEntity entity;
+    
+    protected UnhandledException(RequestEntity entity, Throwable cause) {
+      super(cause);
+      this.entity = entity;
     }
+    
+    public RequestEntity getRequestEntity() {
+      return entity;
+    }
+  }
 }

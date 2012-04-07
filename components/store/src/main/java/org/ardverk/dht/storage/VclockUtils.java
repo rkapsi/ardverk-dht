@@ -9,36 +9,36 @@ import org.ardverk.dht.storage.message.Context;
 import org.ardverk.version.Occured;
 
 public class VclockUtils {
+  
+  private VclockUtils() {}
+  
+  public static <K> Occured compare(Vclock existing, 
+      Vclock clock) {
     
-    private VclockUtils() {}
-    
-    public static <K> Occured compare(Vclock existing, 
-            Vclock clock) {
-        
-        if (existing == null || existing.isEmpty()
-                || clock == null || clock.isEmpty()) {
-            return Occured.AFTER;
-        }
-        
-        return clock.compareTo(existing);
+    if (existing == null || existing.isEmpty()
+        || clock == null || clock.isEmpty()) {
+      return Occured.AFTER;
     }
     
-    public static Vclock valueOf(Key key, Context context) throws IOException {
-        Header clientId = context.removeHeader(Constants.CLIENT_ID);
-        if (clientId == null) {
-            throw new NoSuchElementException(Constants.CLIENT_ID);
-        }
-        
-        return getOrCreate(key, context).update(clientId.getValue());
+    return clock.compareTo(existing);
+  }
+  
+  public static Vclock valueOf(Key key, Context context) throws IOException {
+    Header clientId = context.removeHeader(Constants.CLIENT_ID);
+    if (clientId == null) {
+      throw new NoSuchElementException(Constants.CLIENT_ID);
     }
     
-    private static Vclock getOrCreate(Key key, Context context) throws IOException {
-        Header vclock = context.removeHeader(Constants.VCLOCK);
-        
-        if (vclock != null) {
-            return Vclock.valueOf(key, vclock.getValue());
-        }
-        
-        return Vclock.create(key); // Create a new Vclock
+    return getOrCreate(key, context).update(clientId.getValue());
+  }
+  
+  private static Vclock getOrCreate(Key key, Context context) throws IOException {
+    Header vclock = context.removeHeader(Constants.VCLOCK);
+    
+    if (vclock != null) {
+      return Vclock.valueOf(key, vclock.getValue());
     }
+    
+    return Vclock.create(key); // Create a new Vclock
+  }
 }

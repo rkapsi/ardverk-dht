@@ -22,20 +22,20 @@ import java.net.SocketAddress;
  * An abstract implementation of {@link MessageFactory}.
  */
 public abstract class AbstractMessageFactory implements MessageFactory {
-    
-    private final int length;
-    
-    public AbstractMessageFactory(int length) {
-        this.length = length;
-    }
-    
-    @Override
-    public MessageId createMessageId(SocketAddress dst) {
-        return MessageId.createRandom(length);
-    }
+  
+  private final int length;
+  
+  public AbstractMessageFactory(int length) {
+    this.length = length;
+  }
+  
+  @Override
+  public MessageId createMessageId(SocketAddress dst) {
+    return MessageId.createRandom(length);
+  }
 
-    @Override
-    public boolean isFor(MessageId messageId, SocketAddress src) {
-        return true;
-    }
+  @Override
+  public boolean isFor(MessageId messageId, SocketAddress src) {
+    return true;
+  }
 }

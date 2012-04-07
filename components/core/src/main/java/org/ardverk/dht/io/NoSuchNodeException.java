@@ -24,10 +24,10 @@ import org.ardverk.dht.routing.Contact;
  * found).
  */
 public class NoSuchNodeException extends AbstractLookupException {
-    
-    private static final long serialVersionUID = -2301202118771105303L;
-    
-    public NoSuchNodeException(Outcome outcome) {
-        super(outcome);
-    }
+  
+  private static final long serialVersionUID = -2301202118771105303L;
+  
+  public NoSuchNodeException(Outcome outcome) {
+    super(outcome);
+  }
 }

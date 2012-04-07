@@ -44,160 +44,160 @@ import org.ardverk.net.NetworkUtils;
 @Singleton
 public class BootstrapManager {
 
-    private final Identity localhost;
+  private final Identity localhost;
+  
+  private final ConfigProvider configProvider;
+  
+  private final FutureManager futureManager;
+  
+  private final PingManager pingManager;
+  
+  private final LookupManager lookupManager;
+  
+  @Inject
+  BootstrapManager(Identity localhost,
+      ConfigProvider configProvider,
+      FutureManager futureManager, 
+      PingManager pingManager, 
+      LookupManager lookupManager) {
     
-    private final ConfigProvider configProvider;
+    this.localhost = localhost;
+    this.configProvider = configProvider;
+    this.futureManager = futureManager;
+    this.pingManager = pingManager;
+    this.lookupManager = lookupManager;
+  }
+  
+  public DHTFuture<BootstrapEntity> bootstrap(
+      String host, int port, BootstrapConfig... config) {
+    return bootstrap(NetworkUtils.createResolved(host, port), config);
+  }
+  
+  public DHTFuture<BootstrapEntity> bootstrap(
+      InetAddress address, int port, BootstrapConfig... config) {
+    return bootstrap(NetworkUtils.createResolved(address, port), config);
+  }
+  
+  public DHTFuture<BootstrapEntity> bootstrap(
+      Contact contact, BootstrapConfig... config) {
+    return bootstrap(contact.getRemoteAddress(), config);
+  }
+  
+  public DHTFuture<BootstrapEntity> bootstrap(
+      SocketAddress address, BootstrapConfig... config) {
     
-    private final FutureManager futureManager;
+    BootstrapConfig cfg = configProvider.get(config);
     
-    private final PingManager pingManager;
+    DHTFuture<PingEntity> pingFuture = pingManager.ping(
+        address, cfg.getPingConfig());
     
-    private final LookupManager lookupManager;
+    return bootstrap(pingFuture, cfg);
+  }
+  
+  private DHTFuture<BootstrapEntity> bootstrap(
+      final DHTFuture<PingEntity> pingFuture, 
+      final BootstrapConfig config) {
     
-    @Inject
-    BootstrapManager(Identity localhost,
-            ConfigProvider configProvider,
-            FutureManager futureManager, 
-            PingManager pingManager, 
-            LookupManager lookupManager) {
-        
-        this.localhost = localhost;
-        this.configProvider = configProvider;
-        this.futureManager = futureManager;
-        this.pingManager = pingManager;
-        this.lookupManager = lookupManager;
-    }
+    final Object lock = new Object();
     
-    public DHTFuture<BootstrapEntity> bootstrap(
-            String host, int port, BootstrapConfig... config) {
-        return bootstrap(NetworkUtils.createResolved(host, port), config);
-    }
-    
-    public DHTFuture<BootstrapEntity> bootstrap(
-            InetAddress address, int port, BootstrapConfig... config) {
-        return bootstrap(NetworkUtils.createResolved(address, port), config);
-    }
-    
-    public DHTFuture<BootstrapEntity> bootstrap(
-            Contact contact, BootstrapConfig... config) {
-        return bootstrap(contact.getRemoteAddress(), config);
-    }
-    
-    public DHTFuture<BootstrapEntity> bootstrap(
-            SocketAddress address, BootstrapConfig... config) {
-        
-        BootstrapConfig cfg = configProvider.get(config);
-        
-        DHTFuture<PingEntity> pingFuture = pingManager.ping(
-                address, cfg.getPingConfig());
-        
-        return bootstrap(pingFuture, cfg);
-    }
-    
-    private DHTFuture<BootstrapEntity> bootstrap(
-            final DHTFuture<PingEntity> pingFuture, 
-            final BootstrapConfig config) {
-        
-        final Object lock = new Object();
-        
-        synchronized (lock) {
-            DHTProcess<BootstrapEntity> process = NopProcess.create();
-            final DHTFuture<BootstrapEntity> userFuture 
-                = futureManager.submit(process, config);
-            
-            final ValueReference<DHTFuture<NodeEntity>> lookupFutureRef
-                = new ValueReference<DHTFuture<NodeEntity>>();
-            
-            pingFuture.addAsyncFutureListener(new AsyncFutureListener<PingEntity>() {
-                @Override
-                public void operationComplete(AsyncFuture<PingEntity> future) {
-                    synchronized (lock) {
-                        try {
-                            if (!future.isCancelled()) {
-                                handlePingEntity(future.get());
-                            } else {
-                                handleCancelled();
-                            }
-                        } catch (Throwable t) {
-                            handleException(t);
-                        }
-                    }
-                }
-                
-                private void handlePingEntity(final PingEntity pingEntity) {
-                    Contact[] contacts = new Contact[] { pingEntity.getContact() };
-                    
-                    KUID localhostId = localhost.getId();
-                    AsyncFuture<NodeEntity> lookupFuture 
-                        = lookupFutureRef.make(
-                                lookupManager.lookup(contacts, 
-                                    localhostId, config.getLookupConfig()));
-                    
-                    lookupFuture.addAsyncFutureListener(new AsyncFutureListener<NodeEntity>() {
-                        @Override
-                        public void operationComplete(AsyncFuture<NodeEntity> future) {
-                            synchronized (lock) {
-                                try {
-                                    if (!future.isCancelled()) {
-                                        handleNodeEntity(future.get());
-                                    } else {
-                                        handleCancelled();
-                                    }
-                                } catch (Throwable t) {
-                                    handleException(t);
-                                }
-                            }
-                        }
-                        
-                        private void handleNodeEntity(NodeEntity nodeEntity) {
-                            userFuture.setValue(new BootstrapEntity(
-                                    pingEntity, nodeEntity));
-                        }
-                    });
-                }
-                
-                private void handleCancelled() {
-                    userFuture.cancel(true);
-                }
-                
-                private void handleException(Throwable t) {
-                    userFuture.setException(t);
-                }
-            });
-            
-            userFuture.addAsyncFutureListener(new AsyncFutureListener<BootstrapEntity>() {
-                @Override
-                public void operationComplete(AsyncFuture<BootstrapEntity> future) {
-                    synchronized (lock) {
-                        FutureUtils.cancel(pingFuture, true);
-                        FutureUtils.cancel(lookupFutureRef, true);
-                    }
-                }
-            });
-            
-            userFuture.setAttachment(new Attachment(pingFuture, lookupFutureRef));
-            return userFuture;
-        }
-    }
-    
-    public static class Attachment {
-        
-        private final DHTFuture<PingEntity> pingFuture;
-        
-        private final ValueReference<DHTFuture<NodeEntity>> lookupFutureRef;
-        
-        private Attachment(DHTFuture<PingEntity> pingFuture, 
-                ValueReference<DHTFuture<NodeEntity>> lookupFutureRef) {
-            this.pingFuture = pingFuture;
-            this.lookupFutureRef = lookupFutureRef;
+    synchronized (lock) {
+      DHTProcess<BootstrapEntity> process = NopProcess.create();
+      final DHTFuture<BootstrapEntity> userFuture 
+        = futureManager.submit(process, config);
+      
+      final ValueReference<DHTFuture<NodeEntity>> lookupFutureRef
+        = new ValueReference<DHTFuture<NodeEntity>>();
+      
+      pingFuture.addAsyncFutureListener(new AsyncFutureListener<PingEntity>() {
+        @Override
+        public void operationComplete(AsyncFuture<PingEntity> future) {
+          synchronized (lock) {
+            try {
+              if (!future.isCancelled()) {
+                handlePingEntity(future.get());
+              } else {
+                handleCancelled();
+              }
+            } catch (Throwable t) {
+              handleException(t);
+            }
+          }
         }
         
-        public DHTFuture<PingEntity> getPingFuture() {
-            return pingFuture;
+        private void handlePingEntity(final PingEntity pingEntity) {
+          Contact[] contacts = new Contact[] { pingEntity.getContact() };
+          
+          KUID localhostId = localhost.getId();
+          AsyncFuture<NodeEntity> lookupFuture 
+            = lookupFutureRef.make(
+                lookupManager.lookup(contacts, 
+                  localhostId, config.getLookupConfig()));
+          
+          lookupFuture.addAsyncFutureListener(new AsyncFutureListener<NodeEntity>() {
+            @Override
+            public void operationComplete(AsyncFuture<NodeEntity> future) {
+              synchronized (lock) {
+                try {
+                  if (!future.isCancelled()) {
+                    handleNodeEntity(future.get());
+                  } else {
+                    handleCancelled();
+                  }
+                } catch (Throwable t) {
+                  handleException(t);
+                }
+              }
+            }
+            
+            private void handleNodeEntity(NodeEntity nodeEntity) {
+              userFuture.setValue(new BootstrapEntity(
+                  pingEntity, nodeEntity));
+            }
+          });
         }
         
-        public DHTFuture<NodeEntity> getLookupFuture() {
-            return lookupFutureRef.get();
+        private void handleCancelled() {
+          userFuture.cancel(true);
         }
+        
+        private void handleException(Throwable t) {
+          userFuture.setException(t);
+        }
+      });
+      
+      userFuture.addAsyncFutureListener(new AsyncFutureListener<BootstrapEntity>() {
+        @Override
+        public void operationComplete(AsyncFuture<BootstrapEntity> future) {
+          synchronized (lock) {
+            FutureUtils.cancel(pingFuture, true);
+            FutureUtils.cancel(lookupFutureRef, true);
+          }
+        }
+      });
+      
+      userFuture.setAttachment(new Attachment(pingFuture, lookupFutureRef));
+      return userFuture;
     }
+  }
+  
+  public static class Attachment {
+    
+    private final DHTFuture<PingEntity> pingFuture;
+    
+    private final ValueReference<DHTFuture<NodeEntity>> lookupFutureRef;
+    
+    private Attachment(DHTFuture<PingEntity> pingFuture, 
+        ValueReference<DHTFuture<NodeEntity>> lookupFutureRef) {
+      this.pingFuture = pingFuture;
+      this.lookupFutureRef = lookupFutureRef;
+    }
+    
+    public DHTFuture<PingEntity> getPingFuture() {
+      return pingFuture;
+    }
+    
+    public DHTFuture<NodeEntity> getLookupFuture() {
+      return lookupFutureRef.get();
+    }
+  }
 }

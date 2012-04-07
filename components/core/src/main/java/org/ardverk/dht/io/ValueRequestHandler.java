@@ -41,39 +41,39 @@ import org.ardverk.dht.storage.Datastore;
 @Singleton
 public class ValueRequestHandler extends AbstractRequestHandler {
 
-    private final RouteTable routeTable;
+  private final RouteTable routeTable;
+  
+  private final Datastore datastore;
+  
+  @Inject
+  public ValueRequestHandler(
+      Provider<MessageDispatcher> messageDispatcher, 
+      RouteTable routeTable, 
+      Datastore datastore) {
+    super(messageDispatcher);
     
-    private final Datastore datastore;
+    this.routeTable = routeTable;
+    this.datastore = datastore;
+  }
+  
+  @Override
+  public ResponseMessage handleRequest(RequestMessage message) throws IOException {
+    ValueRequest request = (ValueRequest)message;
     
-    @Inject
-    public ValueRequestHandler(
-            Provider<MessageDispatcher> messageDispatcher, 
-            RouteTable routeTable, 
-            Datastore datastore) {
-        super(messageDispatcher);
-        
-        this.routeTable = routeTable;
-        this.datastore = datastore;
+    Contact src = request.getContact();
+    Key key = request.getKey();
+    Value value = datastore.get(src, key);
+    
+    MessageFactory factory = getMessageFactory();
+    ResponseMessage response = null;
+    
+    if (value != null) {
+      response = factory.createValueResponse(request, value);
+    } else {
+      Contact[] contacts = routeTable.select(key.getId());
+      response = factory.createNodeResponse(request, contacts);
     }
     
-    @Override
-    public ResponseMessage handleRequest(RequestMessage message) throws IOException {
-        ValueRequest request = (ValueRequest)message;
-        
-        Contact src = request.getContact();
-        Key key = request.getKey();
-        Value value = datastore.get(src, key);
-        
-        MessageFactory factory = getMessageFactory();
-        ResponseMessage response = null;
-        
-        if (value != null) {
-            response = factory.createValueResponse(request, value);
-        } else {
-            Contact[] contacts = routeTable.select(key.getId());
-            response = factory.createNodeResponse(request, contacts);
-        }
-        
-        return response;
-    }
+    return response;
+  }
 }

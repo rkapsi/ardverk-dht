@@ -24,51 +24,51 @@ import org.ardverk.dht.routing.Contact;
 
 public abstract class Config {
 
-    private volatile double adaptiveTimeoutMultiplier = -1;
-    
-    private volatile ExecutorKey executorKey = ExecutorKey.DEFAULT;
-    
-    private volatile long operationTimeoutInMillis;
-    
-    public Config() {
-    }
-    
-    public Config(long timeout, TimeUnit unit) {
-        setOperationTimeout(timeout, unit);
-    }
-    
-    public void setOperationTimeout(long timeout, TimeUnit unit) {
-        this.operationTimeoutInMillis = unit.toMillis(timeout);
-    }
-    
-    public long getOperationTimeout(TimeUnit unit) {
-        return unit.convert(operationTimeoutInMillis, TimeUnit.MILLISECONDS);
-    }
-    
-    public ExecutorKey getExecutorKey() {
-        return executorKey;
-    }
+  private volatile double adaptiveTimeoutMultiplier = -1;
+  
+  private volatile ExecutorKey executorKey = ExecutorKey.DEFAULT;
+  
+  private volatile long operationTimeoutInMillis;
+  
+  public Config() {
+  }
+  
+  public Config(long timeout, TimeUnit unit) {
+    setOperationTimeout(timeout, unit);
+  }
+  
+  public void setOperationTimeout(long timeout, TimeUnit unit) {
+    this.operationTimeoutInMillis = unit.toMillis(timeout);
+  }
+  
+  public long getOperationTimeout(TimeUnit unit) {
+    return unit.convert(operationTimeoutInMillis, TimeUnit.MILLISECONDS);
+  }
+  
+  public ExecutorKey getExecutorKey() {
+    return executorKey;
+  }
 
-    public void setExecutorKey(ExecutorKey executorKey) {
-        this.executorKey = executorKey;
-    }
+  public void setExecutorKey(ExecutorKey executorKey) {
+    this.executorKey = executorKey;
+  }
 
-    public final long getOperationTimeoutInMillis() {
-        return getOperationTimeout(TimeUnit.MILLISECONDS);
-    }
-    
-    public double getRoundTripTimeMultiplier() {
-        return adaptiveTimeoutMultiplier;
-    }
+  public final long getOperationTimeoutInMillis() {
+    return getOperationTimeout(TimeUnit.MILLISECONDS);
+  }
+  
+  public double getRoundTripTimeMultiplier() {
+    return adaptiveTimeoutMultiplier;
+  }
 
-    public void setRountTripTimeMultiplier(double adaptiveTimeoutMultiplier) {
-        this.adaptiveTimeoutMultiplier = adaptiveTimeoutMultiplier;
-    }
-    
-    public long getAdaptiveTimeout(Contact dst, 
-            long defaultTimeout, TimeUnit unit) {
-        double multiplier = getRoundTripTimeMultiplier();
-        return ConfigUtils.getAdaptiveTimeout(dst, 
-                multiplier, defaultTimeout, unit);
-    }
+  public void setRountTripTimeMultiplier(double adaptiveTimeoutMultiplier) {
+    this.adaptiveTimeoutMultiplier = adaptiveTimeoutMultiplier;
+  }
+  
+  public long getAdaptiveTimeout(Contact dst, 
+      long defaultTimeout, TimeUnit unit) {
+    double multiplier = getRoundTripTimeMultiplier();
+    return ConfigUtils.getAdaptiveTimeout(dst, 
+        multiplier, defaultTimeout, unit);
+  }
 }

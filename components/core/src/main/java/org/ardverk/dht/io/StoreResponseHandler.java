@@ -45,143 +45,143 @@ import org.slf4j.LoggerFactory;
  * The {@link StoreResponseHandler} manages the {@link MessageType#STORE} process.
  */
 public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
-    
-    private static final Logger LOG 
-        = LoggerFactory.getLogger(StoreResponseHandler.class);
-    
-    private final ProcessCounter counter;
-    
-    private final List<StoreResponse> responses 
-        = new ArrayList<StoreResponse>();
+  
+  private static final Logger LOG 
+    = LoggerFactory.getLogger(StoreResponseHandler.class);
+  
+  private final ProcessCounter counter;
+  
+  private final List<StoreResponse> responses 
+    = new ArrayList<StoreResponse>();
 
-    private final TimeStamp creationTime = TimeStamp.now();
+  private final TimeStamp creationTime = TimeStamp.now();
+  
+  private final Contact[] contacts;
+  
+  private final Iterator<Contact> it;
+  
+  private final Key key;
+  
+  private final Value value;
+  
+  private final StoreConfig config;
+  
+  private final int w;
+  
+  public StoreResponseHandler(
+      Provider<MessageDispatcher> messageDispatcher, 
+      Contact[] contacts, int k,
+      Key key, Value value, 
+      StoreConfig config) {
+    super(messageDispatcher);
     
-    private final Contact[] contacts;
+    this.contacts = contacts;
+    this.it = Iterators.iterator(contacts);
     
-    private final Iterator<Contact> it;
+    this.key = key;
+    this.value = value;
+    this.config = config;
     
-    private final Key key;
+    counter = new ProcessCounter(config.getS());
     
-    private final Value value;
+    int w = config.getW();
     
-    private final StoreConfig config;
+    int replicate = Math.min(w, k);
+    if (replicate != w && LOG.isWarnEnabled()) {
+      LOG.warn("replicate=" + replicate + ", w=" + w);
+    }
     
-    private final int w;
-    
-    public StoreResponseHandler(
-            Provider<MessageDispatcher> messageDispatcher, 
-            Contact[] contacts, int k,
-            Key key, Value value, 
-            StoreConfig config) {
-        super(messageDispatcher);
-        
-        this.contacts = contacts;
-        this.it = Iterators.iterator(contacts);
-        
-        this.key = key;
-        this.value = value;
-        this.config = config;
-        
-        counter = new ProcessCounter(config.getS());
-        
-        int w = config.getW();
-        
-        int replicate = Math.min(w, k);
-        if (replicate != w && LOG.isWarnEnabled()) {
-            LOG.warn("replicate=" + replicate + ", w=" + w);
+    this.w = replicate;
+  }
+
+  @Override
+  protected void go(AsyncFuture<StoreEntity> future) throws Exception {
+    process(0);
+  }
+
+  private synchronized void process(int pop) throws IOException {
+    try {
+      preProcess(pop);
+      
+      while (counter.hasNext() && counter.getCount() < w) {
+        if (!it.hasNext()) {
+          break;
         }
         
-        this.w = replicate;
-    }
-
-    @Override
-    protected void go(AsyncFuture<StoreEntity> future) throws Exception {
-        process(0);
-    }
-
-    private synchronized void process(int pop) throws IOException {
-        try {
-            preProcess(pop);
-            
-            while (counter.hasNext() && counter.getCount() < w) {
-                if (!it.hasNext()) {
-                    break;
-                }
-                
-                Contact dst = it.next();
-                store(dst);
-                
-                counter.increment();
-            }
-            
-        } finally {
-            postProcess();
-        }
-    }
-    
-    private synchronized void preProcess(int pop) {
-        while (0 < pop--) {
-            counter.decrement();
-        }
-    }
-    
-    private synchronized void postProcess() {
-        if (!counter.hasActive()) {
-            long time = creationTime.getAgeInMillis();
-            
-            StoreResponse[] values = responses.toArray(new StoreResponse[0]);
-            if (values.length == 0) {
-                setException(new StoreException(key, 
-                        value, time, TimeUnit.MILLISECONDS));
-            } else {
-                setValue(new StoreEntity(contacts, key, value, 
-                        values, time, TimeUnit.MILLISECONDS));
-            }
-        }
-    }
-    
-    private synchronized void store(Contact dst) throws IOException {
-        MessageFactory factory = getMessageFactory();
-        StoreRequest request = factory.createStoreRequest(dst, key, value);
+        Contact dst = it.next();
+        store(dst);
         
-        long defaultTimeout = config.getStoreTimeoutInMillis();
-        long adaptiveTimeout = config.getAdaptiveTimeout(
-                dst, defaultTimeout, TimeUnit.MILLISECONDS);
-        
-        send(dst, request, adaptiveTimeout, TimeUnit.MILLISECONDS);
+        counter.increment();
+      }
+      
+    } finally {
+      postProcess();
     }
+  }
+  
+  private synchronized void preProcess(int pop) {
+    while (0 < pop--) {
+      counter.decrement();
+    }
+  }
+  
+  private synchronized void postProcess() {
+    if (!counter.hasActive()) {
+      long time = creationTime.getAgeInMillis();
+      
+      StoreResponse[] values = responses.toArray(new StoreResponse[0]);
+      if (values.length == 0) {
+        setException(new StoreException(key, 
+            value, time, TimeUnit.MILLISECONDS));
+      } else {
+        setValue(new StoreEntity(contacts, key, value, 
+            values, time, TimeUnit.MILLISECONDS));
+      }
+    }
+  }
+  
+  private synchronized void store(Contact dst) throws IOException {
+    MessageFactory factory = getMessageFactory();
+    StoreRequest request = factory.createStoreRequest(dst, key, value);
     
-    @Override
-    protected synchronized void processResponse(RequestEntity entity, 
-            ResponseMessage response, long time, TimeUnit unit) throws IOException {
-        StoreResponse message = (StoreResponse)response;
-        
-        try {
-            responses.add(message);
-        } finally {
-            process(1);
-        }
+    long defaultTimeout = config.getStoreTimeoutInMillis();
+    long adaptiveTimeout = config.getAdaptiveTimeout(
+        dst, defaultTimeout, TimeUnit.MILLISECONDS);
+    
+    send(dst, request, adaptiveTimeout, TimeUnit.MILLISECONDS);
+  }
+  
+  @Override
+  protected synchronized void processResponse(RequestEntity entity, 
+      ResponseMessage response, long time, TimeUnit unit) throws IOException {
+    StoreResponse message = (StoreResponse)response;
+    
+    try {
+      responses.add(message);
+    } finally {
+      process(1);
     }
+  }
 
-    @Override
-    protected synchronized void processTimeout(RequestEntity entity, 
-            long time, TimeUnit unit) throws IOException {
-        process(1);
-    }
+  @Override
+  protected synchronized void processTimeout(RequestEntity entity, 
+      long time, TimeUnit unit) throws IOException {
+    process(1);
+  }
 
-    @Override
-    protected synchronized void processIllegalResponse(RequestEntity entity,
-            ResponseMessage response, long time, TimeUnit unit)
-            throws IOException {
-        process(1);
-    }
+  @Override
+  protected synchronized void processIllegalResponse(RequestEntity entity,
+      ResponseMessage response, long time, TimeUnit unit)
+      throws IOException {
+    process(1);
+  }
 
-    @Override
-    protected synchronized void processException(RequestEntity entity, Throwable exception) {
-        try {
-            process(1);
-        } catch (IOException err) {
-            setException(err);
-        }
+  @Override
+  protected synchronized void processException(RequestEntity entity, Throwable exception) {
+    try {
+      process(1);
+    } catch (IOException err) {
+      setException(err);
     }
+  }
 }

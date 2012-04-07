@@ -26,17 +26,17 @@ import org.ardverk.dht.message.MessageFactory;
  */
 abstract class AbstractMessageHandler {
 
-    protected final Provider<MessageDispatcher> messageDispatcher;
-    
-    public AbstractMessageHandler(Provider<MessageDispatcher> messageDispatcher) {
-        this.messageDispatcher = messageDispatcher;
-    }
-    
-    public MessageDispatcher getMessageDispatcher() {
-        return messageDispatcher.get();
-    }
-    
-    public MessageFactory getMessageFactory() {
-        return getMessageDispatcher().getMessageFactory();
-    }
+  protected final Provider<MessageDispatcher> messageDispatcher;
+  
+  public AbstractMessageHandler(Provider<MessageDispatcher> messageDispatcher) {
+    this.messageDispatcher = messageDispatcher;
+  }
+  
+  public MessageDispatcher getMessageDispatcher() {
+    return messageDispatcher.get();
+  }
+  
+  public MessageFactory getMessageFactory() {
+    return getMessageDispatcher().getMessageFactory();
+  }
 }

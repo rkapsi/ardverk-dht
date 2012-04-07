@@ -19,22 +19,22 @@ package org.ardverk.dht.config;
 import java.util.concurrent.TimeUnit;
 
 public class ValueConfig extends NodeConfig {
-    
-    private volatile int r = 1;
-    
-    public ValueConfig() {
-        super();
-    }
+  
+  private volatile int r = 1;
+  
+  public ValueConfig() {
+    super();
+  }
 
-    public ValueConfig(long timeout, TimeUnit unit) {
-        super(timeout, unit);
-    }
-    
-    public int getR() {
-        return r;
-    }
+  public ValueConfig(long timeout, TimeUnit unit) {
+    super(timeout, unit);
+  }
+  
+  public int getR() {
+    return r;
+  }
 
-    public void setR(int r) {
-        this.r = r;
-    }
+  public void setR(int r) {
+    this.r = r;
+  }
 }

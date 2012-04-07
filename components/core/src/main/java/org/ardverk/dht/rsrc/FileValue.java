@@ -26,34 +26,34 @@ import java.io.InputStream;
  * {@link FileValue} reads its data from a {@link File}.
  */
 public class FileValue extends AbstractValue {
-    
-    private final File file;
-    
-    public FileValue(File file) {
-        this.file = file;
-    }
-    
-    public File getFile() {
-        return file;
-    }
-    
-    @Override
-    public long getContentLength() {
-        return file.length();
-    }
+  
+  private final File file;
+  
+  public FileValue(File file) {
+    this.file = file;
+  }
+  
+  public File getFile() {
+    return file;
+  }
+  
+  @Override
+  public long getContentLength() {
+    return file.length();
+  }
 
-    @Override
-    public InputStream getContent() throws IOException {
-        return new FileInputStream(file);
-    }
+  @Override
+  public InputStream getContent() throws IOException {
+    return new FileInputStream(file);
+  }
 
-    @Override
-    public boolean isRepeatable() {
-        return true;
-    }
+  @Override
+  public boolean isRepeatable() {
+    return true;
+  }
 
-    @Override
-    public boolean isStreaming() {
-        return true;
-    }
+  @Override
+  public boolean isStreaming() {
+    return true;
+  }
 }

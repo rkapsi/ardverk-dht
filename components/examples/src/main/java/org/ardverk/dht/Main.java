@@ -21,13 +21,13 @@ import org.ardverk.utils.DeadlockScanner;
 import bsh.Interpreter;
 
 public class Main {
+  
+  public static void main(String[] args) {
+    DeadlockScanner.start();
     
-    public static void main(String[] args) {
-        DeadlockScanner.start();
-        
-        Interpreter interpreter 
-            = InterpreterFactory.create(
-                Main.class, "example.bsh");
-        interpreter.run();
-    }
+    Interpreter interpreter 
+      = InterpreterFactory.create(
+        Main.class, "example.bsh");
+    interpreter.run();
+  }
 }

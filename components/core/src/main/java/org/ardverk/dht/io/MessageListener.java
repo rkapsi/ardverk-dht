@@ -24,14 +24,14 @@ import org.ardverk.dht.message.Message;
  * and outgoing {@link Message}s.
  */
 public interface MessageListener {
-    
-    /**
-     * Called for every {@link Message} that was sent.
-     */
-    public void handleMessageSent(KUID contactId, Message message);
-    
-    /**
-     * Called for every {@link Message} that was received.
-     */
-    public void handleMessageReceived(Message message);
+  
+  /**
+   * Called for every {@link Message} that was sent.
+   */
+  public void handleMessageSent(KUID contactId, Message message);
+  
+  /**
+   * Called for every {@link Message} that was received.
+   */
+  public void handleMessageReceived(Message message);
 }

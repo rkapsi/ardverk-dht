@@ -15,53 +15,53 @@ import org.ardverk.io.Streamable;
 import org.ardverk.utils.StringUtils;
 
 public enum Method implements Streamable, StringValue {
-    
-    GET(HttpGet.METHOD_NAME),
-    PUT(HttpPut.METHOD_NAME),
-    HEAD(HttpHead.METHOD_NAME),
-    DELETE(HttpDelete.METHOD_NAME);
-    
-    private final String value;
-    
-    private Method(String value) {
-        this.value = value;
-    }
+  
+  GET(HttpGet.METHOD_NAME),
+  PUT(HttpPut.METHOD_NAME),
+  HEAD(HttpHead.METHOD_NAME),
+  DELETE(HttpDelete.METHOD_NAME);
+  
+  private final String value;
+  
+  private Method(String value) {
+    this.value = value;
+  }
 
-    @Override
-    public void writeTo(OutputStream out) throws IOException {
-        StringUtils.writeString(value, out);
+  @Override
+  public void writeTo(OutputStream out) throws IOException {
+    StringUtils.writeString(value, out);
+  }
+  
+  @Override
+  public String stringValue() {
+    return value;
+  }
+  
+  @Override
+  public String toString() {
+    return value;
+  }
+  
+  private static final Map<String, Method> VALUES 
+    = new HashMap<String, Method>();
+  
+  static {
+    for (Method method : values()) {
+      Method existing = VALUES.put(method.value, method);
+      if (existing != null) {
+        throw new IllegalStateException(
+            "Collision: " + existing + " vs. " + method);
+      }
+    }
+  }
+  
+  public static Method valueOf(InputStream in) throws IOException {
+    String value = StringUtils.readString(in);
+    Method method = VALUES.get(value);
+    if (method != null) {
+      return method;
     }
     
-    @Override
-    public String stringValue() {
-        return value;
-    }
-    
-    @Override
-    public String toString() {
-        return value;
-    }
-    
-    private static final Map<String, Method> VALUES 
-        = new HashMap<String, Method>();
-    
-    static {
-        for (Method method : values()) {
-            Method existing = VALUES.put(method.value, method);
-            if (existing != null) {
-                throw new IllegalStateException(
-                        "Collision: " + existing + " vs. " + method);
-            }
-        }
-    }
-    
-    public static Method valueOf(InputStream in) throws IOException {
-        String value = StringUtils.readString(in);
-        Method method = VALUES.get(value);
-        if (method != null) {
-            return method;
-        }
-        
-        throw new IllegalArgumentException(value);
-    }
+    throw new IllegalArgumentException(value);
+  }
 }

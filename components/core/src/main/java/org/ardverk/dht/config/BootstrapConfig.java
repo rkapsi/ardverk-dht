@@ -23,40 +23,40 @@ import org.ardverk.dht.concurrent.ExecutorKey;
 
 public class BootstrapConfig extends Config {
 
-    private volatile PingConfig pingConfig = new PingConfig();
-    
-    private volatile NodeConfig lookupConfig = new NodeConfig();
-    
-    @Override
-    public void setExecutorKey(ExecutorKey executorKey) {
-        super.setExecutorKey(executorKey);
-        pingConfig.setExecutorKey(executorKey);
-        lookupConfig.setExecutorKey(executorKey);
-    }
+  private volatile PingConfig pingConfig = new PingConfig();
+  
+  private volatile NodeConfig lookupConfig = new NodeConfig();
+  
+  @Override
+  public void setExecutorKey(ExecutorKey executorKey) {
+    super.setExecutorKey(executorKey);
+    pingConfig.setExecutorKey(executorKey);
+    lookupConfig.setExecutorKey(executorKey);
+  }
 
-    public PingConfig getPingConfig() {
-        return pingConfig;
-    }
-    
-    public void setPingConfig(PingConfig pingConfig) {
-        this.pingConfig = pingConfig;
-    }
+  public PingConfig getPingConfig() {
+    return pingConfig;
+  }
+  
+  public void setPingConfig(PingConfig pingConfig) {
+    this.pingConfig = pingConfig;
+  }
 
-    public NodeConfig getLookupConfig() {
-        return lookupConfig;
-    }
-    
-    public void setLookupConfig(NodeConfig lookupConfig) {
-        this.lookupConfig = lookupConfig;
-    }
+  public NodeConfig getLookupConfig() {
+    return lookupConfig;
+  }
+  
+  public void setLookupConfig(NodeConfig lookupConfig) {
+    this.lookupConfig = lookupConfig;
+  }
 
-    @Override
-    public void setOperationTimeout(long timeout, TimeUnit unit) {
-        throw new UnsupportedOperationException();
-    }
+  @Override
+  public void setOperationTimeout(long timeout, TimeUnit unit) {
+    throw new UnsupportedOperationException();
+  }
 
-    @Override
-    public long getOperationTimeout(TimeUnit unit) {
-        return ConfigUtils.getOperationTimeout(new Config[] { pingConfig, lookupConfig }, unit);
-    }
+  @Override
+  public long getOperationTimeout(TimeUnit unit) {
+    return ConfigUtils.getOperationTimeout(new Config[] { pingConfig, lookupConfig }, unit);
+  }
 }

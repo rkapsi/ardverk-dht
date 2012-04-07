@@ -22,25 +22,25 @@ import org.ardverk.lang.Precoditions;
 
 public abstract class Entity {
 
-    protected final long time;
-    
-    protected final TimeUnit unit;
-    
-    public Entity(long time, TimeUnit unit) {
-        this.time = time;
-        this.unit = Precoditions.notNull(unit, "unit");
-    }
-    
-    public long getTime(TimeUnit unit) {
-        return unit.convert(time, this.unit);
-    }
-    
-    public long getTimeInMillis() {
-        return getTime(TimeUnit.MILLISECONDS);
-    }
-    
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + " (" + time + ", " + unit + ")";
-    }
+  protected final long time;
+  
+  protected final TimeUnit unit;
+  
+  public Entity(long time, TimeUnit unit) {
+    this.time = time;
+    this.unit = Precoditions.notNull(unit, "unit");
+  }
+  
+  public long getTime(TimeUnit unit) {
+    return unit.convert(time, this.unit);
+  }
+  
+  public long getTimeInMillis() {
+    return getTime(TimeUnit.MILLISECONDS);
+  }
+  
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + " (" + time + ", " + unit + ")";
+  }
 }

@@ -26,103 +26,103 @@ import org.ardverk.utils.ReverseComparator;
 
 public class ContactUtils {
 
-    private ContactUtils() {}
-      
-    private static final Comparator<ContactEntry> HEALTH_ASCENDING 
-        = new Comparator<ContactEntry>() {
-            @Override
-            public int compare(ContactEntry o1, ContactEntry o2) {
-                int e1 = o1.getErrorCount();
-                int e2 = o2.getErrorCount();
-                
-                if (e1 == 0 && e2 == 0) {
-                    return LongevityUtils.TIMESTAMP_ASCENDING.compare(o1, o2);
-                } else if (e1 == 0 && e2 != 0) {
-                    return -1;
-                } else if (e1 != 0 && e2 == 0) {
-                    return 1;
-                }
-                
-                // Sort everyone else from least recently failed to most recently failed.
-                // TODO: Take the number of errors into account?
-                TimeStamp t1 = o1.getErrorTimeStamp();
-                TimeStamp t2 = o2.getErrorTimeStamp();
-                if (t1 == null) {
-                    return (t2 != null) ? -1 : 0;
-                } else if (t2 == null) {
-                    return 1;
-                }
-                return t1.compareTo(t2);
-            }
-        };
-        
-    private static final Comparator<ContactEntry> HEALTH_DESCENDING 
-        = new ReverseComparator<ContactEntry>(HEALTH_ASCENDING);
+  private ContactUtils() {}
     
-    public static long getAdaptiveTimeout(DefaultContact contact, 
-            long defaultValue, TimeUnit unit) {
-        long rtt = contact.getRoundTripTime(unit);
-        if (rtt < 0) {
-            return defaultValue;
+  private static final Comparator<ContactEntry> HEALTH_ASCENDING 
+    = new Comparator<ContactEntry>() {
+      @Override
+      public int compare(ContactEntry o1, ContactEntry o2) {
+        int e1 = o1.getErrorCount();
+        int e2 = o2.getErrorCount();
+        
+        if (e1 == 0 && e2 == 0) {
+          return LongevityUtils.TIMESTAMP_ASCENDING.compare(o1, o2);
+        } else if (e1 == 0 && e2 != 0) {
+          return -1;
+        } else if (e1 != 0 && e2 == 0) {
+          return 1;
         }
         
-        return Math.min((long)(rtt * 1.5f), defaultValue);
-    }
-    
-    public static ContactEntry[] byHealth(ContactEntry[] entries) {
-        return byHealth(entries, true);
-    }
-    
-    public static ContactEntry[] byHealth(ContactEntry[] entries, boolean ascending) {
-        Arrays.sort(entries, ascending ? HEALTH_ASCENDING : HEALTH_DESCENDING);
-        return entries;
-    }
-    
-    /**
-     * Turns the given array of {@link ContactEntry}s into an array of {@link Contact}s.
-     */
-    public static Contact[] toContacts(ContactEntry[] entries) {
-        return toContacts(entries, 0, entries.length);
-    }
-    
-    /**
-     * Turns the given array of {@link ContactEntry}s into an array of {@link Contact}s.
-     */
-    public static Contact[] toContacts(ContactEntry[] entries, int offset, int length) {
-        Contact[] contacts = new Contact[length];
-        for (int i = 0; i < length; i++) {
-            contacts[i] = entries[offset + i].getContact();
+        // Sort everyone else from least recently failed to most recently failed.
+        // TODO: Take the number of errors into account?
+        TimeStamp t1 = o1.getErrorTimeStamp();
+        TimeStamp t2 = o2.getErrorTimeStamp();
+        if (t1 == null) {
+          return (t2 != null) ? -1 : 0;
+        } else if (t2 == null) {
+          return 1;
         }
-        return contacts;
+        return t1.compareTo(t2);
+      }
+    };
+    
+  private static final Comparator<ContactEntry> HEALTH_DESCENDING 
+    = new ReverseComparator<ContactEntry>(HEALTH_ASCENDING);
+  
+  public static long getAdaptiveTimeout(DefaultContact contact, 
+      long defaultValue, TimeUnit unit) {
+    long rtt = contact.getRoundTripTime(unit);
+    if (rtt < 0) {
+      return defaultValue;
     }
     
-    /**
-     * Returns the least recently seen {@link ContactEntry} in the 
-     * given {@link Collection}.
-     */
-    public static ContactEntry getLeastRecentlySeen(
-            Collection<? extends ContactEntry> entries) {
-        ContactEntry lrs = null;
-        for (ContactEntry entry : entries) {
-            if (lrs == null || entry.getTimeStamp().compareTo(lrs.getTimeStamp()) < 0) {
-                lrs = entry;
-            }
-        }
-        return lrs;
+    return Math.min((long)(rtt * 1.5f), defaultValue);
+  }
+  
+  public static ContactEntry[] byHealth(ContactEntry[] entries) {
+    return byHealth(entries, true);
+  }
+  
+  public static ContactEntry[] byHealth(ContactEntry[] entries, boolean ascending) {
+    Arrays.sort(entries, ascending ? HEALTH_ASCENDING : HEALTH_DESCENDING);
+    return entries;
+  }
+  
+  /**
+   * Turns the given array of {@link ContactEntry}s into an array of {@link Contact}s.
+   */
+  public static Contact[] toContacts(ContactEntry[] entries) {
+    return toContacts(entries, 0, entries.length);
+  }
+  
+  /**
+   * Turns the given array of {@link ContactEntry}s into an array of {@link Contact}s.
+   */
+  public static Contact[] toContacts(ContactEntry[] entries, int offset, int length) {
+    Contact[] contacts = new Contact[length];
+    for (int i = 0; i < length; i++) {
+      contacts[i] = entries[offset + i].getContact();
     }
-    
-    /**
-     * Returns the most recently seen {@link ContactEntry} in the 
-     * given {@link Collection}.
-     */
-    public static ContactEntry getMostRecentlySeen(
-            Collection<? extends ContactEntry> entries) {
-        ContactEntry mrs = null;
-        for (ContactEntry entry : entries) {
-            if (mrs == null || entry.getTimeStamp().compareTo(mrs.getTimeStamp()) >= 0) {
-                mrs = entry;
-            }
-        }
-        return mrs;
+    return contacts;
+  }
+  
+  /**
+   * Returns the least recently seen {@link ContactEntry} in the 
+   * given {@link Collection}.
+   */
+  public static ContactEntry getLeastRecentlySeen(
+      Collection<? extends ContactEntry> entries) {
+    ContactEntry lrs = null;
+    for (ContactEntry entry : entries) {
+      if (lrs == null || entry.getTimeStamp().compareTo(lrs.getTimeStamp()) < 0) {
+        lrs = entry;
+      }
     }
+    return lrs;
+  }
+  
+  /**
+   * Returns the most recently seen {@link ContactEntry} in the 
+   * given {@link Collection}.
+   */
+  public static ContactEntry getMostRecentlySeen(
+      Collection<? extends ContactEntry> entries) {
+    ContactEntry mrs = null;
+    for (ContactEntry entry : entries) {
+      if (mrs == null || entry.getTimeStamp().compareTo(mrs.getTimeStamp()) >= 0) {
+        mrs = entry;
+      }
+    }
+    return mrs;
+  }
 }

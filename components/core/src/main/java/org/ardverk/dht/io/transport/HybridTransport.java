@@ -43,53 +43,53 @@ import org.ardverk.io.IoUtils;
  */
 public class HybridTransport extends DatagramTransport {
 
-    private final SocketTransport socket;
-    
-    public HybridTransport(MessageCodec codec, int port) {
-        this(codec, new InetSocketAddress(port));
-    }
+  private final SocketTransport socket;
+  
+  public HybridTransport(MessageCodec codec, int port) {
+    this(codec, new InetSocketAddress(port));
+  }
 
-    public HybridTransport(MessageCodec codec, SocketAddress bindaddr) {
-        super(codec, bindaddr);
-        socket = new SocketTransport(codec, bindaddr);
-    }
+  public HybridTransport(MessageCodec codec, SocketAddress bindaddr) {
+    super(codec, bindaddr);
+    socket = new SocketTransport(codec, bindaddr);
+  }
 
-    @Override
-    public void close() {
-        super.close();
-        IoUtils.close(socket);
-    }
-    
-    @Override
-    public void bind(TransportCallback callback) throws IOException {
-        super.bind(callback);
-        socket.bind(callback);
-    }
+  @Override
+  public void close() {
+    super.close();
+    IoUtils.close(socket);
+  }
+  
+  @Override
+  public void bind(TransportCallback callback) throws IOException {
+    super.bind(callback);
+    socket.bind(callback);
+  }
 
-    @Override
-    public void unbind() {
-        super.unbind();
-        socket.unbind();
-    }
+  @Override
+  public void unbind() {
+    super.unbind();
+    socket.unbind();
+  }
+  
+  /**
+   * Returns {@code true} if the given {@link Message} 
+   * should be send over TCP.
+   */
+  protected boolean isUseTCP(Message message) {
+    return message instanceof StoreRequest
+      || message instanceof StoreResponse
+      || message instanceof ValueResponse;
+  }
+  
+  @Override
+  public void send(KUID contactId, Message message, 
+      long timeout, TimeUnit unit) throws IOException {
     
-    /**
-     * Returns {@code true} if the given {@link Message} 
-     * should be send over TCP.
-     */
-    protected boolean isUseTCP(Message message) {
-        return message instanceof StoreRequest
-            || message instanceof StoreResponse
-            || message instanceof ValueResponse;
+    if (isUseTCP(message)) {
+      socket.send(contactId, message, timeout, unit);
+    } else {
+      super.send(contactId, message, timeout, unit);
     }
-    
-    @Override
-    public void send(KUID contactId, Message message, 
-            long timeout, TimeUnit unit) throws IOException {
-        
-        if (isUseTCP(message)) {
-            socket.send(contactId, message, timeout, unit);
-        } else {
-            super.send(contactId, message, timeout, unit);
-        }
-    }
+  }
 }

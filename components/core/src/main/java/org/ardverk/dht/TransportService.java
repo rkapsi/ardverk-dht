@@ -27,9 +27,9 @@ import org.ardverk.lang.Bindable;
  */
 interface TransportService extends Bindable<Transport> {
 
-    @Override
-    public void bind(Transport transport) throws IOException;
-    
-    @Override
-    public void unbind() throws IOException;
+  @Override
+  public void bind(Transport transport) throws IOException;
+  
+  @Override
+  public void unbind() throws IOException;
 }

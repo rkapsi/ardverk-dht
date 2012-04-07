@@ -22,9 +22,9 @@ import org.ardverk.dht.rsrc.Key;
  * A {@link MessageType#STORE} request.
  */
 public interface StoreRequest extends RequestMessage {
-    
-    /**
-     * Returns the {@link Key}.
-     */
-    public Key getKey();
+  
+  /**
+   * Returns the {@link Key}.
+   */
+  public Key getKey();
 }

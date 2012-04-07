@@ -21,23 +21,23 @@ import org.jboss.netty.channel.ChannelEvent;
 
 public class HttpUtils {
 
-    private HttpUtils() {}
-    
-    /**
-     * Calls close on the {@link ChannelEvent#getChannel()}.
-     */
-    public static void close(ChannelEvent event) {
-        if (event != null) {
-            close(event.getChannel());
-        }
+  private HttpUtils() {}
+  
+  /**
+   * Calls close on the {@link ChannelEvent#getChannel()}.
+   */
+  public static void close(ChannelEvent event) {
+    if (event != null) {
+      close(event.getChannel());
     }
-    
-    /**
-     * Closes the given {@link Channel}.
-     */
-    public static void close(Channel channel) {
-        if (channel != null) {
-            channel.close();
-        }
+  }
+  
+  /**
+   * Closes the given {@link Channel}.
+   */
+  public static void close(Channel channel) {
+    if (channel != null) {
+      channel.close();
     }
+  }
 }

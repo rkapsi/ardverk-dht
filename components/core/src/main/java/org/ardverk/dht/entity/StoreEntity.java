@@ -28,46 +28,46 @@ import org.ardverk.dht.rsrc.Value;
  */
 public class StoreEntity extends Entity {
 
-    private final Contact[] contacts;
+  private final Contact[] contacts;
+  
+  private final Key key;
+  
+  private final Value value;
+  
+  private final StoreResponse[] responses;
+  
+  public StoreEntity(Contact[] contacts, Key key, 
+      Value value, StoreResponse[] responses, 
+      long time, TimeUnit unit) {
+    super(time, unit);
     
-    private final Key key;
-    
-    private final Value value;
-    
-    private final StoreResponse[] responses;
-    
-    public StoreEntity(Contact[] contacts, Key key, 
-            Value value, StoreResponse[] responses, 
-            long time, TimeUnit unit) {
-        super(time, unit);
-        
-        this.contacts = contacts;
-        this.key = key;
-        this.value = value;
-        this.responses = responses;
-    }
-    
-    public Contact[] getContacts() {
-        return contacts;
-    }
+    this.contacts = contacts;
+    this.key = key;
+    this.value = value;
+    this.responses = responses;
+  }
+  
+  public Contact[] getContacts() {
+    return contacts;
+  }
 
-    public Key getKey() {
-        return key;
-    }
+  public Key getKey() {
+    return key;
+  }
 
-    public Value getValue() {
-        return value;
+  public Value getValue() {
+    return value;
+  }
+  
+  public Contact[] getStoreContacts() {
+    Contact[] contacts = new Contact[responses.length];
+    for (int i = 0; i < responses.length; i++) {
+      contacts[i] = responses[i].getContact();
     }
-    
-    public Contact[] getStoreContacts() {
-        Contact[] contacts = new Contact[responses.length];
-        for (int i = 0; i < responses.length; i++) {
-            contacts[i] = responses[i].getContact();
-        }
-        return contacts;
-    }
+    return contacts;
+  }
 
-    public StoreResponse[] getStoreResponses() {
-        return responses;
-    }
+  public StoreResponse[] getStoreResponses() {
+    return responses;
+  }
 }

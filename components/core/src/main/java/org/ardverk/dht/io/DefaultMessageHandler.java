@@ -43,99 +43,99 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class DefaultMessageHandler implements MessageCallback {
 
-    private static final Logger LOG 
-        = LoggerFactory.getLogger(DefaultMessageHandler.class);
+  private static final Logger LOG 
+    = LoggerFactory.getLogger(DefaultMessageHandler.class);
+  
+  private final RouteTable routeTable;
+  
+  @Inject
+  public DefaultMessageHandler(RouteTable routeTable) {
+    this.routeTable = routeTable;
+  }
+  
+  public void handleRequest(RequestMessage request) throws IOException {
+    Contact src = request.getContact();
+    routeTable.add(src);
+  }
+  
+  @Override
+  public boolean handleResponse(RequestEntity entity, 
+      ResponseMessage response, long time, TimeUnit unit) throws IOException {
     
-    private final RouteTable routeTable;
+    Contact src = response.getContact();
     
-    @Inject
-    public DefaultMessageHandler(RouteTable routeTable) {
-        this.routeTable = routeTable;
+    if (src instanceof RoundTripTime) {
+      ((RoundTripTime)src).setRoundTripTime(time, unit);
     }
     
-    public void handleRequest(RequestMessage request) throws IOException {
-        Contact src = request.getContact();
-        routeTable.add(src);
+    SocketAddress address = response.getAddress();
+    updateContactAddress(address);
+    
+    routeTable.add(src);
+    
+    return true;
+  }
+  
+  public void handleLateResponse(ResponseMessage response) throws IOException {
+    Contact src = response.getContact();
+    routeTable.add(src);
+  }
+  
+  @Override
+  public void handleTimeout(RequestEntity entity, 
+      long time, TimeUnit unit) throws IOException {
+    
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("Timeout: entity=" + entity + ", time=" + time + ", unit=" + unit);
     }
     
-    @Override
-    public boolean handleResponse(RequestEntity entity, 
-            ResponseMessage response, long time, TimeUnit unit) throws IOException {
-        
-        Contact src = response.getContact();
-        
-        if (src instanceof RoundTripTime) {
-            ((RoundTripTime)src).setRoundTripTime(time, unit);
-        }
-        
-        SocketAddress address = response.getAddress();
-        updateContactAddress(address);
-        
-        routeTable.add(src);
-        
-        return true;
+    handleIoError(entity);
+  }
+  
+  @Override
+  public void handleIllegalResponse(RequestEntity entity,
+      ResponseMessage response, long time, TimeUnit unit)
+      throws IOException {
+    
+    // Do nothing!
+    
+    if (LOG.isErrorEnabled()) {
+      LOG.error("Illegal Response: entity=" + entity + ", response=" + response);
     }
     
-    public void handleLateResponse(ResponseMessage response) throws IOException {
-        Contact src = response.getContact();
-        routeTable.add(src);
-    }
-    
-    @Override
-    public void handleTimeout(RequestEntity entity, 
-            long time, TimeUnit unit) throws IOException {
-        
-        if (LOG.isTraceEnabled()) {
-            LOG.trace("Timeout: entity=" + entity + ", time=" + time + ", unit=" + unit);
-        }
-        
-        handleIoError(entity);
-    }
-    
-    @Override
-    public void handleIllegalResponse(RequestEntity entity,
-            ResponseMessage response, long time, TimeUnit unit)
-            throws IOException {
-        
-        // Do nothing!
-        
-        if (LOG.isErrorEnabled()) {
-            LOG.error("Illegal Response: entity=" + entity + ", response=" + response);
-        }
-        
-        handleIoError(entity);
-    }
+    handleIoError(entity);
+  }
 
-    @Override
-    public void handleException(RequestEntity entity, Throwable exception) {
-        // Do nothing!
-        
-        if (LOG.isTraceEnabled()) {
-            LOG.trace("Exception: entity=" + entity, exception);
-        }
-        
-        handleIoError(entity);
+  @Override
+  public void handleException(RequestEntity entity, Throwable exception) {
+    // Do nothing!
+    
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("Exception: entity=" + entity, exception);
     }
     
-    private void handleIoError(RequestEntity entity) {
-        KUID contactId = entity.getId();
-        SocketAddress address = entity.getAddress();
-        
-        routeTable.handleIoError(contactId, address);
-    }
+    handleIoError(entity);
+  }
+  
+  private void handleIoError(RequestEntity entity) {
+    KUID contactId = entity.getId();
+    SocketAddress address = entity.getAddress();
     
-    /**
-     * Each message contains the receiver's (our) {@link SocketAddress}.
-     * We're using it to update our {@link Identity}'s contact address.
-     */
-    private void updateContactAddress(SocketAddress address) {
-        if (address != null) {
-            Identity localhost = routeTable.getIdentity();
-            SocketAddress current = localhost.getSocketAddress();
-            
-            if (current == null || !current.equals(address)) {
-                localhost.setSocketAddress(address);
-            }
-        }
+    routeTable.handleIoError(contactId, address);
+  }
+  
+  /**
+   * Each message contains the receiver's (our) {@link SocketAddress}.
+   * We're using it to update our {@link Identity}'s contact address.
+   */
+  private void updateContactAddress(SocketAddress address) {
+    if (address != null) {
+      Identity localhost = routeTable.getIdentity();
+      SocketAddress current = localhost.getSocketAddress();
+      
+      if (current == null || !current.equals(address)) {
+        localhost.setSocketAddress(address);
+      }
     }
+  }
 }

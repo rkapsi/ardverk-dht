@@ -28,26 +28,26 @@ import org.ardverk.dht.message.ResponseMessage;
  */
 public interface MessageCallback {
 
-    /**
-     * Called for a {@link ResponseMessage}.
-     */
-    public boolean handleResponse(RequestEntity entity, ResponseMessage response, 
-            long time, TimeUnit unit) throws IOException;
-    
-    /**
-     * Called if a timeout occurred.
-     */
-    public void handleTimeout(RequestEntity entity, 
-            long time, TimeUnit unit) throws IOException;
-    
-    /**
-     * 
-     */
-    public void handleIllegalResponse(RequestEntity entity, 
-            ResponseMessage response, long time, TimeUnit unit) throws IOException;
-    
-    /**
-     * Called if an {@link Exception} occurred.
-     */
-    public void handleException(RequestEntity entity, Throwable exception);
+  /**
+   * Called for a {@link ResponseMessage}.
+   */
+  public boolean handleResponse(RequestEntity entity, ResponseMessage response, 
+      long time, TimeUnit unit) throws IOException;
+  
+  /**
+   * Called if a timeout occurred.
+   */
+  public void handleTimeout(RequestEntity entity, 
+      long time, TimeUnit unit) throws IOException;
+  
+  /**
+   * 
+   */
+  public void handleIllegalResponse(RequestEntity entity, 
+      ResponseMessage response, long time, TimeUnit unit) throws IOException;
+  
+  /**
+   * Called if an {@link Exception} occurred.
+   */
+  public void handleException(RequestEntity entity, Throwable exception);
 }

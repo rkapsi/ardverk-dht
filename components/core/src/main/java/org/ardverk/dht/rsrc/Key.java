@@ -26,31 +26,31 @@ import org.ardverk.dht.lang.Identifier;
  * A {@link Key} is an unique identifier of a {@link Value}.
  */
 public interface Key extends Comparable<Key>, Identifier {
-    
-    /**
-     * 
-     */
-    public String getBucket();
-    
-    /**
-     * 
-     */
-    public Key strip();
-    
-    /**
-     * Returns the resource's {@link URI}.
-     */
-    public URI getURI();
-    
-    /**
-     * Returns the {@link URI}'s path
-     * 
-     * @see URI#getPath()
-     */
-    public String getPath();
-    
-    /**
-     * Returns the {@link URI}'s query string
-     */
-    public Map<String, String> getQueryString();
+  
+  /**
+   * 
+   */
+  public String getBucket();
+  
+  /**
+   * 
+   */
+  public Key strip();
+  
+  /**
+   * Returns the resource's {@link URI}.
+   */
+  public URI getURI();
+  
+  /**
+   * Returns the {@link URI}'s path
+   * 
+   * @see URI#getPath()
+   */
+  public String getPath();
+  
+  /**
+   * Returns the {@link URI}'s query string
+   */
+  public Map<String, String> getQueryString();
 }

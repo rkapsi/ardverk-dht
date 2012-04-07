@@ -22,10 +22,10 @@ import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.rsrc.Value;
 
 public class DefaultStoreResponse extends AbstractResponseMessage 
-        implements StoreResponse {
-    
-    public DefaultStoreResponse(MessageId messageId, Contact contact, 
-            SocketAddress address, Value value) {
-        super(messageId, contact, address, value);
-    }
+    implements StoreResponse {
+  
+  public DefaultStoreResponse(MessageId messageId, Contact contact, 
+      SocketAddress address, Value value) {
+    super(messageId, contact, address, value);
+  }
 }

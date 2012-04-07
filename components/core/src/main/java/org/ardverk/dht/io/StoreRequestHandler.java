@@ -39,31 +39,31 @@ import org.ardverk.dht.storage.Datastore;
  */
 @Singleton
 public class StoreRequestHandler extends AbstractRequestHandler {
+  
+  private final Datastore datastore;
+  
+  @Inject
+  public StoreRequestHandler(
+      Provider<MessageDispatcher> messageDispatcher,
+      Datastore datastore) {
+    super(messageDispatcher);
     
-    private final Datastore datastore;
-    
-    @Inject
-    public StoreRequestHandler(
-            Provider<MessageDispatcher> messageDispatcher,
-            Datastore datastore) {
-        super(messageDispatcher);
-        
-        this.datastore = datastore;
-    }
+    this.datastore = datastore;
+  }
 
-    private Value store(StoreRequest request) {
-        Contact src = request.getContact();
-        Key key = request.getKey();
-        Value value = request.getValue();
-        return datastore.store(src, key, value);
-    }
+  private Value store(StoreRequest request) {
+    Contact src = request.getContact();
+    Key key = request.getKey();
+    Value value = request.getValue();
+    return datastore.store(src, key, value);
+  }
+  
+  @Override
+  public ResponseMessage handleRequest(RequestMessage message) throws IOException {
+    StoreRequest request = (StoreRequest)message;
+    Value value = store(request);
     
-    @Override
-    public ResponseMessage handleRequest(RequestMessage message) throws IOException {
-        StoreRequest request = (StoreRequest)message;
-        Value value = store(request);
-        
-        MessageFactory factory = getMessageFactory();
-        return factory.createStoreResponse(request, value);
-    }
+    MessageFactory factory = getMessageFactory();
+    return factory.createStoreResponse(request, value);
+  }
 }

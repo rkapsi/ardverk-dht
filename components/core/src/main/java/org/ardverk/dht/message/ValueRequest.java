@@ -22,6 +22,6 @@ import org.ardverk.dht.rsrc.Key;
  * A {@link MessageType#FIND_VALUE} request.
  */
 public interface ValueRequest extends LookupRequest {
-    
-    public Key getKey();
+  
+  public Key getKey();
 }

@@ -28,22 +28,22 @@ import com.google.inject.ImplementedBy;
  */
 @ImplementedBy(ArdverkDHT.class)
 public interface DHT extends DHTService, BootstrapService, 
-        QuickenService, FutureService, TransportService {
-    
-    /**
-     * Returns the localhost {@link Contact}.
-     * 
-     * @see RouteTable#getIdentity()
-     */
-    public Identity getIdentity();
-    
-    /**
-     * Returns the {@link DHT}'s {@link RouteTable}.
-     */
-    public RouteTable getRouteTable();
-    
-    /**
-     * Returns the {@link DHT}'s {@link Datastore}.
-     */
-    public Datastore getDatabase();
+    QuickenService, FutureService, TransportService {
+  
+  /**
+   * Returns the localhost {@link Contact}.
+   * 
+   * @see RouteTable#getIdentity()
+   */
+  public Identity getIdentity();
+  
+  /**
+   * Returns the {@link DHT}'s {@link RouteTable}.
+   */
+  public RouteTable getRouteTable();
+  
+  /**
+   * Returns the {@link DHT}'s {@link Datastore}.
+   */
+  public Datastore getDatabase();
 }

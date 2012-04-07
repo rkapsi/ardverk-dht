@@ -36,19 +36,19 @@ import org.ardverk.dht.message.ResponseMessage;
  */
 @Singleton
 public class PingRequestHandler extends AbstractRequestHandler {
-    
-    @Inject
-    public PingRequestHandler(Provider<MessageDispatcher> messageDispatcher) {
-        super(messageDispatcher);
-    }
+  
+  @Inject
+  public PingRequestHandler(Provider<MessageDispatcher> messageDispatcher) {
+    super(messageDispatcher);
+  }
 
-    public PingResponse createResponse(PingRequest request) {
-        MessageFactory factory = getMessageFactory();
-        return factory.createPingResponse(request);
-    }
-    
-    @Override
-    public ResponseMessage handleRequest(RequestMessage request) throws IOException {
-        return createResponse((PingRequest)request);
-    }
+  public PingResponse createResponse(PingRequest request) {
+    MessageFactory factory = getMessageFactory();
+    return factory.createPingResponse(request);
+  }
+  
+  @Override
+  public ResponseMessage handleRequest(RequestMessage request) throws IOException {
+    return createResponse((PingRequest)request);
+  }
 }

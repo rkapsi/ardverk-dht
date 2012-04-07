@@ -24,17 +24,17 @@ import org.ardverk.utils.ArrayUtils;
 
 public class DatastoreUtils {
 
-    private DatastoreUtils() {}
+  private DatastoreUtils() {}
+  
+  public static boolean isInBucket(Key key, RouteTable routeTable) {
+    KUID bucketId = key.getId();
+    Contact[] contacts = routeTable.select(bucketId);
+    Contact localhost = routeTable.getIdentity();
     
-    public static boolean isInBucket(Key key, RouteTable routeTable) {
-        KUID bucketId = key.getId();
-        Contact[] contacts = routeTable.select(bucketId);
-        Contact localhost = routeTable.getIdentity();
-        
-        if (!ArrayUtils.contains(localhost, contacts)) {
-            return false;
-        }
-        
-        return true;
+    if (!ArrayUtils.contains(localhost, contacts)) {
+      return false;
     }
+    
+    return true;
+  }
 }

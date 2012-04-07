@@ -30,15 +30,15 @@ import org.ardverk.dht.config.Config;
  */
 interface FutureService {
 
-    /**
-     * Submits the given {@link DHTProcess} for execution.
-     */
-    public <V> DHTFuture<V> submit(
-            DHTProcess<V> process, Config config);
-    
-    /**
-     * Submits the given {@link DHTProcess} for execution.
-     */
-    public <V> DHTFuture<V> submit(ExecutorKey executorKey, 
-            DHTProcess<V> process, long timeout, TimeUnit unit);
+  /**
+   * Submits the given {@link DHTProcess} for execution.
+   */
+  public <V> DHTFuture<V> submit(
+      DHTProcess<V> process, Config config);
+  
+  /**
+   * Submits the given {@link DHTProcess} for execution.
+   */
+  public <V> DHTFuture<V> submit(ExecutorKey executorKey, 
+      DHTProcess<V> process, long timeout, TimeUnit unit);
 }

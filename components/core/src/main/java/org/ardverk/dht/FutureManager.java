@@ -39,68 +39,68 @@ import org.ardverk.dht.config.Config;
  */
 @Singleton
 public class FutureManager implements Closeable {
-    
-    private final Set<AsyncFuture<?>> futures 
-        = new IdentityHashSet<AsyncFuture<?>>();
-    
-    private boolean open = true;
-    
-    @Override
-    public synchronized void close() {
-        if (!open) {
-            return;
-        }
-        
-        open = false;
-        
-        FutureUtils.cancelAll(futures, true);
-        futures.clear();
+  
+  private final Set<AsyncFuture<?>> futures 
+    = new IdentityHashSet<AsyncFuture<?>>();
+  
+  private boolean open = true;
+  
+  @Override
+  public synchronized void close() {
+    if (!open) {
+      return;
     }
     
-    public <V> DHTFuture<V> submit(DHTProcess<V> process, Config config) {
-        ExecutorKey executorKey = config.getExecutorKey();
-        long timeout = config.getOperationTimeoutInMillis();
-        return submit(executorKey, process, timeout, TimeUnit.MILLISECONDS);
+    open = false;
+    
+    FutureUtils.cancelAll(futures, true);
+    futures.clear();
+  }
+  
+  public <V> DHTFuture<V> submit(DHTProcess<V> process, Config config) {
+    ExecutorKey executorKey = config.getExecutorKey();
+    long timeout = config.getOperationTimeoutInMillis();
+    return submit(executorKey, process, timeout, TimeUnit.MILLISECONDS);
+  }
+  
+  /**
+   * Submits the given {@link DHTProcess} for execution and returns
+   * an {@link DHTFuture} for it.
+   */
+  public synchronized <T> DHTFuture<T> submit(ExecutorKey executorKey, 
+      DHTProcess<T> process, long timeout, TimeUnit unit) {
+    
+    if (!open) {
+      throw new IllegalStateException();
     }
     
-    /**
-     * Submits the given {@link DHTProcess} for execution and returns
-     * an {@link DHTFuture} for it.
-     */
-    public synchronized <T> DHTFuture<T> submit(ExecutorKey executorKey, 
-            DHTProcess<T> process, long timeout, TimeUnit unit) {
-        
-        if (!open) {
-            throw new IllegalStateException();
-        }
-        
-        ManagedFutureTask<T> future 
-            = new ManagedFutureTask<T>(process, timeout, unit);
-        
-        DHTExecutor.execute(executorKey, future);
-        futures.add(future);
-        
-        return future;
-    }
+    ManagedFutureTask<T> future 
+      = new ManagedFutureTask<T>(process, timeout, unit);
     
-    /**
-     * Callback for completed {@link DHTFuture}s.
-     */
-    private synchronized void complete(DHTFuture<?> future) {
-        futures.remove(future);
-    }
+    DHTExecutor.execute(executorKey, future);
+    futures.add(future);
     
-    private class ManagedFutureTask<T> extends DHTFutureTask<T> {
-        
-        public ManagedFutureTask(AsyncProcess<T> process, 
-                long timeout, TimeUnit unit) {
-            super(process, timeout, unit);
-        }
+    return future;
+  }
+  
+  /**
+   * Callback for completed {@link DHTFuture}s.
+   */
+  private synchronized void complete(DHTFuture<?> future) {
+    futures.remove(future);
+  }
+  
+  private class ManagedFutureTask<T> extends DHTFutureTask<T> {
+    
+    public ManagedFutureTask(AsyncProcess<T> process, 
+        long timeout, TimeUnit unit) {
+      super(process, timeout, unit);
+    }
 
-        @Override
-        protected void done0() {
-            complete(this);
-            super.done0();
-        }
+    @Override
+    protected void done0() {
+      complete(this);
+      super.done0();
     }
+  }
 }

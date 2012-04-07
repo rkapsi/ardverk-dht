@@ -22,10 +22,10 @@ import org.ardverk.dht.routing.Contact;
 import org.ardverk.dht.rsrc.Value;
 
 public class DefaultValueResponse extends AbstractLookupResponse 
-        implements ValueResponse {
-    
-    public DefaultValueResponse(MessageId messageId, Contact contact, 
-            SocketAddress address, Value value) {
-        super(messageId, contact, address, value);
-    }
+    implements ValueResponse {
+  
+  public DefaultValueResponse(MessageId messageId, Contact contact, 
+      SocketAddress address, Value value) {
+    super(messageId, contact, address, value);
+  }
 }

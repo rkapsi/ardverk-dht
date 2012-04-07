@@ -25,15 +25,15 @@ import org.ardverk.dht.rsrc.Value;
  * An abstract implementation of {@link LookupResponse}.
  */
 abstract class AbstractLookupResponse extends AbstractResponseMessage 
-        implements LookupResponse {
-    
-    public AbstractLookupResponse(MessageId messageId, 
-            Contact contact, SocketAddress address) {
-        super(messageId, contact, address);
-    }
+    implements LookupResponse {
+  
+  public AbstractLookupResponse(MessageId messageId, 
+      Contact contact, SocketAddress address) {
+    super(messageId, contact, address);
+  }
 
-    public AbstractLookupResponse(MessageId messageId, Contact contact,
-            SocketAddress address, Value value) {
-        super(messageId, contact, address, value);
-    }
+  public AbstractLookupResponse(MessageId messageId, Contact contact,
+      SocketAddress address, Value value) {
+    super(messageId, contact, address, value);
+  }
 }

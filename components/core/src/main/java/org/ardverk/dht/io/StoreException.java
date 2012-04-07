@@ -28,32 +28,32 @@ import org.ardverk.dht.rsrc.Value;
  * be stored in the DHT at all.
  */
 public class StoreException extends DHTException {
-    
-    private static final long serialVersionUID = -1874658787780091708L;
+  
+  private static final long serialVersionUID = -1874658787780091708L;
 
-    private final Key key;
+  private final Key key;
+  
+  private final Value value;
+  
+  public StoreException(Key key, Value value, 
+      long time, TimeUnit unit) {
+    super(time, unit);
     
-    private final Value value;
-    
-    public StoreException(Key key, Value value, 
-            long time, TimeUnit unit) {
-        super(time, unit);
-        
-        this.key = key;
-        this.value = value;
-    }
+    this.key = key;
+    this.value = value;
+  }
 
-    /**
-     * Returns the {@link Key} that failed to be stored.
-     */
-    public Key getKey() {
-        return key;
-    }
-    
-    /**
-     * Returns the {@link Value} that failed to be stored.
-     */
-    public Value getValue() {
-        return value;
-    }
+  /**
+   * Returns the {@link Key} that failed to be stored.
+   */
+  public Key getKey() {
+    return key;
+  }
+  
+  /**
+   * Returns the {@link Value} that failed to be stored.
+   */
+  public Value getValue() {
+    return value;
+  }
 }

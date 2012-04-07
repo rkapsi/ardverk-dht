@@ -39,116 +39,116 @@ import org.ardverk.dht.ui.Painter.EventType;
 
 
 public class PainterPanel extends JPanel {
-    
-    private static final long serialVersionUID = -8406331670508490192L;
+  
+  private static final long serialVersionUID = -8406331670508490192L;
 
-    private static final int FREQUENCY = 100;
-    
-    private final Timer timer = new Timer(FREQUENCY, new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            repaint();
-        }
-    });
-    
-    private final MessageListener listener = new MessageListener() {
-        @Override
-        public void handleMessageSent(KUID contactId, Message message) {
-            PainterPanel.this.handleMessageSent(contactId, message);
-        }
-        
-        @Override
-        public void handleMessageReceived(Message message) {
-            PainterPanel.this.handleMessageReceived(message);
-        }
-    };
-    
-    private final List<Painter> painters = new ArrayList<Painter>();
-    
-    private final DHT dht;
-    
-    private volatile int current = 0;
-    
-    public PainterPanel(DHT dht) {
-        this.dht = dht;
-        
-        Contact localhost = dht.getIdentity();
-        KUID localhostId = localhost.getId();
-        
-        painters.add(new JuicePainter(localhostId));
-        painters.add(new SquashPainter(localhostId));
-        
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (!painters.isEmpty()) {
-                    current = (current + 1) % painters.size();
-                    repaint();
-                }
-            }
-        });
+  private static final int FREQUENCY = 100;
+  
+  private final Timer timer = new Timer(FREQUENCY, new ActionListener() {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      repaint();
     }
-    
-    public boolean isRunning() {
-        return timer.isRunning();
-    }
-    
-    public void start() {
-        if (!isRunning()) {
-            timer.start();
-            ((ArdverkDHT)dht).getMessageDispatcher().addMessageListener(listener);
-        }
-    }
-    
-    public void stop() {
-        if (isRunning()) {
-            timer.stop();
-            ((ArdverkDHT)dht).getMessageDispatcher().removeMessageListener(listener);
-        }
+  });
+  
+  private final MessageListener listener = new MessageListener() {
+    @Override
+    public void handleMessageSent(KUID contactId, Message message) {
+      PainterPanel.this.handleMessageSent(contactId, message);
     }
     
     @Override
-    public void paint(Graphics g) {
-        g.setColor(Color.BLACK);
-        g.fillRect(0, 0, getWidth(), getHeight());
-        
-        painter().paint(this, g);
+    public void handleMessageReceived(Message message) {
+      PainterPanel.this.handleMessageReceived(message);
     }
+  };
+  
+  private final List<Painter> painters = new ArrayList<Painter>();
+  
+  private final DHT dht;
+  
+  private volatile int current = 0;
+  
+  public PainterPanel(DHT dht) {
+    this.dht = dht;
     
-    private Painter painter() {
-        int current = this.current;
-        if (current < painters.size()) {
-            return painters.get(current);
+    Contact localhost = dht.getIdentity();
+    KUID localhostId = localhost.getId();
+    
+    painters.add(new JuicePainter(localhostId));
+    painters.add(new SquashPainter(localhostId));
+    
+    addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        if (!painters.isEmpty()) {
+          current = (current + 1) % painters.size();
+          repaint();
         }
-        return Nop.INSTANCE;
+      }
+    });
+  }
+  
+  public boolean isRunning() {
+    return timer.isRunning();
+  }
+  
+  public void start() {
+    if (!isRunning()) {
+      timer.start();
+      ((ArdverkDHT)dht).getMessageDispatcher().addMessageListener(listener);
     }
+  }
+  
+  public void stop() {
+    if (isRunning()) {
+      timer.stop();
+      ((ArdverkDHT)dht).getMessageDispatcher().removeMessageListener(listener);
+    }
+  }
+  
+  @Override
+  public void paint(Graphics g) {
+    g.setColor(Color.BLACK);
+    g.fillRect(0, 0, getWidth(), getHeight());
     
-    private void handleMessageSent(KUID contactId, Message message) {
-        handleEvent(EventType.MESSAGE_SENT, contactId, message);
+    painter().paint(this, g);
+  }
+  
+  private Painter painter() {
+    int current = this.current;
+    if (current < painters.size()) {
+      return painters.get(current);
+    }
+    return Nop.INSTANCE;
+  }
+  
+  private void handleMessageSent(KUID contactId, Message message) {
+    handleEvent(EventType.MESSAGE_SENT, contactId, message);
+  }
+
+  private void handleMessageReceived(Message message) {
+    handleEvent(EventType.MESSAGE_RECEIVED, 
+        message.getContact().getId(), message);
+  }
+  
+  private void handleEvent(EventType type, KUID contactId, Message message) {
+    painter().handleEvent(type, contactId, message);
+  }
+  
+  private static class Nop implements Painter {
+
+    private static final Nop INSTANCE = new Nop();
+    
+    private Nop() {}
+    
+    @Override
+    public void paint(Component c, Graphics g) {
     }
 
-    private void handleMessageReceived(Message message) {
-        handleEvent(EventType.MESSAGE_RECEIVED, 
-                message.getContact().getId(), message);
+    @Override
+    public void handleEvent(EventType type, 
+        KUID contactId, Message message) {
     }
-    
-    private void handleEvent(EventType type, KUID contactId, Message message) {
-        painter().handleEvent(type, contactId, message);
-    }
-    
-    private static class Nop implements Painter {
-
-        private static final Nop INSTANCE = new Nop();
-        
-        private Nop() {}
-        
-        @Override
-        public void paint(Component c, Graphics g) {
-        }
-
-        @Override
-        public void handleEvent(EventType type, 
-                KUID contactId, Message message) {
-        }
-    }
+  }
 }

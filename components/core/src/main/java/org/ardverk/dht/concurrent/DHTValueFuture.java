@@ -28,67 +28,67 @@ import org.ardverk.concurrent.EventUtils;
  * @see AsyncValueFuture
  */
 public class DHTValueFuture<V> extends AsyncValueFuture<V> 
-        implements DHTFuture<V> {
+    implements DHTFuture<V> {
 
-    private volatile Object attachment;
+  private volatile Object attachment;
+  
+  public DHTValueFuture() {
+    super();
+  }
+
+  public DHTValueFuture(Throwable t) {
+    super(t);
+  }
+
+  public DHTValueFuture(V value) {
+    super(value);
+  }
+  
+  @Override
+  public void setAttachment(Object attachment) {
+    this.attachment = attachment;
+  }
+
+  @Override
+  public Object getAttachment() {
+    return attachment;
+  }
+
+  @Override
+  public long getTimeout(TimeUnit unit) {
+    return 0;
+  }
+
+  @Override
+  public long getTimeoutInMillis() {
+    return getTimeout(TimeUnit.MILLISECONDS);
+  }
+
+  @Override
+  public boolean isTimeout() {
+    return false;
+  }
+
+  @Override
+  protected boolean isEventThread() {
+    return EventUtils.isEventThread();
+  }
+  
+  @Override
+  protected void fireOperationComplete(final AsyncFutureListener<V> first,
+      final AsyncFutureListener<V>... others) {
     
-    public DHTValueFuture() {
-        super();
-    }
-
-    public DHTValueFuture(Throwable t) {
-        super(t);
-    }
-
-    public DHTValueFuture(V value) {
-        super(value);
+    if (first == null) {
+      return;
     }
     
-    @Override
-    public void setAttachment(Object attachment) {
-        this.attachment = attachment;
-    }
-
-    @Override
-    public Object getAttachment() {
-        return attachment;
-    }
-
-    @Override
-    public long getTimeout(TimeUnit unit) {
-        return 0;
-    }
-
-    @Override
-    public long getTimeoutInMillis() {
-        return getTimeout(TimeUnit.MILLISECONDS);
-    }
-
-    @Override
-    public boolean isTimeout() {
-        return false;
-    }
-
-    @Override
-    protected boolean isEventThread() {
-        return EventUtils.isEventThread();
-    }
+    Runnable event = new Runnable() {
+      @Override
+      public void run() {
+        DHTValueFuture.super.fireOperationComplete(first, others);
+      }
+    };
     
-    @Override
-    protected void fireOperationComplete(final AsyncFutureListener<V> first,
-            final AsyncFutureListener<V>... others) {
-        
-        if (first == null) {
-            return;
-        }
-        
-        Runnable event = new Runnable() {
-            @Override
-            public void run() {
-                DHTValueFuture.super.fireOperationComplete(first, others);
-            }
-        };
-        
-        EventUtils.fireEvent(event);
-    }
+    EventUtils.fireEvent(event);
+  }
 }
