@@ -78,7 +78,7 @@ public class KeyUtils {
     }
     
     String[] arguments = query.split("&");
-    Map<String, String> map = new HashMap<String, String>(arguments.length);
+    Map<String, String> map = new HashMap<>(arguments.length);
     
     for (String argument : arguments) {
       String[] tokens = argument.split("=");

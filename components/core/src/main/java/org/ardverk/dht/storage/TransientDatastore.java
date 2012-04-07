@@ -23,7 +23,7 @@ public class TransientDatastore extends SimpleDatastore {
   private static final Logger LOG 
     = LoggerFactory.getLogger(TransientDatastore.class);
   
-  private final Map<Key, Handle> map = new ConcurrentHashMap<Key, Handle>();
+  private final Map<Key, Handle> map = new ConcurrentHashMap<>();
   
   public TransientDatastore(long frequency, TimeUnit unit) {
     super(frequency, frequency, unit);

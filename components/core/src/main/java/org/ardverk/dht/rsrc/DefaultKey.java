@@ -86,7 +86,7 @@ public class DefaultKey extends AbstractKey {
   
   private static List<String> normalize(String value) {
     String[] tokens = PATTERN.split(value, '/');
-    List<String> dst = new ArrayList<String>(tokens.length);
+    List<String> dst = new ArrayList<>(tokens.length);
     
     for (String token : tokens) {
       String normalized = trim(decodeURL(token), '.');

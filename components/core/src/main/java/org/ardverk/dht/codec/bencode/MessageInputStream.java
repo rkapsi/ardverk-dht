@@ -85,19 +85,14 @@ public class MessageInputStream extends BencodingInputStream {
 
   private static <T extends Enum<T>> T readEnum(Class<T> clazz, 
       String method, Class<?> type, Object value) throws IOException {
+    
     try {
       Method m = clazz.getMethod(method, type);
       return clazz.cast(m.invoke(null, value));
-    } catch (SecurityException e) {
-      throw new IOException("SecurityException", e);
-    } catch (IllegalArgumentException e) {
-      throw new IOException("IllegalArgumentException", e);
-    } catch (NoSuchMethodException e) {
-      throw new IOException("NoSuchMethodException", e);
-    } catch (IllegalAccessException e) {
-      throw new IOException("IllegalAccessException", e);
-    } catch (InvocationTargetException e) {
-      throw new IOException("InvocationTargetException", e);
+    } catch (NoSuchMethodException | SecurityException | IllegalAccessException 
+        | IllegalArgumentException | InvocationTargetException e) {
+      
+      throw new IOException(e.getClass().getSimpleName(), e);
     }
   }
 

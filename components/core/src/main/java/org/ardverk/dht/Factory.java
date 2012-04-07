@@ -37,7 +37,7 @@ public class Factory {
   }
   
   public Injector createInjector(SocketAddress address, Module... modules) {
-    List<Module> m = new ArrayList<Module>();
+    List<Module> m = new ArrayList<>();
     m.add(new ArdverkModule(keySize, address));
     m.addAll(Arrays.asList(modules));
     

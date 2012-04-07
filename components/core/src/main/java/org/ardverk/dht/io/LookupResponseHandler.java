@@ -365,8 +365,7 @@ abstract class LookupResponseHandler<T extends LookupEntity>
      * A history of all {@link KUID}s that were added to the 
      * {@link #query} {@link NavigableSet}.
      */
-    private final Map<KUID, Integer> history 
-      = new HashMap<KUID, Integer>();
+    private final Map<KUID, Integer> history = new HashMap<>();
     
     private int currentHop = 0;
     

@@ -56,8 +56,7 @@ public abstract class KeyFactory {
   }
   
   private static Map<String, KeyFactory> createKeyFactoryMap() {
-    Map<String, KeyFactory> map 
-      = new HashMap<String, KeyFactory>();
+    Map<String, KeyFactory> map = new HashMap<>();
     
     ServiceLoader<KeyFactory> factories 
       = ServiceLoader.load(KeyFactory.class);

@@ -53,8 +53,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
   private static final Logger LOG 
     = LoggerFactory.getLogger(DefaultRouteTable.class);
   
-  private final Map<ContactKey, DHTFuture<PingEntity>> pingFutures 
-    = new HashMap<ContactKey, DHTFuture<PingEntity>>();
+  private final Map<ContactKey, DHTFuture<PingEntity>> pingFutures = new HashMap<>();
   
   private final RouteTableConfig config;
   
@@ -69,7 +68,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
     this.config = config;
     this.localhost = localhost;
     
-    this.buckets = new PatriciaTrie<KUID, DefaultBucket>();
+    this.buckets = new PatriciaTrie<>();
     
     init();
   }
@@ -466,7 +465,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
 
   @Override
   public synchronized Contact[] select(KUID contactId, int count) {
-    List<Contact> dst = new ArrayList<Contact>(count);
+    List<Contact> dst = new ArrayList<>(count);
     selectR(contactId, dst, count);
     return dst.toArray(new Contact[0]);
   }
@@ -611,7 +610,7 @@ public class DefaultRouteTable extends AbstractRouteTable {
    * Returns {@link ContactEntry}ies of the given {@link ContactType}.
    */
   private ContactEntry[] getContacts(boolean active) {
-    List<ContactEntry> contacts = new ArrayList<ContactEntry>();
+    List<ContactEntry> contacts = new ArrayList<>();
     for (DefaultBucket bucket : buckets.values()) {
       
       ContactEntry[] entitis = active ? bucket.getActive() : bucket.getCached();
@@ -708,14 +707,12 @@ public class DefaultRouteTable extends AbstractRouteTable {
     private DefaultBucket(KUID bucketId, int depth) {
       super(bucketId, depth);
       
-      active = new PatriciaTrie<KUID, ContactEntry>();
+      active = new PatriciaTrie<>();
       
       int maxCacheSize = config.getMaxCacheSize();
-      cached = new FixedSizeHashMap<KUID, ContactEntry>(
-          maxCacheSize, maxCacheSize);
+      cached = new FixedSizeHashMap<>(maxCacheSize, maxCacheSize);
       
-      counter = new NetworkCounter(
-          config.getNetworkMask());
+      counter = new NetworkCounter(config.getNetworkMask());
     }
     
     @Override

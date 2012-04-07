@@ -75,11 +75,8 @@ public class QuickenManager {
     
     TimeStamp creationTime = TimeStamp.now();
     
-    List<DHTFuture<PingEntity>> pingFutures 
-      = new ArrayList<DHTFuture<PingEntity>>();
-    
-    List<DHTFuture<NodeEntity>> lookupFutures 
-      = new ArrayList<DHTFuture<NodeEntity>>();
+    List<DHTFuture<PingEntity>> pingFutures = new ArrayList<>();
+    List<DHTFuture<NodeEntity>> lookupFutures = new ArrayList<>();
     
     synchronized (routeTable) {
       int pingCount = (int)(routeTable.getK() * cfg.getPingCount());

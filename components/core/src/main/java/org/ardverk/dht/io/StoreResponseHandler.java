@@ -51,8 +51,7 @@ public class StoreResponseHandler extends AbstractResponseHandler<StoreEntity> {
   
   private final ProcessCounter counter;
   
-  private final List<StoreResponse> responses 
-    = new ArrayList<StoreResponse>();
+  private final List<StoreResponse> responses = new ArrayList<>();
 
   private final TimeStamp creationTime = TimeStamp.now();
   
