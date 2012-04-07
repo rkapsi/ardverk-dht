@@ -12,3 +12,4 @@ datastore
 target
 pom.xml.releaseBackup
 release.properties
+.gradle
