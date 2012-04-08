@@ -40,8 +40,7 @@ import org.ardverk.dht.config.Config;
 @Singleton
 public class FutureManager implements Closeable {
   
-  private final Set<AsyncFuture<?>> futures 
-    = new IdentityHashSet<AsyncFuture<?>>();
+  private final Set<AsyncFuture<?>> futures = new IdentityHashSet<>();
   
   private boolean open = true;
   

@@ -76,7 +76,7 @@ public class DHTValueFuture<V> extends AsyncValueFuture<V>
   
   @Override
   protected void fireOperationComplete(final AsyncFutureListener<V> first,
-      final AsyncFutureListener<V>... others) {
+      @SuppressWarnings("unchecked") final AsyncFutureListener<V>... others) {
     
     if (first == null) {
       return;

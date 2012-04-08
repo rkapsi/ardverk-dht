@@ -46,6 +46,6 @@ public class NopFuture<T> extends DHTValueFuture<T> {
    */
   @Override
   public void addAsyncFutureListener(AsyncFutureListener<T> l) {
-    fireOperationComplete(l);
+    fireOperationComplete(l, (AsyncFutureListener<T>[])null);
   }
 }
