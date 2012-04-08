@@ -54,7 +54,7 @@ public class PingManager {
     this.messageDispatcher = messageDispatcher;
   }
   
-  public DHTFuture<PingEntity> ping(Contact contact, PingConfig... config) {
+  public DHTFuture<PingEntity> ping(Contact contact, PingConfig config) {
     
     PingConfig cfg = configProvider.get(config);
     
@@ -64,7 +64,7 @@ public class PingManager {
   }
   
   public DHTFuture<PingEntity> ping(
-      SocketAddress dst, PingConfig... config) {
+      SocketAddress dst, PingConfig config) {
     
     PingConfig cfg = configProvider.get(config);
     

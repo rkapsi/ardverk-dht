@@ -72,7 +72,7 @@ public class StoreManager {
   }
   
   public DHTFuture<PutEntity> put(final Key key, 
-      final Value value, PutConfig... config) {
+      final Value value, PutConfig config) {
     
     final PutConfig cfg = configProvider.get(config);
     

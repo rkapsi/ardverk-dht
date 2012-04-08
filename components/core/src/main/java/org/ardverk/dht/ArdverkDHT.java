@@ -163,56 +163,55 @@ public class ArdverkDHT extends AbstractDHT {
 
   @Override
   public DHTFuture<BootstrapEntity> bootstrap(
-      String host, int port, BootstrapConfig... config) {
+      String host, int port, BootstrapConfig config) {
     return bootstrapManager.bootstrap(host, port, config);
   }
 
   @Override
   public DHTFuture<BootstrapEntity> bootstrap(
-      InetAddress address, int port, BootstrapConfig... config) {
+      InetAddress address, int port, BootstrapConfig config) {
     return bootstrapManager.bootstrap(address, port, config);
   }
 
   @Override
   public DHTFuture<BootstrapEntity> bootstrap(
-      SocketAddress address, BootstrapConfig... config) {
+      SocketAddress address, BootstrapConfig config) {
     return bootstrapManager.bootstrap(address, config);
   }
   
   @Override
   public DHTFuture<BootstrapEntity> bootstrap(
-      Contact contact, BootstrapConfig... config) {
+      Contact contact, BootstrapConfig config) {
     return bootstrapManager.bootstrap(contact, config);
   }
   
   @Override
-  public DHTFuture<PingEntity> ping(Contact contact, PingConfig... config) {
+  public DHTFuture<PingEntity> ping(Contact contact, PingConfig config) {
     return pingManager.ping(contact, config);
   }
 
   @Override
-  public DHTFuture<PingEntity> ping(SocketAddress dst, PingConfig... config) {
+  public DHTFuture<PingEntity> ping(SocketAddress dst, PingConfig config) {
     return pingManager.ping(dst, config);
   }
 
   @Override
-  public DHTFuture<NodeEntity> lookup(KUID lookupId, NodeConfig... config) {
+  public DHTFuture<NodeEntity> lookup(KUID lookupId, NodeConfig config) {
     return lookupManager.lookup(lookupId, config);
   }
   
   @Override
-  public DHTFuture<ValueEntity> get(Key key, ValueConfig... config) {
+  public DHTFuture<ValueEntity> get(Key key, ValueConfig config) {
     return lookupManager.get(key, config);
   }
 
   @Override
-  public DHTFuture<PutEntity> put(Key key, 
-      Value value, PutConfig... config) {
+  public DHTFuture<PutEntity> put(Key key, Value value, PutConfig config) {
     return storeManager.put(key, value, config);
   }
 
   @Override
-  public DHTFuture<QuickenEntity> quicken(QuickenConfig... config) {
+  public DHTFuture<QuickenEntity> quicken(QuickenConfig config) {
     return quickenManager.quicken(config);
   }
 }

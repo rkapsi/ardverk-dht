@@ -69,7 +69,7 @@ public class QuickenManager {
     this.configProvider = configProvider;
   }
   
-  public DHTFuture<QuickenEntity> quicken(QuickenConfig... config) {
+  public DHTFuture<QuickenEntity> quicken(QuickenConfig config) {
     
     QuickenConfig cfg = configProvider.get(config);
     

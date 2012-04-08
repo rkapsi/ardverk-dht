@@ -69,22 +69,22 @@ public class BootstrapManager {
   }
   
   public DHTFuture<BootstrapEntity> bootstrap(
-      String host, int port, BootstrapConfig... config) {
+      String host, int port, BootstrapConfig config) {
     return bootstrap(NetworkUtils.createResolved(host, port), config);
   }
   
   public DHTFuture<BootstrapEntity> bootstrap(
-      InetAddress address, int port, BootstrapConfig... config) {
+      InetAddress address, int port, BootstrapConfig config) {
     return bootstrap(NetworkUtils.createResolved(address, port), config);
   }
   
   public DHTFuture<BootstrapEntity> bootstrap(
-      Contact contact, BootstrapConfig... config) {
+      Contact contact, BootstrapConfig config) {
     return bootstrap(contact.getRemoteAddress(), config);
   }
   
   public DHTFuture<BootstrapEntity> bootstrap(
-      SocketAddress address, BootstrapConfig... config) {
+      SocketAddress address, BootstrapConfig config) {
     
     BootstrapConfig cfg = configProvider.get(config);
     

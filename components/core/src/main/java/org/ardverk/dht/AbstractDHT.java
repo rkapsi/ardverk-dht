@@ -71,14 +71,12 @@ abstract class AbstractDHT implements DHT, Closeable {
   }
   
   @Override
-  public DHTFuture<PingEntity> ping(InetAddress address, 
-      int port, PingConfig... config) {
+  public DHTFuture<PingEntity> ping(InetAddress address, int port, PingConfig config) {
     return ping(new InetSocketAddress(address, port), config);
   }
   
   @Override
-  public DHTFuture<PingEntity> ping(String address, 
-      int port, PingConfig... config) {
+  public DHTFuture<PingEntity> ping(String address, int port, PingConfig config) {
     return ping(new InetSocketAddress(address, port), config);
   }
   

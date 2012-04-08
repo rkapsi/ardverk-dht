@@ -60,13 +60,13 @@ public class LookupManager {
     this.routeTable = routeTable;
   }
   
-  public DHTFuture<NodeEntity> lookup(KUID lookupId, NodeConfig... config) {
+  public DHTFuture<NodeEntity> lookup(KUID lookupId, NodeConfig config) {
     Contact[] contacts = routeTable.select(lookupId);
     return lookup(contacts, lookupId, config);
   }
   
   public DHTFuture<NodeEntity> lookup(Contact[] contacts, 
-      KUID lookupId, NodeConfig... config) {
+      KUID lookupId, NodeConfig config) {
     
     NodeConfig cfg = configProvider.get(config);
     
@@ -76,13 +76,13 @@ public class LookupManager {
     return futureManager.submit(process, cfg);
   }
   
-  public DHTFuture<ValueEntity> get(Key key, ValueConfig... config) {
+  public DHTFuture<ValueEntity> get(Key key, ValueConfig config) {
     Contact[] contacts = routeTable.select(key.getId());
     return get(contacts, key, config);
   }
   
   public DHTFuture<ValueEntity> get(Contact[] contacts, 
-      Key key, ValueConfig... config) {
+      Key key, ValueConfig config) {
     
     ValueConfig cfg = configProvider.get(config);
     
