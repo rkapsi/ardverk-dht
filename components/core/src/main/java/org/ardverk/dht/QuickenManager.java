@@ -56,15 +56,15 @@ public class QuickenManager {
   
   private final PingManager pingManager;
   
-  private final DiscoveryManager lookupManager;
+  private final DiscoveryManager discoveryManager;
   
   private final RouteTable routeTable;
   
   @Inject
-  QuickenManager(PingManager pingManager, DiscoveryManager lookupManager,
+  QuickenManager(PingManager pingManager, DiscoveryManager discoveryManager,
       RouteTable routeTable, ConfigProvider configProvider) {
     this.pingManager = pingManager;
-    this.lookupManager = lookupManager;
+    this.discoveryManager = discoveryManager;
     this.routeTable = routeTable;
     this.configProvider = configProvider;
   }
@@ -76,7 +76,7 @@ public class QuickenManager {
     TimeStamp creationTime = TimeStamp.now();
     
     List<DHTFuture<PingEntity>> pingFutures = new ArrayList<>();
-    List<DHTFuture<NodeEntity>> lookupFutures = new ArrayList<>();
+    List<DHTFuture<NodeEntity>> discoveryFutures = new ArrayList<>();
     
     synchronized (routeTable) {
       int pingCount = (int)(routeTable.getK() * cfg.getPingCount());
@@ -124,8 +124,8 @@ public class QuickenManager {
             bucket.getId(), bucket.getDepth());
         
         DHTFuture<NodeEntity> future 
-          = lookupManager.discover(randomId, lookupConfig);
-        lookupFutures.add(future);
+          = discoveryManager.discover(randomId, lookupConfig);
+        discoveryFutures.add(future);
       }
     }
     
@@ -135,7 +135,7 @@ public class QuickenManager {
     
     @SuppressWarnings("unchecked")
     DHTFuture<NodeEntity>[] lookups 
-      = lookupFutures.toArray(new DHTFuture[0]);
+      = discoveryFutures.toArray(new DHTFuture[0]);
     
     return new QuickenFuture(creationTime, pings, lookups);
   }
