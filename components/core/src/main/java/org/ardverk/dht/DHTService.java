@@ -42,43 +42,36 @@ interface DHTService {
   /**
    * Sends a {@link MessageType#PING} to the given host.
    */
-  public DHTFuture<PingEntity> ping(
-      String host, int port, PingConfig config);
+  public DHTFuture<PingEntity> ping(String host, int port, PingConfig config);
   
   /**
    * Sends a {@link MessageType#PING} to the given host.
    */
-  public DHTFuture<PingEntity> ping(
-      InetAddress address, int port, PingConfig config);
+  public DHTFuture<PingEntity> ping(InetAddress address, int port, PingConfig config);
   
   /**
    * Sends a {@link MessageType#PING} to the given host.
    */
-  public DHTFuture<PingEntity> ping(
-      SocketAddress address, PingConfig config);
+  public DHTFuture<PingEntity> ping(SocketAddress address, PingConfig config);
   
   /**
    * Sends a {@link MessageType#PING} to the given host.
    */
-  public DHTFuture<PingEntity> ping(
-      Contact dst, PingConfig config);
+  public DHTFuture<PingEntity> ping(Contact dst, PingConfig config);
   
   /**
    * Performs a {@link MessageType#FIND_NODE} lookup in the DHT.
    */
-  public DHTFuture<NodeEntity> lookup(
-      KUID lookupId, NodeConfig config);
+  public DHTFuture<NodeEntity> discover(KUID lookupId, NodeConfig config);
   
   /**
    * Performs a {@link MessageType#FIND_VALUE} lookup in the DHT.
    */
-  public DHTFuture<ValueEntity> get(
-      Key key, ValueConfig config);
+  public DHTFuture<ValueEntity> get(Key key, ValueConfig config);
   
   /**
    * Performs a {@link MessageType#FIND_NODE} lookup followed by 
    * a {@link MessageType#STORE} operation.
    */
-  public DHTFuture<PutEntity> put(Key key, 
-      Value value, PutConfig config);
+  public DHTFuture<PutEntity> put(Key key, Value value, PutConfig config);
 }

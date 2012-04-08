@@ -52,14 +52,14 @@ public class BootstrapManager {
   
   private final PingManager pingManager;
   
-  private final LookupManager lookupManager;
+  private final DiscoveryManager lookupManager;
   
   @Inject
   BootstrapManager(Identity localhost,
       ConfigProvider configProvider,
       FutureManager futureManager, 
       PingManager pingManager, 
-      LookupManager lookupManager) {
+      DiscoveryManager lookupManager) {
     
     this.localhost = localhost;
     this.configProvider = configProvider;
@@ -130,7 +130,7 @@ public class BootstrapManager {
           KUID localhostId = localhost.getId();
           AsyncFuture<NodeEntity> lookupFuture 
             = lookupFutureRef.make(
-                lookupManager.lookup(contacts, 
+                lookupManager.discover(contacts, 
                   localhostId, config.getLookupConfig()));
           
           lookupFuture.addAsyncFutureListener(new AsyncFutureListener<NodeEntity>() {

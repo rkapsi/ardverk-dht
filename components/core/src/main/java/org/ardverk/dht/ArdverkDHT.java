@@ -25,11 +25,11 @@ import javax.inject.Singleton;
 
 import org.ardverk.dht.concurrent.DHTFuture;
 import org.ardverk.dht.config.BootstrapConfig;
-import org.ardverk.dht.config.ValueConfig;
 import org.ardverk.dht.config.NodeConfig;
 import org.ardverk.dht.config.PingConfig;
 import org.ardverk.dht.config.PutConfig;
 import org.ardverk.dht.config.QuickenConfig;
+import org.ardverk.dht.config.ValueConfig;
 import org.ardverk.dht.entity.BootstrapEntity;
 import org.ardverk.dht.entity.NodeEntity;
 import org.ardverk.dht.entity.PingEntity;
@@ -58,7 +58,7 @@ public class ArdverkDHT extends AbstractDHT {
   
   private final StoreManager storeManager;
   
-  private final LookupManager lookupManager;
+  private final DiscoveryManager discoveryManager;
   
   private final PingManager pingManager;
   
@@ -72,7 +72,7 @@ public class ArdverkDHT extends AbstractDHT {
       BootstrapManager bootstrapManager,
       QuickenManager quickenManager,
       StoreManager storeManager,
-      LookupManager lookupManager,
+      DiscoveryManager discoveryManager,
       MessageDispatcher messageDispatcher) {
     super(routeTable, datastore, futureManager);
     
@@ -82,12 +82,11 @@ public class ArdverkDHT extends AbstractDHT {
     this.bootstrapManager = bootstrapManager;
     this.quickenManager = quickenManager;
     this.storeManager = storeManager;
-    this.lookupManager = lookupManager;
+    this.discoveryManager = discoveryManager;
     
     BindableUtils.bind(routeTable, new RouteTable.ContactPinger() {
       @Override
-      public DHTFuture<PingEntity> ping(Contact contact,
-          PingConfig config) {
+      public DHTFuture<PingEntity> ping(Contact contact, PingConfig config) {
         return ArdverkDHT.this.ping(contact, config);
       }
     });
@@ -133,10 +132,10 @@ public class ArdverkDHT extends AbstractDHT {
   }
   
   /**
-   * Returns the {@link LookupManager}.
+   * Returns the {@link DiscoveryManager}.
    */
-  public LookupManager getLookupManager() {
-    return lookupManager;
+  public DiscoveryManager getDiscoveryManager() {
+    return discoveryManager;
   }
   
   /**
@@ -196,13 +195,13 @@ public class ArdverkDHT extends AbstractDHT {
   }
 
   @Override
-  public DHTFuture<NodeEntity> lookup(KUID lookupId, NodeConfig config) {
-    return lookupManager.lookup(lookupId, config);
+  public DHTFuture<NodeEntity> discover(KUID lookupId, NodeConfig config) {
+    return discoveryManager.discover(lookupId, config);
   }
   
   @Override
   public DHTFuture<ValueEntity> get(Key key, ValueConfig config) {
-    return lookupManager.get(key, config);
+    return discoveryManager.get(key, config);
   }
 
   @Override

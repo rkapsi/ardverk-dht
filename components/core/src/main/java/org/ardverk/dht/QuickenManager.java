@@ -56,12 +56,12 @@ public class QuickenManager {
   
   private final PingManager pingManager;
   
-  private final LookupManager lookupManager;
+  private final DiscoveryManager lookupManager;
   
   private final RouteTable routeTable;
   
   @Inject
-  QuickenManager(PingManager pingManager, LookupManager lookupManager,
+  QuickenManager(PingManager pingManager, DiscoveryManager lookupManager,
       RouteTable routeTable, ConfigProvider configProvider) {
     this.pingManager = pingManager;
     this.lookupManager = lookupManager;
@@ -124,7 +124,7 @@ public class QuickenManager {
             bucket.getId(), bucket.getDepth());
         
         DHTFuture<NodeEntity> future 
-          = lookupManager.lookup(randomId, lookupConfig);
+          = lookupManager.discover(randomId, lookupConfig);
         lookupFutures.add(future);
       }
     }

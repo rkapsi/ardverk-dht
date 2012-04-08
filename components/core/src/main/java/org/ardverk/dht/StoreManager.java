@@ -51,7 +51,7 @@ public class StoreManager {
   
   private final FutureManager futureManager;
   
-  private final LookupManager lookupManager;
+  private final DiscoveryManager discoveryManager;
   
   private final RouteTable routeTable;
   
@@ -61,11 +61,11 @@ public class StoreManager {
   StoreManager(ConfigProvider configProvider, 
       RouteTable routeTable, 
       FutureManager futureManager, 
-      LookupManager lookupManager,
+      DiscoveryManager discoveryManager,
       Provider<MessageDispatcher> messageDispatcher) {
     
     this.futureManager = futureManager;
-    this.lookupManager = lookupManager;
+    this.discoveryManager = discoveryManager;
     this.routeTable = routeTable;
     this.messageDispatcher = messageDispatcher;
     this.configProvider = configProvider;
@@ -107,7 +107,7 @@ public class StoreManager {
       
       // Start the lookup for the given KUID
       final DHTFuture<NodeEntity> lookupFuture 
-        = lookupManager.lookup(key.getId(), 
+        = discoveryManager.discover(key.getId(), 
             cfg.getLookupConfig());
       
       // Let's wait for the result of the FIND_NODE operation. On success we're 

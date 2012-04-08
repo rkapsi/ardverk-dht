@@ -35,10 +35,10 @@ import org.ardverk.dht.routing.RouteTable;
 import org.ardverk.dht.rsrc.Key;
 
 /**
- * The {@link LookupManager} manages FIND_NODE and FIND_VALUE lookups.
+ * The {@link DiscoveryManager} manages FIND_NODE and FIND_VALUE lookups.
  */
 @Singleton
-public class LookupManager {
+public class DiscoveryManager {
 
   private final ConfigProvider configProvider;
   
@@ -49,7 +49,7 @@ public class LookupManager {
   private final RouteTable routeTable;
   
   @Inject
-  LookupManager(ConfigProvider configProvider,
+  DiscoveryManager(ConfigProvider configProvider,
       RouteTable routeTable, 
       FutureManager futureManager, 
       Provider<MessageDispatcher> messageDispatcher) {
@@ -60,12 +60,12 @@ public class LookupManager {
     this.routeTable = routeTable;
   }
   
-  public DHTFuture<NodeEntity> lookup(KUID lookupId, NodeConfig config) {
+  public DHTFuture<NodeEntity> discover(KUID lookupId, NodeConfig config) {
     Contact[] contacts = routeTable.select(lookupId);
-    return lookup(contacts, lookupId, config);
+    return discover(contacts, lookupId, config);
   }
   
-  public DHTFuture<NodeEntity> lookup(Contact[] contacts, 
+  public DHTFuture<NodeEntity> discover(Contact[] contacts, 
       KUID lookupId, NodeConfig config) {
     
     NodeConfig cfg = configProvider.get(config);

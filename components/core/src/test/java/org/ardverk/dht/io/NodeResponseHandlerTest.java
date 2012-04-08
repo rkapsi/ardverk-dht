@@ -133,7 +133,7 @@ public class NodeResponseHandlerTest {
       config.setLookupTimeout(20L, TimeUnit.SECONDS);
       
       DHTFuture<NodeEntity> future 
-        = first.lookup(lookupId, config);
+        = first.discover(lookupId, config);
       NodeEntity entity = future.get();
       TestCase.assertEquals(lookupId, entity.getId());
       
